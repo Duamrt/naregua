@@ -624,6 +624,7 @@ function renderApptCard(a) {
   const timeStr = hora.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
   const svcName = svc ? svc.name : '—';
   const svcPrice = svc ? formatMoney(svc.price) : '';
+  const isDiaInteiro = svc && svc.blocks_all_day;
   const phone = (a.client_phone || '').replace(/\D/g, '');
 
   const statusMap = {
@@ -673,7 +674,7 @@ function renderApptCard(a) {
       <span class="appt-status ${st.cls}">${st.label}</span>
     </div>
     <div class="barber-appt-client">${esc(a.client_name)}</div>
-    <div class="barber-appt-svc">${svcName} · ${svcPrice}</div>
+    <div class="barber-appt-svc">${svcName} · ${svcPrice}${isDiaInteiro ? ' · <span style="color:#9b59b6;font-weight:700;">DIA INTEIRO</span>' : ''}</div>
     ${a.client_phone ? `<div class="barber-appt-svc">📱 ${a.client_phone}</div>` : ''}
     ${actions ? `<div class="barber-appt-actions">${actions}</div>` : ''}
   </div>`;
@@ -694,7 +695,14 @@ function updateStatus(id, status, btnEl) {
 
   btnEl.textContent = '...';
   btnEl.disabled = true;
-  db.from('appointments').update({ status }).eq('id', id).then(() => renderDay());
+
+  // Se tem group_id, atualiza todo o grupo junto
+  const appt = dayAppointments.find(a => a.id === id);
+  if (appt && appt.group_id) {
+    db.from('appointments').update({ status }).eq('group_id', appt.group_id).then(() => renderDay());
+  } else {
+    db.from('appointments').update({ status }).eq('id', id).then(() => renderDay());
+  }
 }
 
 function excluirAgendamento(id, btnEl) {
@@ -708,8 +716,18 @@ function excluirAgendamento(id, btnEl) {
 
   btnEl.textContent = '...';
   btnEl.disabled = true;
-  db.from('appointments').delete().eq('id', id).then(() => {
-    dayAppointments = dayAppointments.filter(a => a.id !== id);
+
+  const appt = dayAppointments.find(a => a.id === id);
+  const deletePromise = appt && appt.group_id
+    ? db.from('appointments').delete().eq('group_id', appt.group_id)
+    : db.from('appointments').delete().eq('id', id);
+
+  deletePromise.then(() => {
+    if (appt && appt.group_id) {
+      dayAppointments = dayAppointments.filter(a => a.group_id !== appt.group_id);
+    } else {
+      dayAppointments = dayAppointments.filter(a => a.id !== id);
+    }
     renderFilters();
     renderAppointments();
   });

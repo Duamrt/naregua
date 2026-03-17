@@ -376,17 +376,36 @@ function showStep(n) {
 
 function agNext(step) {
   if (step === 2 && !selectedService) { return; }
+  // Dia inteiro: pula barbeiro, vai direto pra data
+  if (step === 2 && selectedService.blocks_all_day) {
+    selectedBarber = barbers[0]; // placeholder, vai usar todos
+    renderDates();
+    showStep(3);
+    return;
+  }
   if (step === 3 && !selectedBarber) { return; }
-  if (step === 4 && (!selectedDate || !selectedTime)) { return; }
+  if (step === 4 && !selectedDate) { return; }
+  if (step === 4 && !selectedService.blocks_all_day && !selectedTime) { return; }
   if (step === 4) renderResumo();
   showStep(step);
 }
 
-function agBack(step) { showStep(step); }
+function agBack(step) {
+  // Se dia inteiro e voltando do step 3, pula o step 2 (barbeiro)
+  if (step === 2 && selectedService && selectedService.blocks_all_day) {
+    showStep(1);
+    return;
+  }
+  showStep(step);
+}
 
 // ── Categorização automática de serviços ──────────────────────
 function categorizar(nome) {
   const n = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  // Pacotes dia inteiro
+  if (n.includes('dia da noiva') || n.includes('dia de noiva') || n.includes('pacote noiva'))
+    return 'pacotes';
 
   // Combos (tem "+")
   if (n.includes('+'))
@@ -414,6 +433,10 @@ function categorizar(nome) {
   if (n.includes('hidrata') || n.includes('limpeza') || n.includes('selagem') || n.includes('massagem') || n.includes('alisamento') || n.includes('cauterizacao') || n.includes('botox'))
     return 'tratamentos';
 
+  // Maquiagem
+  if (n.includes('maquiagem') || n.includes('make'))
+    return 'maquiagem';
+
   // Sobrancelha / depilação
   if (n.includes('sobrancelha') || n.includes('depilacao') || n.includes('cilios'))
     return 'estetica';
@@ -434,6 +457,7 @@ const CAT_LABELS = {
   // Salão
   cabelo: 'Cabelo', estetica: 'Estética',
   // Comum
+  maquiagem: 'Maquiagem', pacotes: 'Pacotes',
   tratamentos: 'Tratamentos', outros: 'Outros'
 };
 
@@ -479,7 +503,7 @@ function renderServices() {
          onclick="selectService('${s.id}')">
       <div>
         <div class="name">${esc(s.name)}</div>
-        <div class="detail">${s.duration_min} min</div>
+        <div class="detail">${s.blocks_all_day ? 'Dia inteiro — equipe exclusiva' : s.duration_min + ' min'}</div>
       </div>
       <div class="price">${formatMoney(s.price)}</div>
     </div>
@@ -568,6 +592,33 @@ async function renderTimes() {
     return;
   }
 
+  // ── Dia inteiro: sem grade de horário ──
+  if (selectedService.blocks_all_day) {
+    label.textContent = `Disponibilidade para ${selectedDate.split('-').reverse().join('/')}`;
+
+    // Checar se QUALQUER profissional tem agendamento nesse dia
+    const { data: dayAppts } = await sb
+      .from('appointments')
+      .select('id')
+      .eq('barbershop_id', shop.id)
+      .gte('scheduled_at', selectedDate + 'T00:00:00')
+      .lte('scheduled_at', selectedDate + 'T23:59:59')
+      .in('status', ['pending', 'confirmed']);
+
+    if ((dayAppts || []).length > 0) {
+      selectedTime = null;
+      el.innerHTML = '<div style="font-size:12px;color:#e74c3c;grid-column:1/-1;text-align:center;padding:20px 0;font-weight:600;">Este dia já tem agendamentos. Escolha outro dia.</div>';
+    } else {
+      selectedTime = shop.opening_time || '08:00';
+      el.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:20px 0;">
+        <div style="font-size:32px;margin-bottom:8px;">👰</div>
+        <div style="font-size:14px;font-weight:700;color:var(--verde-acao);margin-bottom:4px;">Dia disponível!</div>
+        <div style="font-size:12px;color:var(--texto-muted);">Toda a equipe será reservada exclusivamente para você neste dia.</div>
+      </div>`;
+    }
+    return;
+  }
+
   label.textContent = `Horários para ${selectedDate.split('-').reverse().join('/')}`;
 
   // Buscar agendamentos do dia (pra saber quais estão ocupados)
@@ -643,22 +694,24 @@ function selectTime(t) {
 function renderResumo() {
   const dateFormatted = selectedDate.split('-').reverse().join('/');
   const el = document.getElementById('resumo-content');
+  const isDiaInteiro = selectedService.blocks_all_day;
+
   el.innerHTML = `
     <div class="resumo-item">
       <span class="resumo-label">Serviço</span>
       <span class="resumo-valor">${esc(selectedService.name)}</span>
     </div>
-    <div class="resumo-item">
+    ${isDiaInteiro ? '' : `<div class="resumo-item">
       <span class="resumo-label">Profissional</span>
       <span class="resumo-valor">${esc(selectedBarber.name)}</span>
-    </div>
+    </div>`}
     <div class="resumo-item">
       <span class="resumo-label">Data</span>
       <span class="resumo-valor">${dateFormatted}</span>
     </div>
     <div class="resumo-item">
-      <span class="resumo-label">Horário</span>
-      <span class="resumo-valor">${selectedTime}</span>
+      <span class="resumo-label">${isDiaInteiro ? 'Tipo' : 'Horário'}</span>
+      <span class="resumo-valor">${isDiaInteiro ? 'Dia inteiro — equipe exclusiva' : selectedTime}</span>
     </div>
     <div class="resumo-item">
       <span class="resumo-label">Valor</span>
@@ -683,6 +736,77 @@ async function confirmarAgendamento() {
   msgEl.className = 'msg';
 
   const scheduledAt = new Date(selectedDate + 'T' + selectedTime + ':00');
+  const isDiaInteiro = selectedService.blocks_all_day;
+
+  // ── Dia inteiro: verificar se dia ainda está livre ──
+  if (isDiaInteiro) {
+    const { data: dayCheck } = await sb
+      .from('appointments')
+      .select('id')
+      .eq('barbershop_id', shop.id)
+      .gte('scheduled_at', selectedDate + 'T00:00:00')
+      .lte('scheduled_at', selectedDate + 'T23:59:59')
+      .in('status', ['pending', 'confirmed']);
+
+    if ((dayCheck || []).length > 0) {
+      btn.disabled = false;
+      btn.querySelector('.btn-label').style.display = 'inline';
+      btn.querySelector('.spinner').style.display = 'none';
+      showAgMsg('Este dia acabou de ser ocupado. Escolha outro.', 'error');
+      await renderTimes();
+      agBack(3);
+      return;
+    }
+
+    // Inserir 1 appointment por barbeiro com mesmo group_id
+    const groupId = crypto.randomUUID();
+    const payload = barbers.map(b => ({
+      barbershop_id: shop.id,
+      barber_id: b.id,
+      service_id: selectedService.id,
+      client_name: nome,
+      client_phone: phone,
+      scheduled_at: scheduledAt.toISOString(),
+      status: 'pending',
+      group_id: groupId
+    }));
+
+    const { error } = await sb.from('appointments').insert(payload);
+
+    btn.disabled = false;
+    btn.querySelector('.btn-label').style.display = 'inline';
+    btn.querySelector('.spinner').style.display = 'none';
+
+    if (error) {
+      console.error(error);
+      showAgMsg('Erro ao agendar. Tente novamente.', 'error');
+      return;
+    }
+
+    // Sucesso dia inteiro
+    const dateFormatted = selectedDate.split('-').reverse().join('/');
+    document.getElementById('success-msg').textContent =
+      `${selectedService.name}\n${dateFormatted} — Dia inteiro`;
+
+    const shopPhone = (shop.phone || '').replace(/\D/g, '');
+    const waText = 'Ola! Agendei pelo NaRegua:\n\n'
+      + 'Servico: ' + selectedService.name + '\n'
+      + 'Data: ' + dateFormatted + ' (dia inteiro)\n'
+      + 'Nome: ' + nome + '\n'
+      + 'WhatsApp: ' + phone;
+    const waLink = document.getElementById('whatsapp-link');
+    if (shopPhone) {
+      waLink.href = `https://wa.me/55${shopPhone}?text=${encodeURIComponent(waText)}`;
+      waLink.style.display = 'flex';
+    } else {
+      waLink.style.display = 'none';
+    }
+
+    showStep(5);
+    return;
+  }
+
+  // ── Agendamento normal ──
   const duration = selectedService.duration_min || 30;
   const slotEnd = new Date(scheduledAt.getTime() + duration * 60000);
 

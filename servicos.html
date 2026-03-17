@@ -127,6 +127,13 @@
         <input type="number" id="svc-duracao" min="5" step="5" placeholder="30">
       </div>
     </div>
+    <div class="field" style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="document.getElementById('svc-diatodo').checked=!document.getElementById('svc-diatodo').checked">
+      <input type="checkbox" id="svc-diatodo" style="width:18px;height:18px;accent-color:var(--verde-acao);cursor:pointer;" onclick="event.stopPropagation()">
+      <div>
+        <div style="font-size:13px;font-weight:600;">Bloqueia dia inteiro</div>
+        <div style="font-size:10px;color:var(--texto-muted);">Ex: Dia da Noiva — reserva toda a equipe no dia</div>
+      </div>
+    </div>
     <button class="btn btn-primary" onclick="salvarServico()" id="btn-svc-save">
       <span class="btn-label">SALVAR</span>
       <div class="spinner" style="display:none;"></div>
@@ -230,7 +237,7 @@ function renderServices() {
       <div class="svc-top">
         <div>
           <div class="svc-name">${esc(s.name)}</div>
-          <div class="svc-meta">${s.duration_min} min · <span class="svc-badge ${badgeCls}">${badgeLabel}</span></div>
+          <div class="svc-meta">${s.blocks_all_day ? 'Dia inteiro' : s.duration_min + ' min'} · <span class="svc-badge ${badgeCls}">${badgeLabel}</span>${s.blocks_all_day ? ' · <span class="svc-badge" style="background:rgba(155,89,182,0.15);color:#9b59b6;">DIA INTEIRO</span>' : ''}</div>
         </div>
         <div class="svc-price">${formatMoney(s.price)}</div>
       </div>
@@ -250,6 +257,7 @@ function abrirModal() {
   document.getElementById('svc-nome').value = '';
   document.getElementById('svc-preco').value = '';
   document.getElementById('svc-duracao').value = '30';
+  document.getElementById('svc-diatodo').checked = false;
   document.getElementById('modal-svc-msg').className = 'msg';
   document.getElementById('modal-svc').classList.add('show');
   setTimeout(() => document.getElementById('svc-nome').focus(), 100);
@@ -263,6 +271,7 @@ function editarServico(id) {
   document.getElementById('svc-nome').value = s.name;
   document.getElementById('svc-preco').value = s.price;
   document.getElementById('svc-duracao').value = s.duration_min;
+  document.getElementById('svc-diatodo').checked = !!s.blocks_all_day;
   document.getElementById('modal-svc-msg').className = 'msg';
   document.getElementById('modal-svc').classList.add('show');
   setTimeout(() => document.getElementById('svc-nome').focus(), 100);
@@ -279,10 +288,11 @@ async function salvarServico() {
   const nome = document.getElementById('svc-nome').value.trim();
   const preco = parseFloat(document.getElementById('svc-preco').value);
   const duracao = parseInt(document.getElementById('svc-duracao').value);
+  const diaInteiro = document.getElementById('svc-diatodo').checked;
 
   if (!nome) { showModalMsg('Informe o nome.', 'error'); return; }
   if (isNaN(preco) || preco < 0) { showModalMsg('Informe o preço.', 'error'); return; }
-  if (isNaN(duracao) || duracao < 5) { showModalMsg('Duração mínima: 5 min.', 'error'); return; }
+  if (!diaInteiro && (isNaN(duracao) || duracao < 5)) { showModalMsg('Duração mínima: 5 min.', 'error'); return; }
 
   btn.disabled = true;
   btn.querySelector('.btn-label').style.display = 'none';
@@ -291,12 +301,12 @@ async function salvarServico() {
   try {
     if (editId) {
       const { error } = await db.from('services').update({
-        name: nome, price: preco, duration_min: duracao
+        name: nome, price: preco, duration_min: diaInteiro ? 480 : duracao, blocks_all_day: diaInteiro
       }).eq('id', editId);
       if (error) throw error;
     } else {
       const { error } = await db.from('services').insert({
-        barbershop_id: shop.id, name: nome, price: preco, duration_min: duracao, active: true
+        barbershop_id: shop.id, name: nome, price: preco, duration_min: diaInteiro ? 480 : duracao, blocks_all_day: diaInteiro, active: true
       });
       if (error) throw error;
     }

@@ -40,6 +40,7 @@ CREATE TABLE services (
   name text NOT NULL,
   price numeric NOT NULL DEFAULT 0,
   duration_min integer NOT NULL DEFAULT 30,
+  blocks_all_day boolean DEFAULT false,
   active boolean DEFAULT true,
   created_at timestamptz DEFAULT now()
 );
@@ -54,6 +55,7 @@ CREATE TABLE appointments (
   client_phone text DEFAULT '',
   scheduled_at timestamptz NOT NULL,
   status text DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'done', 'cancelled')),
+  group_id uuid,
   notes text DEFAULT '',
   created_at timestamptz DEFAULT now()
 );
