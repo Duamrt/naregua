@@ -18,6 +18,7 @@ CREATE TABLE barbershops (
   opening_time time DEFAULT '08:00',
   closing_time time DEFAULT '19:00',
   business_type text DEFAULT 'barbearia',
+  paid_until date,
   interval_min integer DEFAULT 30,
   days_open integer[] DEFAULT '{1,2,3,4,5,6}',
   created_at timestamptz DEFAULT now()
@@ -145,6 +146,10 @@ CREATE POLICY "appointments_owner" ON appointments
 
 CREATE POLICY "appointments_public_insert" ON appointments
   FOR INSERT WITH CHECK (true);
+
+-- Leitura pública de agendamentos ativos (necessário pra conflito e grade de horários)
+CREATE POLICY "appointments_public_read_active" ON appointments
+  FOR SELECT USING (status IN ('pending', 'confirmed'));
 
 -- Payments: só dono da barbearia
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;

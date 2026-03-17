@@ -145,9 +145,12 @@
     <div>
       <img src="img/logo.png" alt="NaRegua" class="logo-img" style="height:76px;filter:brightness(1.8) contrast(1.1);">
     </div>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span class="admin-badge">ADMIN</span>
-      <button onclick="logout()" style="padding:8px 14px;border-radius:8px;border:1px solid var(--borda);background:transparent;color:var(--texto-secundario);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">SAIR</button>
+    <div style="text-align:right;">
+      <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end;">
+        <span class="admin-badge">ADMIN</span>
+        <button onclick="logout()" style="padding:8px 14px;border-radius:8px;border:1px solid var(--borda);background:transparent;color:var(--texto-secundario);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">SAIR</button>
+      </div>
+      <div id="header-date" style="font-size:11px;color:var(--texto-muted);margin-top:4px;"></div>
     </div>
   </div>
 
@@ -206,13 +209,19 @@
       <label>FORMAS DE PAGAMENTO</label>
       <div id="adm-payments" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
     </div>
-    <div class="field">
-      <label>PLANO</label>
-      <select id="adm-plan" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;">
-        <option value="basico">Básico</option>
-        <option value="profissional">Profissional</option>
-        <option value="premium">Premium</option>
-      </select>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="field">
+        <label>PLANO</label>
+        <select id="adm-plan" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;">
+          <option value="basico">Básico</option>
+          <option value="profissional">Profissional</option>
+          <option value="premium">Premium</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>PAGO ATÉ</label>
+        <input type="date" id="adm-paid-until" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;">
+      </div>
     </div>
 
     <div class="modal-section">Horários</div>
@@ -335,6 +344,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // Data no header
+  const hoje = new Date();
+  const meses = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const dias = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  document.getElementById('header-date').textContent = dias[hoje.getDay()] + ', ' + hoje.getDate() + ' de ' + meses[hoje.getMonth()] + ' de ' + hoje.getFullYear();
+
   await loadAll();
 });
 
@@ -399,15 +414,36 @@ function renderShops() {
     const planCls = s.plan === 'premium' ? 'plan-premium' : s.plan === 'profissional' ? 'plan-profissional' : 'plan-basico';
     const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
 
+    // Mensalidade
+    let mensBadge = '';
+    if (s.paid_until) {
+      const hoje = new Date();
+      hoje.setHours(0,0,0,0);
+      const pago = new Date(s.paid_until + 'T00:00:00');
+      const diff = Math.ceil((pago - hoje) / 86400000);
+      if (diff < 0) {
+        mensBadge = `<span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:12px;background:rgba(231,76,60,0.15);color:#e74c3c;">VENCIDO ${Math.abs(diff)}d</span>`;
+      } else if (diff <= 7) {
+        mensBadge = `<span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:12px;background:rgba(243,156,18,0.15);color:#f39c12;">VENCE EM ${diff}d</span>`;
+      } else {
+        mensBadge = `<span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:12px;background:rgba(46,204,113,0.15);color:#2ecc71;">EM DIA</span>`;
+      }
+    } else {
+      mensBadge = `<span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:12px;background:rgba(255,255,255,0.06);color:var(--texto-muted);">SEM INFO</span>`;
+    }
+
     return `<div class="shop-card">
       <div class="shop-top">
         <div>
           <div class="shop-title">${esc(s.name)}</div>
           <div class="shop-slug">${s.slug}</div>
         </div>
-        <span class="shop-plan ${planCls}">${s.plan || 'basico'}</span>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <span class="shop-plan ${planCls}">${s.plan || 'basico'}</span>
+          ${mensBadge}
+        </div>
       </div>
-      <div class="shop-meta">${s.city || '—'}${s.phone ? ' · ' + s.phone : ''} · ${s.opening_time || '08:00'}-${s.closing_time || '19:00'}</div>
+      <div class="shop-meta">${s.city || '—'}${s.phone ? ' · ' + s.phone : ''} · ${s.opening_time || '08:00'}-${s.closing_time || '19:00'}${s.paid_until ? ' · Pago até ' + s.paid_until.split('-').reverse().join('/') : ''}</div>
       <div class="shop-stats">
         <span>Profissionais: <strong>${shopBarbers.length}</strong></span>
         <span>Serviços: <strong>${shopSvcs.length}</strong></span>
@@ -453,6 +489,7 @@ function editarShop(id) {
   editPayments = [...(s.payment_methods || ['dinheiro', 'pix'])];
   renderAdmPayments();
   document.getElementById('adm-plan').value = s.plan || 'basico';
+  document.getElementById('adm-paid-until').value = s.paid_until || '';
   document.getElementById('adm-open').value = s.opening_time || '08:00';
   document.getElementById('adm-close').value = s.closing_time || '19:00';
   editDays = [...(s.days_open || [1,2,3,4,5,6])];
@@ -480,6 +517,9 @@ function abrirNovaShop() {
   editPayments = ['dinheiro', 'pix'];
   renderAdmPayments();
   document.getElementById('adm-plan').value = 'basico';
+  // Pago até: 30 dias a partir de hoje (trial)
+  const trial = new Date(); trial.setDate(trial.getDate() + 30);
+  document.getElementById('adm-paid-until').value = trial.toISOString().split('T')[0];
   document.getElementById('adm-open').value = '08:00';
   document.getElementById('adm-close').value = '19:00';
   editDays = [1,2,3,4,5,6];
@@ -567,6 +607,7 @@ async function salvarAdmin() {
   const instagram = document.getElementById('adm-instagram').value.trim();
   const businessType = document.getElementById('adm-type').value;
   const plan = document.getElementById('adm-plan').value;
+  const paidUntil = document.getElementById('adm-paid-until').value || null;
   const opening = document.getElementById('adm-open').value;
   const closing = document.getElementById('adm-close').value;
   const slug = gerarSlug(name);
@@ -584,7 +625,7 @@ async function salvarAdmin() {
       // Atualizar
       const { error } = await sbAdmin.from('barbershops').update({
         name, slug, city, phone, address, instagram, payment_methods: editPayments,
-        business_type: businessType, plan, opening_time: opening, closing_time: closing, days_open: editDays
+        business_type: businessType, plan, paid_until: paidUntil, opening_time: opening, closing_time: closing, days_open: editDays
       }).eq('id', editId);
       if (error) throw error;
     } else {
@@ -592,8 +633,8 @@ async function salvarAdmin() {
       const { data: { session } } = await sb.auth.getSession();
       const { data, error } = await sbAdmin.from('barbershops').insert({
         owner_id: session.user.id, name, slug, city, phone, address, instagram,
-        payment_methods: editPayments, business_type: businessType, plan, opening_time: opening,
-        closing_time: closing, days_open: editDays
+        payment_methods: editPayments, business_type: businessType, plan, paid_until: paidUntil,
+        opening_time: opening, closing_time: closing, days_open: editDays
       }).select().single();
       if (error) throw error;
       shopId = data.id;
