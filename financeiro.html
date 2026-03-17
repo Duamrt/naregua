@@ -262,6 +262,32 @@ const CAT_LABELS = {
   comissao:'Comissão', imposto:'Imposto', outros:'Outros'
 };
 
+const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs';
+const SB_REST = 'https://jsydprrcyrjjxdmzrqpz.supabase.co/rest/v1';
+const REST_HEADERS = {
+  'apikey': SERVICE_KEY,
+  'Authorization': 'Bearer ' + SERVICE_KEY
+};
+
+async function restGet(table, filter) {
+  const r = await fetch(SB_REST + '/' + table + '?' + filter, { headers: REST_HEADERS });
+  return r.ok ? await r.json() : [];
+}
+
+async function restDeleteRow(table, filter) {
+  await fetch(SB_REST + '/' + table + '?' + filter, {
+    method: 'DELETE', headers: { ...REST_HEADERS, 'Prefer': 'return=representation' }
+  });
+}
+
+async function restInsert(table, data) {
+  const r = await fetch(SB_REST + '/' + table, {
+    method: 'POST', headers: { ...REST_HEADERS, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+    body: JSON.stringify(data)
+  });
+  return r.ok ? await r.json() : null;
+}
+
 const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
 const _params = new URLSearchParams(window.location.search);
 const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_viewing_shop');
@@ -374,25 +400,20 @@ async function renderPeriod() {
     dateEnd = `${y}-${String(m+1).padStart(2,'0')}-${lastDay}`;
   }
 
-  // Buscar atendimentos concluídos
-  const { data: appts } = await db.from('appointments')
-    .select('*')
-    .eq('barbershop_id', shop.id)
-    .eq('status', 'done')
-    .gte('scheduled_at', dateStart + 'T00:00:00')
-    .lte('scheduled_at', dateEnd + 'T23:59:59')
-    .order('scheduled_at', { ascending: true });
+  // Buscar atendimentos concluídos via REST (RLS bloqueia status=done no client anon)
+  const entradas = await restGet('appointments',
+    'barbershop_id=eq.' + shop.id
+    + '&status=eq.done'
+    + '&scheduled_at=gte.' + dateStart + 'T00:00:00'
+    + '&scheduled_at=lte.' + dateEnd + 'T23:59:59'
+    + '&order=scheduled_at.asc');
 
-  // Buscar despesas
-  const { data: expenses } = await db.from('expenses')
-    .select('*')
-    .eq('barbershop_id', shop.id)
-    .gte('date', dateStart)
-    .lte('date', dateEnd)
-    .order('date', { ascending: true });
-
-  const entradas = appts || [];
-  const saidas = expenses || [];
+  // Buscar despesas via REST
+  const saidas = await restGet('expenses',
+    'barbershop_id=eq.' + shop.id
+    + '&date=gte.' + dateStart
+    + '&date=lte.' + dateEnd
+    + '&order=date.asc');
 
   // Calcular totais
   const totalReceita = entradas.reduce((s, a) => {
@@ -494,14 +515,14 @@ async function salvarDespesa() {
   btn.querySelector('.spinner').style.display = 'inline-block';
 
   try {
-    const { error } = await db.from('expenses').insert({
+    const result = await restInsert('expenses', {
       barbershop_id: shop.id,
       description: desc,
       amount: valor,
       date: data,
       category: cat
     });
-    if (error) throw error;
+    if (!result) throw new Error('Falha ao salvar');
 
     fecharModalDespesa();
     await renderPeriod();
@@ -523,7 +544,7 @@ async function excluirDespesa(id, btnEl) {
     setTimeout(() => { btnEl.textContent = '✕'; btnEl.style.color = ''; delete btnEl.dataset.confirming; }, 3000);
     return;
   }
-  await db.from('expenses').delete().eq('id', id);
+  await restDeleteRow('expenses', 'id=eq.' + id);
   await renderPeriod();
 }
 
