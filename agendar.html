@@ -789,11 +789,14 @@ async function confirmarAgendamento() {
       `${selectedService.name}\n${dateFormatted} — Dia inteiro`;
 
     const shopPhone = (shop.phone || '').replace(/\D/g, '');
-    const waText = 'Ola! Agendei pelo NaRegua:\n\n'
-      + 'Servico: ' + selectedService.name + '\n'
-      + 'Data: ' + dateFormatted + ' (dia inteiro)\n'
-      + 'Nome: ' + nome + '\n'
-      + 'WhatsApp: ' + phone;
+    const hora = new Date().getHours();
+    const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
+    const waText = saudacao + '! Acabei de agendar pelo site.\n\n'
+      + '*' + selectedService.name + '*\n'
+      + 'Dia: ' + dateFormatted + ' (dia inteiro)\n\n'
+      + 'Meu nome: ' + nome + '\n'
+      + 'Meu contato: ' + phone + '\n\n'
+      + 'Confirma pra mim?';
     const waLink = document.getElementById('whatsapp-link');
     if (shopPhone) {
       waLink.href = `https://wa.me/55${shopPhone}?text=${encodeURIComponent(waText)}`;
@@ -891,12 +894,15 @@ async function confirmarAgendamento() {
 
   // Link WhatsApp pro dono da barbearia
   const shopPhone = (shop.phone || '').replace(/\D/g, '');
-  const waText = 'Ola! Agendei pelo NaRegua:\n\n'
-    + 'Servico: ' + selectedService.name + '\n'
-    + 'Profissional: ' + selectedBarber.name + '\n'
-    + 'Data: ' + dateFormatted + ' as ' + selectedTime + '\n'
-    + 'Nome: ' + nome + '\n'
-    + 'WhatsApp: ' + phone;
+  const hora = new Date().getHours();
+  const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
+  const waText = saudacao + '! Acabei de agendar pelo site.\n\n'
+    + '*' + selectedService.name + '*\n'
+    + 'Com: ' + selectedBarber.name + '\n'
+    + 'Dia: ' + dateFormatted + ' as ' + selectedTime + '\n\n'
+    + 'Meu nome: ' + nome + '\n'
+    + 'Meu contato: ' + phone + '\n\n'
+    + 'Confirma pra mim?';
   const waMsg = encodeURIComponent(waText);
   const waLink = document.getElementById('whatsapp-link');
   if (shopPhone) {
