@@ -70,6 +70,13 @@
       cursor:pointer; padding:4px 8px;
     }
 
+    .day-btn {
+      padding:8px 12px; border-radius:8px; font-size:12px; font-weight:700;
+      font-family:inherit; cursor:pointer; transition:all .2s; border:1px solid var(--borda);
+      background:transparent; color:var(--texto-muted);
+    }
+    .day-btn.active { border-color:var(--verde-acao); background:rgba(212,168,83,0.15); color:var(--verde-acao); }
+
     .empty-eq {
       text-align:center; padding:40px 20px; color:var(--texto-muted);
     }
@@ -126,6 +133,20 @@
       <input type="number" id="eq-comissao" min="0" max="100" step="1" placeholder="0" value="0">
       <div style="font-size:10px;color:var(--texto-muted);margin-top:4px;">Percentual sobre cada atendimento</div>
     </div>
+    <div class="field">
+      <label>DIAS QUE TRABALHA</label>
+      <div id="eq-dias" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="field">
+        <label>ENTRA ÀS</label>
+        <input type="time" id="eq-hora-inicio" value="08:00">
+      </div>
+      <div class="field">
+        <label>SAI ÀS</label>
+        <input type="time" id="eq-hora-fim" value="19:00">
+      </div>
+    </div>
     <button class="btn btn-primary" onclick="salvar()" id="btn-eq-save">
       <span class="btn-label">SALVAR</span>
       <div class="spinner" style="display:none;"></div>
@@ -158,6 +179,8 @@ console.log('Equipe v1 carregado');
 // ── Estado ────────────────────────────────────────────────────
 let shop = null;
 let barbers = [];
+let editDays = [1,2,3,4,5,6];
+const DIAS_LABEL = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
 const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs';
 const SB_REST = 'https://jsydprrcyrjjxdmzrqpz.supabase.co/rest/v1';
@@ -235,7 +258,13 @@ function renderBarbers() {
     const toggleLabel = b.active ? 'Desativar' : 'Ativar';
     const toggleCls = b.active ? 'toggle-inactive' : 'toggle-active';
     const inicial = b.name.charAt(0).toUpperCase();
-    const comissao = b.commission_pct ? b.commission_pct + '% comissão' : 'Sem comissão';
+    const comissao = b.commission_pct ? b.commission_pct + '%' : '0%';
+    const dias = b.working_days || [];
+    const diasStr = dias.length === 7 ? 'Todos os dias'
+      : dias.length === 6 && !dias.includes(0) ? 'Seg-Sáb'
+      : dias.length > 0 ? dias.map(d => DIAS_LABEL[d]).join(', ')
+      : 'Sem dias definidos';
+    const horario = (b.working_start || '08:00') + ' - ' + (b.working_end || '19:00');
 
     return `<div class="eq-card ${cardCls}">
       <div class="eq-top">
@@ -243,7 +272,8 @@ function renderBarbers() {
           <div class="eq-avatar">${inicial}</div>
           <div>
             <div class="eq-name">${esc(b.name)}</div>
-            <div class="eq-meta">${comissao} · <span class="eq-badge ${badgeCls}">${badgeLabel}</span></div>
+            <div class="eq-meta">${comissao} comissão · <span class="eq-badge ${badgeCls}">${badgeLabel}</span></div>
+            <div class="eq-meta">${diasStr} · ${horario}</div>
           </div>
         </div>
       </div>
@@ -257,11 +287,26 @@ function renderBarbers() {
 }
 
 // ── Modal ─────────────────────────────────────────────────────
+function renderEditDays() {
+  document.getElementById('eq-dias').innerHTML = DIAS_LABEL.map((d, i) =>
+    `<button type="button" class="day-btn ${editDays.includes(i) ? 'active' : ''}" onclick="toggleEditDay(${i})">${d}</button>`
+  ).join('');
+}
+
+function toggleEditDay(i) {
+  editDays = editDays.includes(i) ? editDays.filter(d => d !== i) : [...editDays, i].sort();
+  renderEditDays();
+}
+
 function abrirModal() {
   document.getElementById('modal-eq-title').textContent = 'Novo Profissional';
   document.getElementById('eq-edit-id').value = '';
   document.getElementById('eq-nome').value = '';
   document.getElementById('eq-comissao').value = '0';
+  editDays = shop.days_open || [1,2,3,4,5,6];
+  renderEditDays();
+  document.getElementById('eq-hora-inicio').value = shop.opening_time || '08:00';
+  document.getElementById('eq-hora-fim').value = shop.closing_time || '19:00';
   document.getElementById('modal-eq-msg').className = 'msg';
   document.getElementById('modal-eq').classList.add('show');
   setTimeout(() => document.getElementById('eq-nome').focus(), 100);
@@ -274,6 +319,10 @@ function editar(id) {
   document.getElementById('eq-edit-id').value = b.id;
   document.getElementById('eq-nome').value = b.name;
   document.getElementById('eq-comissao').value = b.commission_pct || 0;
+  editDays = b.working_days || shop.days_open || [1,2,3,4,5,6];
+  renderEditDays();
+  document.getElementById('eq-hora-inicio').value = b.working_start || shop.opening_time || '08:00';
+  document.getElementById('eq-hora-fim').value = b.working_end || shop.closing_time || '19:00';
   document.getElementById('modal-eq-msg').className = 'msg';
   document.getElementById('modal-eq').classList.add('show');
   setTimeout(() => document.getElementById('eq-nome').focus(), 100);
@@ -289,6 +338,8 @@ async function salvar() {
   const editId = document.getElementById('eq-edit-id').value;
   const nome = document.getElementById('eq-nome').value.trim();
   const comissao = parseInt(document.getElementById('eq-comissao').value) || 0;
+  const horaInicio = document.getElementById('eq-hora-inicio').value;
+  const horaFim = document.getElementById('eq-hora-fim').value;
 
   if (!nome) { showModalMsg('Informe o nome.', 'error'); return; }
 
@@ -296,17 +347,22 @@ async function salvar() {
   btn.querySelector('.btn-label').style.display = 'none';
   btn.querySelector('.spinner').style.display = 'inline-block';
 
+  const payload = {
+    name: nome, commission_pct: comissao,
+    working_days: editDays, working_start: horaInicio, working_end: horaFim
+  };
+
   try {
     if (editId) {
       const r = await fetch(SB_REST + '/barbers?id=eq.' + editId, {
         method: 'PATCH', headers: REST_HEADERS,
-        body: JSON.stringify({ name: nome, commission_pct: comissao })
+        body: JSON.stringify(payload)
       });
       if (!r.ok) throw new Error(await r.text());
     } else {
       const r = await fetch(SB_REST + '/barbers', {
         method: 'POST', headers: REST_HEADERS,
-        body: JSON.stringify({ barbershop_id: shop.id, name: nome, commission_pct: comissao, active: true })
+        body: JSON.stringify({ barbershop_id: shop.id, active: true, ...payload })
       });
       if (!r.ok) throw new Error(await r.text());
     }

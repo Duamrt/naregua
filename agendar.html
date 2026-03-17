@@ -523,27 +523,36 @@ function renderBarbers() {
   if (barbers.length === 1) {
     selectedBarber = barbers[0];
   }
-  el.innerHTML = barbers.map(b => `
+  el.innerHTML = barbers.map(b => {
+    const horario = (b.working_start || shop.opening_time || '08:00') + ' - ' + (b.working_end || shop.closing_time || '19:00');
+    return `
     <div class="option-card ${selectedBarber?.id === b.id ? 'selected' : ''}"
          onclick="selectBarber('${b.id}')">
       <div>
         <div class="name">${esc(b.name)}</div>
+        <div class="detail">${horario}</div>
       </div>
       <div style="font-size:18px;">💈</div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 function selectBarber(id) {
   selectedBarber = barbers.find(b => b.id === id);
+  selectedDate = null;
+  selectedTime = null;
   renderBarbers();
+  renderDates();
 }
 
 // ── Datas ─────────────────────────────────────────────────────
 function renderDates() {
   const el = document.getElementById('dates-list');
   const today = new Date();
-  const daysOpen = shop.days_open || [1,2,3,4,5,6];
+  // Usa dias do profissional se tiver, senão da barbearia
+  const daysOpen = (selectedBarber && selectedBarber.working_days && selectedBarber.working_days.length)
+    ? selectedBarber.working_days
+    : (shop.days_open || [1,2,3,4,5,6]);
   let html = '';
   let count = 0;
 
@@ -552,7 +561,7 @@ function renderDates() {
     d.setDate(d.getDate() + i);
     const dow = d.getDay();
 
-    // Só mostrar dias que a barbearia abre
+    // Só mostrar dias que o profissional/barbearia abre
     if (!daysOpen.includes(dow)) continue;
 
     const key = d.toISOString().split('T')[0];
@@ -637,9 +646,11 @@ async function renderTimes() {
 
   appointments = dayAppts || [];
 
-  // Gerar slots
-  const [openH, openM] = (shop.opening_time || '08:00').split(':').map(Number);
-  const [closeH, closeM] = (shop.closing_time || '19:00').split(':').map(Number);
+  // Gerar slots (usa horário do profissional se tiver, senão da barbearia)
+  const barberStart = selectedBarber.working_start || shop.opening_time || '08:00';
+  const barberEnd = selectedBarber.working_end || shop.closing_time || '19:00';
+  const [openH, openM] = barberStart.split(':').map(Number);
+  const [closeH, closeM] = barberEnd.split(':').map(Number);
   const interval = 15; // grade fixa de 15 min — conflito usa duration_min do serviço
   const now = new Date();
   const isToday = selectedDate === now.toISOString().split('T')[0];

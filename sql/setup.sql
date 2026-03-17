@@ -30,6 +30,9 @@ CREATE TABLE barbers (
   barbershop_id uuid REFERENCES barbershops(id) ON DELETE CASCADE NOT NULL,
   name text NOT NULL,
   commission_pct numeric DEFAULT 0,
+  working_days integer[],
+  working_start time,
+  working_end time,
   active boolean DEFAULT true,
   created_at timestamptz DEFAULT now()
 );
