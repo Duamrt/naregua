@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NaRegua — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page-center">
+  <div class="card" style="max-width:480px;text-align:center;">
+    <div class="logo" style="margin-bottom:16px;">Na<span>Regua</span></div>
+    <h2 id="shop-name-display" style="margin-bottom:8px;">Carregando...</h2>
+    <p id="shop-info" style="color:var(--texto-muted);font-size:13px;margin-bottom:24px;"></p>
+
+    <div id="dash-content" style="text-align:left;"></div>
+
+    <button class="btn btn-outline" onclick="logout()" style="margin-top:20px;">SAIR</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/utils.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href = 'index.html'; return; }
+
+  const { data: shop } = await supabase
+    .from('barbershops')
+    .select('*')
+    .eq('owner_id', session.user.id)
+    .maybeSingle();
+
+  if (!shop) { window.location.href = 'onboarding.html'; return; }
+
+  document.getElementById('shop-name-display').textContent = shop.name;
+  document.getElementById('shop-info').textContent = `${shop.city} · ${shop.phone || 'Sem telefone'}`;
+
+  // Buscar serviços e barbeiros
+  const { data: services } = await supabase.from('services').select('*').eq('barbershop_id', shop.id);
+  const { data: barbers } = await supabase.from('barbers').select('*').eq('barbershop_id', shop.id);
+
+  let html = `<div style="background:var(--cinza-medio);border-radius:8px;padding:14px;margin-bottom:12px;">
+    <div style="font-size:11px;color:var(--verde-acao);font-weight:700;margin-bottom:8px;">LINK PÚBLICO DE AGENDAMENTO</div>
+    <div style="font-size:12px;color:var(--texto-secundario);word-break:break-all;">agendar.html?slug=${shop.slug}</div>
+  </div>`;
+
+  html += `<div style="font-size:11px;color:var(--texto-muted);font-weight:700;letter-spacing:1px;margin:16px 0 8px;">SERVIÇOS (${services?.length || 0})</div>`;
+  (services || []).forEach(s => {
+    html += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--borda);font-size:13px;">
+      <span>${s.name}</span>
+      <span style="color:var(--verde-acao);font-weight:700;">${formatMoney(s.price)}</span>
+    </div>`;
+  });
+
+  html += `<div style="font-size:11px;color:var(--texto-muted);font-weight:700;letter-spacing:1px;margin:16px 0 8px;">BARBEIROS (${barbers?.length || 0})</div>`;
+  (barbers || []).forEach(b => {
+    html += `<div style="padding:8px 0;border-bottom:1px solid var(--borda);font-size:13px;">${b.name}</div>`;
+  });
+
+  document.getElementById('dash-content').innerHTML = html;
+});
+
+async function logout() {
+  await supabase.auth.signOut();
+  window.location.href = 'index.html';
+}
+</script>
+</body>
+</html>

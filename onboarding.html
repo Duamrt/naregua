@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NaRegua — Configurar Barbearia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page-center">
+  <div class="card" style="max-width:480px;">
+    <div class="card-header">
+      <div class="logo">Na<span>Regua</span></div>
+      <p>Vamos configurar sua barbearia</p>
+    </div>
+
+    <div id="onboarding-msg" class="msg"></div>
+
+    <!-- Step 1: Dados da barbearia -->
+    <div id="step-1">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
+        <span style="background:var(--verde-acao);color:#000;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;">1</span>
+        <span style="font-size:14px;font-weight:700;">Sua barbearia</span>
+        <span style="font-size:11px;color:var(--texto-muted);margin-left:auto;">Passo 1 de 3</span>
+      </div>
+
+      <div class="field">
+        <label>NOME DA BARBEARIA *</label>
+        <input type="text" id="shop-name" placeholder="Ex: Barbearia do João">
+      </div>
+      <div class="field">
+        <label>CIDADE *</label>
+        <input type="text" id="shop-city" placeholder="Ex: Jupi-PE">
+      </div>
+      <div class="field">
+        <label>WHATSAPP</label>
+        <input type="tel" id="shop-phone" placeholder="(87) 9 9999-9999">
+      </div>
+
+      <button class="btn btn-primary" onclick="goStep2()">
+        <span class="btn-label">CONTINUAR</span>
+      </button>
+    </div>
+
+    <!-- Step 2: Horários -->
+    <div id="step-2" style="display:none;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
+        <span style="background:var(--verde-acao);color:#000;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;">2</span>
+        <span style="font-size:14px;font-weight:700;">Horários de funcionamento</span>
+        <span style="font-size:11px;color:var(--texto-muted);margin-left:auto;">Passo 2 de 3</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="field">
+          <label>ABRE ÀS</label>
+          <input type="time" id="shop-open" value="08:00">
+        </div>
+        <div class="field">
+          <label>FECHA ÀS</label>
+          <input type="time" id="shop-close" value="19:00">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>INTERVALO ENTRE AGENDAMENTOS</label>
+        <select id="shop-interval" style="width:100%;padding:12px 14px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;">
+          <option value="20">20 minutos</option>
+          <option value="30" selected>30 minutos</option>
+          <option value="40">40 minutos</option>
+          <option value="45">45 minutos</option>
+          <option value="60">1 hora</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>DIAS QUE ABRE</label>
+        <div id="days-grid" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+      </div>
+
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-outline" onclick="backStep1()" style="flex:0.4;">VOLTAR</button>
+        <button class="btn btn-primary" onclick="goStep3()" style="flex:0.6;">CONTINUAR</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Serviços -->
+    <div id="step-3" style="display:none;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
+        <span style="background:var(--verde-acao);color:#000;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;">3</span>
+        <span style="font-size:14px;font-weight:700;">Seus serviços</span>
+        <span style="font-size:11px;color:var(--texto-muted);margin-left:auto;">Passo 3 de 3</span>
+      </div>
+
+      <div id="services-list"></div>
+
+      <button class="btn btn-outline" onclick="addServiceRow()" style="margin-bottom:16px;font-size:12px;">
+        + ADICIONAR SERVIÇO
+      </button>
+
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-outline" onclick="backStep2()" style="flex:0.4;">VOLTAR</button>
+        <button class="btn btn-primary" onclick="finishOnboarding()" id="btn-finish" style="flex:0.6;">
+          <span class="btn-label">FINALIZAR</span>
+          <div class="spinner" style="display:none;"></div>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/utils.js"></script>
+<script>
+// ── Verificar sessão ──────────────────────────────────────────
+let currentUser = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href = 'index.html'; return; }
+  currentUser = session.user;
+
+  // Já tem barbearia? Vai pro dashboard
+  const { data: shop } = await supabase
+    .from('barbershops')
+    .select('id')
+    .eq('owner_id', currentUser.id)
+    .maybeSingle();
+  if (shop) { window.location.href = 'dashboard.html'; return; }
+
+  // Preencher nome do user se tiver
+  const nome = currentUser.user_metadata?.nome || '';
+  if (nome) {
+    const nameInput = document.getElementById('shop-name');
+    if (!nameInput.value) nameInput.placeholder = `Ex: Barbearia do ${nome.split(' ')[0]}`;
+  }
+
+  // Dias da semana
+  renderDays();
+  // Serviços padrão
+  addServiceRow('Corte', 25, 30);
+  addServiceRow('Barba', 15, 20);
+  addServiceRow('Corte + Barba', 35, 45);
+});
+
+// ── Steps navigation ──────────────────────────────────────────
+function goStep2() {
+  const name = document.getElementById('shop-name').value.trim();
+  const city = document.getElementById('shop-city').value.trim();
+  if (!name) { showOnbMsg('Informe o nome da barbearia.', 'error'); return; }
+  if (!city) { showOnbMsg('Informe a cidade.', 'error'); return; }
+  hideOnbMsg();
+  document.getElementById('step-1').style.display = 'none';
+  document.getElementById('step-2').style.display = 'block';
+}
+
+function backStep1() {
+  document.getElementById('step-2').style.display = 'none';
+  document.getElementById('step-1').style.display = 'block';
+}
+
+function goStep3() {
+  hideOnbMsg();
+  document.getElementById('step-2').style.display = 'none';
+  document.getElementById('step-3').style.display = 'block';
+}
+
+function backStep2() {
+  document.getElementById('step-3').style.display = 'none';
+  document.getElementById('step-2').style.display = 'block';
+}
+
+// ── Dias da semana ────────────────────────────────────────────
+const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+let selectedDays = [1, 2, 3, 4, 5, 6]; // seg-sab por padrão
+
+function renderDays() {
+  const grid = document.getElementById('days-grid');
+  grid.innerHTML = DIAS.map((d, i) => {
+    const active = selectedDays.includes(i);
+    return `<button type="button" onclick="toggleDay(${i})" style="
+      padding:8px 12px;border-radius:8px;font-size:12px;font-weight:700;
+      font-family:inherit;cursor:pointer;transition:all .2s;
+      border:1px solid ${active ? 'var(--verde-acao)' : 'var(--borda)'};
+      background:${active ? 'rgba(46,204,113,0.15)' : 'transparent'};
+      color:${active ? 'var(--verde-acao)' : 'var(--texto-muted)'};
+    ">${d}</button>`;
+  }).join('');
+}
+
+function toggleDay(i) {
+  if (selectedDays.includes(i)) {
+    selectedDays = selectedDays.filter(d => d !== i);
+  } else {
+    selectedDays.push(i);
+    selectedDays.sort();
+  }
+  renderDays();
+}
+
+// ── Serviços ──────────────────────────────────────────────────
+let serviceCount = 0;
+
+function addServiceRow(nome, preco, duracao) {
+  serviceCount++;
+  const id = serviceCount;
+  const list = document.getElementById('services-list');
+  const row = document.createElement('div');
+  row.id = `svc-${id}`;
+  row.style.cssText = 'display:grid;grid-template-columns:1fr 80px 80px 32px;gap:8px;align-items:end;margin-bottom:10px;';
+  row.innerHTML = `
+    <div class="field" style="margin:0;">
+      <label style="font-size:9px;">SERVIÇO</label>
+      <input type="text" class="svc-name" placeholder="Nome" value="${nome || ''}">
+    </div>
+    <div class="field" style="margin:0;">
+      <label style="font-size:9px;">PREÇO</label>
+      <input type="number" class="svc-price" placeholder="R$" min="0" step="1" value="${preco || ''}">
+    </div>
+    <div class="field" style="margin:0;">
+      <label style="font-size:9px;">MIN</label>
+      <input type="number" class="svc-duration" placeholder="30" min="5" step="5" value="${duracao || ''}">
+    </div>
+    <button type="button" onclick="document.getElementById('svc-${id}').remove()" style="
+      background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.2);
+      border-radius:8px;color:#e74c3c;font-size:16px;cursor:pointer;
+      height:42px;display:flex;align-items:center;justify-content:center;
+    ">✕</button>
+  `;
+  list.appendChild(row);
+}
+
+// ── Finalizar onboarding ──────────────────────────────────────
+async function finishOnboarding() {
+  const btn = document.getElementById('btn-finish');
+  const name = document.getElementById('shop-name').value.trim();
+  const city = document.getElementById('shop-city').value.trim();
+  const phone = document.getElementById('shop-phone').value.trim();
+  const opening = document.getElementById('shop-open').value;
+  const closing = document.getElementById('shop-close').value;
+  const interval = parseInt(document.getElementById('shop-interval').value);
+  const slug = gerarSlug(name);
+
+  // Coletar serviços
+  const svcRows = document.querySelectorAll('#services-list > div');
+  const services = [];
+  svcRows.forEach(row => {
+    const n = row.querySelector('.svc-name').value.trim();
+    const p = parseFloat(row.querySelector('.svc-price').value) || 0;
+    const d = parseInt(row.querySelector('.svc-duration').value) || 30;
+    if (n) services.push({ name: n, price: p, duration_min: d });
+  });
+
+  if (services.length === 0) {
+    showOnbMsg('Adicione pelo menos um serviço.', 'error');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.querySelector('.btn-label').style.display = 'none';
+  btn.querySelector('.spinner').style.display = 'inline-block';
+  hideOnbMsg();
+
+  try {
+    // 1. Criar barbearia
+    const { data: shop, error: errShop } = await supabase
+      .from('barbershops')
+      .insert({
+        owner_id: currentUser.id,
+        name,
+        slug,
+        city: city.toUpperCase(),
+        phone,
+        opening_time: opening,
+        closing_time: closing,
+        interval_min: interval,
+        days_open: selectedDays
+      })
+      .select()
+      .single();
+
+    if (errShop) throw errShop;
+
+    // 2. Criar barbeiro padrão (o próprio dono)
+    const nomeUser = currentUser.user_metadata?.nome || name;
+    await supabase.from('barbers').insert({
+      barbershop_id: shop.id,
+      name: nomeUser.split(' ')[0],
+      commission_pct: 100
+    });
+
+    // 3. Criar serviços
+    const svcPayload = services.map(s => ({
+      barbershop_id: shop.id,
+      name: s.name,
+      price: s.price,
+      duration_min: s.duration_min
+    }));
+    await supabase.from('services').insert(svcPayload);
+
+    // 4. Criar assinatura trial
+    const expires = new Date();
+    expires.setDate(expires.getDate() + 30);
+    await supabase.from('subscriptions').insert({
+      barbershop_id: shop.id,
+      plan: 'basico',
+      expires_at: expires.toISOString()
+    });
+
+    // Redirecionar pro dashboard
+    window.location.href = 'dashboard.html';
+
+  } catch (e) {
+    console.error(e);
+    const msg = e.message?.includes('duplicate')
+      ? 'Já existe uma barbearia com esse nome. Tente outro.'
+      : 'Erro ao cadastrar. Tente novamente.';
+    showOnbMsg(msg, 'error');
+    btn.disabled = false;
+    btn.querySelector('.btn-label').style.display = 'inline';
+    btn.querySelector('.spinner').style.display = 'none';
+  }
+}
+
+// ── Feedback ──────────────────────────────────────────────────
+function showOnbMsg(text, type) {
+  const el = document.getElementById('onboarding-msg');
+  el.textContent = text;
+  el.className = `msg msg-${type} show`;
+}
+function hideOnbMsg() {
+  document.getElementById('onboarding-msg').className = 'msg';
+}
+</script>
+</body>
+</html>
