@@ -613,20 +613,21 @@ function showAdmMsg(text, type) {
 }
 
 // ── Excluir barbearia ─────────────────────────────────────────
+const _confirmingDelete = new Set();
+
 async function excluirShop(id, btnEl) {
-  if (!btnEl.dataset.confirming) {
+  if (!_confirmingDelete.has(id)) {
+    _confirmingDelete.add(id);
     btnEl.textContent = 'Tem certeza?';
     btnEl.style.color = '#e74c3c';
     btnEl.style.borderColor = '#e74c3c';
-    btnEl.dataset.confirming = 'true';
     setTimeout(() => {
-      btnEl.textContent = 'Excluir';
-      btnEl.style.color = '';
-      btnEl.style.borderColor = '';
-      delete btnEl.dataset.confirming;
-    }, 3000);
+      _confirmingDelete.delete(id);
+      if (btnEl) { btnEl.textContent = 'Excluir'; btnEl.style.color = ''; btnEl.style.borderColor = ''; }
+    }, 5000);
     return;
   }
+  _confirmingDelete.delete(id);
   btnEl.textContent = 'Excluindo...';
   btnEl.disabled = true;
 
