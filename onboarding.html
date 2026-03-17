@@ -65,18 +65,6 @@
       </div>
 
       <div class="field">
-        <label>TEMPO DE CADA ATENDIMENTO</label>
-        <select id="shop-interval" style="width:100%;padding:12px 14px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;">
-          <option value="20">20 min (ex: sobrancelha, retoque)</option>
-          <option value="30" selected>30 min (ex: corte simples)</option>
-          <option value="40">40 min (ex: corte + barba)</option>
-          <option value="45">45 min (ex: manicure, coloração)</option>
-          <option value="60">1 hora (ex: combo completo)</option>
-        </select>
-        <div style="font-size:10px;color:var(--texto-muted);margin-top:4px;">Define os horários disponíveis na agenda. Ex: 30 min = 08:00, 08:30, 09:00...</div>
-      </div>
-
-      <div class="field">
         <label>DIAS QUE ABRE</label>
         <div id="days-grid" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
       </div>
@@ -252,7 +240,6 @@ async function finishOnboarding() {
   const phone = document.getElementById('shop-phone').value.trim();
   const opening = document.getElementById('shop-open').value;
   const closing = document.getElementById('shop-close').value;
-  const interval = parseInt(document.getElementById('shop-interval').value);
   const slug = gerarSlug(name);
 
   // Coletar serviços
@@ -287,7 +274,6 @@ async function finishOnboarding() {
         phone,
         opening_time: opening,
         closing_time: closing,
-        interval_min: interval,
         days_open: selectedDays
       })
       .select()

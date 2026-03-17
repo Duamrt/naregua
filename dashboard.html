@@ -344,16 +344,6 @@
       </div>
     </div>
     <div class="field">
-      <label>TEMPO POR ATENDIMENTO</label>
-      <select id="edit-interval" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;">
-        <option value="20">20 min</option>
-        <option value="30">30 min</option>
-        <option value="40">40 min</option>
-        <option value="45">45 min</option>
-        <option value="60">60 min</option>
-      </select>
-    </div>
-    <div class="field">
       <label>DIAS QUE ABRE</label>
       <div class="days-modal" id="edit-days"></div>
     </div>
@@ -756,8 +746,6 @@ function abrirEdicao() {
   document.getElementById('edit-phone').value = shop.phone || '';
   document.getElementById('edit-open').value = shop.opening_time || '08:00';
   document.getElementById('edit-close').value = shop.closing_time || '19:00';
-  document.getElementById('edit-interval').value = shop.interval_min || 30;
-
   editDays = [...(shop.days_open || [1,2,3,4,5,6])];
   renderEditDays();
 
@@ -817,8 +805,6 @@ async function salvarEdicao() {
   const phone = document.getElementById('edit-phone').value.trim();
   const opening = document.getElementById('edit-open').value;
   const closing = document.getElementById('edit-close').value;
-  const interval = parseInt(document.getElementById('edit-interval').value);
-
   if (!name) { showEditMsg('Informe o nome.', 'error'); return; }
 
   btn.disabled = true;
@@ -830,7 +816,7 @@ async function salvarEdicao() {
     const slug = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
     const { error: shopErr } = await db.from('barbershops').update({
       name, slug, city, phone, opening_time: opening, closing_time: closing,
-      interval_min: interval, days_open: editDays
+      days_open: editDays
     }).eq('id', shop.id);
 
     if (shopErr) throw shopErr;

@@ -218,16 +218,6 @@
       </div>
     </div>
     <div class="field">
-      <label>TEMPO POR ATENDIMENTO</label>
-      <select id="adm-interval" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;">
-        <option value="20">20 min</option>
-        <option value="30">30 min</option>
-        <option value="40">40 min</option>
-        <option value="45">45 min</option>
-        <option value="60">60 min</option>
-      </select>
-    </div>
-    <div class="field">
       <label>DIAS</label>
       <div class="days-modal" id="adm-days"></div>
     </div>
@@ -397,8 +387,6 @@ function editarShop(id) {
   document.getElementById('adm-plan').value = s.plan || 'basico';
   document.getElementById('adm-open').value = s.opening_time || '08:00';
   document.getElementById('adm-close').value = s.closing_time || '19:00';
-  document.getElementById('adm-interval').value = s.interval_min || 30;
-
   editDays = [...(s.days_open || [1,2,3,4,5,6])];
   renderAdmDays();
 
@@ -425,8 +413,6 @@ function abrirNovaShop() {
   document.getElementById('adm-plan').value = 'basico';
   document.getElementById('adm-open').value = '08:00';
   document.getElementById('adm-close').value = '19:00';
-  document.getElementById('adm-interval').value = '30';
-
   editDays = [1,2,3,4,5,6];
   renderAdmDays();
 
@@ -517,7 +503,6 @@ async function salvarAdmin() {
   const plan = document.getElementById('adm-plan').value;
   const opening = document.getElementById('adm-open').value;
   const closing = document.getElementById('adm-close').value;
-  const interval = parseInt(document.getElementById('adm-interval').value);
   const slug = gerarSlug(name);
 
   if (!name) { showAdmMsg('Informe o nome.', 'error'); return; }
@@ -533,7 +518,7 @@ async function salvarAdmin() {
       // Atualizar
       const { error } = await sbAdmin.from('barbershops').update({
         name, slug, city, phone, address, instagram, payment_methods: editPayments,
-        plan, opening_time: opening, closing_time: closing, interval_min: interval, days_open: editDays
+        plan, opening_time: opening, closing_time: closing, days_open: editDays
       }).eq('id', editId);
       if (error) throw error;
     } else {
@@ -542,7 +527,7 @@ async function salvarAdmin() {
       const { data, error } = await sbAdmin.from('barbershops').insert({
         owner_id: session.user.id, name, slug, city, phone, address, instagram,
         payment_methods: editPayments, plan, opening_time: opening, closing_time: closing,
-        interval_min: interval, days_open: editDays
+        days_open: editDays
       }).select().single();
       if (error) throw error;
       shopId = data.id;

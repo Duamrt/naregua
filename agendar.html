@@ -560,7 +560,7 @@ async function renderTimes() {
   // Gerar slots
   const [openH, openM] = (shop.opening_time || '08:00').split(':').map(Number);
   const [closeH, closeM] = (shop.closing_time || '19:00').split(':').map(Number);
-  const interval = shop.interval_min || 30;
+  const interval = 15; // grade fixa de 15 min — conflito usa duration_min do serviço
   const now = new Date();
   const isToday = selectedDate === now.toISOString().split('T')[0];
 
