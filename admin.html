@@ -174,6 +174,15 @@
 
     <input type="hidden" id="adm-edit-id">
     <div class="field">
+      <label>TIPO</label>
+      <select id="adm-type" onchange="onAdmTypeChange()" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;">
+        <option value="barbearia">Barbearia</option>
+        <option value="manicure">Manicure</option>
+        <option value="salao">Salão</option>
+        <option value="outro">Outro</option>
+      </select>
+    </div>
+    <div class="field">
       <label>NOME</label>
       <input type="text" id="adm-name">
     </div>
@@ -259,6 +268,46 @@ let editShopServices = [];
 let editDays = [];
 let editPayments = [];
 const PAY_OPTIONS = ['dinheiro', 'pix', 'credito', 'debito'];
+
+const DEFAULT_SERVICES = {
+  barbearia: [
+    { id: null, name: 'Corte', price: 25, duration_min: 30 },
+    { id: null, name: 'Barba', price: 15, duration_min: 20 },
+    { id: null, name: 'Corte + Barba', price: 35, duration_min: 45 },
+    { id: null, name: 'Sobrancelha', price: 10, duration_min: 10 },
+  ],
+  manicure: [
+    { id: null, name: 'Manicure simples', price: 25, duration_min: 40 },
+    { id: null, name: 'Pedicure', price: 30, duration_min: 50 },
+    { id: null, name: 'Manicure + Pedicure', price: 50, duration_min: 80 },
+    { id: null, name: 'Esmaltação em gel', price: 60, duration_min: 60 },
+    { id: null, name: 'Banho de gel', price: 50, duration_min: 60 },
+    { id: null, name: 'Alongamento', price: 120, duration_min: 120 },
+    { id: null, name: 'Francesinha', price: 35, duration_min: 50 },
+    { id: null, name: 'Spa dos pés', price: 40, duration_min: 45 },
+  ],
+  salao: [
+    { id: null, name: 'Corte feminino', price: 40, duration_min: 45 },
+    { id: null, name: 'Escova', price: 30, duration_min: 40 },
+    { id: null, name: 'Progressiva', price: 120, duration_min: 120 },
+    { id: null, name: 'Hidratação', price: 40, duration_min: 40 },
+    { id: null, name: 'Coloração', price: 80, duration_min: 90 },
+    { id: null, name: 'Manicure', price: 25, duration_min: 40 },
+    { id: null, name: 'Pedicure', price: 30, duration_min: 50 },
+    { id: null, name: 'Sobrancelha', price: 15, duration_min: 15 },
+  ],
+  outro: [],
+};
+
+function onAdmTypeChange() {
+  // Só preenche defaults se for novo (sem ID = sem serviços existentes)
+  const editId = document.getElementById('adm-edit-id').value;
+  if (!editId) {
+    const type = document.getElementById('adm-type').value;
+    editShopServices = JSON.parse(JSON.stringify(DEFAULT_SERVICES[type] || []));
+    renderAdmServices();
+  }
+}
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
@@ -377,6 +426,7 @@ function editarShop(id) {
 
   document.getElementById('modal-admin-title').textContent = 'Editar · ' + s.name;
   document.getElementById('adm-edit-id').value = s.id;
+  document.getElementById('adm-type').value = s.business_type || 'barbearia';
   document.getElementById('adm-name').value = s.name || '';
   document.getElementById('adm-city').value = s.city || '';
   document.getElementById('adm-phone').value = s.phone || '';
@@ -403,6 +453,7 @@ function editarShop(id) {
 function abrirNovaShop() {
   document.getElementById('modal-admin-title').textContent = 'Novo Cliente';
   document.getElementById('adm-edit-id').value = '';
+  document.getElementById('adm-type').value = 'barbearia';
   document.getElementById('adm-name').value = '';
   document.getElementById('adm-city').value = '';
   document.getElementById('adm-phone').value = '';
@@ -419,12 +470,8 @@ function abrirNovaShop() {
   editShopBarbers = [];
   renderAdmBarbers();
 
-  editShopServices = [
-    { id: null, name: 'Corte', price: 25, duration_min: 30 },
-    { id: null, name: 'Barba', price: 15, duration_min: 20 },
-    { id: null, name: 'Corte + Barba', price: 35, duration_min: 45 },
-    { id: null, name: 'Sobrancelha', price: 10, duration_min: 10 },
-  ];
+  const type = document.getElementById('adm-type').value;
+  editShopServices = JSON.parse(JSON.stringify(DEFAULT_SERVICES[type] || DEFAULT_SERVICES.barbearia));
   renderAdmServices();
 
   document.getElementById('admin-edit-msg').className = 'msg';
@@ -500,6 +547,7 @@ async function salvarAdmin() {
   const phone = document.getElementById('adm-phone').value.trim();
   const address = document.getElementById('adm-address').value.trim();
   const instagram = document.getElementById('adm-instagram').value.trim();
+  const businessType = document.getElementById('adm-type').value;
   const plan = document.getElementById('adm-plan').value;
   const opening = document.getElementById('adm-open').value;
   const closing = document.getElementById('adm-close').value;
@@ -518,7 +566,7 @@ async function salvarAdmin() {
       // Atualizar
       const { error } = await sbAdmin.from('barbershops').update({
         name, slug, city, phone, address, instagram, payment_methods: editPayments,
-        plan, opening_time: opening, closing_time: closing, days_open: editDays
+        business_type: businessType, plan, opening_time: opening, closing_time: closing, days_open: editDays
       }).eq('id', editId);
       if (error) throw error;
     } else {
@@ -526,8 +574,8 @@ async function salvarAdmin() {
       const { data: { session } } = await sb.auth.getSession();
       const { data, error } = await sbAdmin.from('barbershops').insert({
         owner_id: session.user.id, name, slug, city, phone, address, instagram,
-        payment_methods: editPayments, plan, opening_time: opening, closing_time: closing,
-        days_open: editDays
+        payment_methods: editPayments, business_type: businessType, plan, opening_time: opening,
+        closing_time: closing, days_open: editDays
       }).select().single();
       if (error) throw error;
       shopId = data.id;

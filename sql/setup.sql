@@ -17,6 +17,7 @@ CREATE TABLE barbershops (
   plan_expires_at timestamptz,
   opening_time time DEFAULT '08:00',
   closing_time time DEFAULT '19:00',
+  business_type text DEFAULT 'barbearia',
   interval_min integer DEFAULT 30,
   days_open integer[] DEFAULT '{1,2,3,4,5,6}',
   created_at timestamptz DEFAULT now()

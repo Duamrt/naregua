@@ -387,25 +387,54 @@ function agBack(step) { showStep(step); }
 // ── Categorização automática de serviços ──────────────────────
 function categorizar(nome) {
   const n = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  // Combos (tem "+" ou múltiplos serviços)
-  if (n.includes('+') || (n.includes('barba') && (n.includes('cabelo') || n.includes('corte') || n.includes('degrade') || n.includes('navalhado'))))
+
+  // Combos (tem "+")
+  if (n.includes('+'))
     return 'combos';
-  // Barba
+
+  // Barbearia
+  if (n.includes('barba') && (n.includes('cabelo') || n.includes('corte') || n.includes('degrade') || n.includes('navalhado')))
+    return 'combos';
   if (n.includes('barba') || n.includes('barbaterapia'))
     return 'barba';
+
+  // Manicure / Pedicure
+  if (n.includes('manicure') || n.includes('cutilagem') || n.includes('francesinha') || n.includes('esmaltacao') || n.includes('esmalte'))
+    return 'maos';
+  if (n.includes('pedicure') || n.includes('spa dos pes'))
+    return 'pes';
+  if (n.includes('alongamento') || n.includes('banho de gel') || n.includes('unha') || n.includes('fibra') || n.includes('acrigel'))
+    return 'unhas';
+
+  // Salão
+  if (n.includes('escova') || n.includes('progressiva') || n.includes('coloracao') || n.includes('luzes') || n.includes('tintura') || n.includes('mechas'))
+    return 'cabelo';
+
   // Tratamentos
-  if (n.includes('hidrata') || n.includes('limpeza') || n.includes('selagem') || n.includes('massagem') || n.includes('alisamento'))
+  if (n.includes('hidrata') || n.includes('limpeza') || n.includes('selagem') || n.includes('massagem') || n.includes('alisamento') || n.includes('cauterizacao') || n.includes('botox'))
     return 'tratamentos';
-  // Cortes (default pra tudo com corte/degrade/cabelo/infantil/social/navalhado)
-  return 'cortes';
+
+  // Sobrancelha / depilação
+  if (n.includes('sobrancelha') || n.includes('depilacao') || n.includes('cilios'))
+    return 'estetica';
+
+  // Default: cortes (barbearia) ou geral
+  if (n.includes('corte') || n.includes('degrade') || n.includes('cabelo') || n.includes('infantil') || n.includes('social') || n.includes('navalhado'))
+    return 'cortes';
+
+  return 'outros';
 }
 
 const CAT_LABELS = {
   todos: 'Todos',
-  cortes: 'Cortes',
-  barba: 'Barba',
-  combos: 'Combos',
-  tratamentos: 'Tratamentos'
+  // Barbearia
+  cortes: 'Cortes', barba: 'Barba', combos: 'Combos',
+  // Manicure
+  maos: 'Mãos', pes: 'Pés', unhas: 'Unhas',
+  // Salão
+  cabelo: 'Cabelo', estetica: 'Estética',
+  // Comum
+  tratamentos: 'Tratamentos', outros: 'Outros'
 };
 
 function renderCatFilters() {
@@ -419,7 +448,7 @@ function renderCatFilters() {
     counts[cat] = (counts[cat] || 0) + 1;
   });
 
-  const cats = ['todos', 'cortes', 'barba', 'combos', 'tratamentos'];
+  const cats = Object.keys(CAT_LABELS);
   el.innerHTML = cats.filter(c => (counts[c] || 0) > 0).map(c =>
     `<button class="cat-chip ${selectedCategory === c ? 'active' : ''}" onclick="setCategory('${c}')">
       ${CAT_LABELS[c]}<span class="chip-count">${counts[c]}</span>

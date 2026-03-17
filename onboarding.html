@@ -28,6 +28,10 @@
       </div>
 
       <div class="field">
+        <label>TIPO DE NEGÓCIO *</label>
+        <div id="type-grid" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      </div>
+      <div class="field">
         <label>NOME DO ESTABELECIMENTO *</label>
         <input type="text" id="shop-name" placeholder="Ex: Studio Maria, Barbearia do João">
       </div>
@@ -139,10 +143,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Dias da semana
   renderDays();
-  // Serviços padrão
-  addServiceRow('Corte', 25, 30);
-  addServiceRow('Barba', 15, 20);
-  addServiceRow('Corte + Barba', 35, 45);
+  // Tipo de negócio
+  renderTypes();
+  // Serviços padrão (barbearia por default)
+  loadDefaultServices();
 });
 
 // ── Steps navigation ──────────────────────────────────────────
@@ -198,6 +202,74 @@ function toggleDay(i) {
     selectedDays.sort();
   }
   renderDays();
+}
+
+// ── Tipo de negócio ───────────────────────────────────────────
+const TIPOS = [
+  { key: 'barbearia', label: 'Barbearia', icon: '💈' },
+  { key: 'manicure',  label: 'Manicure',  icon: '💅' },
+  { key: 'salao',     label: 'Salão',     icon: '✂️' },
+  { key: 'outro',     label: 'Outro',     icon: '📋' },
+];
+
+let selectedType = 'barbearia';
+
+const DEFAULT_SERVICES = {
+  barbearia: [
+    { name: 'Corte', price: 25, duration_min: 30 },
+    { name: 'Barba', price: 15, duration_min: 20 },
+    { name: 'Corte + Barba', price: 35, duration_min: 45 },
+  ],
+  manicure: [
+    { name: 'Manicure simples', price: 25, duration_min: 40 },
+    { name: 'Pedicure', price: 30, duration_min: 50 },
+    { name: 'Manicure + Pedicure', price: 50, duration_min: 80 },
+    { name: 'Esmaltação em gel', price: 60, duration_min: 60 },
+    { name: 'Banho de gel', price: 50, duration_min: 60 },
+    { name: 'Alongamento', price: 120, duration_min: 120 },
+    { name: 'Francesinha', price: 35, duration_min: 50 },
+    { name: 'Spa dos pés', price: 40, duration_min: 45 },
+  ],
+  salao: [
+    { name: 'Corte feminino', price: 40, duration_min: 45 },
+    { name: 'Escova', price: 30, duration_min: 40 },
+    { name: 'Progressiva', price: 120, duration_min: 120 },
+    { name: 'Hidratação', price: 40, duration_min: 40 },
+    { name: 'Coloração', price: 80, duration_min: 90 },
+    { name: 'Manicure', price: 25, duration_min: 40 },
+    { name: 'Pedicure', price: 30, duration_min: 50 },
+    { name: 'Sobrancelha', price: 15, duration_min: 15 },
+  ],
+  outro: [],
+};
+
+function renderTypes() {
+  const el = document.getElementById('type-grid');
+  el.innerHTML = TIPOS.map(t =>
+    `<button type="button" onclick="setType('${t.key}')" style="
+      flex:1;min-width:90px;padding:12px 8px;border-radius:10px;font-size:12px;font-weight:700;
+      font-family:inherit;cursor:pointer;transition:all .2s;text-align:center;
+      border:1.5px solid ${selectedType === t.key ? 'var(--verde-acao)' : 'var(--borda)'};
+      background:${selectedType === t.key ? 'rgba(212,168,83,0.1)' : 'transparent'};
+      color:${selectedType === t.key ? 'var(--verde-acao)' : 'var(--texto-muted)'};
+    "><div style="font-size:20px;margin-bottom:4px;">${t.icon}</div>${t.label}</button>`
+  ).join('');
+}
+
+function setType(type) {
+  selectedType = type;
+  renderTypes();
+  loadDefaultServices();
+  // Atualizar placeholder do nome
+  const placeholders = { barbearia: 'Barbearia do João', manicure: 'Studio Maria Nails', salao: 'Salão Beleza Pura', outro: 'Meu Negócio' };
+  document.getElementById('shop-name').placeholder = 'Ex: ' + (placeholders[type] || 'Meu Negócio');
+}
+
+function loadDefaultServices() {
+  document.getElementById('services-list').innerHTML = '';
+  serviceCount = 0;
+  const defaults = DEFAULT_SERVICES[selectedType] || [];
+  defaults.forEach(s => addServiceRow(s.name, s.price, s.duration_min));
 }
 
 // ── Serviços ──────────────────────────────────────────────────
@@ -272,6 +344,7 @@ async function finishOnboarding() {
         slug,
         city: city.toUpperCase(),
         phone,
+        business_type: selectedType,
         opening_time: opening,
         closing_time: closing,
         days_open: selectedDays
