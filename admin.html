@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NaRegua — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .admin-container { max-width:900px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
+
+    .admin-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 0 16px; border-bottom:1px solid var(--borda); margin-bottom:20px;
+    }
+    .admin-header .logo { font-size:20px; }
+    .admin-badge {
+      font-size:9px; font-weight:700; letter-spacing:1px; padding:4px 10px;
+      border-radius:20px; background:rgba(231,76,60,0.15); color:#e74c3c;
+      text-transform:uppercase;
+    }
+
+    /* Stats globais */
+    .global-stats {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
+      gap:10px; margin-bottom:24px;
+    }
+    .g-stat {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:10px;
+      padding:14px; text-align:center;
+    }
+    .g-stat-num { font-size:24px; font-weight:800; }
+    .g-stat-label { font-size:9px; color:var(--texto-muted); font-weight:700; letter-spacing:1px; margin-top:4px; }
+
+    /* Cards de barbearia */
+    .shop-card {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:12px;
+      padding:16px; margin-bottom:12px; transition:all .2s; cursor:pointer;
+    }
+    .shop-card:hover { border-color:var(--borda-hover); transform:translateY(-1px); }
+    .shop-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
+    .shop-title { font-size:16px; font-weight:700; }
+    .shop-slug { font-size:11px; color:var(--verde-acao); margin-top:2px; }
+    .shop-plan {
+      font-size:9px; font-weight:700; letter-spacing:0.5px; padding:4px 10px;
+      border-radius:20px; text-transform:uppercase;
+    }
+    .plan-basico { background:rgba(46,204,113,0.15); color:#2ecc71; }
+    .plan-profissional { background:rgba(52,152,219,0.15); color:#3498db; }
+    .plan-premium { background:rgba(243,156,18,0.15); color:#f39c12; }
+
+    .shop-meta { font-size:12px; color:var(--texto-muted); margin-bottom:8px; }
+    .shop-stats { display:flex; gap:16px; font-size:12px; }
+    .shop-stats span { color:var(--texto-muted); }
+    .shop-stats strong { color:var(--texto-principal); }
+
+    .shop-actions { display:flex; gap:8px; margin-top:12px; }
+    .shop-action-btn {
+      padding:7px 14px; border-radius:8px; border:1px solid var(--borda);
+      background:transparent; color:var(--texto-secundario); font-size:11px;
+      font-weight:600; font-family:inherit; cursor:pointer; transition:all .2s;
+    }
+    .shop-action-btn:hover { border-color:var(--verde-acao); color:var(--verde-acao); }
+    .shop-action-btn.danger:hover { border-color:#e74c3c; color:#e74c3c; }
+
+    /* Modal edição admin */
+    .modal-overlay {
+      position:fixed; top:0; left:0; right:0; bottom:0; z-index:1000;
+      background:rgba(0,0,0,0.7); display:none; align-items:center;
+      justify-content:center; padding:16px;
+    }
+    .modal-overlay.show { display:flex; }
+    .modal {
+      background:var(--cinza-escuro); border:1px solid var(--borda);
+      border-radius:12px; width:100%; max-width:460px; max-height:90vh;
+      overflow-y:auto; padding:24px 20px; animation:fadeUp 0.3s ease;
+    }
+    .modal-title {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:20px;
+    }
+    .modal-title h2 { font-size:16px; }
+    .modal-close {
+      background:none; border:none; color:var(--texto-muted); font-size:18px;
+      cursor:pointer; padding:4px 8px;
+    }
+    .modal-section {
+      font-size:10px; color:var(--texto-muted); font-weight:700;
+      letter-spacing:1.5px; text-transform:uppercase;
+      margin:20px 0 10px; padding-top:16px; border-top:1px solid var(--borda);
+    }
+    .barber-row {
+      display:flex; align-items:center; gap:8px; padding:8px 0;
+      border-bottom:1px solid var(--borda);
+    }
+    .barber-row input {
+      flex:1; padding:8px 10px; background:var(--cinza-medio); border:1px solid var(--borda);
+      border-radius:6px; color:var(--texto-principal); font-size:13px; font-family:inherit;
+    }
+    .barber-row input:focus { border-color:var(--verde-acao); outline:none; }
+    .barber-row-del {
+      background:rgba(231,76,60,0.1); border:1px solid rgba(231,76,60,0.2);
+      border-radius:6px; color:#e74c3c; font-size:14px; cursor:pointer;
+      width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+    }
+    .days-modal { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+    .day-btn {
+      padding:8px 12px; border-radius:8px; font-size:12px; font-weight:700;
+      font-family:inherit; cursor:pointer; transition:all .2s; border:1px solid var(--borda);
+      background:transparent; color:var(--texto-muted);
+    }
+    .day-btn.active { border-color:var(--verde-acao); background:rgba(46,204,113,0.15); color:var(--verde-acao); }
+
+    .empty-admin {
+      text-align:center; padding:60px 20px; color:var(--texto-muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="admin-container">
+
+  <!-- Header -->
+  <div class="admin-header">
+    <div>
+      <div class="logo">Na<span>Regua</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="admin-badge">ADMIN</span>
+      <button class="icon-btn" onclick="logout()" title="Sair" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--borda);background:transparent;color:var(--texto-secundario);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">⏻</button>
+    </div>
+  </div>
+
+  <!-- Stats globais -->
+  <div class="global-stats" id="global-stats"></div>
+
+  <!-- Lista de barbearias -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <h2>Barbearias</h2>
+    <button class="btn btn-primary" onclick="abrirNovaShop()" style="width:auto;padding:8px 16px;font-size:12px;">+ NOVA</button>
+  </div>
+  <div id="shops-list"></div>
+
+</div>
+
+<!-- Modal edição -->
+<div class="modal-overlay" id="modal-admin-edit">
+  <div class="modal">
+    <div class="modal-title">
+      <h2 id="modal-admin-title">Editar Barbearia</h2>
+      <button class="modal-close" onclick="fecharModalAdmin()">✕</button>
+    </div>
+    <div id="admin-edit-msg" class="msg"></div>
+
+    <input type="hidden" id="adm-edit-id">
+    <div class="field">
+      <label>NOME</label>
+      <input type="text" id="adm-name">
+    </div>
+    <div class="field">
+      <label>CIDADE</label>
+      <input type="text" id="adm-city">
+    </div>
+    <div class="field">
+      <label>WHATSAPP</label>
+      <input type="tel" id="adm-phone">
+    </div>
+    <div class="field">
+      <label>PLANO</label>
+      <select id="adm-plan" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;">
+        <option value="basico">Básico</option>
+        <option value="profissional">Profissional</option>
+        <option value="premium">Premium</option>
+      </select>
+    </div>
+
+    <div class="modal-section">Horários</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="field">
+        <label>ABRE</label>
+        <input type="time" id="adm-open">
+      </div>
+      <div class="field">
+        <label>FECHA</label>
+        <input type="time" id="adm-close">
+      </div>
+    </div>
+    <div class="field">
+      <label>INTERVALO</label>
+      <select id="adm-interval" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;">
+        <option value="20">20 min</option>
+        <option value="30">30 min</option>
+        <option value="40">40 min</option>
+        <option value="45">45 min</option>
+        <option value="60">60 min</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>DIAS</label>
+      <div class="days-modal" id="adm-days"></div>
+    </div>
+
+    <div class="modal-section">Barbeiros</div>
+    <div id="adm-barbers"></div>
+    <button class="btn btn-outline" onclick="admAddBarber()" style="margin:10px 0 16px;font-size:12px;">+ BARBEIRO</button>
+
+    <button class="btn btn-primary" onclick="salvarAdmin()" id="btn-adm-save">
+      <span class="btn-label">SALVAR</span>
+      <div class="spinner" style="display:none;"></div>
+    </button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/utils.js"></script>
+<script>
+// ── Config admin — só seu e-mail tem acesso ───────────────────
+const ADMIN_EMAILS = ['duamrt@gmail.com', 'teste@naregua.com'];
+
+// Service key pra acesso total (necessário pra ver todas as barbearias)
+const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs';
+const sbAdmin = window.supabase.createClient(
+  'https://jsydprrcyrjjxdmzrqpz.supabase.co', SERVICE_KEY
+);
+
+let allShops = [];
+let allBarbers = [];
+let allServices = [];
+let allAppointments = [];
+let editShopBarbers = [];
+let editDays = [];
+
+// ── Init ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session || !ADMIN_EMAILS.includes(session.user.email)) {
+    window.location.href = 'index.html';
+    return;
+  }
+
+  await loadAll();
+});
+
+async function loadAll() {
+  const [shopsRes, barbersRes, svcRes, apptsRes] = await Promise.all([
+    sbAdmin.from('barbershops').select('*').order('created_at', { ascending: false }),
+    sbAdmin.from('barbers').select('*'),
+    sbAdmin.from('services').select('*'),
+    sbAdmin.from('appointments').select('*')
+  ]);
+
+  allShops = shopsRes.data || [];
+  allBarbers = barbersRes.data || [];
+  allServices = svcRes.data || [];
+  allAppointments = apptsRes.data || [];
+
+  renderGlobalStats();
+  renderShops();
+}
+
+// ── Stats globais ─────────────────────────────────────────────
+function renderGlobalStats() {
+  const totalShops = allShops.length;
+  const totalBarbers = allBarbers.filter(b => b.active).length;
+  const totalAppts = allAppointments.length;
+  const totalDone = allAppointments.filter(a => a.status === 'done').length;
+  const totalNoShow = allAppointments.filter(a => a.status === 'no_show').length;
+  const revenue = allAppointments.filter(a => a.status === 'done').reduce((s, a) => {
+    const svc = allServices.find(sv => sv.id === a.service_id);
+    return s + (svc ? Number(svc.price) : 0);
+  }, 0);
+
+  document.getElementById('global-stats').innerHTML = `
+    <div class="g-stat"><div class="g-stat-num" style="color:var(--verde-acao);">${totalShops}</div><div class="g-stat-label">BARBEARIAS</div></div>
+    <div class="g-stat"><div class="g-stat-num" style="color:var(--texto-principal);">${totalBarbers}</div><div class="g-stat-label">BARBEIROS</div></div>
+    <div class="g-stat"><div class="g-stat-num" style="color:var(--texto-principal);">${totalAppts}</div><div class="g-stat-label">AGENDAMENTOS</div></div>
+    <div class="g-stat"><div class="g-stat-num" style="color:var(--verde-acao);">${totalDone}</div><div class="g-stat-label">ATENDIDOS</div></div>
+    <div class="g-stat"><div class="g-stat-num" style="color:#9b59b6;">${totalNoShow}</div><div class="g-stat-label">FALTARAM</div></div>
+    <div class="g-stat"><div class="g-stat-num" style="color:var(--verde-acao);">${formatMoney(revenue)}</div><div class="g-stat-label">FATURADO TOTAL</div></div>
+  `;
+}
+
+// ── Lista de barbearias ───────────────────────────────────────
+function renderShops() {
+  const el = document.getElementById('shops-list');
+
+  if (!allShops.length) {
+    el.innerHTML = '<div class="empty-admin">Nenhuma barbearia cadastrada.</div>';
+    return;
+  }
+
+  el.innerHTML = allShops.map(s => {
+    const shopBarbers = allBarbers.filter(b => b.barbershop_id === s.id && b.active);
+    const shopSvcs = allServices.filter(sv => sv.barbershop_id === s.id && sv.active);
+    const shopAppts = allAppointments.filter(a => a.barbershop_id === s.id);
+    const shopDone = shopAppts.filter(a => a.status === 'done');
+    const shopRevenue = shopDone.reduce((sum, a) => {
+      const svc = allServices.find(sv => sv.id === a.service_id);
+      return sum + (svc ? Number(svc.price) : 0);
+    }, 0);
+
+    const planCls = s.plan === 'premium' ? 'plan-premium' : s.plan === 'profissional' ? 'plan-profissional' : 'plan-basico';
+    const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
+
+    return `<div class="shop-card">
+      <div class="shop-top">
+        <div>
+          <div class="shop-title">${esc(s.name)}</div>
+          <div class="shop-slug">${s.slug}</div>
+        </div>
+        <span class="shop-plan ${planCls}">${s.plan || 'basico'}</span>
+      </div>
+      <div class="shop-meta">${s.city || '—'}${s.phone ? ' · ' + s.phone : ''} · ${s.opening_time || '08:00'}-${s.closing_time || '19:00'}</div>
+      <div class="shop-stats">
+        <span>Barbeiros: <strong>${shopBarbers.length}</strong></span>
+        <span>Serviços: <strong>${shopSvcs.length}</strong></span>
+        <span>Agendamentos: <strong>${shopAppts.length}</strong></span>
+        <span>Faturado: <strong>${formatMoney(shopRevenue)}</strong></span>
+      </div>
+      <div class="shop-actions">
+        <button class="shop-action-btn" onclick="editarShop('${s.id}')">Editar</button>
+        <button class="shop-action-btn" onclick="copiarLinkShop('${s.slug}')">Copiar link</button>
+        <button class="shop-action-btn" onclick="window.open('${baseUrl}agendar.html?slug=${s.slug}','_blank')">Ver página</button>
+        <button class="shop-action-btn danger" onclick="excluirShop('${s.id}','${esc(s.name)}')">Excluir</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function copiarLinkShop(slug) {
+  const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
+  navigator.clipboard.writeText(baseUrl + 'agendar.html?slug=' + slug);
+}
+
+// ── Editar barbearia ──────────────────────────────────────────
+const DIAS_LABEL = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+function editarShop(id) {
+  const s = allShops.find(x => x.id === id);
+  if (!s) return;
+
+  document.getElementById('modal-admin-title').textContent = 'Editar: ' + s.name;
+  document.getElementById('adm-edit-id').value = s.id;
+  document.getElementById('adm-name').value = s.name || '';
+  document.getElementById('adm-city').value = s.city || '';
+  document.getElementById('adm-phone').value = s.phone || '';
+  document.getElementById('adm-plan').value = s.plan || 'basico';
+  document.getElementById('adm-open').value = s.opening_time || '08:00';
+  document.getElementById('adm-close').value = s.closing_time || '19:00';
+  document.getElementById('adm-interval').value = s.interval_min || 30;
+
+  editDays = [...(s.days_open || [1,2,3,4,5,6])];
+  renderAdmDays();
+
+  editShopBarbers = allBarbers.filter(b => b.barbershop_id === id).map(b => ({ id: b.id, name: b.name }));
+  renderAdmBarbers();
+
+  document.getElementById('admin-edit-msg').className = 'msg';
+  document.getElementById('modal-admin-edit').classList.add('show');
+}
+
+function abrirNovaShop() {
+  document.getElementById('modal-admin-title').textContent = 'Nova Barbearia';
+  document.getElementById('adm-edit-id').value = '';
+  document.getElementById('adm-name').value = '';
+  document.getElementById('adm-city').value = '';
+  document.getElementById('adm-phone').value = '';
+  document.getElementById('adm-plan').value = 'basico';
+  document.getElementById('adm-open').value = '08:00';
+  document.getElementById('adm-close').value = '19:00';
+  document.getElementById('adm-interval').value = '30';
+
+  editDays = [1,2,3,4,5,6];
+  renderAdmDays();
+
+  editShopBarbers = [];
+  renderAdmBarbers();
+
+  document.getElementById('admin-edit-msg').className = 'msg';
+  document.getElementById('modal-admin-edit').classList.add('show');
+}
+
+function fecharModalAdmin() {
+  document.getElementById('modal-admin-edit').classList.remove('show');
+}
+
+function renderAdmDays() {
+  document.getElementById('adm-days').innerHTML = DIAS_LABEL.map((d, i) =>
+    `<button type="button" class="day-btn ${editDays.includes(i) ? 'active' : ''}" onclick="toggleAdmDay(${i})">${d}</button>`
+  ).join('');
+}
+
+function toggleAdmDay(i) {
+  editDays = editDays.includes(i) ? editDays.filter(d => d !== i) : [...editDays, i].sort();
+  renderAdmDays();
+}
+
+function renderAdmBarbers() {
+  document.getElementById('adm-barbers').innerHTML = editShopBarbers.map((b, i) =>
+    `<div class="barber-row">
+      <input type="text" value="${esc(b.name)}" onchange="editShopBarbers[${i}].name=this.value">
+      <button class="barber-row-del" onclick="editShopBarbers.splice(${i},1);renderAdmBarbers()">✕</button>
+    </div>`
+  ).join('');
+}
+
+function admAddBarber() {
+  editShopBarbers.push({ id: null, name: '' });
+  renderAdmBarbers();
+  const inputs = document.querySelectorAll('#adm-barbers input');
+  if (inputs.length) inputs[inputs.length - 1].focus();
+}
+
+async function salvarAdmin() {
+  const btn = document.getElementById('btn-adm-save');
+  const editId = document.getElementById('adm-edit-id').value;
+  const name = document.getElementById('adm-name').value.trim();
+  const city = document.getElementById('adm-city').value.trim().toUpperCase();
+  const phone = document.getElementById('adm-phone').value.trim();
+  const plan = document.getElementById('adm-plan').value;
+  const opening = document.getElementById('adm-open').value;
+  const closing = document.getElementById('adm-close').value;
+  const interval = parseInt(document.getElementById('adm-interval').value);
+  const slug = gerarSlug(name);
+
+  if (!name) { showAdmMsg('Informe o nome.', 'error'); return; }
+
+  btn.disabled = true;
+  btn.querySelector('.btn-label').style.display = 'none';
+  btn.querySelector('.spinner').style.display = 'inline-block';
+
+  try {
+    let shopId = editId;
+
+    if (editId) {
+      // Atualizar
+      const { error } = await sbAdmin.from('barbershops').update({
+        name, slug, city, phone, plan, opening_time: opening,
+        closing_time: closing, interval_min: interval, days_open: editDays
+      }).eq('id', editId);
+      if (error) throw error;
+    } else {
+      // Criar nova — pegar o owner_id do admin logado
+      const { data: { session } } = await sb.auth.getSession();
+      const { data, error } = await sbAdmin.from('barbershops').insert({
+        owner_id: session.user.id, name, slug, city, phone, plan,
+        opening_time: opening, closing_time: closing,
+        interval_min: interval, days_open: editDays
+      }).select().single();
+      if (error) throw error;
+      shopId = data.id;
+
+      // Criar serviços padrão
+      await sbAdmin.from('services').insert([
+        { barbershop_id: shopId, name: 'Corte', price: 25, duration_min: 30 },
+        { barbershop_id: shopId, name: 'Barba', price: 15, duration_min: 20 },
+        { barbershop_id: shopId, name: 'Corte + Barba', price: 35, duration_min: 45 },
+        { barbershop_id: shopId, name: 'Sobrancelha', price: 10, duration_min: 10 },
+      ]);
+    }
+
+    // Gerenciar barbeiros
+    const existingBarbers = allBarbers.filter(b => b.barbershop_id === shopId);
+    const editIds = editShopBarbers.filter(b => b.id).map(b => b.id);
+
+    // Remover
+    for (const b of existingBarbers) {
+      if (!editIds.includes(b.id)) {
+        await sbAdmin.from('barbers').delete().eq('id', b.id);
+      }
+    }
+
+    // Atualizar e criar
+    for (const b of editShopBarbers) {
+      if (!b.name.trim()) continue;
+      if (b.id) {
+        await sbAdmin.from('barbers').update({ name: b.name.trim() }).eq('id', b.id);
+      } else {
+        await sbAdmin.from('barbers').insert({
+          barbershop_id: shopId, name: b.name.trim(), commission_pct: 0, active: true
+        });
+      }
+    }
+
+    fecharModalAdmin();
+    await loadAll();
+
+  } catch (e) {
+    console.error(e);
+    const msg = e.message?.includes('duplicate') ? 'Nome já existe.' : 'Erro ao salvar.';
+    showAdmMsg(msg, 'error');
+  }
+
+  btn.disabled = false;
+  btn.querySelector('.btn-label').style.display = 'inline';
+  btn.querySelector('.spinner').style.display = 'none';
+}
+
+function showAdmMsg(text, type) {
+  const el = document.getElementById('admin-edit-msg');
+  el.textContent = text;
+  el.className = `msg msg-${type} show`;
+}
+
+// ── Excluir barbearia ─────────────────────────────────────────
+async function excluirShop(id, nome) {
+  const card = event.target.closest('.shop-card');
+  // Confirmar com segundo clique
+  if (!event.target.dataset.confirming) {
+    event.target.textContent = 'Tem certeza?';
+    event.target.style.color = '#e74c3c';
+    event.target.dataset.confirming = 'true';
+    setTimeout(() => {
+      event.target.textContent = 'Excluir';
+      event.target.style.color = '';
+      delete event.target.dataset.confirming;
+    }, 3000);
+    return;
+  }
+
+  await sbAdmin.from('appointments').delete().eq('barbershop_id', id);
+  await sbAdmin.from('payments').delete().eq('barbershop_id', id);
+  await sbAdmin.from('services').delete().eq('barbershop_id', id);
+  await sbAdmin.from('barbers').delete().eq('barbershop_id', id);
+  await sbAdmin.from('subscriptions').delete().eq('barbershop_id', id);
+  await sbAdmin.from('barbershops').delete().eq('id', id);
+
+  await loadAll();
+}
+
+// ── Logout ────────────────────────────────────────────────────
+async function logout() {
+  await sb.auth.signOut();
+  window.location.href = 'index.html';
+}
+</script>
+</body>
+</html>
