@@ -950,9 +950,8 @@ let _pagApptId = null;
 let _pagMethod = 'pix';
 
 function abrirModalPagamento(apptId) {
-  alert('Abrindo modal pra: ' + apptId);
   const a = dayAppointments.find(x => x.id === apptId);
-  if (!a) { alert('Appointment nao encontrado'); return; }
+  if (!a) return;
   const svc = services.find(s => s.id === a.service_id);
   _pagApptId = apptId;
   _pagMethod = 'pix';
