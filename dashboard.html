@@ -191,6 +191,59 @@
     }
     .btn-delete:hover { opacity:0.85; }
 
+    /* Modal */
+    .modal-overlay {
+      position:fixed; top:0; left:0; right:0; bottom:0; z-index:1000;
+      background:rgba(0,0,0,0.7); display:none; align-items:center;
+      justify-content:center; padding:16px;
+    }
+    .modal-overlay.show { display:flex; }
+    .modal {
+      background:var(--cinza-escuro); border:1px solid var(--borda);
+      border-radius:12px; width:100%; max-width:460px; max-height:90vh;
+      overflow-y:auto; padding:24px 20px; animation:fadeUp 0.3s ease;
+    }
+    .modal-title {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:20px;
+    }
+    .modal-title h2 { font-size:16px; }
+    .modal-close {
+      background:none; border:none; color:var(--texto-muted); font-size:18px;
+      cursor:pointer; padding:4px 8px;
+    }
+    .modal-section {
+      font-size:10px; color:var(--texto-muted); font-weight:700;
+      letter-spacing:1.5px; text-transform:uppercase;
+      margin:20px 0 10px; padding-top:16px; border-top:1px solid var(--borda);
+    }
+    .modal-section:first-of-type { border:none; margin-top:0; padding-top:0; }
+
+    /* Barbeiro row no modal */
+    .barber-row {
+      display:flex; align-items:center; gap:8px; padding:8px 0;
+      border-bottom:1px solid var(--borda);
+    }
+    .barber-row input {
+      flex:1; padding:8px 10px; background:var(--cinza-medio); border:1px solid var(--borda);
+      border-radius:6px; color:var(--texto-principal); font-size:13px; font-family:inherit;
+    }
+    .barber-row input:focus { border-color:var(--verde-acao); outline:none; }
+    .barber-row-del {
+      background:rgba(231,76,60,0.1); border:1px solid rgba(231,76,60,0.2);
+      border-radius:6px; color:#e74c3c; font-size:14px; cursor:pointer;
+      width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+    }
+
+    /* Dias no modal */
+    .days-modal { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+    .day-btn {
+      padding:8px 12px; border-radius:8px; font-size:12px; font-weight:700;
+      font-family:inherit; cursor:pointer; transition:all .2s; border:1px solid var(--borda);
+      background:transparent; color:var(--texto-muted);
+    }
+    .day-btn.active { border-color:var(--verde-acao); background:rgba(46,204,113,0.15); color:var(--verde-acao); }
+
     body { padding-bottom:70px; }
   </style>
 </head>
@@ -205,6 +258,7 @@
       <div class="shop-city" id="shop-city"></div>
     </div>
     <div class="header-actions">
+      <button class="icon-btn" onclick="abrirEdicao()" title="Editar barbearia">✏️</button>
       <button class="icon-btn" onclick="compartilharLink()" title="Compartilhar link">🔗</button>
       <button class="icon-btn" onclick="logout()" title="Sair">⏻</button>
     </div>
@@ -252,6 +306,70 @@
   <!-- Lista de agendamentos -->
   <div id="appt-list"></div>
 
+</div>
+
+<!-- Modal edição -->
+<div class="modal-overlay" id="modal-edit">
+  <div class="modal">
+    <div class="modal-title">
+      <h2>Editar Barbearia</h2>
+      <button class="modal-close" onclick="fecharEdicao()">✕</button>
+    </div>
+
+    <div id="edit-msg" class="msg"></div>
+
+    <div class="modal-section">Dados</div>
+    <div class="field">
+      <label>NOME DA BARBEARIA</label>
+      <input type="text" id="edit-name">
+    </div>
+    <div class="field">
+      <label>CIDADE</label>
+      <input type="text" id="edit-city">
+    </div>
+    <div class="field">
+      <label>WHATSAPP</label>
+      <input type="tel" id="edit-phone">
+    </div>
+
+    <div class="modal-section">Horários</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="field">
+        <label>ABRE ÀS</label>
+        <input type="time" id="edit-open">
+      </div>
+      <div class="field">
+        <label>FECHA ÀS</label>
+        <input type="time" id="edit-close">
+      </div>
+    </div>
+    <div class="field">
+      <label>INTERVALO (MIN)</label>
+      <select id="edit-interval" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;">
+        <option value="20">20 min</option>
+        <option value="30">30 min</option>
+        <option value="40">40 min</option>
+        <option value="45">45 min</option>
+        <option value="60">60 min</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>DIAS QUE ABRE</label>
+      <div class="days-modal" id="edit-days"></div>
+    </div>
+
+    <div class="modal-section">Barbeiros</div>
+    <div id="edit-barbers"></div>
+    <button class="btn btn-outline" onclick="addBarberRow()" style="margin:10px 0 16px;font-size:12px;">+ ADICIONAR BARBEIRO</button>
+
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline" onclick="fecharEdicao()" style="flex:0.4;">CANCELAR</button>
+      <button class="btn btn-primary" onclick="salvarEdicao()" id="btn-save-edit" style="flex:0.6;">
+        <span class="btn-label">SALVAR</span>
+        <div class="spinner" style="display:none;"></div>
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- Bottom Nav -->
@@ -574,6 +692,148 @@ function copiarLink() {
     btn.textContent = 'COPIADO!';
     setTimeout(() => btn.textContent = 'COPIAR', 2000);
   });
+}
+
+// ── Edição da barbearia ───────────────────────────────────────
+const DIAS_LABEL = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+let editDays = [];
+let editBarbersList = [];
+
+function abrirEdicao() {
+  document.getElementById('edit-name').value = shop.name || '';
+  document.getElementById('edit-city').value = shop.city || '';
+  document.getElementById('edit-phone').value = shop.phone || '';
+  document.getElementById('edit-open').value = shop.opening_time || '08:00';
+  document.getElementById('edit-close').value = shop.closing_time || '19:00';
+  document.getElementById('edit-interval').value = shop.interval_min || 30;
+
+  editDays = [...(shop.days_open || [1,2,3,4,5,6])];
+  renderEditDays();
+
+  editBarbersList = barbers.map(b => ({ id: b.id, name: b.name, active: b.active }));
+  renderEditBarbers();
+
+  document.getElementById('edit-msg').className = 'msg';
+  document.getElementById('modal-edit').classList.add('show');
+}
+
+function fecharEdicao() {
+  document.getElementById('modal-edit').classList.remove('show');
+}
+
+function renderEditDays() {
+  document.getElementById('edit-days').innerHTML = DIAS_LABEL.map((d, i) =>
+    `<button type="button" class="day-btn ${editDays.includes(i) ? 'active' : ''}" onclick="toggleEditDay(${i})">${d}</button>`
+  ).join('');
+}
+
+function toggleEditDay(i) {
+  if (editDays.includes(i)) {
+    editDays = editDays.filter(d => d !== i);
+  } else {
+    editDays.push(i);
+    editDays.sort();
+  }
+  renderEditDays();
+}
+
+function renderEditBarbers() {
+  document.getElementById('edit-barbers').innerHTML = editBarbersList.map((b, i) =>
+    `<div class="barber-row">
+      <input type="text" value="${esc(b.name)}" onchange="editBarbersList[${i}].name=this.value">
+      <button class="barber-row-del" onclick="removeBarberRow(${i})" title="Remover">✕</button>
+    </div>`
+  ).join('');
+}
+
+function addBarberRow() {
+  editBarbersList.push({ id: null, name: '', active: true });
+  renderEditBarbers();
+  // Focar no novo input
+  const inputs = document.querySelectorAll('#edit-barbers input');
+  if (inputs.length) inputs[inputs.length - 1].focus();
+}
+
+function removeBarberRow(i) {
+  editBarbersList.splice(i, 1);
+  renderEditBarbers();
+}
+
+async function salvarEdicao() {
+  const btn = document.getElementById('btn-save-edit');
+  const name = document.getElementById('edit-name').value.trim();
+  const city = document.getElementById('edit-city').value.trim().toUpperCase();
+  const phone = document.getElementById('edit-phone').value.trim();
+  const opening = document.getElementById('edit-open').value;
+  const closing = document.getElementById('edit-close').value;
+  const interval = parseInt(document.getElementById('edit-interval').value);
+
+  if (!name) { showEditMsg('Informe o nome.', 'error'); return; }
+
+  btn.disabled = true;
+  btn.querySelector('.btn-label').style.display = 'none';
+  btn.querySelector('.spinner').style.display = 'inline-block';
+
+  try {
+    // Atualizar barbearia
+    const slug = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+    const { error: shopErr } = await sb.from('barbershops').update({
+      name, slug, city, phone, opening_time: opening, closing_time: closing,
+      interval_min: interval, days_open: editDays
+    }).eq('id', shop.id);
+
+    if (shopErr) throw shopErr;
+
+    // Atualizar barbeiros
+    // Remover os que não estão mais na lista
+    const editIds = editBarbersList.filter(b => b.id).map(b => b.id);
+    const toRemove = barbers.filter(b => !editIds.includes(b.id));
+    for (const b of toRemove) {
+      await sb.from('barbers').delete().eq('id', b.id);
+    }
+
+    // Atualizar existentes e criar novos
+    for (const b of editBarbersList) {
+      if (!b.name.trim()) continue;
+      if (b.id) {
+        await sb.from('barbers').update({ name: b.name.trim() }).eq('id', b.id);
+      } else {
+        await sb.from('barbers').insert({
+          barbershop_id: shop.id, name: b.name.trim(), commission_pct: 0, active: true
+        });
+      }
+    }
+
+    // Recarregar dados
+    const { data: shopData } = await sb.from('barbershops').select('*').eq('id', shop.id).single();
+    shop = shopData;
+    const { data: barbData } = await sb.from('barbers').select('*').eq('barbershop_id', shop.id);
+    barbers = barbData || [];
+
+    // Atualizar header
+    document.getElementById('shop-name').textContent = shop.name;
+    document.getElementById('shop-city').textContent = shop.city + (shop.phone ? ' · ' + shop.phone : '');
+    const baseUrl = window.location.origin + window.location.pathname.replace('dashboard.html', '');
+    document.getElementById('share-link').textContent = baseUrl + 'agendar.html?slug=' + shop.slug;
+
+    fecharEdicao();
+    renderDay();
+
+  } catch (e) {
+    console.error(e);
+    const msg = e.message?.includes('duplicate') ? 'Já existe uma barbearia com esse nome.' : 'Erro ao salvar. Tente novamente.';
+    showEditMsg(msg, 'error');
+  }
+
+  btn.disabled = false;
+  btn.querySelector('.btn-label').style.display = 'inline';
+  btn.querySelector('.spinner').style.display = 'none';
+}
+
+function showEditMsg(text, type) {
+  const el = document.getElementById('edit-msg');
+  el.textContent = text;
+  el.className = `msg msg-${type} show`;
 }
 
 // ── Logout ────────────────────────────────────────────────────
