@@ -401,27 +401,46 @@ const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','ag
 
 // ── Init ──────────────────────────────────────────────────────
 const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
+const adminViewingShop = sessionStorage.getItem('admin_viewing_shop');
+const isAdminViewing = !!adminViewingShop;
 
 document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'index.html'; return; }
 
-  if (ADMIN_EMAILS.includes(session.user.email)) {
+  if (ADMIN_EMAILS.includes(session.user.email) && !isAdminViewing) {
     window.location.href = 'admin.html';
     return;
   }
 
-  const { data: shopData } = await sb
-    .from('barbershops')
-    .select('*')
-    .eq('owner_id', session.user.id)
-    .maybeSingle();
+  let shopData;
+  if (isAdminViewing) {
+    // Admin vendo uma barbearia específica — usar service key
+    const sbAdmin = window.supabase.createClient(
+      'https://jsydprrcyrjjxdmzrqpz.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs'
+    );
+    const { data } = await sbAdmin.from('barbershops').select('*').eq('id', adminViewingShop).single();
+    shopData = data;
+  } else {
+    const { data } = await sb.from('barbershops').select('*').eq('owner_id', session.user.id).maybeSingle();
+    shopData = data;
+  }
 
   if (!shopData) { window.location.href = 'onboarding.html'; return; }
   shop = shopData;
 
   document.getElementById('shop-name').textContent = shop.name;
   document.getElementById('shop-city').textContent = shop.city + (shop.phone ? ' · ' + shop.phone : '');
+
+  // Banner admin
+  if (isAdminViewing) {
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3);border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;';
+    banner.innerHTML = `<span style="font-size:11px;color:#e74c3c;font-weight:700;">ADMIN · Visualizando ${esc(shop.name)}</span>
+      <button onclick="sessionStorage.removeItem('admin_viewing_shop');location.href='admin.html'" style="background:#e74c3c;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">VOLTAR</button>`;
+    document.querySelector('.dash-container').insertBefore(banner, document.querySelector('.dash-header'));
+  }
 
   // Buscar serviços e barbeiros
   const [svcRes, barbRes] = await Promise.all([

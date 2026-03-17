@@ -358,6 +358,7 @@ function renderShops() {
         <span>Faturado: <strong>${formatMoney(shopRevenue)}</strong></span>
       </div>
       <div class="shop-actions">
+        <button class="shop-action-btn" style="border-color:rgba(46,204,113,0.3);color:var(--verde-acao);font-weight:700;" onclick="entrarComo('${s.id}')">Entrar como</button>
         <button class="shop-action-btn" onclick="editarShop('${s.id}')">Editar</button>
         <button class="shop-action-btn" onclick="copiarLinkShop('${s.slug}')">Copiar link</button>
         <button class="shop-action-btn" onclick="window.open('${baseUrl}agendar.html?slug=${s.slug}','_blank')">Ver página</button>
@@ -365,6 +366,11 @@ function renderShops() {
       </div>
     </div>`;
   }).join('');
+}
+
+function entrarComo(shopId) {
+  sessionStorage.setItem('admin_viewing_shop', shopId);
+  window.location.href = 'dashboard.html';
 }
 
 function copiarLinkShop(slug) {
