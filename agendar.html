@@ -679,9 +679,33 @@ async function confirmarAgendamento() {
     btn.disabled = false;
     btn.querySelector('.btn-label').style.display = 'inline';
     btn.querySelector('.spinner').style.display = 'none';
-    showAgMsg('Esse horário acabou de ser ocupado. Escolha outro.', 'error');
-    // Recarregar slots pra mostrar o horário como indisponível
+
+    // Saudação automática
+    const hora = new Date().getHours();
+    const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
+    const dateFormatted = selectedDate.split('-').reverse().join('/');
+    const linkAgendamento = window.location.href.split('?')[0] + '?slug=' + shop.slug;
+
+    const waText = saudacao + ' ' + nome + '! Aqui e da ' + shop.name + '.\n\n'
+      + 'O horario que voce escolheu (' + dateFormatted + ' as ' + selectedTime + ') nao esta mais disponivel.\n\n'
+      + 'Mas ainda temos horarios livres! Acesse o link abaixo pra verificar e remarcar:\n'
+      + linkAgendamento + '\n\n'
+      + 'Obrigado pela preferencia!';
+
+    const phoneClean = phone.replace(/\D/g, '');
+    const waLink = phoneClean ? 'https://wa.me/55' + phoneClean + '?text=' + encodeURIComponent(waText) : '';
+
+    // Mostrar erro + botão WhatsApp
+    const msgEl = document.getElementById('ag-msg');
+    msgEl.innerHTML = `<div style="margin-bottom:8px;">Esse horario acabou de ser ocupado por outro cliente.</div>`
+      + (waLink ? `<a href="${waLink}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.3);border-radius:8px;color:#25d366;font-size:11px;font-weight:700;text-decoration:none;margin-top:4px;">AVISAR PELO WHATSAPP</a>` : '')
+      + `<div style="margin-top:8px;font-size:11px;color:var(--texto-muted);">Escolha outro horario abaixo.</div>`;
+    msgEl.className = 'msg msg-error show';
+    msgEl.style.flexDirection = 'column';
+    msgEl.style.alignItems = 'flex-start';
+
     await renderTimes();
+    agBack(3);
     return;
   }
 
