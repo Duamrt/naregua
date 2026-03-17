@@ -544,13 +544,16 @@ async function renderTimes() {
   // Buscar agendamentos do dia (pra saber quais estão ocupados)
   const dayStart = selectedDate + 'T00:00:00';
   const dayEnd = selectedDate + 'T23:59:59';
-  const { data: dayAppts } = await sb
+  // Filtrar por barbeiro selecionado (se tiver)
+  let query = sb
     .from('appointments')
-    .select('scheduled_at,service_id,status')
+    .select('scheduled_at,service_id,barber_id,status')
     .eq('barbershop_id', shop.id)
     .gte('scheduled_at', dayStart)
     .lte('scheduled_at', dayEnd)
     .in('status', ['pending', 'confirmed']);
+  if (selectedBarber) query = query.eq('barber_id', selectedBarber.id);
+  const { data: dayAppts } = await query;
 
   appointments = dayAppts || [];
 
@@ -651,6 +654,36 @@ async function confirmarAgendamento() {
   msgEl.className = 'msg';
 
   const scheduledAt = new Date(selectedDate + 'T' + selectedTime + ':00');
+  const duration = selectedService.duration_min || 30;
+  const slotEnd = new Date(scheduledAt.getTime() + duration * 60000);
+
+  // Verificar conflito antes de salvar (evita duplicata)
+  const { data: conflitos } = await sb
+    .from('appointments')
+    .select('id,scheduled_at,service_id')
+    .eq('barbershop_id', shop.id)
+    .eq('barber_id', selectedBarber.id)
+    .in('status', ['pending', 'confirmed'])
+    .gte('scheduled_at', selectedDate + 'T00:00:00')
+    .lte('scheduled_at', selectedDate + 'T23:59:59');
+
+  const temConflito = (conflitos || []).some(a => {
+    const aStart = new Date(a.scheduled_at);
+    const aSvc = services.find(s => s.id === a.service_id);
+    const aDur = aSvc ? aSvc.duration_min : 30;
+    const aEnd = new Date(aStart.getTime() + aDur * 60000);
+    return scheduledAt < aEnd && slotEnd > aStart;
+  });
+
+  if (temConflito) {
+    btn.disabled = false;
+    btn.querySelector('.btn-label').style.display = 'inline';
+    btn.querySelector('.spinner').style.display = 'none';
+    showAgMsg('Esse horário acabou de ser ocupado. Escolha outro.', 'error');
+    // Recarregar slots pra mostrar o horário como indisponível
+    await renderTimes();
+    return;
+  }
 
   const { error } = await sb
     .from('appointments')
