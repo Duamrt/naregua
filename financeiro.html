@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NaRegua — Caixa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .fin-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
+
+    .fin-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 0 16px; border-bottom:1px solid var(--borda); margin-bottom:16px;
+    }
+    .fin-header h1 { font-size:18px; font-weight:700; }
+
+    /* Período */
+    .period-nav {
+      display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;
+    }
+    .period-btn {
+      width:36px; height:36px; border-radius:8px; border:1px solid var(--borda);
+      background:transparent; color:var(--texto-secundario); font-size:16px;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      font-family:inherit; transition:all .2s;
+    }
+    .period-btn:hover { border-color:var(--borda-hover); }
+    .period-label { font-size:14px; font-weight:700; text-align:center; }
+    .period-toggle {
+      display:flex; background:var(--cinza-medio); border-radius:8px; padding:3px; margin-bottom:16px;
+    }
+    .period-tab {
+      flex:1; padding:8px 0; text-align:center; font-size:12px; font-weight:600;
+      color:var(--texto-muted); border-radius:6px; cursor:pointer; border:none;
+      background:transparent; font-family:inherit; transition:all .2s;
+    }
+    .period-tab.active { background:var(--verde-acao); color:#000; font-weight:700; }
+
+    /* Cards resumo */
+    .fin-cards { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; }
+    .fin-card {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:12px;
+      padding:14px; text-align:center;
+    }
+    .fin-card.full { grid-column:1/-1; }
+    .fin-num { font-size:22px; font-weight:800; }
+    .fin-label { font-size:9px; color:var(--texto-muted); font-weight:700; letter-spacing:1px; margin-top:4px; }
+    .fin-sub { font-size:10px; color:var(--texto-muted); margin-top:4px; }
+
+    /* Barra de progresso margem */
+    .margin-bar {
+      height:8px; background:rgba(255,255,255,0.06); border-radius:4px;
+      overflow:hidden; margin-top:8px;
+    }
+    .margin-fill { height:100%; border-radius:4px; transition:width .5s; }
+
+    /* Seções */
+    .section-title {
+      font-size:11px; color:var(--texto-muted); font-weight:700;
+      letter-spacing:1.5px; margin:20px 0 10px;
+      display:flex; justify-content:space-between; align-items:center;
+    }
+
+    /* Lista de itens */
+    .fin-item {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:10px 0; border-bottom:1px solid var(--borda);
+    }
+    .fin-item:last-child { border:none; }
+    .fin-item-left { flex:1; }
+    .fin-item-desc { font-size:13px; font-weight:600; }
+    .fin-item-meta { font-size:11px; color:var(--texto-muted); margin-top:2px; }
+    .fin-item-val { font-size:14px; font-weight:700; white-space:nowrap; margin-left:12px; }
+    .fin-item-del {
+      margin-left:8px; background:none; border:none; color:var(--texto-muted);
+      cursor:pointer; font-size:14px; padding:4px; transition:all .2s;
+    }
+    .fin-item-del:hover { color:#e74c3c; }
+
+    /* Categorias de despesa */
+    .cat-badge {
+      font-size:9px; font-weight:700; padding:2px 8px; border-radius:10px;
+      background:rgba(255,255,255,0.06); color:var(--texto-muted);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position:fixed; top:0; left:0; right:0; bottom:0; z-index:1000;
+      background:rgba(0,0,0,0.7); display:none; align-items:center;
+      justify-content:center; padding:16px;
+    }
+    .modal-overlay.show { display:flex; }
+    .modal {
+      background:var(--cinza-escuro); border:1px solid var(--borda);
+      border-radius:12px; width:100%; max-width:400px;
+      padding:24px 20px; animation:fadeUp 0.3s ease;
+    }
+    .modal-title {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:20px;
+    }
+    .modal-title h2 { font-size:16px; }
+    .modal-close {
+      background:none; border:none; color:var(--texto-muted); font-size:18px;
+      cursor:pointer; padding:4px 8px;
+    }
+
+    /* Bottom nav */
+    .bottom-nav {
+      position:fixed; bottom:0; left:0; right:0;
+      background:var(--cinza-escuro); border-top:1px solid var(--borda);
+      display:flex; justify-content:center; gap:0; padding:8px 0;
+      padding-bottom:max(8px, env(safe-area-inset-bottom));
+    }
+    .nav-item {
+      flex:1; max-width:100px; display:flex; flex-direction:column;
+      align-items:center; gap:2px; padding:6px 0;
+      color:var(--texto-muted); font-size:10px; font-weight:600;
+      text-decoration:none; cursor:pointer; border:none; background:none;
+      font-family:inherit; transition:all .2s;
+    }
+    .nav-item.active { color:var(--verde-acao); }
+    .nav-item .nav-icon { font-size:18px; }
+
+    body { padding-bottom:70px; }
+  </style>
+</head>
+<body>
+
+<div class="fin-container">
+
+  <div class="fin-header">
+    <h1>Caixa</h1>
+    <button class="btn btn-primary" onclick="abrirModalDespesa()" style="width:auto;padding:8px 16px;font-size:12px;">+ DESPESA</button>
+  </div>
+
+  <!-- Toggle dia/mês -->
+  <div class="period-toggle">
+    <button class="period-tab active" data-period="dia" onclick="setPeriod('dia')">DIA</button>
+    <button class="period-tab" data-period="mes" onclick="setPeriod('mes')">MÊS</button>
+  </div>
+
+  <!-- Navegação período -->
+  <div class="period-nav">
+    <button class="period-btn" onclick="changePeriod(-1)">‹</button>
+    <div>
+      <div class="period-label" id="period-label"></div>
+      <button id="btn-hoje" onclick="goHoje()" style="display:none;font-size:11px;color:var(--verde-acao);font-weight:700;cursor:pointer;background:none;border:none;font-family:inherit;margin-top:2px;">voltar pra hoje</button>
+    </div>
+    <button class="period-btn" onclick="changePeriod(1)">›</button>
+  </div>
+
+  <!-- Cards resumo -->
+  <div class="fin-cards">
+    <div class="fin-card">
+      <div class="fin-num" id="fin-receita" style="color:var(--verde-acao);">R$ 0</div>
+      <div class="fin-label">FATURAMENTO</div>
+      <div class="fin-sub" id="fin-receita-qtd"></div>
+    </div>
+    <div class="fin-card">
+      <div class="fin-num" id="fin-despesa" style="color:#e74c3c;">R$ 0</div>
+      <div class="fin-label">DESPESAS</div>
+      <div class="fin-sub" id="fin-despesa-qtd"></div>
+    </div>
+    <div class="fin-card full">
+      <div class="fin-num" id="fin-lucro" style="color:var(--verde-acao);">R$ 0</div>
+      <div class="fin-label">LUCRO</div>
+      <div class="fin-sub" id="fin-margem"></div>
+      <div class="margin-bar"><div class="margin-fill" id="margin-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- Entradas -->
+  <div class="section-title">
+    <span>ENTRADAS (atendimentos concluídos)</span>
+    <span id="entradas-total" style="color:var(--verde-acao);"></span>
+  </div>
+  <div id="entradas-list"></div>
+
+  <!-- Saídas -->
+  <div class="section-title">
+    <span>SAÍDAS (despesas)</span>
+    <span id="saidas-total" style="color:#e74c3c;"></span>
+  </div>
+  <div id="saidas-list"></div>
+
+</div>
+
+<!-- Modal despesa -->
+<div class="modal-overlay" id="modal-despesa">
+  <div class="modal">
+    <div class="modal-title">
+      <h2 id="modal-desp-title">Nova Despesa</h2>
+      <button class="modal-close" onclick="fecharModalDespesa()">✕</button>
+    </div>
+    <div id="desp-msg" class="msg"></div>
+    <input type="hidden" id="desp-edit-id">
+    <div class="field">
+      <label>DESCRIÇÃO *</label>
+      <input type="text" id="desp-desc" placeholder="Ex: Aluguel, Energia, Produtos">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="field">
+        <label>VALOR (R$) *</label>
+        <input type="number" id="desp-valor" min="0" step="0.01" placeholder="0,00">
+      </div>
+      <div class="field">
+        <label>DATA</label>
+        <input type="date" id="desp-data">
+      </div>
+    </div>
+    <div class="field">
+      <label>CATEGORIA</label>
+      <select id="desp-cat" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;">
+        <option value="aluguel">Aluguel</option>
+        <option value="energia">Energia</option>
+        <option value="agua">Água</option>
+        <option value="internet">Internet</option>
+        <option value="produtos">Produtos</option>
+        <option value="manutencao">Manutenção</option>
+        <option value="equipamento">Equipamento</option>
+        <option value="comissao">Comissão barbeiro</option>
+        <option value="imposto">Imposto</option>
+        <option value="outros" selected>Outros</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="salvarDespesa()" id="btn-desp-save">
+      <span class="btn-label">SALVAR</span>
+      <div class="spinner" style="display:none;"></div>
+    </button>
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+  <a class="nav-item" href="dashboard.html">
+    <span class="nav-icon">📅</span>AGENDA
+  </a>
+  <a class="nav-item" href="servicos.html">
+    <span class="nav-icon">✂️</span>SERVIÇOS
+  </a>
+  <a class="nav-item active" href="financeiro.html">
+    <span class="nav-icon">💰</span>CAIXA
+  </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js?v=2"></script>
+<script src="js/utils.js?v=2"></script>
+<script>
+// ── Estado ────────────────────────────────────────────────────
+let shop = null;
+let services = [];
+let currentPeriod = 'dia'; // 'dia' ou 'mes'
+let currentDate = new Date();
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const CAT_LABELS = {
+  aluguel:'Aluguel', energia:'Energia', agua:'Água', internet:'Internet',
+  produtos:'Produtos', manutencao:'Manutenção', equipamento:'Equipamento',
+  comissao:'Comissão', imposto:'Imposto', outros:'Outros'
+};
+
+const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
+const _params = new URLSearchParams(window.location.search);
+const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_viewing_shop');
+if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
+const isAdminViewing = !!adminViewingShop;
+const db = isAdminViewing
+  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs')
+  : sb;
+
+// ── Init ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'index.html'; return; }
+
+  if (ADMIN_EMAILS.includes(session.user.email) && !isAdminViewing) {
+    window.location.href = 'admin.html';
+    return;
+  }
+
+  let shopData;
+  if (isAdminViewing) {
+    const { data } = await db.from('barbershops').select('*').eq('id', adminViewingShop).single();
+    shopData = data;
+  } else {
+    const { data } = await db.from('barbershops').select('*').eq('owner_id', session.user.id).maybeSingle();
+    shopData = data;
+  }
+
+  if (!shopData) { window.location.href = isAdminViewing ? 'admin.html' : 'onboarding.html'; return; }
+  shop = shopData;
+
+  // Banner admin
+  if (isAdminViewing) {
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3);border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;';
+    banner.innerHTML = `<span style="font-size:11px;color:#e74c3c;font-weight:700;">ADMIN · ${esc(shop.name)}</span>
+      <button onclick="sessionStorage.removeItem('admin_viewing_shop');location.href='admin.html'" style="background:#e74c3c;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">VOLTAR</button>`;
+    document.querySelector('.fin-container').insertBefore(banner, document.querySelector('.fin-header'));
+  }
+
+  const { data: svcData } = await db.from('services').select('*').eq('barbershop_id', shop.id);
+  services = svcData || [];
+
+  document.getElementById('desp-data').value = new Date().toISOString().split('T')[0];
+  renderPeriod();
+});
+
+// ── Período ───────────────────────────────────────────────────
+function setPeriod(p) {
+  currentPeriod = p;
+  document.querySelectorAll('.period-tab').forEach(t => t.classList.toggle('active', t.dataset.period === p));
+  renderPeriod();
+}
+
+function changePeriod(delta) {
+  if (currentPeriod === 'dia') {
+    currentDate.setDate(currentDate.getDate() + delta);
+  } else {
+    currentDate.setMonth(currentDate.getMonth() + delta);
+  }
+  renderPeriod();
+}
+
+function goHoje() {
+  currentDate = new Date();
+  renderPeriod();
+}
+
+function isHoje() {
+  const h = new Date();
+  return currentDate.getFullYear() === h.getFullYear() &&
+         currentDate.getMonth() === h.getMonth() &&
+         currentDate.getDate() === h.getDate();
+}
+
+function isMesAtual() {
+  const h = new Date();
+  return currentDate.getFullYear() === h.getFullYear() && currentDate.getMonth() === h.getMonth();
+}
+
+function renderPeriodLabel() {
+  const el = document.getElementById('period-label');
+  const btn = document.getElementById('btn-hoje');
+
+  if (currentPeriod === 'dia') {
+    const d = currentDate;
+    const dias = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+    el.textContent = isHoje() ? `Hoje, ${d.getDate()} de ${MESES[d.getMonth()]}` : `${dias[d.getDay()]}, ${d.getDate()} de ${MESES[d.getMonth()]}`;
+    btn.style.display = isHoje() ? 'none' : 'block';
+  } else {
+    el.textContent = `${MESES[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+    btn.style.display = isMesAtual() ? 'none' : 'block';
+  }
+}
+
+// ── Renderizar ────────────────────────────────────────────────
+async function renderPeriod() {
+  renderPeriodLabel();
+
+  let dateStart, dateEnd;
+  if (currentPeriod === 'dia') {
+    const ds = currentDate.toISOString().split('T')[0];
+    dateStart = ds;
+    dateEnd = ds;
+  } else {
+    const y = currentDate.getFullYear();
+    const m = currentDate.getMonth();
+    dateStart = `${y}-${String(m+1).padStart(2,'0')}-01`;
+    const lastDay = new Date(y, m+1, 0).getDate();
+    dateEnd = `${y}-${String(m+1).padStart(2,'0')}-${lastDay}`;
+  }
+
+  // Buscar atendimentos concluídos
+  const { data: appts } = await db.from('appointments')
+    .select('*')
+    .eq('barbershop_id', shop.id)
+    .eq('status', 'done')
+    .gte('scheduled_at', dateStart + 'T00:00:00')
+    .lte('scheduled_at', dateEnd + 'T23:59:59')
+    .order('scheduled_at', { ascending: true });
+
+  // Buscar despesas
+  const { data: expenses } = await db.from('expenses')
+    .select('*')
+    .eq('barbershop_id', shop.id)
+    .gte('date', dateStart)
+    .lte('date', dateEnd)
+    .order('date', { ascending: true });
+
+  const entradas = appts || [];
+  const saidas = expenses || [];
+
+  // Calcular totais
+  const totalReceita = entradas.reduce((s, a) => {
+    const svc = services.find(sv => sv.id === a.service_id);
+    return s + (svc ? Number(svc.price) : 0);
+  }, 0);
+  const totalDespesa = saidas.reduce((s, e) => s + Number(e.amount || 0), 0);
+  const lucro = totalReceita - totalDespesa;
+  const margem = totalReceita > 0 ? (lucro / totalReceita * 100) : 0;
+
+  // Cards
+  document.getElementById('fin-receita').textContent = formatMoney(totalReceita);
+  document.getElementById('fin-receita-qtd').textContent = `${entradas.length} atendimento${entradas.length !== 1 ? 's' : ''}`;
+  document.getElementById('fin-despesa').textContent = formatMoney(totalDespesa);
+  document.getElementById('fin-despesa-qtd').textContent = `${saidas.length} lançamento${saidas.length !== 1 ? 's' : ''}`;
+
+  document.getElementById('fin-lucro').textContent = formatMoney(lucro);
+  document.getElementById('fin-lucro').style.color = lucro >= 0 ? 'var(--verde-acao)' : '#e74c3c';
+  document.getElementById('fin-margem').textContent = totalReceita > 0 ? `Margem ${margem.toFixed(0)}%` : '';
+
+  const fill = document.getElementById('margin-fill');
+  fill.style.width = Math.max(0, Math.min(100, margem)) + '%';
+  fill.style.background = margem >= 50 ? 'var(--verde-acao)' : margem >= 20 ? '#f39c12' : '#e74c3c';
+
+  // Entradas
+  document.getElementById('entradas-total').textContent = formatMoney(totalReceita);
+  const entradasEl = document.getElementById('entradas-list');
+  if (!entradas.length) {
+    entradasEl.innerHTML = '<div style="padding:16px 0;font-size:12px;color:var(--texto-muted);text-align:center;">Nenhum atendimento concluído.</div>';
+  } else {
+    entradasEl.innerHTML = entradas.map(a => {
+      const svc = services.find(sv => sv.id === a.service_id);
+      const hora = new Date(a.scheduled_at);
+      const timeStr = hora.toLocaleDateString('pt-BR') + ' ' + hora.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+      return `<div class="fin-item">
+        <div class="fin-item-left">
+          <div class="fin-item-desc">${esc(a.client_name)}</div>
+          <div class="fin-item-meta">${svc ? svc.name : '—'} · ${timeStr}</div>
+        </div>
+        <div class="fin-item-val" style="color:var(--verde-acao);">+${formatMoney(svc ? svc.price : 0)}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Saídas
+  document.getElementById('saidas-total').textContent = formatMoney(totalDespesa);
+  const saidasEl = document.getElementById('saidas-list');
+  if (!saidas.length) {
+    saidasEl.innerHTML = '<div style="padding:16px 0;font-size:12px;color:var(--texto-muted);text-align:center;">Nenhuma despesa lançada.</div>';
+  } else {
+    saidasEl.innerHTML = saidas.map(e => {
+      return `<div class="fin-item">
+        <div class="fin-item-left">
+          <div class="fin-item-desc">${esc(e.description)}</div>
+          <div class="fin-item-meta">${formatDate(e.date)} · <span class="cat-badge">${CAT_LABELS[e.category] || e.category}</span></div>
+        </div>
+        <div style="display:flex;align-items:center;">
+          <div class="fin-item-val" style="color:#e74c3c;">-${formatMoney(e.amount)}</div>
+          <button class="fin-item-del" onclick="excluirDespesa('${e.id}', this)">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ── Modal despesa ─────────────────────────────────────────────
+function abrirModalDespesa() {
+  document.getElementById('modal-desp-title').textContent = 'Nova Despesa';
+  document.getElementById('desp-edit-id').value = '';
+  document.getElementById('desp-desc').value = '';
+  document.getElementById('desp-valor').value = '';
+  document.getElementById('desp-data').value = new Date().toISOString().split('T')[0];
+  document.getElementById('desp-cat').value = 'outros';
+  document.getElementById('desp-msg').className = 'msg';
+  document.getElementById('modal-despesa').classList.add('show');
+  setTimeout(() => document.getElementById('desp-desc').focus(), 100);
+}
+
+function fecharModalDespesa() {
+  document.getElementById('modal-despesa').classList.remove('show');
+}
+
+async function salvarDespesa() {
+  const btn = document.getElementById('btn-desp-save');
+  const desc = document.getElementById('desp-desc').value.trim();
+  const valor = parseFloat(document.getElementById('desp-valor').value);
+  const data = document.getElementById('desp-data').value;
+  const cat = document.getElementById('desp-cat').value;
+
+  if (!desc) { showDespMsg('Informe a descrição.', 'error'); return; }
+  if (isNaN(valor) || valor <= 0) { showDespMsg('Informe o valor.', 'error'); return; }
+
+  btn.disabled = true;
+  btn.querySelector('.btn-label').style.display = 'none';
+  btn.querySelector('.spinner').style.display = 'inline-block';
+
+  try {
+    const { error } = await db.from('expenses').insert({
+      barbershop_id: shop.id,
+      description: desc,
+      amount: valor,
+      date: data,
+      category: cat
+    });
+    if (error) throw error;
+
+    fecharModalDespesa();
+    await renderPeriod();
+  } catch (e) {
+    console.error(e);
+    showDespMsg('Erro ao salvar.', 'error');
+  }
+
+  btn.disabled = false;
+  btn.querySelector('.btn-label').style.display = 'inline';
+  btn.querySelector('.spinner').style.display = 'none';
+}
+
+async function excluirDespesa(id, btnEl) {
+  if (!btnEl.dataset.confirming) {
+    btnEl.textContent = '?';
+    btnEl.style.color = '#e74c3c';
+    btnEl.dataset.confirming = 'true';
+    setTimeout(() => { btnEl.textContent = '✕'; btnEl.style.color = ''; delete btnEl.dataset.confirming; }, 3000);
+    return;
+  }
+  await db.from('expenses').delete().eq('id', id);
+  await renderPeriod();
+}
+
+function showDespMsg(text, type) {
+  const el = document.getElementById('desp-msg');
+  el.textContent = text;
+  el.className = `msg msg-${type} show`;
+}
+</script>
+</body>
+</html>
