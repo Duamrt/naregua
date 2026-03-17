@@ -527,14 +527,13 @@ async function confirmarAgendamento() {
 
   // Link WhatsApp pro dono da barbearia
   const shopPhone = (shop.phone || '').replace(/\D/g, '');
-  const waMsg = encodeURIComponent(
-    `Olá! Agendei pelo NaRegua:\n` +
-    `📋 ${selectedService.name}\n` +
-    `💈 ${selectedBarber.name}\n` +
-    `📅 ${dateFormatted} às ${selectedTime}\n` +
-    `👤 ${nome}\n` +
-    `📱 ${phone}`
-  );
+  const waText = 'Ola! Agendei pelo NaRegua:\n\n'
+    + 'Servico: ' + selectedService.name + '\n'
+    + 'Profissional: ' + selectedBarber.name + '\n'
+    + 'Data: ' + dateFormatted + ' as ' + selectedTime + '\n'
+    + 'Nome: ' + nome + '\n'
+    + 'WhatsApp: ' + phone;
+  const waMsg = encodeURIComponent(waText);
   const waLink = document.getElementById('whatsapp-link');
   if (shopPhone) {
     waLink.href = `https://wa.me/55${shopPhone}?text=${waMsg}`;

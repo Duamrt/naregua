@@ -7,65 +7,381 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
+
+    /* Header */
+    .dash-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 0 16px; border-bottom:1px solid var(--borda); margin-bottom:16px;
+    }
+    .dash-header .shop-name { font-size:16px; font-weight:700; }
+    .dash-header .shop-city { font-size:11px; color:var(--texto-muted); }
+    .header-actions { display:flex; gap:8px; }
+    .icon-btn {
+      width:36px; height:36px; border-radius:8px; border:1px solid var(--borda);
+      background:transparent; color:var(--texto-secundario); font-size:16px;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      transition:all .2s;
+    }
+    .icon-btn:hover { border-color:var(--borda-hover); background:rgba(255,255,255,0.03); }
+
+    /* Stats */
+    .stats-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:20px; }
+    .stat-card {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:10px;
+      padding:12px; text-align:center;
+    }
+    .stat-num { font-size:22px; font-weight:800; font-family:'Inter',sans-serif; }
+    .stat-label { font-size:9px; color:var(--texto-muted); font-weight:700; letter-spacing:1px; margin-top:4px; }
+
+    /* Navegação de data */
+    .date-nav {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:16px;
+    }
+    .date-nav-btn {
+      width:36px; height:36px; border-radius:8px; border:1px solid var(--borda);
+      background:transparent; color:var(--texto-secundario); font-size:16px;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      transition:all .2s; font-family:inherit;
+    }
+    .date-nav-btn:hover { border-color:var(--borda-hover); }
+    .date-nav-label { font-size:14px; font-weight:700; }
+    .date-nav-sub { font-size:11px; color:var(--texto-muted); text-align:center; }
+    .date-nav-today {
+      font-size:11px; color:var(--verde-acao); font-weight:700; cursor:pointer;
+      background:none; border:none; font-family:inherit;
+    }
+
+    /* Cards de agendamento */
+    .appt-card {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:12px;
+      padding:14px; margin-bottom:10px; transition:all .2s;
+    }
+    .appt-card:hover { border-color:var(--borda-hover); }
+    .appt-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
+    .appt-time { font-size:20px; font-weight:800; color:var(--verde-acao); }
+    .appt-status {
+      font-size:9px; font-weight:700; letter-spacing:0.5px; padding:4px 10px;
+      border-radius:20px; text-transform:uppercase;
+    }
+    .status-pending { background:rgba(243,156,18,0.15); color:#f39c12; }
+    .status-confirmed { background:rgba(46,204,113,0.15); color:#2ecc71; }
+    .status-done { background:rgba(255,255,255,0.08); color:var(--texto-muted); }
+    .status-cancelled { background:rgba(231,76,60,0.1); color:#e74c3c; text-decoration:line-through; }
+
+    .appt-client { font-size:14px; font-weight:600; margin-bottom:2px; }
+    .appt-detail { font-size:12px; color:var(--texto-muted); }
+    .appt-actions { display:flex; gap:6px; margin-top:10px; }
+    .appt-btn {
+      flex:1; padding:8px 0; border-radius:8px; border:none; font-size:11px;
+      font-weight:700; font-family:inherit; cursor:pointer; transition:all .2s;
+      letter-spacing:0.5px;
+    }
+    .appt-btn:hover { opacity:0.85; }
+    .btn-confirm-appt { background:rgba(46,204,113,0.15); color:#2ecc71; }
+    .btn-done-appt { background:rgba(46,204,113,0.15); color:#2ecc71; }
+    .btn-cancel-appt { background:rgba(231,76,60,0.1); color:#e74c3c; }
+    .btn-whatsapp { background:rgba(37,211,102,0.15); color:#25d366; }
+
+    .empty-state {
+      text-align:center; padding:40px 20px; color:var(--texto-muted);
+    }
+    .empty-icon { font-size:40px; margin-bottom:12px; }
+    .empty-text { font-size:13px; }
+
+    /* Link compartilhar */
+    .share-bar {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:10px;
+      padding:12px 14px; margin-bottom:16px; display:flex; align-items:center;
+      justify-content:space-between; gap:10px;
+    }
+    .share-bar .link { font-size:11px; color:var(--texto-muted); word-break:break-all; flex:1; }
+    .share-bar .copy-btn {
+      background:var(--verde-acao); color:#000; border:none; border-radius:6px;
+      padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer;
+      font-family:inherit; white-space:nowrap;
+    }
+
+    /* Bottom nav */
+    .bottom-nav {
+      position:fixed; bottom:0; left:0; right:0;
+      background:var(--cinza-escuro); border-top:1px solid var(--borda);
+      display:flex; justify-content:center; gap:0; padding:8px 0;
+      padding-bottom:max(8px, env(safe-area-inset-bottom));
+    }
+    .nav-item {
+      flex:1; max-width:100px; display:flex; flex-direction:column;
+      align-items:center; gap:2px; padding:6px 0;
+      color:var(--texto-muted); font-size:10px; font-weight:600;
+      text-decoration:none; cursor:pointer; border:none; background:none;
+      font-family:inherit; transition:all .2s;
+    }
+    .nav-item.active { color:var(--verde-acao); }
+    .nav-item .nav-icon { font-size:18px; }
+
+    body { padding-bottom:70px; }
+  </style>
 </head>
 <body>
 
-<div class="page-center">
-  <div class="card" style="max-width:480px;text-align:center;">
-    <div class="logo" style="margin-bottom:16px;">Na<span>Regua</span></div>
-    <h2 id="shop-name-display" style="margin-bottom:8px;">Carregando...</h2>
-    <p id="shop-info" style="color:var(--texto-muted);font-size:13px;margin-bottom:24px;"></p>
+<div class="dash-container">
 
-    <div id="dash-content" style="text-align:left;"></div>
-
-    <button class="btn btn-outline" onclick="logout()" style="margin-top:20px;">SAIR</button>
+  <!-- Header -->
+  <div class="dash-header">
+    <div>
+      <div class="shop-name" id="shop-name"></div>
+      <div class="shop-city" id="shop-city"></div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="compartilharLink()" title="Compartilhar link">🔗</button>
+      <button class="icon-btn" onclick="logout()" title="Sair">⏻</button>
+    </div>
   </div>
+
+  <!-- Link público -->
+  <div class="share-bar" id="share-bar" style="display:none;">
+    <div class="link" id="share-link"></div>
+    <button class="copy-btn" onclick="copiarLink()">COPIAR</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num" id="stat-total" style="color:var(--texto-principal);">0</div>
+      <div class="stat-label">AGENDADOS</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-confirmed" style="color:var(--verde-acao);">0</div>
+      <div class="stat-label">CONFIRMADOS</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-revenue" style="color:var(--verde-acao);">0</div>
+      <div class="stat-label">FATURAMENTO</div>
+    </div>
+  </div>
+
+  <!-- Navegação de data -->
+  <div class="date-nav">
+    <button class="date-nav-btn" onclick="changeDay(-1)">‹</button>
+    <div style="text-align:center;">
+      <div class="date-nav-label" id="date-label"></div>
+      <button class="date-nav-today" id="btn-today" onclick="goToday()" style="display:none;">voltar pra hoje</button>
+    </div>
+    <button class="date-nav-btn" onclick="changeDay(1)">›</button>
+  </div>
+
+  <!-- Lista de agendamentos -->
+  <div id="appt-list"></div>
+
+</div>
+
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+  <a class="nav-item active" href="dashboard.html">
+    <span class="nav-icon">📅</span>AGENDA
+  </a>
+  <a class="nav-item" href="servicos.html">
+    <span class="nav-icon">✂️</span>SERVIÇOS
+  </a>
+  <a class="nav-item" href="financeiro.html">
+    <span class="nav-icon">💰</span>CAIXA
+  </a>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="js/supabase.js"></script>
 <script src="js/utils.js"></script>
 <script>
+// ── Estado ────────────────────────────────────────────────────
+let shop = null;
+let services = [];
+let barbers = [];
+let currentDate = new Date();
+const DIAS_SEMANA = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+
+// ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'index.html'; return; }
 
-  const { data: shop } = await sb
+  const { data: shopData } = await sb
     .from('barbershops')
     .select('*')
     .eq('owner_id', session.user.id)
     .maybeSingle();
 
-  if (!shop) { window.location.href = 'onboarding.html'; return; }
+  if (!shopData) { window.location.href = 'onboarding.html'; return; }
+  shop = shopData;
 
-  document.getElementById('shop-name-display').textContent = shop.name;
-  document.getElementById('shop-info').textContent = `${shop.city} · ${shop.phone || 'Sem telefone'}`;
+  document.getElementById('shop-name').textContent = shop.name;
+  document.getElementById('shop-city').textContent = shop.city + (shop.phone ? ' · ' + shop.phone : '');
 
   // Buscar serviços e barbeiros
-  const { data: services } = await sb.from('services').select('*').eq('barbershop_id', shop.id);
-  const { data: barbers } = await sb.from('barbers').select('*').eq('barbershop_id', shop.id);
+  const [svcRes, barbRes] = await Promise.all([
+    sb.from('services').select('*').eq('barbershop_id', shop.id),
+    sb.from('barbers').select('*').eq('barbershop_id', shop.id)
+  ]);
+  services = svcRes.data || [];
+  barbers = barbRes.data || [];
 
-  let html = `<div style="background:var(--cinza-medio);border-radius:8px;padding:14px;margin-bottom:12px;">
-    <div style="font-size:11px;color:var(--verde-acao);font-weight:700;margin-bottom:8px;">LINK PÚBLICO DE AGENDAMENTO</div>
-    <div style="font-size:12px;color:var(--texto-secundario);word-break:break-all;">agendar.html?slug=${shop.slug}</div>
-  </div>`;
+  // Link público
+  const baseUrl = window.location.origin + window.location.pathname.replace('dashboard.html', '');
+  document.getElementById('share-link').textContent = baseUrl + 'agendar.html?slug=' + shop.slug;
 
-  html += `<div style="font-size:11px;color:var(--texto-muted);font-weight:700;letter-spacing:1px;margin:16px 0 8px;">SERVIÇOS (${services?.length || 0})</div>`;
-  (services || []).forEach(s => {
-    html += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--borda);font-size:13px;">
-      <span>${s.name}</span>
-      <span style="color:var(--verde-acao);font-weight:700;">${formatMoney(s.price)}</span>
-    </div>`;
-  });
-
-  html += `<div style="font-size:11px;color:var(--texto-muted);font-weight:700;letter-spacing:1px;margin:16px 0 8px;">BARBEIROS (${barbers?.length || 0})</div>`;
-  (barbers || []).forEach(b => {
-    html += `<div style="padding:8px 0;border-bottom:1px solid var(--borda);font-size:13px;">${b.name}</div>`;
-  });
-
-  document.getElementById('dash-content').innerHTML = html;
+  renderDay();
 });
 
+// ── Navegação de dias ─────────────────────────────────────────
+function changeDay(delta) {
+  currentDate.setDate(currentDate.getDate() + delta);
+  renderDay();
+}
+
+function goToday() {
+  currentDate = new Date();
+  renderDay();
+}
+
+function isToday(d) {
+  const today = new Date();
+  return d.getFullYear() === today.getFullYear() &&
+         d.getMonth() === today.getMonth() &&
+         d.getDate() === today.getDate();
+}
+
+function renderDateLabel() {
+  const d = currentDate;
+  const label = document.getElementById('date-label');
+  const btnToday = document.getElementById('btn-today');
+
+  if (isToday(d)) {
+    label.textContent = 'Hoje, ' + d.getDate() + ' de ' + MESES[d.getMonth()];
+    btnToday.style.display = 'none';
+  } else {
+    label.textContent = DIAS_SEMANA[d.getDay()] + ', ' + d.getDate() + ' de ' + MESES[d.getMonth()];
+    btnToday.style.display = 'block';
+  }
+}
+
+// ── Renderizar dia ────────────────────────────────────────────
+async function renderDay() {
+  renderDateLabel();
+
+  const dateStr = currentDate.toISOString().split('T')[0];
+  const dayStart = dateStr + 'T00:00:00';
+  const dayEnd = dateStr + 'T23:59:59';
+
+  const { data: appts } = await sb
+    .from('appointments')
+    .select('*')
+    .eq('barbershop_id', shop.id)
+    .gte('scheduled_at', dayStart)
+    .lte('scheduled_at', dayEnd)
+    .order('scheduled_at', { ascending: true });
+
+  const list = appts || [];
+  const el = document.getElementById('appt-list');
+
+  // Stats
+  const ativos = list.filter(a => a.status !== 'cancelled');
+  const confirmados = list.filter(a => a.status === 'confirmed' || a.status === 'done');
+  const faturamento = list.filter(a => a.status === 'done').reduce((s, a) => {
+    const svc = services.find(sv => sv.id === a.service_id);
+    return s + (svc ? Number(svc.price) : 0);
+  }, 0);
+
+  document.getElementById('stat-total').textContent = ativos.length;
+  document.getElementById('stat-confirmed').textContent = confirmados.length;
+  document.getElementById('stat-revenue').textContent = faturamento > 0 ? formatMoney(faturamento).replace('R$ ', '') : '0';
+
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">📭</div>
+      <div class="empty-text">Nenhum agendamento${isToday(currentDate) ? ' pra hoje' : ' neste dia'}.</div>
+      <div style="margin-top:12px;font-size:11px;color:var(--texto-muted);">
+        Compartilhe seu link pra receber agendamentos!
+      </div>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = list.map(a => {
+    const svc = services.find(s => s.id === a.service_id);
+    const barber = barbers.find(b => b.id === a.barber_id);
+    const hora = new Date(a.scheduled_at);
+    const timeStr = hora.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+    const svcName = svc ? svc.name : '—';
+    const svcPrice = svc ? formatMoney(svc.price) : '';
+    const barberName = barber ? barber.name : '';
+    const phone = (a.client_phone || '').replace(/\D/g, '');
+
+    const statusMap = {
+      pending: { label: 'PENDENTE', cls: 'status-pending' },
+      confirmed: { label: 'CONFIRMADO', cls: 'status-confirmed' },
+      done: { label: 'CONCLUÍDO', cls: 'status-done' },
+      cancelled: { label: 'CANCELADO', cls: 'status-cancelled' }
+    };
+    const st = statusMap[a.status] || statusMap.pending;
+
+    // Ações baseadas no status
+    let actions = '';
+    if (a.status === 'pending') {
+      actions = `
+        <button class="appt-btn btn-confirm-appt" onclick="updateStatus('${a.id}','confirmed')">CONFIRMAR</button>
+        <button class="appt-btn btn-cancel-appt" onclick="updateStatus('${a.id}','cancelled')">CANCELAR</button>
+        ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${phone}','${esc(a.client_name)}')">ZAP</button>` : ''}
+      `;
+    } else if (a.status === 'confirmed') {
+      actions = `
+        <button class="appt-btn btn-done-appt" onclick="updateStatus('${a.id}','done')">CONCLUIR</button>
+        <button class="appt-btn btn-cancel-appt" onclick="updateStatus('${a.id}','cancelled')">CANCELAR</button>
+        ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${phone}','${esc(a.client_name)}')">ZAP</button>` : ''}
+      `;
+    }
+
+    return `<div class="appt-card">
+      <div class="appt-top">
+        <div class="appt-time">${timeStr}</div>
+        <span class="appt-status ${st.cls}">${st.label}</span>
+      </div>
+      <div class="appt-client">${esc(a.client_name)}</div>
+      <div class="appt-detail">${svcName}${barberName ? ' · ' + barberName : ''}${svcPrice ? ' · ' + svcPrice : ''}</div>
+      ${a.client_phone ? `<div class="appt-detail" style="margin-top:2px;">📱 ${a.client_phone}</div>` : ''}
+      ${actions ? `<div class="appt-actions">${actions}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── Ações ─────────────────────────────────────────────────────
+async function updateStatus(id, status) {
+  await sb.from('appointments').update({ status }).eq('id', id);
+  renderDay();
+}
+
+function abrirWhatsApp(phone, nome) {
+  const msg = encodeURIComponent('Ola ' + nome + '! Aqui e da ' + shop.name + '.');
+  window.open('https://wa.me/55' + phone + '?text=' + msg, '_blank');
+}
+
+// ── Compartilhar ──────────────────────────────────────────────
+function compartilharLink() {
+  const bar = document.getElementById('share-bar');
+  bar.style.display = bar.style.display === 'none' ? 'flex' : 'none';
+}
+
+function copiarLink() {
+  const link = document.getElementById('share-link').textContent;
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'COPIADO!';
+    setTimeout(() => btn.textContent = 'COPIAR', 2000);
+  });
+}
+
+// ── Logout ────────────────────────────────────────────────────
 async function logout() {
   await sb.auth.signOut();
   window.location.href = 'index.html';
