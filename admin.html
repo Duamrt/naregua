@@ -99,6 +99,18 @@
       border-radius:6px; color:var(--texto-principal); font-size:13px; font-family:inherit;
     }
     .barber-row input:focus { border-color:var(--verde-acao); outline:none; }
+    .svc-row {
+      display:grid; grid-template-columns:1fr 70px 60px 32px; gap:6px;
+      align-items:end; padding:8px 0; border-bottom:1px solid var(--borda);
+    }
+    .svc-row input {
+      padding:8px 10px; background:var(--cinza-medio); border:1px solid var(--borda);
+      border-radius:6px; color:var(--texto-principal); font-size:13px; font-family:inherit;
+      width:100%;
+    }
+    .svc-row input:focus { border-color:var(--verde-acao); outline:none; }
+    .svc-row-label { font-size:8px; color:var(--texto-muted); font-weight:700; margin-bottom:2px; }
+
     .barber-row-del {
       background:rgba(231,76,60,0.1); border:1px solid rgba(231,76,60,0.2);
       border-radius:6px; color:#e74c3c; font-size:14px; cursor:pointer;
@@ -201,6 +213,10 @@
       <div class="days-modal" id="adm-days"></div>
     </div>
 
+    <div class="modal-section">Serviços</div>
+    <div id="adm-services"></div>
+    <button class="btn btn-outline" onclick="admAddService()" style="margin:10px 0 16px;font-size:12px;">+ SERVIÇO</button>
+
     <div class="modal-section">Barbeiros</div>
     <div id="adm-barbers"></div>
     <button class="btn btn-outline" onclick="admAddBarber()" style="margin:10px 0 16px;font-size:12px;">+ BARBEIRO</button>
@@ -230,6 +246,7 @@ let allBarbers = [];
 let allServices = [];
 let allAppointments = [];
 let editShopBarbers = [];
+let editShopServices = [];
 let editDays = [];
 
 // ── Init ──────────────────────────────────────────────────────
@@ -357,6 +374,9 @@ function editarShop(id) {
   editShopBarbers = allBarbers.filter(b => b.barbershop_id === id).map(b => ({ id: b.id, name: b.name }));
   renderAdmBarbers();
 
+  editShopServices = allServices.filter(sv => sv.barbershop_id === id).map(sv => ({ id: sv.id, name: sv.name, price: sv.price, duration_min: sv.duration_min }));
+  renderAdmServices();
+
   document.getElementById('admin-edit-msg').className = 'msg';
   document.getElementById('modal-admin-edit').classList.add('show');
 }
@@ -377,6 +397,14 @@ function abrirNovaShop() {
 
   editShopBarbers = [];
   renderAdmBarbers();
+
+  editShopServices = [
+    { id: null, name: 'Corte', price: 25, duration_min: 30 },
+    { id: null, name: 'Barba', price: 15, duration_min: 20 },
+    { id: null, name: 'Corte + Barba', price: 35, duration_min: 45 },
+    { id: null, name: 'Sobrancelha', price: 10, duration_min: 10 },
+  ];
+  renderAdmServices();
 
   document.getElementById('admin-edit-msg').className = 'msg';
   document.getElementById('modal-admin-edit').classList.add('show');
@@ -404,6 +432,24 @@ function renderAdmBarbers() {
       <button class="barber-row-del" onclick="editShopBarbers.splice(${i},1);renderAdmBarbers()">✕</button>
     </div>`
   ).join('');
+}
+
+function renderAdmServices() {
+  document.getElementById('adm-services').innerHTML = editShopServices.map((s, i) =>
+    `<div class="svc-row">
+      <div><div class="svc-row-label">SERVIÇO</div><input type="text" value="${esc(s.name)}" onchange="editShopServices[${i}].name=this.value"></div>
+      <div><div class="svc-row-label">PREÇO</div><input type="number" value="${s.price||''}" min="0" step="1" onchange="editShopServices[${i}].price=parseFloat(this.value)||0"></div>
+      <div><div class="svc-row-label">MIN</div><input type="number" value="${s.duration_min||''}" min="5" step="5" onchange="editShopServices[${i}].duration_min=parseInt(this.value)||30"></div>
+      <button class="barber-row-del" onclick="editShopServices.splice(${i},1);renderAdmServices()" style="align-self:end;">✕</button>
+    </div>`
+  ).join('');
+}
+
+function admAddService() {
+  editShopServices.push({ id: null, name: '', price: 0, duration_min: 30 });
+  renderAdmServices();
+  const inputs = document.querySelectorAll('#adm-services input[type=text]');
+  if (inputs.length) inputs[inputs.length - 1].focus();
 }
 
 function admAddBarber() {
@@ -451,14 +497,27 @@ async function salvarAdmin() {
       }).select().single();
       if (error) throw error;
       shopId = data.id;
+    }
 
-      // Criar serviços padrão
-      await sbAdmin.from('services').insert([
-        { barbershop_id: shopId, name: 'Corte', price: 25, duration_min: 30 },
-        { barbershop_id: shopId, name: 'Barba', price: 15, duration_min: 20 },
-        { barbershop_id: shopId, name: 'Corte + Barba', price: 35, duration_min: 45 },
-        { barbershop_id: shopId, name: 'Sobrancelha', price: 10, duration_min: 10 },
-      ]);
+    // Gerenciar serviços
+    const existingServices = allServices.filter(sv => sv.barbershop_id === shopId);
+    const editSvcIds = editShopServices.filter(s => s.id).map(s => s.id);
+
+    for (const sv of existingServices) {
+      if (!editSvcIds.includes(sv.id)) {
+        await sbAdmin.from('services').delete().eq('id', sv.id);
+      }
+    }
+
+    for (const sv of editShopServices) {
+      if (!sv.name.trim()) continue;
+      if (sv.id) {
+        await sbAdmin.from('services').update({ name: sv.name.trim(), price: sv.price, duration_min: sv.duration_min }).eq('id', sv.id);
+      } else {
+        await sbAdmin.from('services').insert({
+          barbershop_id: shopId, name: sv.name.trim(), price: sv.price || 0, duration_min: sv.duration_min || 30, active: true
+        });
+      }
     }
 
     // Gerenciar barbeiros
