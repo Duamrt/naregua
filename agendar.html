@@ -22,7 +22,7 @@
     .payment-badges { display:flex; gap:6px; flex-wrap:wrap; justify-content:center; }
     .pay-badge {
       font-size:10px; font-weight:600; padding:4px 10px; border-radius:6px;
-      background:rgba(46,204,113,0.08); border:1px solid rgba(46,204,113,0.15);
+      background:rgba(74,158,173,0.08); border:1px solid rgba(74,158,173,0.15);
       color:var(--verde-acao);
     }
 
@@ -44,13 +44,13 @@
       cursor:pointer; font-family:inherit; transition:all .2s; white-space:nowrap;
     }
     .cat-chip:hover { border-color:var(--borda-hover); }
-    .cat-chip.active { border-color:var(--verde-acao); background:rgba(46,204,113,0.1); color:var(--verde-acao); }
+    .cat-chip.active { border-color:var(--verde-acao); background:rgba(74,158,173,0.1); color:var(--verde-acao); }
     .cat-chip .chip-count {
       display:inline-block; min-width:14px; text-align:center;
       background:rgba(255,255,255,0.08); border-radius:10px; padding:1px 5px;
       font-size:9px; margin-left:4px;
     }
-    .cat-chip.active .chip-count { background:rgba(46,204,113,0.2); }
+    .cat-chip.active .chip-count { background:rgba(74,158,173,0.2); }
 
     .step-indicator {
       display:flex; gap:4px; justify-content:center; margin-bottom:24px;
@@ -70,7 +70,7 @@
       border-radius:10px; cursor:pointer; transition:all .2s;
     }
     .option-card:hover { border-color:var(--borda-hover); }
-    .option-card.selected { border-color:var(--verde-acao); background:rgba(46,204,113,0.08); }
+    .option-card.selected { border-color:var(--verde-acao); background:rgba(74,158,173,0.08); }
     .option-card .name { font-size:14px; font-weight:600; }
     .option-card .detail { font-size:11px; color:var(--texto-muted); margin-top:2px; }
     .option-card .price { font-size:15px; font-weight:700; color:var(--verde-acao); }
@@ -87,7 +87,7 @@
       border-radius:10px; cursor:pointer; transition:all .2s; flex-shrink:0;
     }
     .date-card:hover { border-color:var(--borda-hover); }
-    .date-card.selected { border-color:var(--verde-acao); background:rgba(46,204,113,0.08); }
+    .date-card.selected { border-color:var(--verde-acao); background:rgba(74,158,173,0.08); }
     .date-card .dia-semana { font-size:10px; color:var(--texto-muted); font-weight:700; text-transform:uppercase; }
     .date-card .dia-num { font-size:20px; font-weight:800; margin:4px 0; }
     .date-card .mes { font-size:10px; color:var(--texto-muted); }
@@ -102,7 +102,7 @@
       border-radius:8px; cursor:pointer; transition:all .2s;
     }
     .time-slot:hover { border-color:var(--borda-hover); }
-    .time-slot.selected { border-color:var(--verde-acao); background:rgba(46,204,113,0.08); color:var(--verde-acao); }
+    .time-slot.selected { border-color:var(--verde-acao); background:rgba(74,158,173,0.08); color:var(--verde-acao); }
     .time-slot.disabled {
       opacity:0.3; cursor:not-allowed; pointer-events:none;
     }
@@ -148,7 +148,7 @@
 
       <!-- Header da barbearia -->
       <div class="shop-header">
-        <div class="logo" style="font-size:20px;margin-bottom:12px;">Na<span>Regua</span></div>
+        <img src="img/logo.png" alt="NaRegua" class="logo-img" style="height:40px;margin-bottom:12px;">
         <h1 id="shop-name"></h1>
         <div class="info" id="shop-info"></div>
 
