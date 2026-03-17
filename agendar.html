@@ -38,6 +38,20 @@
     .social-instagram { color:#e4405f; border-color:rgba(228,64,95,0.3); }
     .social-instagram:hover { background:rgba(228,64,95,0.08); }
 
+    .cat-chip {
+      padding:6px 14px; border-radius:20px; font-size:11px; font-weight:700;
+      border:1.5px solid var(--borda); background:transparent; color:var(--texto-muted);
+      cursor:pointer; font-family:inherit; transition:all .2s; white-space:nowrap;
+    }
+    .cat-chip:hover { border-color:var(--borda-hover); }
+    .cat-chip.active { border-color:var(--verde-acao); background:rgba(46,204,113,0.1); color:var(--verde-acao); }
+    .cat-chip .chip-count {
+      display:inline-block; min-width:14px; text-align:center;
+      background:rgba(255,255,255,0.08); border-radius:10px; padding:1px 5px;
+      font-size:9px; margin-left:4px;
+    }
+    .cat-chip.active .chip-count { background:rgba(46,204,113,0.2); }
+
     .step-indicator {
       display:flex; gap:4px; justify-content:center; margin-bottom:24px;
     }
@@ -150,7 +164,8 @@
 
       <!-- Step 1: Serviço -->
       <div id="ag-step-1">
-        <h3 style="margin-bottom:12px;">Escolha o serviço</h3>
+        <h3 style="margin-bottom:8px;">Escolha o serviço</h3>
+        <div id="cat-filters" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;"></div>
         <div class="option-grid" id="services-list"></div>
         <button class="btn btn-primary" style="margin-top:16px;" onclick="agNext(2)" id="btn-step1">CONTINUAR</button>
       </div>
@@ -235,6 +250,7 @@ let barbers = [];
 let appointments = [];
 let selectedService = null;
 let selectedBarber = null;
+let selectedCategory = 'todos';
 let selectedDate = null;
 let selectedTime = null;
 let currentStep = 1;
@@ -326,6 +342,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   socialEl.innerHTML = socialHtml;
 
   renderStepDots();
+  renderCatFilters();
   renderServices();
   renderBarbers();
   renderDates();
@@ -367,10 +384,68 @@ function agNext(step) {
 
 function agBack(step) { showStep(step); }
 
+// ── Categorização automática de serviços ──────────────────────
+function categorizar(nome) {
+  const n = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  // Combos (tem "+" ou múltiplos serviços)
+  if (n.includes('+') || (n.includes('barba') && (n.includes('cabelo') || n.includes('corte') || n.includes('degrade') || n.includes('navalhado'))))
+    return 'combos';
+  // Barba
+  if (n.includes('barba') || n.includes('barbaterapia'))
+    return 'barba';
+  // Tratamentos
+  if (n.includes('hidrata') || n.includes('limpeza') || n.includes('selagem') || n.includes('massagem') || n.includes('alisamento'))
+    return 'tratamentos';
+  // Cortes (default pra tudo com corte/degrade/cabelo/infantil/social/navalhado)
+  return 'cortes';
+}
+
+const CAT_LABELS = {
+  todos: 'Todos',
+  cortes: 'Cortes',
+  barba: 'Barba',
+  combos: 'Combos',
+  tratamentos: 'Tratamentos'
+};
+
+function renderCatFilters() {
+  const el = document.getElementById('cat-filters');
+  // Só mostra filtros se tem mais de 5 serviços
+  if (services.length <= 5) { el.innerHTML = ''; return; }
+
+  const counts = { todos: services.length };
+  services.forEach(s => {
+    const cat = categorizar(s.name);
+    counts[cat] = (counts[cat] || 0) + 1;
+  });
+
+  const cats = ['todos', 'cortes', 'barba', 'combos', 'tratamentos'];
+  el.innerHTML = cats.filter(c => (counts[c] || 0) > 0).map(c =>
+    `<button class="cat-chip ${selectedCategory === c ? 'active' : ''}" onclick="setCategory('${c}')">
+      ${CAT_LABELS[c]}<span class="chip-count">${counts[c]}</span>
+    </button>`
+  ).join('');
+}
+
+function setCategory(cat) {
+  selectedCategory = cat;
+  renderCatFilters();
+  renderServices();
+}
+
 // ── Serviços ──────────────────────────────────────────────────
 function renderServices() {
   const el = document.getElementById('services-list');
-  el.innerHTML = services.map(s => `
+  const filtered = selectedCategory === 'todos'
+    ? services
+    : services.filter(s => categorizar(s.name) === selectedCategory);
+
+  if (!filtered.length) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;font-size:12px;color:var(--texto-muted);">Nenhum serviço nesta categoria.</div>';
+    return;
+  }
+
+  el.innerHTML = filtered.map(s => `
     <div class="option-card ${selectedService?.id === s.id ? 'selected' : ''}"
          onclick="selectService('${s.id}')">
       <div>
@@ -385,7 +460,7 @@ function renderServices() {
 function selectService(id) {
   selectedService = services.find(s => s.id === id);
   renderServices();
-  renderTimes(); // Recalcular slots com a duração do serviço
+  renderTimes();
 }
 
 // ── Barbeiros ─────────────────────────────────────────────────
