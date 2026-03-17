@@ -46,7 +46,7 @@
       font-size:9px; font-weight:700; letter-spacing:0.5px; padding:4px 10px;
       border-radius:20px; text-transform:uppercase;
     }
-    .plan-basico { background:rgba(74,158,173,0.15); color:#4a9ead; }
+    .plan-basico { background:rgba(212,168,83,0.15); color:#d4a853; }
     .plan-profissional { background:rgba(52,152,219,0.15); color:#3498db; }
     .plan-premium { background:rgba(243,156,18,0.15); color:#f39c12; }
 
@@ -121,7 +121,7 @@
       font-family:inherit; cursor:pointer; transition:all .2s;
       border:1px solid var(--borda); background:transparent; color:var(--texto-muted);
     }
-    .pay-toggle.active { border-color:var(--verde-acao); background:rgba(74,158,173,0.15); color:var(--verde-acao); }
+    .pay-toggle.active { border-color:var(--verde-acao); background:rgba(212,168,83,0.15); color:var(--verde-acao); }
 
     .days-modal { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
     .day-btn {
@@ -129,7 +129,7 @@
       font-family:inherit; cursor:pointer; transition:all .2s; border:1px solid var(--borda);
       background:transparent; color:var(--texto-muted);
     }
-    .day-btn.active { border-color:var(--verde-acao); background:rgba(74,158,173,0.15); color:var(--verde-acao); }
+    .day-btn.active { border-color:var(--verde-acao); background:rgba(212,168,83,0.15); color:var(--verde-acao); }
 
     .empty-admin {
       text-align:center; padding:60px 20px; color:var(--texto-muted);
@@ -358,7 +358,7 @@ function renderShops() {
         <span>Faturado: <strong>${formatMoney(shopRevenue)}</strong></span>
       </div>
       <div class="shop-actions">
-        <button class="shop-action-btn" style="border-color:rgba(74,158,173,0.3);color:var(--verde-acao);font-weight:700;" onclick="entrarComo('${s.id}')">Entrar como</button>
+        <button class="shop-action-btn" style="border-color:rgba(212,168,83,0.3);color:var(--verde-acao);font-weight:700;" onclick="entrarComo('${s.id}')">Entrar como</button>
         <button class="shop-action-btn" onclick="editarShop('${s.id}')">Editar</button>
         <button class="shop-action-btn" onclick="copiarLinkShop('${s.slug}')">Copiar link</button>
         <button class="shop-action-btn" onclick="window.open('${baseUrl}agendar.html?slug=${s.slug}','_blank')">Ver página</button>
