@@ -12,6 +12,32 @@
     .shop-header h1 { font-size:20px; margin-bottom:4px; }
     .shop-header .info { font-size:12px; color:var(--texto-muted); }
 
+    .info-badge {
+      display:inline-flex; align-items:center; gap:6px;
+      background:var(--cinza-medio); border:1px solid var(--borda);
+      border-radius:8px; padding:6px 12px; font-size:11px; color:var(--texto-secundario);
+    }
+    .info-badges { display:flex; gap:6px; flex-wrap:wrap; justify-content:center; }
+
+    .payment-badges { display:flex; gap:6px; flex-wrap:wrap; justify-content:center; }
+    .pay-badge {
+      font-size:10px; font-weight:600; padding:4px 10px; border-radius:6px;
+      background:rgba(46,204,113,0.08); border:1px solid rgba(46,204,113,0.15);
+      color:var(--verde-acao);
+    }
+
+    .social-btn {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:8px 16px; border-radius:8px; font-size:12px; font-weight:600;
+      text-decoration:none; transition:all .2s; border:1px solid var(--borda);
+      color:var(--texto-secundario);
+    }
+    .social-btn:hover { border-color:var(--borda-hover); text-decoration:none; }
+    .social-whatsapp { color:#25d366; border-color:rgba(37,211,102,0.3); }
+    .social-whatsapp:hover { background:rgba(37,211,102,0.08); }
+    .social-instagram { color:#e4405f; border-color:rgba(228,64,95,0.3); }
+    .social-instagram:hover { background:rgba(228,64,95,0.08); }
+
     .step-indicator {
       display:flex; gap:4px; justify-content:center; margin-bottom:24px;
     }
@@ -111,6 +137,12 @@
         <div class="logo" style="font-size:20px;margin-bottom:12px;">Na<span>Regua</span></div>
         <h1 id="shop-name"></h1>
         <div class="info" id="shop-info"></div>
+
+        <!-- Info bar -->
+        <div id="shop-details" style="margin-top:14px;display:flex;flex-direction:column;gap:8px;"></div>
+
+        <!-- Redes sociais -->
+        <div id="shop-social" style="display:flex;gap:10px;justify-content:center;margin-top:12px;"></div>
       </div>
 
       <!-- Indicador de steps -->
@@ -242,9 +274,56 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Atualizar título da página
   document.title = `${shop.name} — Agendar | NaRegua`;
 
-  // Renderizar
+  // Renderizar header
   document.getElementById('shop-name').textContent = shop.name;
-  document.getElementById('shop-info').textContent = `${shop.city}${shop.phone ? ' · ' + shop.phone : ''}`;
+  document.getElementById('shop-info').textContent = shop.city || '';
+
+  // Info badges (horário, endereço)
+  const detailsEl = document.getElementById('shop-details');
+  let detailsHtml = '<div class="info-badges">';
+
+  // Horário de funcionamento
+  const diasOpen = shop.days_open || [1,2,3,4,5,6];
+  const diasNome = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
+  const primeiro = diasOpen[0];
+  const ultimo = diasOpen[diasOpen.length - 1];
+  const diasLabel = diasOpen.length === 7 ? 'Todos os dias'
+    : diasOpen.length === 6 && !diasOpen.includes(0) ? 'Seg a Sab'
+    : diasNome[primeiro] + ' a ' + diasNome[ultimo];
+  detailsHtml += `<span class="info-badge">🕐 ${diasLabel} · ${shop.opening_time || '08:00'} - ${shop.closing_time || '19:00'}</span>`;
+
+  // Endereço
+  if (shop.address) {
+    detailsHtml += `<span class="info-badge">📍 ${esc(shop.address)}</span>`;
+  }
+
+  detailsHtml += '</div>';
+
+  // Formas de pagamento
+  const payments = shop.payment_methods || [];
+  if (payments.length) {
+    detailsHtml += '<div class="payment-badges" style="margin-top:6px;">';
+    const payLabels = { dinheiro: 'Dinheiro', pix: 'PIX', credito: 'Crédito', debito: 'Débito' };
+    payments.forEach(p => {
+      detailsHtml += `<span class="pay-badge">${payLabels[p] || p}</span>`;
+    });
+    detailsHtml += '</div>';
+  }
+
+  detailsEl.innerHTML = detailsHtml;
+
+  // Redes sociais
+  const socialEl = document.getElementById('shop-social');
+  let socialHtml = '';
+  const phone = (shop.phone || '').replace(/\D/g, '');
+  if (phone) {
+    socialHtml += `<a href="https://wa.me/55${phone}" target="_blank" class="social-btn social-whatsapp">📱 WhatsApp</a>`;
+  }
+  if (shop.instagram) {
+    const ig = shop.instagram.replace('@','');
+    socialHtml += `<a href="https://instagram.com/${ig}" target="_blank" class="social-btn social-instagram">📸 @${ig}</a>`;
+  }
+  socialEl.innerHTML = socialHtml;
 
   renderStepDots();
   renderServices();

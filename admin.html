@@ -116,6 +116,13 @@
       border-radius:6px; color:#e74c3c; font-size:14px; cursor:pointer;
       width:32px; height:32px; display:flex; align-items:center; justify-content:center;
     }
+    .pay-toggle {
+      padding:8px 14px; border-radius:8px; font-size:12px; font-weight:700;
+      font-family:inherit; cursor:pointer; transition:all .2s;
+      border:1px solid var(--borda); background:transparent; color:var(--texto-muted);
+    }
+    .pay-toggle.active { border-color:var(--verde-acao); background:rgba(46,204,113,0.15); color:var(--verde-acao); }
+
     .days-modal { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
     .day-btn {
       padding:8px 12px; border-radius:8px; font-size:12px; font-weight:700;
@@ -177,6 +184,18 @@
     <div class="field">
       <label>WHATSAPP</label>
       <input type="tel" id="adm-phone">
+    </div>
+    <div class="field">
+      <label>ENDEREÇO</label>
+      <input type="text" id="adm-address" placeholder="Rua, número, referência">
+    </div>
+    <div class="field">
+      <label>INSTAGRAM</label>
+      <input type="text" id="adm-instagram" placeholder="@nomedabarbearia">
+    </div>
+    <div class="field">
+      <label>FORMAS DE PAGAMENTO</label>
+      <div id="adm-payments" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
     </div>
     <div class="field">
       <label>PLANO</label>
@@ -248,6 +267,8 @@ let allAppointments = [];
 let editShopBarbers = [];
 let editShopServices = [];
 let editDays = [];
+let editPayments = [];
+const PAY_OPTIONS = ['dinheiro', 'pix', 'credito', 'debito'];
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
@@ -363,6 +384,10 @@ function editarShop(id) {
   document.getElementById('adm-name').value = s.name || '';
   document.getElementById('adm-city').value = s.city || '';
   document.getElementById('adm-phone').value = s.phone || '';
+  document.getElementById('adm-address').value = s.address || '';
+  document.getElementById('adm-instagram').value = s.instagram || '';
+  editPayments = [...(s.payment_methods || ['dinheiro', 'pix'])];
+  renderAdmPayments();
   document.getElementById('adm-plan').value = s.plan || 'basico';
   document.getElementById('adm-open').value = s.opening_time || '08:00';
   document.getElementById('adm-close').value = s.closing_time || '19:00';
@@ -387,6 +412,10 @@ function abrirNovaShop() {
   document.getElementById('adm-name').value = '';
   document.getElementById('adm-city').value = '';
   document.getElementById('adm-phone').value = '';
+  document.getElementById('adm-address').value = '';
+  document.getElementById('adm-instagram').value = '';
+  editPayments = ['dinheiro', 'pix'];
+  renderAdmPayments();
   document.getElementById('adm-plan').value = 'basico';
   document.getElementById('adm-open').value = '08:00';
   document.getElementById('adm-close').value = '19:00';
@@ -412,6 +441,18 @@ function abrirNovaShop() {
 
 function fecharModalAdmin() {
   document.getElementById('modal-admin-edit').classList.remove('show');
+}
+
+function renderAdmPayments() {
+  const labels = { dinheiro: 'Dinheiro', pix: 'PIX', credito: 'Crédito', debito: 'Débito' };
+  document.getElementById('adm-payments').innerHTML = PAY_OPTIONS.map(p =>
+    `<button type="button" class="pay-toggle ${editPayments.includes(p) ? 'active' : ''}" onclick="toggleAdmPay('${p}')">${labels[p]}</button>`
+  ).join('');
+}
+
+function toggleAdmPay(p) {
+  editPayments = editPayments.includes(p) ? editPayments.filter(x => x !== p) : [...editPayments, p];
+  renderAdmPayments();
 }
 
 function renderAdmDays() {
@@ -465,6 +506,8 @@ async function salvarAdmin() {
   const name = document.getElementById('adm-name').value.trim();
   const city = document.getElementById('adm-city').value.trim().toUpperCase();
   const phone = document.getElementById('adm-phone').value.trim();
+  const address = document.getElementById('adm-address').value.trim();
+  const instagram = document.getElementById('adm-instagram').value.trim();
   const plan = document.getElementById('adm-plan').value;
   const opening = document.getElementById('adm-open').value;
   const closing = document.getElementById('adm-close').value;
@@ -483,16 +526,16 @@ async function salvarAdmin() {
     if (editId) {
       // Atualizar
       const { error } = await sbAdmin.from('barbershops').update({
-        name, slug, city, phone, plan, opening_time: opening,
-        closing_time: closing, interval_min: interval, days_open: editDays
+        name, slug, city, phone, address, instagram, payment_methods: editPayments,
+        plan, opening_time: opening, closing_time: closing, interval_min: interval, days_open: editDays
       }).eq('id', editId);
       if (error) throw error;
     } else {
       // Criar nova — pegar o owner_id do admin logado
       const { data: { session } } = await sb.auth.getSession();
       const { data, error } = await sbAdmin.from('barbershops').insert({
-        owner_id: session.user.id, name, slug, city, phone, plan,
-        opening_time: opening, closing_time: closing,
+        owner_id: session.user.id, name, slug, city, phone, address, instagram,
+        payment_methods: editPayments, plan, opening_time: opening, closing_time: closing,
         interval_min: interval, days_open: editDays
       }).select().single();
       if (error) throw error;
