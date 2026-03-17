@@ -370,7 +370,7 @@ function renderShops() {
 
 function entrarComo(shopId) {
   sessionStorage.setItem('admin_viewing_shop', shopId);
-  window.location.href = 'dashboard.html';
+  window.location.href = 'dashboard.html?shop=' + shopId;
 }
 
 function copiarLinkShop(slug) {

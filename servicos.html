@@ -156,7 +156,9 @@ let shop = null;
 let services = [];
 
 const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
-const adminViewingShop = sessionStorage.getItem('admin_viewing_shop');
+const _params = new URLSearchParams(window.location.search);
+const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_viewing_shop');
+if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
 const isAdminViewing = !!adminViewingShop;
 const db = isAdminViewing
   ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs')
