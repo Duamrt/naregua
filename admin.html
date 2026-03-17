@@ -689,24 +689,37 @@ async function confirmarExclusao() {
   btn.querySelector('.spinner').style.display = 'inline-block';
   errEl.style.display = 'none';
 
+  const id = _deleteShopId;
+
   try {
-    // Deletar filhas na ordem certa (appointments primeiro pq referencia barbers/services)
+    // Deletar filhas na ordem certa
     const filhas = ['payments','appointments','services','barbers','subscriptions'];
     for (const t of filhas) {
-      const { error } = await sbAdmin.from(t).delete().eq('barbershop_id', _deleteShopId);
-      if (error) {
-        errEl.textContent = 'Erro em ' + t + ': ' + error.message;
+      const res = await sbAdmin.from(t).delete().eq('barbershop_id', id).select();
+      if (res.error) {
+        errEl.textContent = 'Erro em ' + t + ': ' + res.error.message;
         errEl.style.display = 'block';
-        throw error;
+        throw res.error;
       }
     }
-    const { error } = await sbAdmin.from('barbershops').delete().eq('id', _deleteShopId);
-    if (error) {
-      errEl.textContent = 'Erro em barbershops: ' + error.message;
+
+    // Deletar a barbearia
+    const res = await sbAdmin.from('barbershops').delete().eq('id', id).select();
+    if (res.error) {
+      errEl.textContent = 'Erro em barbershops: ' + res.error.message;
       errEl.style.display = 'block';
-      throw error;
+      throw res.error;
     }
-    fecharModalDelete();
+
+    // Verificar se realmente excluiu
+    const { data: check } = await sbAdmin.from('barbershops').select('id').eq('id', id).maybeSingle();
+    if (check) {
+      errEl.textContent = 'Exclusão não efetivou. ID: ' + id + ' — Deletados: ' + JSON.stringify(res.data);
+      errEl.style.display = 'block';
+    } else {
+      fecharModalDelete();
+    }
+
     await loadAll();
   } catch (e) {
     console.error('Erro na exclusao:', e);
