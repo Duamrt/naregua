@@ -55,7 +55,7 @@ CREATE TABLE appointments (
   client_name text NOT NULL,
   client_phone text DEFAULT '',
   scheduled_at timestamptz NOT NULL,
-  status text DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'done', 'cancelled')),
+  status text DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'done', 'cancelled', 'no_show')),
   group_id uuid,
   price_paid numeric,
   payment_method text,
