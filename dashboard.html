@@ -70,6 +70,7 @@
     .status-confirmed { background:rgba(46,204,113,0.15); color:#2ecc71; }
     .status-done { background:rgba(255,255,255,0.08); color:var(--texto-muted); }
     .status-cancelled { background:rgba(231,76,60,0.1); color:#e74c3c; text-decoration:line-through; }
+    .status-no_show { background:rgba(155,89,182,0.15); color:#9b59b6; }
 
     .appt-client { font-size:14px; font-weight:600; margin-bottom:2px; }
     .appt-detail { font-size:12px; color:var(--texto-muted); }
@@ -83,6 +84,7 @@
     .btn-confirm-appt { background:rgba(46,204,113,0.15); color:#2ecc71; }
     .btn-done-appt { background:rgba(46,204,113,0.15); color:#2ecc71; }
     .btn-cancel-appt { background:rgba(231,76,60,0.1); color:#e74c3c; }
+    .btn-noshow { background:rgba(155,89,182,0.15); color:#9b59b6; }
     .btn-whatsapp { background:rgba(37,211,102,0.15); color:#25d366; }
 
     .empty-state {
@@ -215,18 +217,22 @@
   </div>
 
   <!-- Stats -->
-  <div class="stats-row">
+  <div class="stats-row" style="grid-template-columns:1fr 1fr 1fr 1fr;">
     <div class="stat-card">
       <div class="stat-num" id="stat-total" style="color:var(--texto-principal);">0</div>
       <div class="stat-label">AGENDADOS</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num" id="stat-confirmed" style="color:var(--verde-acao);">0</div>
-      <div class="stat-label">CONFIRMADOS</div>
+      <div class="stat-num" id="stat-done" style="color:var(--verde-acao);">0</div>
+      <div class="stat-label">ATENDIDOS</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-noshow" style="color:#9b59b6;">0</div>
+      <div class="stat-label">FALTARAM</div>
     </div>
     <div class="stat-card">
       <div class="stat-num" id="stat-revenue" style="color:var(--verde-acao);">0</div>
-      <div class="stat-label">FATURAMENTO</div>
+      <div class="stat-label">FATURADO</div>
     </div>
   </div>
 
@@ -305,6 +311,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('share-link').textContent = baseUrl + 'agendar.html?slug=' + shop.slug;
 
   renderDay();
+
+  // Atualizar automaticamente a cada 30s (pega novos agendamentos)
+  setInterval(() => renderDay(), 30000);
 });
 
 // ── Navegação de dias ─────────────────────────────────────────
@@ -356,13 +365,37 @@ async function renderDay() {
     .order('scheduled_at', { ascending: true });
 
   dayAppointments = appts || [];
+
+  // Auto-confirmar pendentes com mais de 5 minutos
+  if (isToday(currentDate)) {
+    await autoConfirmar();
+  }
+
   renderFilters();
   renderAppointments();
 }
 
+async function autoConfirmar() {
+  const agora = new Date();
+  const cincoMinAtras = new Date(agora.getTime() - 5 * 60000);
+  const pendentes = dayAppointments.filter(a =>
+    a.status === 'pending' && new Date(a.created_at) < cincoMinAtras
+  );
+
+  if (pendentes.length > 0) {
+    const ids = pendentes.map(a => a.id);
+    await sb.from('appointments')
+      .update({ status: 'confirmed' })
+      .in('id', ids);
+
+    // Atualizar local
+    pendentes.forEach(a => a.status = 'confirmed');
+  }
+}
+
 function renderFilters() {
   const el = document.getElementById('filters');
-  const counts = { all: 0, pending: 0, confirmed: 0, done: 0, cancelled: 0 };
+  const counts = { all: 0, pending: 0, confirmed: 0, done: 0, cancelled: 0, no_show: 0 };
   dayAppointments.forEach(a => {
     counts.all++;
     counts[a.status] = (counts[a.status] || 0) + 1;
@@ -372,7 +405,8 @@ function renderFilters() {
     { key: 'all', label: 'Todos', count: counts.all },
     { key: 'pending', label: 'Pendentes', count: counts.pending },
     { key: 'confirmed', label: 'Confirmados', count: counts.confirmed },
-    { key: 'done', label: 'Concluídos', count: counts.done },
+    { key: 'done', label: 'Atendidos', count: counts.done },
+    { key: 'no_show', label: 'Faltaram', count: counts.no_show },
     { key: 'cancelled', label: 'Cancelados', count: counts.cancelled },
   ];
 
@@ -394,15 +428,17 @@ function renderAppointments() {
   const el = document.getElementById('appt-list');
 
   // Stats (sempre do dia todo, não do filtro)
-  const ativos = dayAppointments.filter(a => a.status !== 'cancelled');
-  const confirmados = dayAppointments.filter(a => a.status === 'confirmed' || a.status === 'done');
-  const faturamento = dayAppointments.filter(a => a.status === 'done').reduce((s, a) => {
+  const ativos = dayAppointments.filter(a => !['cancelled','no_show'].includes(a.status));
+  const done = dayAppointments.filter(a => a.status === 'done');
+  const noShow = dayAppointments.filter(a => a.status === 'no_show');
+  const faturamento = done.reduce((s, a) => {
     const svc = services.find(sv => sv.id === a.service_id);
     return s + (svc ? Number(svc.price) : 0);
   }, 0);
 
   document.getElementById('stat-total').textContent = ativos.length;
-  document.getElementById('stat-confirmed').textContent = confirmados.length;
+  document.getElementById('stat-done').textContent = done.length;
+  document.getElementById('stat-noshow').textContent = noShow.length;
   document.getElementById('stat-revenue').textContent = faturamento > 0 ? formatMoney(faturamento).replace('R$ ', '') : '0';
 
   if (!dayAppointments.length) {
@@ -457,10 +493,18 @@ function renderApptCard(a) {
   const statusMap = {
     pending: { label: 'PENDENTE', cls: 'status-pending' },
     confirmed: { label: 'CONFIRMADO', cls: 'status-confirmed' },
-    done: { label: 'CONCLUÍDO', cls: 'status-done' },
-    cancelled: { label: 'CANCELADO', cls: 'status-cancelled' }
+    done: { label: 'ATENDIDO', cls: 'status-done' },
+    cancelled: { label: 'CANCELADO', cls: 'status-cancelled' },
+    no_show: { label: 'FALTOU', cls: 'status-no_show' }
   };
   const st = statusMap[a.status] || statusMap.pending;
+
+  // Verificar se horário já passou (pra mostrar botão FALTOU)
+  const agora = new Date();
+  const horario = new Date(a.scheduled_at);
+  const svcDur = svc ? svc.duration_min : 30;
+  const fimAtendimento = new Date(horario.getTime() + svcDur * 60000);
+  const jaPassou = agora > fimAtendimento;
 
   let actions = '';
   if (a.status === 'pending') {
@@ -470,12 +514,20 @@ function renderApptCard(a) {
       ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${phone}','${esc(a.client_name)}')">ZAP</button>` : ''}
     `;
   } else if (a.status === 'confirmed') {
-    actions = `
-      <button class="appt-btn btn-done-appt" onclick="updateStatus('${a.id}','done')">CONCLUIR</button>
-      <button class="appt-btn btn-cancel-appt" onclick="updateStatus('${a.id}','cancelled')">CANCELAR</button>
-      ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${phone}','${esc(a.client_name)}')">ZAP</button>` : ''}
-    `;
-  } else if (a.status === 'cancelled') {
+    if (jaPassou) {
+      // Horário já passou — mostrar ATENDIDO ou FALTOU
+      actions = `
+        <button class="appt-btn btn-done-appt" onclick="updateStatus('${a.id}','done')">ATENDIDO</button>
+        <button class="appt-btn btn-noshow" onclick="updateStatus('${a.id}','no_show')">FALTOU</button>
+      `;
+    } else {
+      actions = `
+        <button class="appt-btn btn-done-appt" onclick="updateStatus('${a.id}','done')">CONCLUIR</button>
+        <button class="appt-btn btn-cancel-appt" onclick="updateStatus('${a.id}','cancelled')">CANCELAR</button>
+        ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${phone}','${esc(a.client_name)}')">ZAP</button>` : ''}
+      `;
+    }
+  } else if (a.status === 'cancelled' || a.status === 'no_show') {
     actions = `<button class="btn-delete" onclick="excluirAgendamento('${a.id}')">EXCLUIR</button>`;
   }
 
