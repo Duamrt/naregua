@@ -246,6 +246,24 @@
   </div>
 </div>
 
+<!-- Modal confirmação exclusão -->
+<div class="modal-overlay" id="modal-delete">
+  <div class="modal" style="max-width:360px;text-align:center;">
+    <div style="font-size:40px;margin-bottom:12px;">⚠️</div>
+    <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Confirma exclusão?</div>
+    <div style="font-size:13px;color:var(--texto-muted);margin-bottom:8px;" id="delete-shop-name"></div>
+    <div style="font-size:11px;color:#e74c3c;margin-bottom:20px;">Todos os dados serão apagados (barbeiros, serviços, agendamentos).</div>
+    <div id="delete-error" style="display:none;font-size:11px;color:#e74c3c;background:rgba(231,76,60,0.1);border-radius:8px;padding:10px;margin-bottom:12px;text-align:left;word-break:break-all;"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline" onclick="fecharModalDelete()" style="flex:1;">CANCELAR</button>
+      <button class="btn" onclick="confirmarExclusao()" id="btn-delete-confirm" style="flex:1;background:#e74c3c;color:#fff;">
+        <span class="btn-label">EXCLUIR</span>
+        <div class="spinner" style="display:none;"></div>
+      </button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="js/supabase.js"></script>
 <script src="js/utils.js"></script>
@@ -401,7 +419,7 @@ function renderShops() {
         <button class="shop-action-btn" onclick="editarShop('${s.id}')">Editar</button>
         <button class="shop-action-btn" onclick="copiarLinkShop('${s.slug}')">Copiar link</button>
         <button class="shop-action-btn" onclick="window.open('${baseUrl}agendar.html?slug=${s.slug}','_blank')">Ver página</button>
-        <button class="shop-action-btn danger" onclick="excluirShop('${s.id}',this)">Excluir</button>
+        <button class="shop-action-btn danger" onclick="excluirShop('${s.id}')">Excluir</button>
       </div>
     </div>`;
   }).join('');
@@ -646,39 +664,57 @@ function showAdmMsg(text, type) {
 }
 
 // ── Excluir barbearia ─────────────────────────────────────────
-const _confirmingDelete = new Set();
+let _deleteShopId = null;
 
-async function excluirShop(id, btnEl) {
-  if (!_confirmingDelete.has(id)) {
-    _confirmingDelete.add(id);
-    btnEl.textContent = 'Tem certeza?';
-    btnEl.style.color = '#e74c3c';
-    btnEl.style.borderColor = '#e74c3c';
-    setTimeout(() => {
-      _confirmingDelete.delete(id);
-      if (btnEl) { btnEl.textContent = 'Excluir'; btnEl.style.color = ''; btnEl.style.borderColor = ''; }
-    }, 5000);
-    return;
-  }
-  _confirmingDelete.delete(id);
-  btnEl.textContent = 'Excluindo...';
-  btnEl.disabled = true;
+function excluirShop(id) {
+  const s = allShops.find(x => x.id === id);
+  if (!s) return;
+  _deleteShopId = id;
+  document.getElementById('delete-shop-name').textContent = s.name + ' · ' + (s.city || '');
+  document.getElementById('delete-error').style.display = 'none';
+  document.getElementById('modal-delete').classList.add('show');
+}
+
+function fecharModalDelete() {
+  document.getElementById('modal-delete').classList.remove('show');
+  _deleteShopId = null;
+}
+
+async function confirmarExclusao() {
+  if (!_deleteShopId) return;
+  const btn = document.getElementById('btn-delete-confirm');
+  const errEl = document.getElementById('delete-error');
+  btn.disabled = true;
+  btn.querySelector('.btn-label').style.display = 'none';
+  btn.querySelector('.spinner').style.display = 'inline-block';
+  errEl.style.display = 'none';
 
   try {
     // Deletar filhas na ordem certa (appointments primeiro pq referencia barbers/services)
     const filhas = ['payments','appointments','services','barbers','subscriptions'];
     for (const t of filhas) {
-      await sbAdmin.from(t).delete().eq('barbershop_id', id);
+      const { error } = await sbAdmin.from(t).delete().eq('barbershop_id', _deleteShopId);
+      if (error) {
+        errEl.textContent = 'Erro em ' + t + ': ' + error.message;
+        errEl.style.display = 'block';
+        throw error;
+      }
     }
-    const { error } = await sbAdmin.from('barbershops').delete().eq('id', id);
-    if (error) throw error;
+    const { error } = await sbAdmin.from('barbershops').delete().eq('id', _deleteShopId);
+    if (error) {
+      errEl.textContent = 'Erro em barbershops: ' + error.message;
+      errEl.style.display = 'block';
+      throw error;
+    }
+    fecharModalDelete();
     await loadAll();
   } catch (e) {
     console.error('Erro na exclusao:', e);
-    btnEl.textContent = 'Erro!';
-    btnEl.disabled = false;
-    setTimeout(() => { btnEl.textContent = 'Excluir'; btnEl.style.color = ''; btnEl.style.borderColor = ''; }, 3000);
   }
+
+  btn.disabled = false;
+  btn.querySelector('.btn-label').style.display = 'inline';
+  btn.querySelector('.spinner').style.display = 'none';
 }
 
 // ── Logout ────────────────────────────────────────────────────
