@@ -422,6 +422,8 @@ let barbers = [];
 let currentDate = new Date();
 let currentFilter = 'all';
 let dayAppointments = [];
+let _knownApptIds = new Set(); // pra detectar novos agendamentos
+let _firstLoad = true;
 const DIAS_SEMANA = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 
@@ -507,6 +509,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const baseUrl = window.location.origin + window.location.pathname.replace('dashboard.html', '');
   document.getElementById('share-link').textContent = baseUrl + 'agendar.html?slug=' + shop.slug;
 
+  // Pedir permissão de notificação
+  requestNotificationPermission();
+
   renderDay();
 
   // Atualizar automaticamente a cada 30s (pega novos agendamentos)
@@ -562,6 +567,11 @@ async function renderDay() {
     .order('scheduled_at', { ascending: true });
 
   dayAppointments = appts || [];
+
+  // Verificar novos agendamentos e notificar
+  if (isToday(currentDate)) {
+    checkNewAppointments(dayAppointments);
+  }
 
   // Auto-confirmar pendentes com mais de 5 minutos
   if (isToday(currentDate)) {
@@ -1040,6 +1050,63 @@ async function confirmarPagamento() {
 
   fecharModalPag();
   await renderDay();
+}
+
+// ── Notificações ──────────────────────────────────────────────
+function playNotificationSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // Dois beeps curtos (dó-mi)
+    [523, 659].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.value = 0.3;
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.25 + 0.2);
+      osc.start(ctx.currentTime + i * 0.25);
+      osc.stop(ctx.currentTime + i * 0.25 + 0.2);
+    });
+  } catch (e) { /* sem suporte a audio */ }
+}
+
+function sendBrowserNotification(title, body) {
+  if (Notification.permission === 'granted') {
+    new Notification(title, { body, icon: 'img/logo.png' });
+  }
+}
+
+function requestNotificationPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function checkNewAppointments(appts) {
+  if (_firstLoad) {
+    // Primeiro carregamento: só registrar IDs sem notificar
+    (appts || []).forEach(a => _knownApptIds.add(a.id));
+    _firstLoad = false;
+    return;
+  }
+
+  const novos = (appts || []).filter(a => !_knownApptIds.has(a.id));
+  (appts || []).forEach(a => _knownApptIds.add(a.id));
+
+  if (novos.length > 0) {
+    playNotificationSound();
+    novos.forEach(a => {
+      const svc = services.find(s => s.id === a.service_id);
+      const hora = new Date(a.scheduled_at);
+      const horaStr = hora.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+      sendBrowserNotification(
+        'Novo agendamento!',
+        a.client_name + ' — ' + (svc ? svc.name : 'Serviço') + ' às ' + horaStr
+      );
+    });
+  }
 }
 
 // ── Logout ────────────────────────────────────────────────────
