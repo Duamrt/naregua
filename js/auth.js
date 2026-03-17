@@ -29,10 +29,18 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ── Sessão ────────────────────────────────────────────────────
+const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
+
 async function checkSession() {
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) return;
+
+    // Admin vai direto pro painel admin
+    if (ADMIN_EMAILS.includes(session.user.email)) {
+      window.location.href = 'admin.html';
+      return;
+    }
 
     const { data: shop } = await sb
       .from('barbershops')
@@ -90,6 +98,11 @@ async function handleLogin(e) {
   }
 
   // Redirecionar
+  if (ADMIN_EMAILS.includes(data.user.email)) {
+    window.location.href = 'admin.html';
+    return;
+  }
+
   const { data: shop } = await sb
     .from('barbershops')
     .select('id')
