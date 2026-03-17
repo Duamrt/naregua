@@ -998,15 +998,27 @@ async function confirmarPagamento() {
 
   // Se tem group_id, atualiza todo o grupo
   const updateData = { status: 'done', price_paid: price, payment_method: _pagMethod };
+  let res;
   if (a && a.group_id) {
-    await db.from('appointments').update(updateData).eq('group_id', a.group_id);
+    res = await db.from('appointments').update(updateData).eq('group_id', a.group_id).select();
   } else {
-    await db.from('appointments').update(updateData).eq('id', _pagApptId);
+    res = await db.from('appointments').update(updateData).eq('id', _pagApptId).select();
   }
 
   btn.disabled = false;
   btn.querySelector('.btn-label').style.display = 'inline';
   btn.querySelector('.spinner').style.display = 'none';
+
+  if (res.error) {
+    alert('Erro ao concluir: ' + res.error.message);
+    console.error(res.error);
+    return;
+  }
+
+  if (!res.data || !res.data.length) {
+    alert('Nenhum registro atualizado. ID: ' + _pagApptId);
+    return;
+  }
 
   fecharModalPag();
   await renderDay();
