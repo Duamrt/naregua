@@ -91,6 +91,49 @@
     .empty-icon { font-size:40px; margin-bottom:12px; }
     .empty-text { font-size:13px; }
 
+    /* Layout por barbeiro */
+    .barbers-grid {
+      display:grid; gap:16px;
+    }
+    @media (min-width: 600px) {
+      .barbers-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+      .dash-container { max-width:900px; }
+    }
+    .barber-column {
+      background:var(--cinza-medio); border:1px solid var(--borda);
+      border-radius:12px; padding:12px; min-height:120px;
+    }
+    .barber-header {
+      display:flex; align-items:center; gap:8px; padding-bottom:10px;
+      margin-bottom:10px; border-bottom:1px solid var(--borda);
+    }
+    .barber-avatar {
+      width:32px; height:32px; border-radius:50%;
+      background:var(--verde-medio); display:flex; align-items:center;
+      justify-content:center; font-size:14px; font-weight:800; color:#fff;
+    }
+    .barber-name { font-size:14px; font-weight:700; }
+    .barber-count {
+      margin-left:auto; font-size:10px; font-weight:700; color:var(--texto-muted);
+      background:rgba(255,255,255,0.06); padding:3px 8px; border-radius:10px;
+    }
+    .barber-empty {
+      text-align:center; padding:20px 10px; font-size:12px; color:var(--texto-muted);
+    }
+    .barber-appt {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:10px;
+      padding:10px 12px; margin-bottom:8px; transition:all .2s;
+    }
+    .barber-appt:last-child { margin-bottom:0; }
+    .barber-appt:hover { border-color:var(--borda-hover); }
+    .barber-appt-time {
+      font-size:16px; font-weight:800; color:var(--verde-acao); margin-bottom:4px;
+    }
+    .barber-appt-client { font-size:13px; font-weight:600; margin-bottom:2px; }
+    .barber-appt-svc { font-size:11px; color:var(--texto-muted); }
+    .barber-appt-actions { display:flex; gap:4px; margin-top:8px; }
+    .barber-appt-actions .appt-btn { font-size:10px; padding:6px 0; }
+
     /* Link compartilhar */
     .share-bar {
       background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:10px;
@@ -350,10 +393,10 @@ function renderAppointments() {
   const list = currentFilter === 'all' ? dayAppointments : dayAppointments.filter(a => a.status === currentFilter);
   const el = document.getElementById('appt-list');
 
-  // Stats
-  const ativos = list.filter(a => a.status !== 'cancelled');
-  const confirmados = list.filter(a => a.status === 'confirmed' || a.status === 'done');
-  const faturamento = list.filter(a => a.status === 'done').reduce((s, a) => {
+  // Stats (sempre do dia todo, não do filtro)
+  const ativos = dayAppointments.filter(a => a.status !== 'cancelled');
+  const confirmados = dayAppointments.filter(a => a.status === 'confirmed' || a.status === 'done');
+  const faturamento = dayAppointments.filter(a => a.status === 'done').reduce((s, a) => {
     const svc = services.find(sv => sv.id === a.service_id);
     return s + (svc ? Number(svc.price) : 0);
   }, 0);
@@ -362,7 +405,7 @@ function renderAppointments() {
   document.getElementById('stat-confirmed').textContent = confirmados.length;
   document.getElementById('stat-revenue').textContent = faturamento > 0 ? formatMoney(faturamento).replace('R$ ', '') : '0';
 
-  if (!list.length) {
+  if (!dayAppointments.length) {
     el.innerHTML = `<div class="empty-state">
       <div class="empty-icon">📭</div>
       <div class="empty-text">Nenhum agendamento${isToday(currentDate) ? ' pra hoje' : ' neste dia'}.</div>
@@ -373,53 +416,79 @@ function renderAppointments() {
     return;
   }
 
-  el.innerHTML = list.map(a => {
-    const svc = services.find(s => s.id === a.service_id);
-    const barber = barbers.find(b => b.id === a.barber_id);
-    const hora = new Date(a.scheduled_at);
-    const timeStr = hora.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
-    const svcName = svc ? svc.name : '—';
-    const svcPrice = svc ? formatMoney(svc.price) : '';
-    const barberName = barber ? barber.name : '';
-    const phone = (a.client_phone || '').replace(/\D/g, '');
+  // Agrupar por barbeiro
+  const columns = barbers.map(b => {
+    const appts = list.filter(a => a.barber_id === b.id).sort((a,c) => new Date(a.scheduled_at) - new Date(c.scheduled_at));
+    return { barber: b, appts };
+  });
 
-    const statusMap = {
-      pending: { label: 'PENDENTE', cls: 'status-pending' },
-      confirmed: { label: 'CONFIRMADO', cls: 'status-confirmed' },
-      done: { label: 'CONCLUÍDO', cls: 'status-done' },
-      cancelled: { label: 'CANCELADO', cls: 'status-cancelled' }
-    };
-    const st = statusMap[a.status] || statusMap.pending;
+  // Agendamentos sem barbeiro definido
+  const semBarbeiro = list.filter(a => !a.barber_id || !barbers.find(b => b.id === a.barber_id));
+  if (semBarbeiro.length) {
+    columns.push({ barber: { id: null, name: 'Sem barbeiro' }, appts: semBarbeiro });
+  }
 
-    // Ações baseadas no status
-    let actions = '';
-    if (a.status === 'pending') {
-      actions = `
-        <button class="appt-btn btn-confirm-appt" onclick="updateStatus('${a.id}','confirmed')">CONFIRMAR</button>
-        <button class="appt-btn btn-cancel-appt" onclick="updateStatus('${a.id}','cancelled')">CANCELAR</button>
-        ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${phone}','${esc(a.client_name)}')">ZAP</button>` : ''}
-      `;
-    } else if (a.status === 'confirmed') {
-      actions = `
-        <button class="appt-btn btn-done-appt" onclick="updateStatus('${a.id}','done')">CONCLUIR</button>
-        <button class="appt-btn btn-cancel-appt" onclick="updateStatus('${a.id}','cancelled')">CANCELAR</button>
-        ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${phone}','${esc(a.client_name)}')">ZAP</button>` : ''}
-      `;
-    } else if (a.status === 'cancelled') {
-      actions = `<button class="btn-delete" onclick="excluirAgendamento('${a.id}')">EXCLUIR</button>`;
-    }
+  el.innerHTML = `<div class="barbers-grid">${columns.map(col => {
+    const inicial = col.barber.name.charAt(0).toUpperCase();
+    const cards = col.appts.map(a => renderApptCard(a)).join('');
+    const empty = col.appts.length === 0
+      ? `<div class="barber-empty">Livre${isToday(currentDate) ? ' hoje' : ''}</div>`
+      : '';
 
-    return `<div class="appt-card">
-      <div class="appt-top">
-        <div class="appt-time">${timeStr}</div>
-        <span class="appt-status ${st.cls}">${st.label}</span>
+    return `<div class="barber-column">
+      <div class="barber-header">
+        <div class="barber-avatar">${inicial}</div>
+        <div class="barber-name">${esc(col.barber.name)}</div>
+        <div class="barber-count">${col.appts.length}</div>
       </div>
-      <div class="appt-client">${esc(a.client_name)}</div>
-      <div class="appt-detail">${svcName}${barberName ? ' · ' + barberName : ''}${svcPrice ? ' · ' + svcPrice : ''}</div>
-      ${a.client_phone ? `<div class="appt-detail" style="margin-top:2px;">📱 ${a.client_phone}</div>` : ''}
-      ${actions ? `<div class="appt-actions">${actions}</div>` : ''}
+      ${cards}${empty}
     </div>`;
-  }).join('');
+  }).join('')}</div>`;
+}
+
+function renderApptCard(a) {
+  const svc = services.find(s => s.id === a.service_id);
+  const hora = new Date(a.scheduled_at);
+  const timeStr = hora.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+  const svcName = svc ? svc.name : '—';
+  const svcPrice = svc ? formatMoney(svc.price) : '';
+  const phone = (a.client_phone || '').replace(/\D/g, '');
+
+  const statusMap = {
+    pending: { label: 'PENDENTE', cls: 'status-pending' },
+    confirmed: { label: 'CONFIRMADO', cls: 'status-confirmed' },
+    done: { label: 'CONCLUÍDO', cls: 'status-done' },
+    cancelled: { label: 'CANCELADO', cls: 'status-cancelled' }
+  };
+  const st = statusMap[a.status] || statusMap.pending;
+
+  let actions = '';
+  if (a.status === 'pending') {
+    actions = `
+      <button class="appt-btn btn-confirm-appt" onclick="updateStatus('${a.id}','confirmed')">CONFIRMAR</button>
+      <button class="appt-btn btn-cancel-appt" onclick="updateStatus('${a.id}','cancelled')">CANCELAR</button>
+      ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${phone}','${esc(a.client_name)}')">ZAP</button>` : ''}
+    `;
+  } else if (a.status === 'confirmed') {
+    actions = `
+      <button class="appt-btn btn-done-appt" onclick="updateStatus('${a.id}','done')">CONCLUIR</button>
+      <button class="appt-btn btn-cancel-appt" onclick="updateStatus('${a.id}','cancelled')">CANCELAR</button>
+      ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${phone}','${esc(a.client_name)}')">ZAP</button>` : ''}
+    `;
+  } else if (a.status === 'cancelled') {
+    actions = `<button class="btn-delete" onclick="excluirAgendamento('${a.id}')">EXCLUIR</button>`;
+  }
+
+  return `<div class="barber-appt">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <div class="barber-appt-time">${timeStr}</div>
+      <span class="appt-status ${st.cls}">${st.label}</span>
+    </div>
+    <div class="barber-appt-client">${esc(a.client_name)}</div>
+    <div class="barber-appt-svc">${svcName} · ${svcPrice}</div>
+    ${a.client_phone ? `<div class="barber-appt-svc">📱 ${a.client_phone}</div>` : ''}
+    ${actions ? `<div class="barber-appt-actions">${actions}</div>` : ''}
+  </div>`;
 }
 
 // ── Ações ─────────────────────────────────────────────────────
