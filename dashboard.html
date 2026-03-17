@@ -680,7 +680,7 @@ function renderApptCard(a) {
     actions = `
       <button class="appt-btn btn-confirm-appt" onclick="updateStatus('${a.id}','confirmed',this)">CONFIRMAR</button>
       <button class="appt-btn btn-cancel-appt" onclick="updateStatus('${a.id}','cancelled',this)">CANCELAR</button>
-      ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${phone}','${esc(a.client_name)}')">ZAP</button>` : ''}
+      ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${a.id}')">ZAP</button>` : ''}
     `;
   } else if (a.status === 'confirmed') {
     if (jaPassou) {
@@ -693,7 +693,7 @@ function renderApptCard(a) {
       actions = `
         <button class="appt-btn btn-done-appt" onclick="abrirModalPagamento('${a.id}')">CONCLUIR</button>
         <button class="appt-btn btn-cancel-appt" onclick="updateStatus('${a.id}','cancelled',this)">CANCELAR</button>
-        ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${phone}','${esc(a.client_name)}')">ZAP</button>` : ''}
+        ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${a.id}')">ZAP</button>` : ''}
       `;
     }
   } else if (a.status === 'cancelled' || a.status === 'no_show') {
@@ -765,9 +765,25 @@ function excluirAgendamento(id, btnEl) {
   });
 }
 
-function abrirWhatsApp(phone, nome) {
-  const msg = encodeURIComponent('Ola ' + nome + '! Aqui e da ' + shop.name + '.');
-  window.open('https://wa.me/55' + phone + '?text=' + msg, '_blank');
+function abrirWhatsApp(apptId) {
+  const a = dayAppointments.find(x => x.id === apptId);
+  if (!a) return;
+  const phone = (a.client_phone || '').replace(/\D/g, '');
+  if (!phone) return;
+  const svc = services.find(s => s.id === a.service_id);
+  const hora = new Date(a.scheduled_at);
+  const dataStr = hora.toLocaleDateString('pt-BR');
+  const horaStr = hora.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+  const h = new Date().getHours();
+  const saudacao = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+
+  const msg = saudacao + ', ' + a.client_name + '! Aqui e da *' + shop.name + '*.\n\n'
+    + 'Passando pra confirmar seu horario:\n\n'
+    + '*' + (svc ? svc.name : 'Servico') + '*\n'
+    + 'Dia: ' + dataStr + ' as ' + horaStr + '\n\n'
+    + 'Pode confirmar pra gente? Te esperamos!';
+
+  window.open('https://wa.me/55' + phone + '?text=' + encodeURIComponent(msg), '_blank');
 }
 
 // ── Compartilhar ──────────────────────────────────────────────
