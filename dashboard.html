@@ -499,12 +499,12 @@ function renderApptCard(a) {
   };
   const st = statusMap[a.status] || statusMap.pending;
 
-  // Verificar se horário já passou (pra mostrar botão FALTOU)
+  // Verificar se passou a tolerância de 15 min após o horário marcado
   const agora = new Date();
   const horario = new Date(a.scheduled_at);
-  const svcDur = svc ? svc.duration_min : 30;
-  const fimAtendimento = new Date(horario.getTime() + svcDur * 60000);
-  const jaPassou = agora > fimAtendimento;
+  const TOLERANCIA_MIN = 15;
+  const limiteTolerancia = new Date(horario.getTime() + TOLERANCIA_MIN * 60000);
+  const jaPassou = agora > limiteTolerancia;
 
   let actions = '';
   if (a.status === 'pending') {
