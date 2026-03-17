@@ -690,31 +690,39 @@ async function confirmarExclusao() {
   errEl.style.display = 'none';
 
   const id = _deleteShopId;
+  const SB_URL = 'https://jsydprrcyrjjxdmzrqpz.supabase.co/rest/v1';
+  const headers = {
+    'apikey': SERVICE_KEY,
+    'Authorization': 'Bearer ' + SERVICE_KEY,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation'
+  };
 
   try {
-    // Deletar filhas na ordem certa
+    // Deletar filhas via REST API na ordem certa
     const filhas = ['payments','appointments','services','barbers','subscriptions'];
     for (const t of filhas) {
-      const res = await sbAdmin.from(t).delete().eq('barbershop_id', id).select();
-      if (res.error) {
-        errEl.textContent = 'Erro em ' + t + ': ' + res.error.message;
+      const r = await fetch(SB_URL + '/' + t + '?barbershop_id=eq.' + id, { method: 'DELETE', headers });
+      if (!r.ok) {
+        const msg = await r.text();
+        errEl.textContent = 'Erro em ' + t + ': ' + msg;
         errEl.style.display = 'block';
-        throw res.error;
+        throw new Error(msg);
       }
     }
 
     // Deletar a barbearia
-    const res = await sbAdmin.from('barbershops').delete().eq('id', id).select();
-    if (res.error) {
-      errEl.textContent = 'Erro em barbershops: ' + res.error.message;
+    const r = await fetch(SB_URL + '/barbershops?id=eq.' + id, { method: 'DELETE', headers });
+    if (!r.ok) {
+      const msg = await r.text();
+      errEl.textContent = 'Erro em barbershops: ' + msg;
       errEl.style.display = 'block';
-      throw res.error;
+      throw new Error(msg);
     }
 
-    // Verificar se realmente excluiu
-    const { data: check } = await sbAdmin.from('barbershops').select('id').eq('id', id).maybeSingle();
-    if (check) {
-      errEl.textContent = 'Exclusão não efetivou. ID: ' + id + ' — Deletados: ' + JSON.stringify(res.data);
+    const deleted = await r.json();
+    if (!deleted.length) {
+      errEl.textContent = 'Nenhum registro excluído. ID: ' + id;
       errEl.style.display = 'block';
     } else {
       fecharModalDelete();
