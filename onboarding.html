@@ -120,16 +120,18 @@
 let currentUser = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session }, error: sessErr } = await sb.auth.getSession();
+  console.log('onboarding session:', session ? 'OK' : 'NONE', sessErr);
   if (!session) { window.location.href = 'index.html'; return; }
   currentUser = session.user;
 
   // Já tem barbearia? Vai pro dashboard
-  const { data: shop } = await supabase
+  const { data: shop, error: shopErr } = await sb
     .from('barbershops')
     .select('id')
     .eq('owner_id', currentUser.id)
     .maybeSingle();
+  console.log('onboarding shop:', shop, 'err:', shopErr);
   if (shop) { window.location.href = 'dashboard.html'; return; }
 
   // Preencher nome do user se tiver
@@ -267,7 +269,7 @@ async function finishOnboarding() {
 
   try {
     // 1. Criar barbearia
-    const { data: shop, error: errShop } = await supabase
+    const { data: shop, error: errShop } = await sb
       .from('barbershops')
       .insert({
         owner_id: currentUser.id,
@@ -287,7 +289,7 @@ async function finishOnboarding() {
 
     // 2. Criar barbeiro padrão (o próprio dono)
     const nomeUser = currentUser.user_metadata?.nome || name;
-    await supabase.from('barbers').insert({
+    await sb.from('barbers').insert({
       barbershop_id: shop.id,
       name: nomeUser.split(' ')[0],
       commission_pct: 100
@@ -300,12 +302,12 @@ async function finishOnboarding() {
       price: s.price,
       duration_min: s.duration_min
     }));
-    await supabase.from('services').insert(svcPayload);
+    await sb.from('services').insert(svcPayload);
 
     // 4. Criar assinatura trial
     const expires = new Date();
     expires.setDate(expires.getDate() + 30);
-    await supabase.from('subscriptions').insert({
+    await sb.from('subscriptions').insert({
       barbershop_id: shop.id,
       plan: 'basico',
       expires_at: expires.toISOString()

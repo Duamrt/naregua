@@ -30,20 +30,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── Sessão ────────────────────────────────────────────────────
 async function checkSession() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) {
-    // Verificar se já tem barbearia cadastrada
-    const { data: shop } = await supabase
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+
+    const { data: shop } = await sb
       .from('barbershops')
       .select('id')
       .eq('owner_id', session.user.id)
       .maybeSingle();
 
-    if (shop) {
-      window.location.href = 'dashboard.html';
-    } else {
-      window.location.href = 'onboarding.html';
-    }
+    window.location.href = shop ? 'dashboard.html' : 'onboarding.html';
+  } catch (e) {
+    console.error('checkSession erro:', e);
   }
 }
 
@@ -73,7 +72,7 @@ async function handleLogin(e) {
   setLoading(btn, true);
   hideMsg();
 
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await sb.auth.signInWithPassword({
     email,
     password: senha
   });
@@ -91,7 +90,7 @@ async function handleLogin(e) {
   }
 
   // Redirecionar
-  const { data: shop } = await supabase
+  const { data: shop } = await sb
     .from('barbershops')
     .select('id')
     .eq('owner_id', data.user.id)
@@ -121,7 +120,7 @@ async function handleSignup(e) {
   setLoading(btn, true);
   hideMsg();
 
-  const { data, error } = await supabase.auth.signUp({
+  const { data, error } = await sb.auth.signUp({
     email,
     password: senha,
     options: {
