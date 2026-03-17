@@ -631,15 +631,21 @@ async function excluirShop(id, btnEl) {
   btnEl.textContent = 'Excluindo...';
   btnEl.disabled = true;
 
-  await sbAdmin.from('expenses').delete().eq('barbershop_id', id);
-  await sbAdmin.from('appointments').delete().eq('barbershop_id', id);
-  await sbAdmin.from('payments').delete().eq('barbershop_id', id);
-  await sbAdmin.from('services').delete().eq('barbershop_id', id);
-  await sbAdmin.from('barbers').delete().eq('barbershop_id', id);
-  await sbAdmin.from('subscriptions').delete().eq('barbershop_id', id);
-  await sbAdmin.from('barbershops').delete().eq('id', id);
-
-  await loadAll();
+  try {
+    const tables = ['expenses','payments','appointments','services','barbers','subscriptions'];
+    for (const t of tables) {
+      const { error } = await sbAdmin.from(t).delete().eq('barbershop_id', id);
+      if (error) console.error(`Erro deletando ${t}:`, error);
+    }
+    const { error } = await sbAdmin.from('barbershops').delete().eq('id', id);
+    if (error) console.error('Erro deletando barbershop:', error);
+    await loadAll();
+  } catch (e) {
+    console.error('Erro na exclusao:', e);
+    btnEl.textContent = 'Erro!';
+    btnEl.disabled = false;
+    setTimeout(() => { btnEl.textContent = 'Excluir'; btnEl.style.color = ''; btnEl.style.borderColor = ''; }, 3000);
+  }
 }
 
 // ── Logout ────────────────────────────────────────────────────
