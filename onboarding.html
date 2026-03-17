@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NaRegua — Configurar Barbearia</title>
+  <title>NaRegua — Configurar seu negócio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -14,7 +14,7 @@
   <div class="card" style="max-width:480px;">
     <div class="card-header">
       <img src="img/logo.png" alt="NaRegua" class="logo-img" style="height:48px;margin-bottom:8px;">
-      <p>Vamos configurar sua barbearia</p>
+      <p>Vamos configurar seu negócio</p>
     </div>
 
     <div id="onboarding-msg" class="msg"></div>
@@ -23,13 +23,13 @@
     <div id="step-1">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
         <span style="background:var(--verde-acao);color:#000;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;">1</span>
-        <span style="font-size:14px;font-weight:700;">Sua barbearia</span>
+        <span style="font-size:14px;font-weight:700;">Seu negócio</span>
         <span style="font-size:11px;color:var(--texto-muted);margin-left:auto;">Passo 1 de 3</span>
       </div>
 
       <div class="field">
-        <label>NOME DA BARBEARIA *</label>
-        <input type="text" id="shop-name" placeholder="Ex: Barbearia do João">
+        <label>NOME DO ESTABELECIMENTO *</label>
+        <input type="text" id="shop-name" placeholder="Ex: Studio Maria, Barbearia do João">
       </div>
       <div class="field">
         <label>CIDADE *</label>
@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const nome = currentUser.user_metadata?.nome || '';
   if (nome) {
     const nameInput = document.getElementById('shop-name');
-    if (!nameInput.value) nameInput.placeholder = `Ex: Barbearia do ${nome.split(' ')[0]}`;
+    if (!nameInput.value) nameInput.placeholder = `Ex: Studio ${nome.split(' ')[0]}`;
   }
 
   // Dias da semana
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 function goStep2() {
   const name = document.getElementById('shop-name').value.trim();
   const city = document.getElementById('shop-city').value.trim();
-  if (!name) { showOnbMsg('Informe o nome da barbearia.', 'error'); return; }
+  if (!name) { showOnbMsg('Informe o nome do estabelecimento.', 'error'); return; }
   if (!city) { showOnbMsg('Informe a cidade.', 'error'); return; }
   hideOnbMsg();
   document.getElementById('step-1').style.display = 'none';
@@ -326,7 +326,7 @@ async function finishOnboarding() {
   } catch (e) {
     console.error(e);
     const msg = e.message?.includes('duplicate')
-      ? 'Já existe uma barbearia com esse nome. Tente outro.'
+      ? 'Já existe um estabelecimento com esse nome. Tente outro.'
       : 'Erro ao cadastrar. Tente novamente.';
     showOnbMsg(msg, 'error');
     btn.disabled = false;

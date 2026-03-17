@@ -258,7 +258,7 @@
       <div class="shop-city" id="shop-city"></div>
     </div>
     <div class="header-actions">
-      <button class="icon-btn" onclick="abrirEdicao()" title="Editar barbearia">✏️</button>
+      <button class="icon-btn" onclick="abrirEdicao()" title="Editar">✏️</button>
       <button class="icon-btn" onclick="compartilharLink()" title="Compartilhar link">🔗</button>
       <button class="icon-btn" onclick="logout()" title="Sair">⏻</button>
     </div>
@@ -312,7 +312,7 @@
 <div class="modal-overlay" id="modal-edit">
   <div class="modal">
     <div class="modal-title">
-      <h2>Editar Barbearia</h2>
+      <h2>Editar Estabelecimento</h2>
       <button class="modal-close" onclick="fecharEdicao()">✕</button>
     </div>
 
@@ -320,7 +320,7 @@
 
     <div class="modal-section">Dados</div>
     <div class="field">
-      <label>NOME DA BARBEARIA</label>
+      <label>NOME DO ESTABELECIMENTO</label>
       <input type="text" id="edit-name">
     </div>
     <div class="field">
@@ -358,7 +358,7 @@
       <div class="days-modal" id="edit-days"></div>
     </div>
 
-    <div class="modal-section">Barbeiros</div>
+    <div class="modal-section">Profissionais</div>
     <div id="edit-barbers"></div>
     <button class="btn btn-outline" onclick="addBarberRow()" style="margin:10px 0 16px;font-size:12px;">+ ADICIONAR BARBEIRO</button>
 
@@ -872,7 +872,7 @@ async function salvarEdicao() {
 
   } catch (e) {
     console.error(e);
-    const msg = e.message?.includes('duplicate') ? 'Já existe uma barbearia com esse nome.' : 'Erro ao salvar. Tente novamente.';
+    const msg = e.message?.includes('duplicate') ? 'Já existe um estabelecimento com esse nome.' : 'Erro ao salvar. Tente novamente.';
     showEditMsg(msg, 'error');
   }
 

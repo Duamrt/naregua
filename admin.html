@@ -167,7 +167,7 @@
 <div class="modal-overlay" id="modal-admin-edit">
   <div class="modal">
     <div class="modal-title">
-      <h2 id="modal-admin-title">Editar Barbearia</h2>
+      <h2 id="modal-admin-title">Editar Cliente</h2>
       <button class="modal-close" onclick="fecharModalAdmin()">✕</button>
     </div>
     <div id="admin-edit-msg" class="msg"></div>
@@ -191,7 +191,7 @@
     </div>
     <div class="field">
       <label>INSTAGRAM</label>
-      <input type="text" id="adm-instagram" placeholder="@nomedabarbearia">
+      <input type="text" id="adm-instagram" placeholder="@seuperfil">
     </div>
     <div class="field">
       <label>FORMAS DE PAGAMENTO</label>
@@ -236,7 +236,7 @@
     <div id="adm-services"></div>
     <button class="btn btn-outline" onclick="admAddService()" style="margin:10px 0 16px;font-size:12px;">+ SERVIÇO</button>
 
-    <div class="modal-section">Barbeiros</div>
+    <div class="modal-section">Profissionais</div>
     <div id="adm-barbers"></div>
     <button class="btn btn-outline" onclick="admAddBarber()" style="margin:10px 0 16px;font-size:12px;">+ BARBEIRO</button>
 
@@ -312,7 +312,7 @@ function renderGlobalStats() {
 
   document.getElementById('global-stats').innerHTML = `
     <div class="g-stat"><div class="g-stat-num" style="color:var(--verde-acao);">${totalShops}</div><div class="g-stat-label">CLIENTES</div></div>
-    <div class="g-stat"><div class="g-stat-num" style="color:var(--texto-principal);">${totalBarbers}</div><div class="g-stat-label">BARBEIROS</div></div>
+    <div class="g-stat"><div class="g-stat-num" style="color:var(--texto-principal);">${totalBarbers}</div><div class="g-stat-label">PROFISSIONAIS</div></div>
     <div class="g-stat"><div class="g-stat-num" style="color:var(--texto-principal);">${totalAppts}</div><div class="g-stat-label">AGENDAMENTOS</div></div>
     <div class="g-stat"><div class="g-stat-num" style="color:var(--verde-acao);">${totalDone}</div><div class="g-stat-label">ATENDIDOS</div></div>
     <div class="g-stat"><div class="g-stat-num" style="color:#9b59b6;">${totalNoShow}</div><div class="g-stat-label">FALTARAM</div></div>
@@ -352,7 +352,7 @@ function renderShops() {
       </div>
       <div class="shop-meta">${s.city || '—'}${s.phone ? ' · ' + s.phone : ''} · ${s.opening_time || '08:00'}-${s.closing_time || '19:00'}</div>
       <div class="shop-stats">
-        <span>Barbeiros: <strong>${shopBarbers.length}</strong></span>
+        <span>Profissionais: <strong>${shopBarbers.length}</strong></span>
         <span>Serviços: <strong>${shopSvcs.length}</strong></span>
         <span>Agendamentos: <strong>${shopAppts.length}</strong></span>
         <span>Faturado: <strong>${formatMoney(shopRevenue)}</strong></span>
@@ -385,7 +385,7 @@ function editarShop(id) {
   const s = allShops.find(x => x.id === id);
   if (!s) return;
 
-  document.getElementById('modal-admin-title').textContent = 'Editar: ' + s.name;
+  document.getElementById('modal-admin-title').textContent = 'Editar · ' + s.name;
   document.getElementById('adm-edit-id').value = s.id;
   document.getElementById('adm-name').value = s.name || '';
   document.getElementById('adm-city').value = s.city || '';
@@ -413,7 +413,7 @@ function editarShop(id) {
 }
 
 function abrirNovaShop() {
-  document.getElementById('modal-admin-title').textContent = 'Nova Barbearia';
+  document.getElementById('modal-admin-title').textContent = 'Novo Cliente';
   document.getElementById('adm-edit-id').value = '';
   document.getElementById('adm-name').value = '';
   document.getElementById('adm-city').value = '';
