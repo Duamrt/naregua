@@ -6,84 +6,270 @@
   <title>NaRegua — Sua barbearia na palma da mão</title>
   <meta name="description" content="Sistema de gestão completo para barbearias. Agenda, financeiro e clientes num só lugar.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background:#000; overflow-x:hidden; }
+
+    .login-page {
+      min-height:100dvh; display:flex; flex-direction:column;
+      align-items:center; justify-content:center; padding:20px;
+      position:relative;
+    }
+
+    /* Glow sutil dourado no fundo */
+    .login-page::before {
+      content:''; position:absolute; top:-20%; left:50%; transform:translateX(-50%);
+      width:600px; height:600px; border-radius:50%;
+      background:radial-gradient(circle, rgba(212,168,83,0.06) 0%, transparent 70%);
+      pointer-events:none;
+    }
+
+    /* Logo grande */
+    .hero-logo { margin-bottom:32px; text-align:center; position:relative; z-index:1; }
+    .hero-logo img { height:72px; filter:drop-shadow(0 4px 20px rgba(212,168,83,0.15)); }
+    .hero-tagline {
+      font-size:13px; color:#525252; margin-top:10px; letter-spacing:0.5px;
+    }
+    .hero-tagline strong { color:#d4a853; font-weight:600; }
+
+    /* Card de login */
+    .login-card {
+      background:rgba(10,10,10,0.8); backdrop-filter:blur(20px);
+      border:1px solid rgba(255,255,255,0.05);
+      border-radius:16px; padding:28px 24px; width:100%; max-width:380px;
+      position:relative; z-index:1;
+      box-shadow:0 8px 40px rgba(0,0,0,0.4);
+    }
+
+    /* Tabs redesenhadas */
+    .login-tabs {
+      display:flex; gap:0; margin-bottom:24px;
+      border-bottom:1px solid rgba(255,255,255,0.06);
+    }
+    .login-tab {
+      flex:1; padding:12px 0; text-align:center; font-size:12px; font-weight:700;
+      letter-spacing:1px; color:#525252; background:none; border:none;
+      cursor:pointer; font-family:inherit; position:relative; transition:all .2s;
+    }
+    .login-tab.active { color:#d4a853; }
+    .login-tab.active::after {
+      content:''; position:absolute; bottom:-1px; left:20%; right:20%;
+      height:2px; background:linear-gradient(90deg, transparent, #d4a853, transparent);
+      border-radius:2px;
+    }
+    .login-tab:not(.active):hover { color:#a3a3a3; }
+
+    /* Inputs refinados */
+    .login-field { margin-bottom:16px; }
+    .login-label {
+      font-size:10px; font-weight:700; color:#525252; letter-spacing:1.5px;
+      text-transform:uppercase; margin-bottom:6px; display:block;
+    }
+    .login-input-wrap { position:relative; }
+    .login-input {
+      width:100%; padding:13px 16px; background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.06); border-radius:10px;
+      color:#fafafa; font-size:14px; font-family:inherit; outline:none;
+      transition:all .2s;
+    }
+    .login-input::placeholder { color:#3f3f46; }
+    .login-input:focus {
+      border-color:rgba(212,168,83,0.3);
+      box-shadow:0 0 0 3px rgba(212,168,83,0.08);
+      background:rgba(255,255,255,0.04);
+    }
+    .login-eye {
+      position:absolute; right:14px; top:50%; transform:translateY(-50%);
+      background:none; border:none; color:#525252; cursor:pointer;
+      font-size:15px; padding:2px; transition:all .2s;
+    }
+    .login-eye:hover { color:#a3a3a3; }
+
+    /* Botão dourado */
+    .login-btn {
+      width:100%; padding:14px; border:none; border-radius:10px;
+      font-size:13px; font-weight:800; font-family:inherit; cursor:pointer;
+      letter-spacing:0.5px; transition:all .2s; margin-top:4px;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .login-btn-primary {
+      background:linear-gradient(135deg, #d4a853 0%, #c49a45 50%, #b08a38 100%);
+      color:#000;
+    }
+    .login-btn-primary:hover {
+      transform:translateY(-1px);
+      box-shadow:0 4px 20px rgba(212,168,83,0.3);
+    }
+    .login-btn-primary:disabled { opacity:0.6; transform:none; box-shadow:none; cursor:not-allowed; }
+
+    .login-btn .spinner {
+      width:14px; height:14px; border:2px solid rgba(0,0,0,0.2);
+      border-top-color:#000; border-radius:50%;
+      animation:spin .6s linear infinite;
+    }
+
+    /* Link bottom */
+    .login-bottom {
+      text-align:center; margin-top:18px; font-size:12px; color:#525252;
+    }
+    .login-bottom a { color:#d4a853; text-decoration:none; font-weight:600; }
+    .login-bottom a:hover { text-decoration:underline; }
+
+    /* Mensagem */
+    .login-msg {
+      padding:10px 14px; border-radius:8px; font-size:12px; font-weight:600;
+      margin-bottom:16px; display:none; align-items:center; gap:8px;
+    }
+    .login-msg.show { display:flex; }
+    .login-msg-error { background:rgba(239,68,68,0.08); color:#ef4444; border:1px solid rgba(239,68,68,0.15); }
+    .login-msg-success { background:rgba(212,168,83,0.08); color:#d4a853; border:1px solid rgba(212,168,83,0.15); }
+
+    /* Features abaixo do card */
+    .features {
+      display:flex; gap:24px; margin-top:32px; position:relative; z-index:1;
+    }
+    .feature {
+      text-align:center; flex:1;
+    }
+    .feature-icon { font-size:20px; margin-bottom:6px; }
+    .feature-text { font-size:10px; color:#525252; font-weight:600; letter-spacing:0.5px; }
+
+    /* Footer */
+    .login-footer {
+      margin-top:32px; text-align:center; font-size:10px; color:#27272a;
+      position:relative; z-index:1;
+    }
+
+    @media (max-width:480px) {
+      .login-card { padding:24px 20px; border-radius:14px; }
+      .hero-logo img { height:60px; }
+      .features { gap:16px; }
+    }
+  </style>
 </head>
 <body>
 
-<div class="page-center">
-  <div class="card">
+<div class="login-page">
 
-    <!-- Header -->
-    <div class="card-header">
-      <img src="img/logo.png" alt="NaRegua" class="logo-img" style="height:56px;margin-bottom:8px;">
-      <p>Sua barbearia na palma da mão</p>
-    </div>
+  <!-- Logo -->
+  <div class="hero-logo">
+    <img src="img/logo.png" alt="NaRegua">
+    <div class="hero-tagline">Gestão <strong>premium</strong> para sua barbearia</div>
+  </div>
+
+  <!-- Card -->
+  <div class="login-card">
 
     <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab active" data-mode="login">ENTRAR</button>
-      <button class="tab" data-mode="signup">CRIAR CONTA</button>
+    <div class="login-tabs">
+      <button class="login-tab active" data-mode="login">ENTRAR</button>
+      <button class="login-tab" data-mode="signup">CRIAR CONTA</button>
     </div>
 
-    <!-- Mensagem de feedback -->
-    <div id="auth-msg" class="msg"></div>
+    <!-- Mensagem -->
+    <div id="auth-msg" class="login-msg"></div>
 
     <!-- Form Login -->
     <form id="form-login" autocomplete="on">
-      <div class="field">
-        <label for="login-email">E-MAIL</label>
-        <input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email" required>
-      </div>
-      <div class="field">
-        <label for="login-senha">SENHA</label>
-        <div class="field-password">
-          <input type="password" id="login-senha" placeholder="Sua senha" autocomplete="current-password" required>
-          <button type="button" class="toggle-password">👁</button>
+      <div class="login-field">
+        <label class="login-label" for="login-email">E-mail</label>
+        <div class="login-input-wrap">
+          <input class="login-input" type="email" id="login-email" placeholder="seu@email.com" autocomplete="email" required>
         </div>
       </div>
-      <button type="submit" id="btn-login" class="btn btn-primary">
+      <div class="login-field">
+        <label class="login-label" for="login-senha">Senha</label>
+        <div class="login-input-wrap">
+          <input class="login-input" type="password" id="login-senha" placeholder="Sua senha" autocomplete="current-password" required style="padding-right:44px;">
+          <button type="button" class="login-eye toggle-password">👁</button>
+        </div>
+      </div>
+      <button type="submit" id="btn-login" class="login-btn login-btn-primary">
         <span class="btn-label">ENTRAR</span>
         <div class="spinner" style="display:none;"></div>
       </button>
-      <div class="bottom-link">
+      <div class="login-bottom">
         <a href="#" onclick="switchTab('signup');return false;">Ainda no caderninho? Crie sua conta</a>
       </div>
     </form>
 
     <!-- Form Signup -->
     <form id="form-signup" style="display:none;" autocomplete="on">
-      <div class="field">
-        <label for="signup-nome">SEU NOME</label>
-        <input type="text" id="signup-nome" placeholder="Como te chamam" autocomplete="name" required>
-      </div>
-      <div class="field">
-        <label for="signup-email">E-MAIL</label>
-        <input type="email" id="signup-email" placeholder="seu@email.com" autocomplete="email" required>
-      </div>
-      <div class="field">
-        <label for="signup-senha">SENHA</label>
-        <div class="field-password">
-          <input type="password" id="signup-senha" placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6" required>
-          <button type="button" class="toggle-password">👁</button>
+      <div class="login-field">
+        <label class="login-label" for="signup-nome">Seu nome</label>
+        <div class="login-input-wrap">
+          <input class="login-input" type="text" id="signup-nome" placeholder="Como te chamam" autocomplete="name" required>
         </div>
       </div>
-      <button type="submit" id="btn-signup" class="btn btn-primary">
+      <div class="login-field">
+        <label class="login-label" for="signup-email">E-mail</label>
+        <div class="login-input-wrap">
+          <input class="login-input" type="email" id="signup-email" placeholder="seu@email.com" autocomplete="email" required>
+        </div>
+      </div>
+      <div class="login-field">
+        <label class="login-label" for="signup-senha">Senha</label>
+        <div class="login-input-wrap">
+          <input class="login-input" type="password" id="signup-senha" placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6" required style="padding-right:44px;">
+          <button type="button" class="login-eye toggle-password">👁</button>
+        </div>
+      </div>
+      <button type="submit" id="btn-signup" class="login-btn login-btn-primary">
         <span class="btn-label">CRIAR CONTA GRÁTIS</span>
         <div class="spinner" style="display:none;"></div>
       </button>
-      <div class="bottom-link">
+      <div class="login-bottom">
         <a href="#" onclick="switchTab('login');return false;">Já tem conta? Entre aqui</a>
       </div>
     </form>
 
   </div>
+
+  <!-- Features -->
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">📅</div>
+      <div class="feature-text">Agenda online</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">💰</div>
+      <div class="feature-text">Controle financeiro</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">📱</div>
+      <div class="feature-text">Link pro cliente</div>
+    </div>
+  </div>
+
+  <div class="login-footer">NaRegua &copy; 2026</div>
+
 </div>
 
 <!-- Supabase CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="js/supabase.js"></script>
 <script src="js/utils.js"></script>
-<script src="js/auth.js?v=2"></script>
+<script src="js/auth.js?v=3"></script>
+<script>
+// Override tabs pro novo layout
+document.querySelectorAll('.login-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    switchTab(tab.dataset.mode);
+  });
+});
+
+// Override showMsg pro novo layout
+function showMsg(text, type) {
+  const el = document.getElementById('auth-msg');
+  el.textContent = text;
+  el.className = `login-msg login-msg-${type} show`;
+}
+function hideMsg() {
+  document.getElementById('auth-msg').className = 'login-msg';
+}
+</script>
 </body>
 </html>
