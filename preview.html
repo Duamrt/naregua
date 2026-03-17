@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NaRegua — Preview Visual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Inter',sans-serif; background:#09090b; color:#fafafa; min-height:100vh; -webkit-font-smoothing:antialiased; }
+
+    .preview-grid {
+      display:grid; grid-template-columns:1fr 1fr 1fr;
+      gap:24px; padding:24px; max-width:1200px; margin:0 auto;
+    }
+    @media (max-width:900px) { .preview-grid { grid-template-columns:1fr; max-width:420px; } }
+
+    .preview-label {
+      grid-column:1/-1; text-align:center; padding:20px 0 0;
+      font-size:11px; color:#52525b; font-weight:700; letter-spacing:3px; text-transform:uppercase;
+    }
+
+    /* ═══ OPÇÃO A: Cinza Aço + Azul Gelo ═══ */
+    .opt-a {
+      --bg: #0c0c0e; --card: #141418; --card2: #1c1c22; --border: rgba(255,255,255,0.06);
+      --accent: #60a5fa; --accent-soft: rgba(96,165,250,0.1); --accent-border: rgba(96,165,250,0.2);
+      --text: #f0f0f2; --text2: #a1a1aa; --text3: #52525b;
+    }
+
+    /* ═══ OPÇÃO B: Preto Puro + Dourado ═══ */
+    .opt-b {
+      --bg: #000000; --card: #0a0a0a; --card2: #141414; --border: rgba(255,255,255,0.05);
+      --accent: #d4a853; --accent-soft: rgba(212,168,83,0.1); --accent-border: rgba(212,168,83,0.2);
+      --text: #fafafa; --text2: #a3a3a3; --text3: #525252;
+    }
+
+    /* ═══ OPÇÃO C: Carvão + Prata/Ciano ═══ */
+    .opt-c {
+      --bg: #0b0d0f; --card: #12151a; --card2: #1a1e25; --border: rgba(255,255,255,0.07);
+      --accent: #94a3b8; --accent-soft: rgba(148,163,184,0.1); --accent-border: rgba(148,163,184,0.2);
+      --text: #e2e8f0; --text2: #94a3b8; --text3: #475569;
+    }
+
+    /* Card container */
+    .phone-frame {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 20px 16px;
+      min-height: 580px;
+      position: relative;
+      overflow: hidden;
+    }
+    .phone-frame::before {
+      content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
+      width:100px; height:4px; background:var(--card2); border-radius:0 0 8px 8px;
+    }
+
+    /* Logo */
+    .p-logo { text-align:center; margin:16px 0 20px; }
+    .p-logo img { height:44px; }
+    .p-logo-text { font-size:22px; font-weight:900; color:var(--text); margin-top:4px; letter-spacing:-0.5px; }
+    .p-logo-sub { font-size:11px; color:var(--text3); margin-top:4px; }
+
+    /* Tabs */
+    .p-tabs { display:flex; background:var(--card); border-radius:10px; padding:3px; margin-bottom:20px; }
+    .p-tab {
+      flex:1; padding:10px; text-align:center; font-size:12px; font-weight:700;
+      border-radius:8px; color:var(--text3); cursor:default;
+    }
+    .p-tab.active { background:var(--accent); color:#000; }
+
+    /* Input */
+    .p-field { margin-bottom:14px; }
+    .p-label { font-size:10px; color:var(--text3); font-weight:700; letter-spacing:1px; margin-bottom:5px; }
+    .p-input {
+      width:100%; padding:11px 13px; background:var(--card2); border:1px solid var(--border);
+      border-radius:8px; color:var(--text); font-size:13px; font-family:inherit;
+    }
+
+    /* Button */
+    .p-btn {
+      width:100%; padding:12px; border:none; border-radius:10px;
+      font-size:13px; font-weight:700; font-family:inherit; cursor:default;
+      margin-top:4px;
+    }
+    .p-btn-primary { background:var(--accent); color:#000; }
+    .p-btn-outline { background:transparent; border:1px solid var(--border); color:var(--text2); margin-top:8px; }
+
+    /* Service card */
+    .p-svc {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:12px 14px; background:var(--card); border:1.5px solid var(--border);
+      border-radius:10px; margin-bottom:8px;
+    }
+    .p-svc.selected { border-color:var(--accent); background:var(--accent-soft); }
+    .p-svc-name { font-size:13px; font-weight:600; color:var(--text); }
+    .p-svc-meta { font-size:10px; color:var(--text3); margin-top:2px; }
+    .p-svc-price { font-size:14px; font-weight:800; color:var(--accent); }
+
+    /* Stats */
+    .p-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:16px; }
+    .p-stat {
+      background:var(--card); border:1px solid var(--border); border-radius:10px;
+      padding:12px 8px; text-align:center;
+    }
+    .p-stat-num { font-size:18px; font-weight:800; color:var(--accent); }
+    .p-stat-label { font-size:8px; color:var(--text3); font-weight:700; letter-spacing:1px; margin-top:3px; }
+
+    /* Appointment card */
+    .p-appt {
+      background:var(--card); border:1px solid var(--border); border-radius:10px;
+      padding:12px; margin-bottom:8px;
+    }
+    .p-appt-time { font-size:16px; font-weight:800; color:var(--accent); }
+    .p-appt-name { font-size:13px; font-weight:600; color:var(--text); margin-top:4px; }
+    .p-appt-detail { font-size:11px; color:var(--text3); }
+    .p-appt-badge {
+      display:inline-block; font-size:9px; font-weight:700; padding:3px 8px;
+      border-radius:12px; background:var(--accent-soft); color:var(--accent);
+      margin-top:6px;
+    }
+
+    /* Bottom nav */
+    .p-nav {
+      display:flex; justify-content:center; gap:0; margin-top:16px;
+      border-top:1px solid var(--border); padding-top:10px;
+    }
+    .p-nav-item {
+      flex:1; text-align:center; font-size:9px; font-weight:600; color:var(--text3);
+    }
+    .p-nav-item.active { color:var(--accent); }
+    .p-nav-icon { font-size:16px; display:block; margin-bottom:2px; }
+
+    /* Option title */
+    .opt-title {
+      text-align:center; margin-bottom:12px;
+      font-size:13px; font-weight:800; color:var(--accent);
+      letter-spacing:1px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="preview-label">NAREGUA — OPÇÕES DE VISUAL</div>
+
+<div class="preview-grid">
+
+  <!-- ═══ OPÇÃO A: Azul Gelo ═══ -->
+  <div class="phone-frame opt-a">
+    <div class="opt-title">A · AÇO + AZUL GELO</div>
+    <div class="p-logo">
+      <img src="img/logo.png" alt="NaRegua" style="height:44px;">
+      <div class="p-logo-sub">Sua barbearia na palma da mão</div>
+    </div>
+    <div class="p-tabs">
+      <div class="p-tab active">ENTRAR</div>
+      <div class="p-tab">CRIAR CONTA</div>
+    </div>
+    <div class="p-field"><div class="p-label">E-MAIL</div><div class="p-input" style="color:var(--text3);">seu@email.com</div></div>
+    <div class="p-field"><div class="p-label">SENHA</div><div class="p-input" style="color:var(--text3);">••••••</div></div>
+    <div class="p-btn p-btn-primary">ENTRAR</div>
+
+    <div style="margin-top:24px;">
+      <div class="p-stats">
+        <div class="p-stat"><div class="p-stat-num">12</div><div class="p-stat-label">AGENDADOS</div></div>
+        <div class="p-stat"><div class="p-stat-num">8</div><div class="p-stat-label">ATENDIDOS</div></div>
+        <div class="p-stat"><div class="p-stat-num">R$ 340</div><div class="p-stat-label">FATURADO</div></div>
+      </div>
+      <div class="p-appt"><div class="p-appt-time">09:30</div><div class="p-appt-name">Carlos Mendes</div><div class="p-appt-detail">Corte + Barba · R$ 35,00</div><div class="p-appt-badge">CONFIRMADO</div></div>
+      <div class="p-appt"><div class="p-appt-time">10:00</div><div class="p-appt-name">João Silva</div><div class="p-appt-detail">Degradê · R$ 25,00</div><div class="p-appt-badge">PENDENTE</div></div>
+    </div>
+
+    <div class="p-nav">
+      <div class="p-nav-item active"><span class="p-nav-icon">📅</span>AGENDA</div>
+      <div class="p-nav-item"><span class="p-nav-icon">✂️</span>SERVIÇOS</div>
+      <div class="p-nav-item"><span class="p-nav-icon">💰</span>CAIXA</div>
+    </div>
+  </div>
+
+  <!-- ═══ OPÇÃO B: Dourado ═══ -->
+  <div class="phone-frame opt-b">
+    <div class="opt-title">B · PRETO + DOURADO</div>
+    <div class="p-logo">
+      <img src="img/logo.png" alt="NaRegua" style="height:44px;">
+      <div class="p-logo-sub">Sua barbearia na palma da mão</div>
+    </div>
+    <div class="p-tabs">
+      <div class="p-tab active">ENTRAR</div>
+      <div class="p-tab">CRIAR CONTA</div>
+    </div>
+    <div class="p-field"><div class="p-label">E-MAIL</div><div class="p-input" style="color:var(--text3);">seu@email.com</div></div>
+    <div class="p-field"><div class="p-label">SENHA</div><div class="p-input" style="color:var(--text3);">••••••</div></div>
+    <div class="p-btn p-btn-primary">ENTRAR</div>
+
+    <div style="margin-top:24px;">
+      <div class="p-stats">
+        <div class="p-stat"><div class="p-stat-num">12</div><div class="p-stat-label">AGENDADOS</div></div>
+        <div class="p-stat"><div class="p-stat-num">8</div><div class="p-stat-label">ATENDIDOS</div></div>
+        <div class="p-stat"><div class="p-stat-num">R$ 340</div><div class="p-stat-label">FATURADO</div></div>
+      </div>
+      <div class="p-appt"><div class="p-appt-time">09:30</div><div class="p-appt-name">Carlos Mendes</div><div class="p-appt-detail">Corte + Barba · R$ 35,00</div><div class="p-appt-badge">CONFIRMADO</div></div>
+      <div class="p-appt"><div class="p-appt-time">10:00</div><div class="p-appt-name">João Silva</div><div class="p-appt-detail">Degradê · R$ 25,00</div><div class="p-appt-badge">PENDENTE</div></div>
+    </div>
+
+    <div class="p-svc selected" style="margin-top:12px;"><div><div class="p-svc-name">Corte + Barba</div><div class="p-svc-meta">45 min</div></div><div class="p-svc-price">R$ 35,00</div></div>
+    <div class="p-svc"><div><div class="p-svc-name">Degradê</div><div class="p-svc-meta">30 min</div></div><div class="p-svc-price">R$ 25,00</div></div>
+  </div>
+
+  <!-- ═══ OPÇÃO C: Prata ═══ -->
+  <div class="phone-frame opt-c">
+    <div class="opt-title">C · CARVÃO + PRATA</div>
+    <div class="p-logo">
+      <img src="img/logo.png" alt="NaRegua" style="height:44px;">
+      <div class="p-logo-sub">Sua barbearia na palma da mão</div>
+    </div>
+    <div class="p-tabs">
+      <div class="p-tab active">ENTRAR</div>
+      <div class="p-tab">CRIAR CONTA</div>
+    </div>
+    <div class="p-field"><div class="p-label">E-MAIL</div><div class="p-input" style="color:var(--text3);">seu@email.com</div></div>
+    <div class="p-field"><div class="p-label">SENHA</div><div class="p-input" style="color:var(--text3);">••••••</div></div>
+    <div class="p-btn p-btn-primary">ENTRAR</div>
+
+    <div style="margin-top:24px;">
+      <div class="p-stats">
+        <div class="p-stat"><div class="p-stat-num">12</div><div class="p-stat-label">AGENDADOS</div></div>
+        <div class="p-stat"><div class="p-stat-num">8</div><div class="p-stat-label">ATENDIDOS</div></div>
+        <div class="p-stat"><div class="p-stat-num">R$ 340</div><div class="p-stat-label">FATURADO</div></div>
+      </div>
+      <div class="p-appt"><div class="p-appt-time">09:30</div><div class="p-appt-name">Carlos Mendes</div><div class="p-appt-detail">Corte + Barba · R$ 35,00</div><div class="p-appt-badge">CONFIRMADO</div></div>
+      <div class="p-appt"><div class="p-appt-time">10:00</div><div class="p-appt-name">João Silva</div><div class="p-appt-detail">Degradê · R$ 25,00</div><div class="p-appt-badge">PENDENTE</div></div>
+    </div>
+
+    <div class="p-svc selected" style="margin-top:12px;"><div><div class="p-svc-name">Corte + Barba</div><div class="p-svc-meta">45 min</div></div><div class="p-svc-price">R$ 35,00</div></div>
+    <div class="p-svc"><div><div class="p-svc-name">Degradê</div><div class="p-svc-meta">30 min</div></div><div class="p-svc-price">R$ 25,00</div></div>
+
+    <div class="p-nav">
+      <div class="p-nav-item active"><span class="p-nav-icon">📅</span>AGENDA</div>
+      <div class="p-nav-item"><span class="p-nav-icon">✂️</span>SERVIÇOS</div>
+      <div class="p-nav-item"><span class="p-nav-icon">💰</span>CAIXA</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
