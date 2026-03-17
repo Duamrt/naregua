@@ -1166,7 +1166,7 @@ function playNotificationSound() {
       gain.connect(ctx.destination);
       osc.type = 'square';
       osc.frequency.value = freq;
-      gain.gain.value = 0.8;
+      gain.gain.value = 0.3;
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.2 + 0.18);
       osc.start(ctx.currentTime + i * 0.2);
       osc.stop(ctx.currentTime + i * 0.2 + 0.18);
