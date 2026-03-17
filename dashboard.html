@@ -121,6 +121,31 @@
     .nav-item.active { color:var(--verde-acao); }
     .nav-item .nav-icon { font-size:18px; }
 
+    /* Filtros */
+    .filters {
+      display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;
+    }
+    .filter-chip {
+      padding:6px 14px; border-radius:20px; font-size:11px; font-weight:700;
+      border:1.5px solid var(--borda); background:transparent; color:var(--texto-muted);
+      cursor:pointer; font-family:inherit; transition:all .2s; white-space:nowrap;
+    }
+    .filter-chip:hover { border-color:var(--borda-hover); }
+    .filter-chip.active { border-color:var(--verde-acao); background:rgba(46,204,113,0.1); color:var(--verde-acao); }
+    .filter-chip .count {
+      display:inline-block; min-width:16px; text-align:center;
+      background:rgba(255,255,255,0.08); border-radius:10px; padding:1px 5px;
+      font-size:9px; margin-left:4px;
+    }
+    .filter-chip.active .count { background:rgba(46,204,113,0.2); }
+
+    .btn-delete {
+      flex:1; padding:8px 0; border-radius:8px; border:none; font-size:11px;
+      font-weight:700; font-family:inherit; cursor:pointer; transition:all .2s;
+      background:rgba(231,76,60,0.1); color:#e74c3c; letter-spacing:0.5px;
+    }
+    .btn-delete:hover { opacity:0.85; }
+
     body { padding-bottom:70px; }
   </style>
 </head>
@@ -172,6 +197,9 @@
     <button class="date-nav-btn" onclick="changeDay(1)">›</button>
   </div>
 
+  <!-- Filtros -->
+  <div class="filters" id="filters"></div>
+
   <!-- Lista de agendamentos -->
   <div id="appt-list"></div>
 
@@ -199,6 +227,8 @@ let shop = null;
 let services = [];
 let barbers = [];
 let currentDate = new Date();
+let currentFilter = 'all';
+let dayAppointments = [];
 const DIAS_SEMANA = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 
@@ -282,7 +312,42 @@ async function renderDay() {
     .lte('scheduled_at', dayEnd)
     .order('scheduled_at', { ascending: true });
 
-  const list = appts || [];
+  dayAppointments = appts || [];
+  renderFilters();
+  renderAppointments();
+}
+
+function renderFilters() {
+  const el = document.getElementById('filters');
+  const counts = { all: 0, pending: 0, confirmed: 0, done: 0, cancelled: 0 };
+  dayAppointments.forEach(a => {
+    counts.all++;
+    counts[a.status] = (counts[a.status] || 0) + 1;
+  });
+
+  const filters = [
+    { key: 'all', label: 'Todos', count: counts.all },
+    { key: 'pending', label: 'Pendentes', count: counts.pending },
+    { key: 'confirmed', label: 'Confirmados', count: counts.confirmed },
+    { key: 'done', label: 'Concluídos', count: counts.done },
+    { key: 'cancelled', label: 'Cancelados', count: counts.cancelled },
+  ];
+
+  el.innerHTML = filters.filter(f => f.count > 0 || f.key === 'all').map(f =>
+    `<button class="filter-chip ${currentFilter === f.key ? 'active' : ''}" onclick="setFilter('${f.key}')">
+      ${f.label}<span class="count">${f.count}</span>
+    </button>`
+  ).join('');
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  renderFilters();
+  renderAppointments();
+}
+
+function renderAppointments() {
+  const list = currentFilter === 'all' ? dayAppointments : dayAppointments.filter(a => a.status === currentFilter);
   const el = document.getElementById('appt-list');
 
   // Stats
@@ -340,6 +405,8 @@ async function renderDay() {
         <button class="appt-btn btn-cancel-appt" onclick="updateStatus('${a.id}','cancelled')">CANCELAR</button>
         ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${phone}','${esc(a.client_name)}')">ZAP</button>` : ''}
       `;
+    } else if (a.status === 'cancelled') {
+      actions = `<button class="btn-delete" onclick="excluirAgendamento('${a.id}')">EXCLUIR</button>`;
     }
 
     return `<div class="appt-card">
@@ -359,6 +426,13 @@ async function renderDay() {
 async function updateStatus(id, status) {
   await sb.from('appointments').update({ status }).eq('id', id);
   renderDay();
+}
+
+async function excluirAgendamento(id) {
+  await sb.from('appointments').delete().eq('id', id);
+  dayAppointments = dayAppointments.filter(a => a.id !== id);
+  renderFilters();
+  renderAppointments();
 }
 
 function abrirWhatsApp(phone, nome) {
