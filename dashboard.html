@@ -812,10 +812,11 @@ function abrirWhatsApp(apptId) {
   const saudacao = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
 
   const msg = saudacao + ', ' + a.client_name + '! Aqui e da *' + shop.name + '*.\n\n'
-    + 'Passando pra confirmar seu horario:\n\n'
+    + 'Seu horario ta confirmado:\n\n'
     + '*' + (svc ? svc.name : 'Servico') + '*\n'
     + 'Dia: ' + dataStr + ' as ' + horaStr + '\n\n'
-    + 'Pode confirmar pra gente? Te esperamos!';
+    + 'Se precisar remarcar, avisa com pelo menos 2h de antecedencia pra gente encaixar outro cliente.\n\n'
+    + 'Te esperamos!';
 
   window.open('https://wa.me/55' + phone + '?text=' + encodeURIComponent(msg), '_blank');
 }
