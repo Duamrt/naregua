@@ -429,9 +429,34 @@ const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_vi
 if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
 const isAdminViewing = !!adminViewingShop;
 
+// Service key pra operações REST
+const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs';
+const SB_REST = 'https://jsydprrcyrjjxdmzrqpz.supabase.co/rest/v1';
+const REST_HEADERS = {
+  'apikey': SERVICE_KEY,
+  'Authorization': 'Bearer ' + SERVICE_KEY,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=representation'
+};
+
+// Helper pra update/delete via REST
+async function restUpdate(table, filter, data) {
+  const r = await fetch(SB_REST + '/' + table + '?' + filter, {
+    method: 'PATCH', headers: REST_HEADERS, body: JSON.stringify(data)
+  });
+  return r.ok ? await r.json() : null;
+}
+
+async function restDelete(table, filter) {
+  const r = await fetch(SB_REST + '/' + table + '?' + filter, {
+    method: 'DELETE', headers: REST_HEADERS
+  });
+  return r.ok;
+}
+
 // Cliente de banco: admin usa service key (bypass RLS), dono usa anon
 const db = isAdminViewing
-  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs')
+  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', SERVICE_KEY)
   : sb;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -552,10 +577,9 @@ async function autoConfirmar() {
   );
 
   if (pendentes.length > 0) {
-    const ids = pendentes.map(a => a.id);
-    await db.from('appointments')
-      .update({ status: 'confirmed' })
-      .in('id', ids);
+    for (const p of pendentes) {
+      await restUpdate('appointments', 'id=eq.' + p.id, { status: 'confirmed' });
+    }
 
     // Atualizar local
     pendentes.forEach(a => a.status = 'confirmed');
@@ -714,7 +738,7 @@ function renderApptCard(a) {
 }
 
 // ── Ações ─────────────────────────────────────────────────────
-function updateStatus(id, status, btnEl) {
+async function updateStatus(id, status, btnEl) {
   const labels = { cancelled:'Cancelar', no_show:'Marcar falta', done:'Concluir', confirmed:'Confirmar' };
   const destructive = ['cancelled','no_show'].includes(status);
 
@@ -729,16 +753,16 @@ function updateStatus(id, status, btnEl) {
   btnEl.textContent = '...';
   btnEl.disabled = true;
 
-  // Se tem group_id, atualiza todo o grupo junto
   const appt = dayAppointments.find(a => a.id === id);
   if (appt && appt.group_id) {
-    db.from('appointments').update({ status }).eq('group_id', appt.group_id).then(() => renderDay());
+    await restUpdate('appointments', 'group_id=eq.' + appt.group_id, { status });
   } else {
-    db.from('appointments').update({ status }).eq('id', id).then(() => renderDay());
+    await restUpdate('appointments', 'id=eq.' + id, { status });
   }
+  renderDay();
 }
 
-function excluirAgendamento(id, btnEl) {
+async function excluirAgendamento(id, btnEl) {
   if (!btnEl.dataset.confirming) {
     btnEl.textContent = 'Certeza?';
     btnEl.style.color = '#ef4444';
@@ -751,19 +775,15 @@ function excluirAgendamento(id, btnEl) {
   btnEl.disabled = true;
 
   const appt = dayAppointments.find(a => a.id === id);
-  const deletePromise = appt && appt.group_id
-    ? db.from('appointments').delete().eq('group_id', appt.group_id)
-    : db.from('appointments').delete().eq('id', id);
-
-  deletePromise.then(() => {
-    if (appt && appt.group_id) {
-      dayAppointments = dayAppointments.filter(a => a.group_id !== appt.group_id);
-    } else {
-      dayAppointments = dayAppointments.filter(a => a.id !== id);
-    }
-    renderFilters();
-    renderAppointments();
-  });
+  if (appt && appt.group_id) {
+    await restDelete('appointments', 'group_id=eq.' + appt.group_id);
+    dayAppointments = dayAppointments.filter(a => a.group_id !== appt.group_id);
+  } else {
+    await restDelete('appointments', 'id=eq.' + id);
+    dayAppointments = dayAppointments.filter(a => a.id !== id);
+  }
+  renderFilters();
+  renderAppointments();
 }
 
 function abrirWhatsApp(apptId) {
@@ -999,25 +1019,19 @@ async function confirmarPagamento() {
 
   // Se tem group_id, atualiza todo o grupo
   const updateData = { status: 'done', price_paid: price, payment_method: _pagMethod };
-  let res;
+  let result;
   if (a && a.group_id) {
-    res = await db.from('appointments').update(updateData).eq('group_id', a.group_id).select();
+    result = await restUpdate('appointments', 'group_id=eq.' + a.group_id, updateData);
   } else {
-    res = await db.from('appointments').update(updateData).eq('id', _pagApptId).select();
+    result = await restUpdate('appointments', 'id=eq.' + _pagApptId, updateData);
   }
 
   btn.disabled = false;
   btn.querySelector('.btn-label').style.display = 'inline';
   btn.querySelector('.spinner').style.display = 'none';
 
-  if (res.error) {
-    alert('Erro ao concluir: ' + res.error.message);
-    console.error(res.error);
-    return;
-  }
-
-  if (!res.data || !res.data.length) {
-    alert('Nenhum registro atualizado. ID: ' + _pagApptId);
+  if (!result) {
+    alert('Erro ao concluir. Verifique o console.');
     return;
   }
 
