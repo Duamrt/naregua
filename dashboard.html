@@ -753,7 +753,11 @@ function copiarLink() {
 
 function compartilharWhatsApp() {
   const link = document.getElementById('share-link').textContent;
-  const msg = 'Agende seu horario comigo pelo link:\n' + link;
+  const msg = 'Ola! Aqui e da *' + shop.name + '*.\n\n'
+    + 'Agora voce pode agendar seu horario online, sem precisar ligar ou mandar mensagem!\n\n'
+    + 'E rapido, so escolher o servico, o dia e o horario:\n'
+    + link + '\n\n'
+    + 'Te esperamos! ✂️';
   window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
 }
 
