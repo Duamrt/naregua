@@ -404,6 +404,11 @@ const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
 const adminViewingShop = sessionStorage.getItem('admin_viewing_shop');
 const isAdminViewing = !!adminViewingShop;
 
+// Cliente de banco: admin usa service key (bypass RLS), dono usa anon
+const db = isAdminViewing
+  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs')
+  : sb;
+
 document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'index.html'; return; }
@@ -415,15 +420,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let shopData;
   if (isAdminViewing) {
-    // Admin vendo uma barbearia específica — usar service key
-    const sbAdmin = window.supabase.createClient(
-      'https://jsydprrcyrjjxdmzrqpz.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs'
-    );
-    const { data } = await sbAdmin.from('barbershops').select('*').eq('id', adminViewingShop).single();
+    const { data } = await db.from('barbershops').select('*').eq('id', adminViewingShop).single();
     shopData = data;
   } else {
-    const { data } = await sb.from('barbershops').select('*').eq('owner_id', session.user.id).maybeSingle();
+    const { data } = await db.from('barbershops').select('*').eq('owner_id', session.user.id).maybeSingle();
     shopData = data;
   }
 
@@ -444,8 +444,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Buscar serviços e barbeiros
   const [svcRes, barbRes] = await Promise.all([
-    sb.from('services').select('*').eq('barbershop_id', shop.id),
-    sb.from('barbers').select('*').eq('barbershop_id', shop.id)
+    db.from('services').select('*').eq('barbershop_id', shop.id),
+    db.from('barbers').select('*').eq('barbershop_id', shop.id)
   ]);
   services = svcRes.data || [];
   barbers = barbRes.data || [];
@@ -528,7 +528,7 @@ async function autoConfirmar() {
 
   if (pendentes.length > 0) {
     const ids = pendentes.map(a => a.id);
-    await sb.from('appointments')
+    await db.from('appointments')
       .update({ status: 'confirmed' })
       .in('id', ids);
 
@@ -689,12 +689,12 @@ function renderApptCard(a) {
 
 // ── Ações ─────────────────────────────────────────────────────
 async function updateStatus(id, status) {
-  await sb.from('appointments').update({ status }).eq('id', id);
+  await db.from('appointments').update({ status }).eq('id', id);
   renderDay();
 }
 
 async function excluirAgendamento(id) {
-  await sb.from('appointments').delete().eq('id', id);
+  await db.from('appointments').delete().eq('id', id);
   dayAppointments = dayAppointments.filter(a => a.id !== id);
   renderFilters();
   renderAppointments();
@@ -803,7 +803,7 @@ async function salvarEdicao() {
   try {
     // Atualizar barbearia
     const slug = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-    const { error: shopErr } = await sb.from('barbershops').update({
+    const { error: shopErr } = await db.from('barbershops').update({
       name, slug, city, phone, opening_time: opening, closing_time: closing,
       interval_min: interval, days_open: editDays
     }).eq('id', shop.id);
@@ -815,25 +815,25 @@ async function salvarEdicao() {
     const editIds = editBarbersList.filter(b => b.id).map(b => b.id);
     const toRemove = barbers.filter(b => !editIds.includes(b.id));
     for (const b of toRemove) {
-      await sb.from('barbers').delete().eq('id', b.id);
+      await db.from('barbers').delete().eq('id', b.id);
     }
 
     // Atualizar existentes e criar novos
     for (const b of editBarbersList) {
       if (!b.name.trim()) continue;
       if (b.id) {
-        await sb.from('barbers').update({ name: b.name.trim() }).eq('id', b.id);
+        await db.from('barbers').update({ name: b.name.trim() }).eq('id', b.id);
       } else {
-        await sb.from('barbers').insert({
+        await db.from('barbers').insert({
           barbershop_id: shop.id, name: b.name.trim(), commission_pct: 0, active: true
         });
       }
     }
 
     // Recarregar dados
-    const { data: shopData } = await sb.from('barbershops').select('*').eq('id', shop.id).single();
+    const { data: shopData } = await db.from('barbershops').select('*').eq('id', shop.id).single();
     shop = shopData;
-    const { data: barbData } = await sb.from('barbers').select('*').eq('barbershop_id', shop.id);
+    const { data: barbData } = await db.from('barbers').select('*').eq('barbershop_id', shop.id);
     barbers = barbData || [];
 
     // Atualizar header

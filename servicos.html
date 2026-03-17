@@ -158,6 +158,9 @@ let services = [];
 const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
 const adminViewingShop = sessionStorage.getItem('admin_viewing_shop');
 const isAdminViewing = !!adminViewingShop;
+const db = isAdminViewing
+  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs')
+  : sb;
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
@@ -171,14 +174,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let shopData;
   if (isAdminViewing) {
-    const sbAdmin = window.supabase.createClient(
-      'https://jsydprrcyrjjxdmzrqpz.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs'
-    );
-    const { data } = await sbAdmin.from('barbershops').select('*').eq('id', adminViewingShop).single();
+    const { data } = await db.from('barbershops').select('*').eq('id', adminViewingShop).single();
     shopData = data;
   } else {
-    const { data } = await sb.from('barbershops').select('*').eq('owner_id', session.user.id).maybeSingle();
+    const { data } = await db.from('barbershops').select('*').eq('owner_id', session.user.id).maybeSingle();
     shopData = data;
   }
 
@@ -289,12 +288,12 @@ async function salvarServico() {
 
   try {
     if (editId) {
-      const { error } = await sb.from('services').update({
+      const { error } = await db.from('services').update({
         name: nome, price: preco, duration_min: duracao
       }).eq('id', editId);
       if (error) throw error;
     } else {
-      const { error } = await sb.from('services').insert({
+      const { error } = await db.from('services').insert({
         barbershop_id: shop.id, name: nome, price: preco, duration_min: duracao, active: true
       });
       if (error) throw error;
@@ -315,7 +314,7 @@ async function salvarServico() {
 
 // ── Toggle ativo/inativo ──────────────────────────────────────
 async function toggleServico(id, ativo) {
-  await sb.from('services').update({ active: ativo }).eq('id', id);
+  await db.from('services').update({ active: ativo }).eq('id', id);
   await loadServices();
 }
 
@@ -333,7 +332,7 @@ async function excluirServico(id, nome, btnEl) {
     return;
   }
 
-  await sb.from('services').delete().eq('id', id);
+  await db.from('services').delete().eq('id', id);
   await loadServices();
 }
 
