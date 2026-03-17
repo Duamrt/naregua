@@ -113,17 +113,24 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js"></script>
-<script src="js/utils.js"></script>
+<script src="js/supabase.js?v=2"></script>
+<script src="js/utils.js?v=2"></script>
 <script>
 // ── Verificar sessão ──────────────────────────────────────────
 let currentUser = null;
 
+const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
+
 document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session }, error: sessErr } = await sb.auth.getSession();
-  console.log('onboarding session:', session ? 'OK' : 'NONE', sessErr);
   if (!session) { window.location.href = 'index.html'; return; }
   currentUser = session.user;
+
+  // Admin vai pro painel, não pro onboarding
+  if (ADMIN_EMAILS.includes(currentUser.email)) {
+    window.location.href = 'admin.html';
+    return;
+  }
 
   // Já tem barbearia? Vai pro dashboard
   const { data: shop, error: shopErr } = await sb

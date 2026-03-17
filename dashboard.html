@@ -400,9 +400,16 @@ const DIAS_SEMANA = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'
 const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 
 // ── Init ──────────────────────────────────────────────────────
+const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
+
 document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'index.html'; return; }
+
+  if (ADMIN_EMAILS.includes(session.user.email)) {
+    window.location.href = 'admin.html';
+    return;
+  }
 
   const { data: shopData } = await sb
     .from('barbershops')
