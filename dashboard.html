@@ -1143,10 +1143,21 @@ function fecharModalVaga() {
 }
 
 // ── Notificações ──────────────────────────────────────────────
+// AudioContext precisa ser desbloqueado com interação do usuário (mobile)
+let _audioCtx = null;
+function getAudioCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+// Desbloquear no primeiro toque/clique
+document.addEventListener('click', () => getAudioCtx(), { once: true });
+document.addEventListener('touchstart', () => getAudioCtx(), { once: true });
+
 function playNotificationSound() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    // 3 beeps fortes (dó-mi-sol) com repetição
+    const ctx = getAudioCtx();
+    // 3 beeps fortes (dó-mi-sol) repetidos 2x
     const notas = [523, 659, 784, 523, 659, 784];
     notas.forEach((freq, i) => {
       const osc = ctx.createOscillator();
@@ -1155,12 +1166,12 @@ function playNotificationSound() {
       gain.connect(ctx.destination);
       osc.type = 'square';
       osc.frequency.value = freq;
-      gain.gain.value = 0.6;
+      gain.gain.value = 0.8;
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.2 + 0.18);
       osc.start(ctx.currentTime + i * 0.2);
       osc.stop(ctx.currentTime + i * 0.2 + 0.18);
     });
-  } catch (e) { /* sem suporte a audio */ }
+  } catch (e) { console.error('Audio error:', e); }
 }
 
 function sendBrowserNotification(title, body) {
