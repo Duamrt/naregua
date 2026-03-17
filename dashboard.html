@@ -375,6 +375,20 @@
   </div>
 </div>
 
+<!-- Modal vaga aberta (remarketing) -->
+<div class="modal-overlay" id="modal-vaga">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-title">
+      <h2>Vaga aberta!</h2>
+      <button class="modal-close" onclick="fecharModalVaga()">✕</button>
+    </div>
+    <div style="font-size:12px;color:var(--texto-muted);margin-bottom:16px;" id="vaga-info"></div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--texto-muted);margin-bottom:10px;">CLIENTES COM HORÁRIO MAIS TARDE</div>
+    <div id="vaga-clientes"></div>
+    <button class="btn btn-outline" onclick="fecharModalVaga()" style="margin-top:12px;width:100%;">FECHAR</button>
+  </div>
+</div>
+
 <!-- Modal pagamento -->
 <div class="modal-overlay" id="modal-pagamento">
   <div class="modal" style="max-width:340px;text-align:center;">
@@ -717,7 +731,7 @@ function renderApptCard(a) {
   if (a.status === 'pending') {
     actions = `
       <button class="appt-btn btn-confirm-appt" onclick="updateStatus('${a.id}','confirmed',this)">CONFIRMAR</button>
-      <button class="appt-btn btn-cancel-appt" onclick="updateStatus('${a.id}','cancelled',this)">CANCELAR</button>
+      <button class="appt-btn btn-cancel-appt" onclick="cancelarComVaga('${a.id}',this)">CANCELAR</button>
       ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${a.id}')">ZAP</button>` : ''}
     `;
   } else if (a.status === 'confirmed') {
@@ -730,7 +744,7 @@ function renderApptCard(a) {
     } else {
       actions = `
         <button class="appt-btn btn-done-appt" onclick="abrirModalPagamento('${a.id}')">CONCLUIR</button>
-        <button class="appt-btn btn-cancel-appt" onclick="updateStatus('${a.id}','cancelled',this)">CANCELAR</button>
+        <button class="appt-btn btn-cancel-appt" onclick="cancelarComVaga('${a.id}',this)">CANCELAR</button>
         ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${a.id}')">ZAP</button>` : ''}
       `;
     }
@@ -1051,6 +1065,81 @@ async function confirmarPagamento() {
 
   fecharModalPag();
   await renderDay();
+}
+
+// ── Remarketing de vaga ───────────────────────────────────────
+async function cancelarComVaga(apptId, btnEl) {
+  // Confirmação duplo clique
+  if (!btnEl.dataset.confirming) {
+    const original = btnEl.textContent;
+    btnEl.textContent = 'Certeza?';
+    btnEl.dataset.confirming = 'true';
+    setTimeout(() => { btnEl.textContent = original; delete btnEl.dataset.confirming; }, 3000);
+    return;
+  }
+
+  btnEl.textContent = '...';
+  btnEl.disabled = true;
+
+  const cancelado = dayAppointments.find(a => a.id === apptId);
+  if (!cancelado) return;
+
+  // Cancelar o agendamento
+  const appt = dayAppointments.find(a => a.id === apptId);
+  if (appt && appt.group_id) {
+    await restUpdate('appointments', 'group_id=eq.' + appt.group_id, { status: 'cancelled' });
+  } else {
+    await restUpdate('appointments', 'id=eq.' + apptId, { status: 'cancelled' });
+  }
+
+  // Buscar clientes com horário POSTERIOR no mesmo dia e barbeiro
+  const horaCancelada = new Date(cancelado.scheduled_at);
+  const posteriores = dayAppointments.filter(a =>
+    a.id !== apptId &&
+    ['pending', 'confirmed'].includes(a.status) &&
+    a.barber_id === cancelado.barber_id &&
+    new Date(a.scheduled_at) > horaCancelada
+  ).sort((a, b) => new Date(a.scheduled_at) - new Date(b.scheduled_at));
+
+  await renderDay();
+
+  // Se tem clientes posteriores, mostrar modal
+  if (posteriores.length > 0) {
+    const horaVaga = horaCancelada.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+    const svcCancelado = services.find(s => s.id === cancelado.service_id);
+    document.getElementById('vaga-info').innerHTML =
+      'O horário das <strong>' + horaVaga + '</strong>' +
+      (svcCancelado ? ' (' + esc(svcCancelado.name) + ')' : '') +
+      ' foi cancelado. Avise os clientes abaixo que podem antecipar:';
+
+    document.getElementById('vaga-clientes').innerHTML = posteriores.map(a => {
+      const svc = services.find(s => s.id === a.service_id);
+      const hora = new Date(a.scheduled_at);
+      const horaStr = hora.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+      const phone = (a.client_phone || '').replace(/\D/g, '');
+      const h = new Date().getHours();
+      const saudacao = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+      const waMsg = saudacao + ', ' + a.client_name + '! Aqui e da *' + shop.name + '*.\n\n'
+        + 'Abriu uma vaga mais cedo: *' + horaVaga + '*\n'
+        + 'Seu horario atual: ' + horaStr + '\n\n'
+        + 'Quer antecipar? Me responde aqui que eu troco pra voce!';
+      const waLink = phone ? 'https://wa.me/55' + phone + '?text=' + encodeURIComponent(waMsg) : '';
+
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--borda);">
+        <div>
+          <div style="font-size:13px;font-weight:600;">${esc(a.client_name)}</div>
+          <div style="font-size:11px;color:var(--texto-muted);">${svc ? svc.name : '—'} · ${horaStr}</div>
+        </div>
+        ${waLink ? `<a href="${waLink}" target="_blank" style="padding:8px 14px;border-radius:8px;background:rgba(37,211,102,0.15);color:#25d366;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;">AVISAR</a>` : ''}
+      </div>`;
+    }).join('');
+
+    document.getElementById('modal-vaga').classList.add('show');
+  }
+}
+
+function fecharModalVaga() {
+  document.getElementById('modal-vaga').classList.remove('show');
 }
 
 // ── Notificações ──────────────────────────────────────────────
