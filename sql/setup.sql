@@ -57,7 +57,20 @@ CREATE TABLE appointments (
   scheduled_at timestamptz NOT NULL,
   status text DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'done', 'cancelled')),
   group_id uuid,
+  price_paid numeric,
+  payment_method text,
   notes text DEFAULT '',
+  created_at timestamptz DEFAULT now()
+);
+
+-- Despesas
+CREATE TABLE expenses (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  barbershop_id uuid REFERENCES barbershops(id) ON DELETE CASCADE NOT NULL,
+  description text NOT NULL,
+  amount numeric NOT NULL DEFAULT 0,
+  date date DEFAULT CURRENT_DATE,
+  category text DEFAULT 'outros',
   created_at timestamptz DEFAULT now()
 );
 
@@ -90,6 +103,7 @@ CREATE INDEX idx_barbers_shop ON barbers(barbershop_id);
 CREATE INDEX idx_services_shop ON services(barbershop_id);
 CREATE INDEX idx_appointments_shop ON appointments(barbershop_id);
 CREATE INDEX idx_appointments_scheduled ON appointments(scheduled_at);
+CREATE INDEX idx_expenses_shop ON expenses(barbershop_id);
 CREATE INDEX idx_payments_shop ON payments(barbershop_id);
 
 -- ══════════════════════════════════════════
@@ -150,6 +164,14 @@ CREATE POLICY "appointments_public_insert" ON appointments
 -- Leitura pública de agendamentos ativos (necessário pra conflito e grade de horários)
 CREATE POLICY "appointments_public_read_active" ON appointments
   FOR SELECT USING (status IN ('pending', 'confirmed'));
+
+-- Expenses: só dono da barbearia
+ALTER TABLE expenses ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "expenses_owner" ON expenses
+  FOR ALL USING (
+    barbershop_id IN (SELECT id FROM barbershops WHERE owner_id = auth.uid())
+  );
 
 -- Payments: só dono da barbearia
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;

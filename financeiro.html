@@ -396,6 +396,7 @@ async function renderPeriod() {
 
   // Calcular totais
   const totalReceita = entradas.reduce((s, a) => {
+    if (a.price_paid != null) return s + Number(a.price_paid);
     const svc = services.find(sv => sv.id === a.service_id);
     return s + (svc ? Number(svc.price) : 0);
   }, 0);
@@ -427,12 +428,15 @@ async function renderPeriod() {
       const svc = services.find(sv => sv.id === a.service_id);
       const hora = new Date(a.scheduled_at);
       const timeStr = hora.toLocaleDateString('pt-BR') + ' ' + hora.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+      const valor = a.price_paid != null ? Number(a.price_paid) : (svc ? Number(svc.price) : 0);
+      const metodoLabels = { pix:'PIX', dinheiro:'Dinheiro', cartao:'Cartão' };
+      const metodo = a.payment_method ? metodoLabels[a.payment_method] || a.payment_method : '';
       return `<div class="fin-item">
         <div class="fin-item-left">
           <div class="fin-item-desc">${esc(a.client_name)}</div>
-          <div class="fin-item-meta">${svc ? svc.name : '—'} · ${timeStr}</div>
+          <div class="fin-item-meta">${svc ? svc.name : '—'} · ${timeStr}${metodo ? ' · ' + metodo : ''}</div>
         </div>
-        <div class="fin-item-val" style="color:var(--verde-acao);">+${formatMoney(svc ? svc.price : 0)}</div>
+        <div class="fin-item-val" style="color:var(--verde-acao);">+${formatMoney(valor)}</div>
       </div>`;
     }).join('');
   }

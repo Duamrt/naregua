@@ -244,6 +244,16 @@
     }
     .day-btn.active { border-color:var(--verde-acao); background:rgba(212,168,83,0.15); color:var(--verde-acao); }
 
+    .pay-method-btn {
+      flex:1; padding:12px 0; border-radius:10px; border:1.5px solid var(--borda);
+      background:transparent; color:var(--texto-muted); font-size:11px;
+      font-weight:700; font-family:inherit; cursor:pointer; transition:all .2s;
+      text-align:center;
+    }
+    .pay-method-btn:hover { border-color:var(--borda-hover); }
+    .pay-method-btn.active { border-color:var(--verde-acao); background:rgba(212,168,83,0.1); color:var(--verde-acao); }
+    .pay-method-btn .pay-icon { font-size:18px; display:block; margin-bottom:4px; }
+
     body { padding-bottom:70px; }
   </style>
 </head>
@@ -359,6 +369,25 @@
       <button class="btn btn-outline" onclick="fecharEdicao()" style="flex:0.4;">CANCELAR</button>
       <button class="btn btn-primary" onclick="salvarEdicao()" id="btn-save-edit" style="flex:0.6;">
         <span class="btn-label">SALVAR</span>
+        <div class="spinner" style="display:none;"></div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pagamento -->
+<div class="modal-overlay" id="modal-pagamento">
+  <div class="modal" style="max-width:340px;text-align:center;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--texto-muted);margin-bottom:12px;">REGISTRAR PAGAMENTO</div>
+    <div id="pag-cliente" style="font-size:15px;font-weight:700;margin-bottom:4px;"></div>
+    <div id="pag-servico" style="font-size:12px;color:var(--texto-muted);margin-bottom:4px;"></div>
+    <div id="pag-valor" style="font-size:24px;font-weight:800;color:var(--verde-acao);margin-bottom:16px;"></div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--texto-muted);margin-bottom:8px;">FORMA DE PAGAMENTO</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;" id="pag-metodos"></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline" onclick="fecharModalPag()" style="flex:0.4;">CANCELAR</button>
+      <button class="btn btn-primary" onclick="confirmarPagamento()" id="btn-pag-confirm" style="flex:0.6;">
+        <span class="btn-label">CONFIRMAR</span>
         <div class="spinner" style="display:none;"></div>
       </button>
     </div>
@@ -657,12 +686,12 @@ function renderApptCard(a) {
     if (jaPassou) {
       // Horário já passou — mostrar ATENDIDO ou FALTOU
       actions = `
-        <button class="appt-btn btn-done-appt" onclick="updateStatus('${a.id}','done',this)">ATENDIDO</button>
+        <button class="appt-btn btn-done-appt" onclick="abrirModalPagamento('${a.id}')">ATENDIDO</button>
         <button class="appt-btn btn-noshow" onclick="updateStatus('${a.id}','no_show',this)">FALTOU</button>
       `;
     } else {
       actions = `
-        <button class="appt-btn btn-done-appt" onclick="updateStatus('${a.id}','done',this)">CONCLUIR</button>
+        <button class="appt-btn btn-done-appt" onclick="abrirModalPagamento('${a.id}')">CONCLUIR</button>
         <button class="appt-btn btn-cancel-appt" onclick="updateStatus('${a.id}','cancelled',this)">CANCELAR</button>
         ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${phone}','${esc(a.client_name)}')">ZAP</button>` : ''}
       `;
@@ -897,6 +926,74 @@ function showEditMsg(text, type) {
   const el = document.getElementById('edit-msg');
   el.textContent = text;
   el.className = `msg msg-${type} show`;
+}
+
+// ── Modal pagamento ───────────────────────────────────────────
+let _pagApptId = null;
+let _pagMethod = 'pix';
+
+function abrirModalPagamento(apptId) {
+  const a = dayAppointments.find(x => x.id === apptId);
+  if (!a) return;
+  const svc = services.find(s => s.id === a.service_id);
+  _pagApptId = apptId;
+  _pagMethod = 'pix';
+
+  document.getElementById('pag-cliente').textContent = a.client_name;
+  document.getElementById('pag-servico').textContent = svc ? svc.name : '—';
+  document.getElementById('pag-valor').textContent = formatMoney(svc ? svc.price : 0);
+  renderPayMethods();
+  document.getElementById('modal-pagamento').classList.add('show');
+}
+
+function fecharModalPag() {
+  document.getElementById('modal-pagamento').classList.remove('show');
+  _pagApptId = null;
+}
+
+function renderPayMethods() {
+  const metodos = [
+    { key: 'pix', icon: '📲', label: 'PIX' },
+    { key: 'dinheiro', icon: '💵', label: 'Dinheiro' },
+    { key: 'cartao', icon: '💳', label: 'Cartão' },
+  ];
+  document.getElementById('pag-metodos').innerHTML = metodos.map(m =>
+    `<button class="pay-method-btn ${_pagMethod === m.key ? 'active' : ''}" onclick="setPagMethod('${m.key}')">
+      <span class="pay-icon">${m.icon}</span>${m.label}
+    </button>`
+  ).join('');
+}
+
+function setPagMethod(m) {
+  _pagMethod = m;
+  renderPayMethods();
+}
+
+async function confirmarPagamento() {
+  if (!_pagApptId) return;
+  const btn = document.getElementById('btn-pag-confirm');
+  btn.disabled = true;
+  btn.querySelector('.btn-label').style.display = 'none';
+  btn.querySelector('.spinner').style.display = 'inline-block';
+
+  const a = dayAppointments.find(x => x.id === _pagApptId);
+  const svc = a ? services.find(s => s.id === a.service_id) : null;
+  const price = svc ? Number(svc.price) : 0;
+
+  // Se tem group_id, atualiza todo o grupo
+  const updateData = { status: 'done', price_paid: price, payment_method: _pagMethod };
+  if (a && a.group_id) {
+    await db.from('appointments').update(updateData).eq('group_id', a.group_id);
+  } else {
+    await db.from('appointments').update(updateData).eq('id', _pagApptId);
+  }
+
+  btn.disabled = false;
+  btn.querySelector('.btn-label').style.display = 'inline';
+  btn.querySelector('.spinner').style.display = 'none';
+
+  fecharModalPag();
+  await renderDay();
 }
 
 // ── Logout ────────────────────────────────────────────────────
