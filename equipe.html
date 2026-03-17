@@ -3,41 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NaRegua — Serviços</title>
+  <title>NaRegua — Equipe</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <style>
-    .svc-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
+    .eq-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
-    .svc-header {
+    .eq-header {
       display:flex; align-items:center; justify-content:space-between;
       padding:12px 0 16px; border-bottom:1px solid var(--borda); margin-bottom:20px;
     }
-    .svc-header h1 { font-size:18px; font-weight:700; }
+    .eq-header h1 { font-size:18px; font-weight:700; }
 
-    .svc-card {
+    .eq-card {
       background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:12px;
       padding:14px; margin-bottom:10px; transition:all .2s;
     }
-    .svc-card:hover { border-color:var(--borda-hover); }
-    .svc-card.inactive { opacity:0.5; }
-    .svc-top { display:flex; justify-content:space-between; align-items:flex-start; }
-    .svc-name { font-size:14px; font-weight:700; margin-bottom:2px; }
-    .svc-meta { font-size:12px; color:var(--texto-muted); }
-    .svc-price { font-size:16px; font-weight:800; color:var(--verde-acao); }
-    .svc-actions { display:flex; gap:6px; margin-top:10px; }
-    .svc-btn {
+    .eq-card:hover { border-color:var(--borda-hover); }
+    .eq-card.inactive { opacity:0.5; }
+    .eq-top { display:flex; justify-content:space-between; align-items:center; }
+    .eq-name { font-size:14px; font-weight:700; }
+    .eq-meta { font-size:12px; color:var(--texto-muted); margin-top:2px; }
+    .eq-avatar {
+      width:40px; height:40px; border-radius:50%;
+      background:var(--verde-medio); display:flex; align-items:center;
+      justify-content:center; font-size:18px; font-weight:800; color:#fff;
+    }
+    .eq-actions { display:flex; gap:6px; margin-top:10px; }
+    .eq-btn {
       padding:7px 14px; border-radius:8px; border:1px solid var(--borda);
       background:transparent; color:var(--texto-secundario); font-size:11px;
       font-weight:600; font-family:inherit; cursor:pointer; transition:all .2s;
     }
-    .svc-btn:hover { border-color:var(--verde-acao); color:var(--verde-acao); }
-    .svc-btn.danger:hover { border-color:#e74c3c; color:#e74c3c; }
-    .svc-btn.toggle-active { color:var(--verde-acao); border-color:rgba(212,168,83,0.3); }
-    .svc-btn.toggle-inactive { color:#f39c12; border-color:rgba(243,156,18,0.3); }
+    .eq-btn:hover { border-color:var(--verde-acao); color:var(--verde-acao); }
+    .eq-btn.danger:hover { border-color:#e74c3c; color:#e74c3c; }
+    .eq-btn.toggle-active { color:var(--verde-acao); border-color:rgba(212,168,83,0.3); }
+    .eq-btn.toggle-inactive { color:#f39c12; border-color:rgba(243,156,18,0.3); }
 
-    .svc-badge {
+    .eq-badge {
       font-size:9px; font-weight:700; padding:3px 8px; border-radius:12px;
       text-transform:uppercase; letter-spacing:0.5px;
     }
@@ -66,7 +70,7 @@
       cursor:pointer; padding:4px 8px;
     }
 
-    .empty-svc {
+    .empty-eq {
       text-align:center; padding:40px 20px; color:var(--texto-muted);
     }
 
@@ -92,49 +96,37 @@
 </head>
 <body>
 
-<div class="svc-container">
+<div class="eq-container">
 
-  <div class="svc-header">
-    <h1>Serviços</h1>
+  <div class="eq-header">
+    <h1>Equipe</h1>
     <button class="btn btn-primary" onclick="abrirModal()" style="width:auto;padding:8px 16px;font-size:12px;">+ NOVO</button>
   </div>
 
-  <div id="svc-msg" class="msg"></div>
-  <div id="svc-list"></div>
+  <div id="eq-msg" class="msg"></div>
+  <div id="eq-list"></div>
 
 </div>
 
 <!-- Modal -->
-<div class="modal-overlay" id="modal-svc">
+<div class="modal-overlay" id="modal-eq">
   <div class="modal">
     <div class="modal-title">
-      <h2 id="modal-svc-title">Novo Serviço</h2>
+      <h2 id="modal-eq-title">Novo Profissional</h2>
       <button class="modal-close" onclick="fecharModal()">✕</button>
     </div>
-    <div id="modal-svc-msg" class="msg"></div>
-    <input type="hidden" id="svc-edit-id">
+    <div id="modal-eq-msg" class="msg"></div>
+    <input type="hidden" id="eq-edit-id">
     <div class="field">
-      <label>NOME DO SERVIÇO *</label>
-      <input type="text" id="svc-nome" placeholder="Ex: Corte + Barba">
+      <label>NOME *</label>
+      <input type="text" id="eq-nome" placeholder="Ex: João, Maria">
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div class="field">
-        <label>PREÇO (R$) *</label>
-        <input type="number" id="svc-preco" min="0" step="1" placeholder="25">
-      </div>
-      <div class="field">
-        <label>DURAÇÃO (MIN) *</label>
-        <input type="number" id="svc-duracao" min="5" step="5" placeholder="30">
-      </div>
+    <div class="field">
+      <label>COMISSÃO (%)</label>
+      <input type="number" id="eq-comissao" min="0" max="100" step="1" placeholder="0" value="0">
+      <div style="font-size:10px;color:var(--texto-muted);margin-top:4px;">Percentual sobre cada atendimento</div>
     </div>
-    <div class="field" style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="document.getElementById('svc-diatodo').checked=!document.getElementById('svc-diatodo').checked">
-      <input type="checkbox" id="svc-diatodo" style="width:18px;height:18px;accent-color:var(--verde-acao);cursor:pointer;" onclick="event.stopPropagation()">
-      <div>
-        <div style="font-size:13px;font-weight:600;">Bloqueia dia inteiro</div>
-        <div style="font-size:10px;color:var(--texto-muted);">Ex: Dia da Noiva — reserva toda a equipe no dia</div>
-      </div>
-    </div>
-    <button class="btn btn-primary" onclick="salvarServico()" id="btn-svc-save">
+    <button class="btn btn-primary" onclick="salvar()" id="btn-eq-save">
       <span class="btn-label">SALVAR</span>
       <div class="spinner" style="display:none;"></div>
     </button>
@@ -146,10 +138,10 @@
   <a class="nav-item" href="dashboard.html">
     <span class="nav-icon">📅</span>AGENDA
   </a>
-  <a class="nav-item active" href="servicos.html">
+  <a class="nav-item" href="servicos.html">
     <span class="nav-icon">✂️</span>SERVIÇOS
   </a>
-  <a class="nav-item" href="equipe.html">
+  <a class="nav-item active" href="equipe.html">
     <span class="nav-icon">👥</span>EQUIPE
   </a>
   <a class="nav-item" href="financeiro.html">
@@ -158,12 +150,23 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="js/supabase.js?v=2"></script>
-<script src="js/utils.js?v=2"></script>
+<script src="js/supabase.js?v=3"></script>
+<script src="js/utils.js?v=3"></script>
 <script>
+console.log('Equipe v1 carregado');
+
 // ── Estado ────────────────────────────────────────────────────
 let shop = null;
-let services = [];
+let barbers = [];
+
+const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs';
+const SB_REST = 'https://jsydprrcyrjjxdmzrqpz.supabase.co/rest/v1';
+const REST_HEADERS = {
+  'apikey': SERVICE_KEY,
+  'Authorization': 'Bearer ' + SERVICE_KEY,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=representation'
+};
 
 const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
 const _params = new URLSearchParams(window.location.search);
@@ -171,7 +174,7 @@ const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_vi
 if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
 const isAdminViewing = !!adminViewingShop;
 const db = isAdminViewing
-  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs')
+  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', SERVICE_KEY)
   : sb;
 
 // ── Init ──────────────────────────────────────────────────────
@@ -202,52 +205,52 @@ document.addEventListener('DOMContentLoaded', async () => {
     banner.style.cssText = 'background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3);border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;';
     banner.innerHTML = `<span style="font-size:11px;color:#e74c3c;font-weight:700;">ADMIN · ${esc(shop.name)}</span>
       <button onclick="sessionStorage.removeItem('admin_viewing_shop');location.href='admin.html'" style="background:#e74c3c;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">VOLTAR</button>`;
-    document.querySelector('.svc-container').insertBefore(banner, document.querySelector('.svc-header'));
+    document.querySelector('.eq-container').insertBefore(banner, document.querySelector('.eq-header'));
   }
 
-  await loadServices();
+  await loadBarbers();
 });
 
-async function loadServices() {
-  const { data } = await sb
-    .from('services')
-    .select('*')
-    .eq('barbershop_id', shop.id)
-    .order('active', { ascending: false })
-    .order('name');
-
-  services = data || [];
-  renderServices();
+async function loadBarbers() {
+  const r = await fetch(SB_REST + '/barbers?barbershop_id=eq.' + shop.id + '&order=active.desc,name.asc', {
+    headers: REST_HEADERS
+  });
+  barbers = r.ok ? await r.json() : [];
+  renderBarbers();
 }
 
 // ── Renderizar ────────────────────────────────────────────────
-function renderServices() {
-  const el = document.getElementById('svc-list');
+function renderBarbers() {
+  const el = document.getElementById('eq-list');
 
-  if (!services.length) {
-    el.innerHTML = '<div class="empty-svc"><div style="font-size:40px;margin-bottom:12px;">✂️</div><div>Nenhum serviço cadastrado.</div></div>';
+  if (!barbers.length) {
+    el.innerHTML = '<div class="empty-eq"><div style="font-size:40px;margin-bottom:12px;">👥</div><div>Nenhum profissional cadastrado.</div></div>';
     return;
   }
 
-  el.innerHTML = services.map(s => {
-    const badgeCls = s.active ? 'badge-active' : 'badge-inactive';
-    const badgeLabel = s.active ? 'ATIVO' : 'INATIVO';
-    const cardCls = s.active ? '' : 'inactive';
-    const toggleLabel = s.active ? 'Desativar' : 'Ativar';
-    const toggleCls = s.active ? 'toggle-inactive' : 'toggle-active';
+  el.innerHTML = barbers.map(b => {
+    const badgeCls = b.active ? 'badge-active' : 'badge-inactive';
+    const badgeLabel = b.active ? 'ATIVO' : 'INATIVO';
+    const cardCls = b.active ? '' : 'inactive';
+    const toggleLabel = b.active ? 'Desativar' : 'Ativar';
+    const toggleCls = b.active ? 'toggle-inactive' : 'toggle-active';
+    const inicial = b.name.charAt(0).toUpperCase();
+    const comissao = b.commission_pct ? b.commission_pct + '% comissão' : 'Sem comissão';
 
-    return `<div class="svc-card ${cardCls}">
-      <div class="svc-top">
-        <div>
-          <div class="svc-name">${esc(s.name)}</div>
-          <div class="svc-meta">${s.blocks_all_day ? 'Dia inteiro' : s.duration_min + ' min'} · <span class="svc-badge ${badgeCls}">${badgeLabel}</span>${s.blocks_all_day ? ' · <span class="svc-badge" style="background:rgba(155,89,182,0.15);color:#9b59b6;">DIA INTEIRO</span>' : ''}</div>
+    return `<div class="eq-card ${cardCls}">
+      <div class="eq-top">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="eq-avatar">${inicial}</div>
+          <div>
+            <div class="eq-name">${esc(b.name)}</div>
+            <div class="eq-meta">${comissao} · <span class="eq-badge ${badgeCls}">${badgeLabel}</span></div>
+          </div>
         </div>
-        <div class="svc-price">${formatMoney(s.price)}</div>
       </div>
-      <div class="svc-actions">
-        <button class="svc-btn" onclick="editarServico('${s.id}')">Editar</button>
-        <button class="svc-btn ${toggleCls}" onclick="toggleServico('${s.id}', ${!s.active})">${toggleLabel}</button>
-        <button class="svc-btn danger" onclick="excluirServico('${s.id}', '${esc(s.name)}', this)">Excluir</button>
+      <div class="eq-actions">
+        <button class="eq-btn" onclick="editar('${b.id}')">Editar</button>
+        <button class="eq-btn ${toggleCls}" onclick="toggle('${b.id}', ${!b.active})">${toggleLabel}</button>
+        <button class="eq-btn danger" onclick="excluir('${b.id}', '${esc(b.name)}', this)">Excluir</button>
       </div>
     </div>`;
   }).join('');
@@ -255,47 +258,39 @@ function renderServices() {
 
 // ── Modal ─────────────────────────────────────────────────────
 function abrirModal() {
-  document.getElementById('modal-svc-title').textContent = 'Novo Serviço';
-  document.getElementById('svc-edit-id').value = '';
-  document.getElementById('svc-nome').value = '';
-  document.getElementById('svc-preco').value = '';
-  document.getElementById('svc-duracao').value = '30';
-  document.getElementById('svc-diatodo').checked = false;
-  document.getElementById('modal-svc-msg').className = 'msg';
-  document.getElementById('modal-svc').classList.add('show');
-  setTimeout(() => document.getElementById('svc-nome').focus(), 100);
+  document.getElementById('modal-eq-title').textContent = 'Novo Profissional';
+  document.getElementById('eq-edit-id').value = '';
+  document.getElementById('eq-nome').value = '';
+  document.getElementById('eq-comissao').value = '0';
+  document.getElementById('modal-eq-msg').className = 'msg';
+  document.getElementById('modal-eq').classList.add('show');
+  setTimeout(() => document.getElementById('eq-nome').focus(), 100);
 }
 
-function editarServico(id) {
-  const s = services.find(x => x.id === id);
-  if (!s) return;
-  document.getElementById('modal-svc-title').textContent = 'Editar Serviço';
-  document.getElementById('svc-edit-id').value = s.id;
-  document.getElementById('svc-nome').value = s.name;
-  document.getElementById('svc-preco').value = s.price;
-  document.getElementById('svc-duracao').value = s.duration_min;
-  document.getElementById('svc-diatodo').checked = !!s.blocks_all_day;
-  document.getElementById('modal-svc-msg').className = 'msg';
-  document.getElementById('modal-svc').classList.add('show');
-  setTimeout(() => document.getElementById('svc-nome').focus(), 100);
+function editar(id) {
+  const b = barbers.find(x => x.id === id);
+  if (!b) return;
+  document.getElementById('modal-eq-title').textContent = 'Editar Profissional';
+  document.getElementById('eq-edit-id').value = b.id;
+  document.getElementById('eq-nome').value = b.name;
+  document.getElementById('eq-comissao').value = b.commission_pct || 0;
+  document.getElementById('modal-eq-msg').className = 'msg';
+  document.getElementById('modal-eq').classList.add('show');
+  setTimeout(() => document.getElementById('eq-nome').focus(), 100);
 }
 
 function fecharModal() {
-  document.getElementById('modal-svc').classList.remove('show');
+  document.getElementById('modal-eq').classList.remove('show');
 }
 
 // ── Salvar ────────────────────────────────────────────────────
-async function salvarServico() {
-  const btn = document.getElementById('btn-svc-save');
-  const editId = document.getElementById('svc-edit-id').value;
-  const nome = document.getElementById('svc-nome').value.trim();
-  const preco = parseFloat(document.getElementById('svc-preco').value);
-  const duracao = parseInt(document.getElementById('svc-duracao').value);
-  const diaInteiro = document.getElementById('svc-diatodo').checked;
+async function salvar() {
+  const btn = document.getElementById('btn-eq-save');
+  const editId = document.getElementById('eq-edit-id').value;
+  const nome = document.getElementById('eq-nome').value.trim();
+  const comissao = parseInt(document.getElementById('eq-comissao').value) || 0;
 
   if (!nome) { showModalMsg('Informe o nome.', 'error'); return; }
-  if (isNaN(preco) || preco < 0) { showModalMsg('Informe o preço.', 'error'); return; }
-  if (!diaInteiro && (isNaN(duracao) || duracao < 5)) { showModalMsg('Duração mínima: 5 min.', 'error'); return; }
 
   btn.disabled = true;
   btn.querySelector('.btn-label').style.display = 'none';
@@ -303,19 +298,21 @@ async function salvarServico() {
 
   try {
     if (editId) {
-      const { error } = await db.from('services').update({
-        name: nome, price: preco, duration_min: diaInteiro ? 480 : duracao, blocks_all_day: diaInteiro
-      }).eq('id', editId);
-      if (error) throw error;
-    } else {
-      const { error } = await db.from('services').insert({
-        barbershop_id: shop.id, name: nome, price: preco, duration_min: diaInteiro ? 480 : duracao, blocks_all_day: diaInteiro, active: true
+      const r = await fetch(SB_REST + '/barbers?id=eq.' + editId, {
+        method: 'PATCH', headers: REST_HEADERS,
+        body: JSON.stringify({ name: nome, commission_pct: comissao })
       });
-      if (error) throw error;
+      if (!r.ok) throw new Error(await r.text());
+    } else {
+      const r = await fetch(SB_REST + '/barbers', {
+        method: 'POST', headers: REST_HEADERS,
+        body: JSON.stringify({ barbershop_id: shop.id, name: nome, commission_pct: comissao, active: true })
+      });
+      if (!r.ok) throw new Error(await r.text());
     }
 
     fecharModal();
-    await loadServices();
+    await loadBarbers();
 
   } catch (e) {
     console.error(e);
@@ -328,13 +325,16 @@ async function salvarServico() {
 }
 
 // ── Toggle ativo/inativo ──────────────────────────────────────
-async function toggleServico(id, ativo) {
-  await db.from('services').update({ active: ativo }).eq('id', id);
-  await loadServices();
+async function toggle(id, ativo) {
+  await fetch(SB_REST + '/barbers?id=eq.' + id, {
+    method: 'PATCH', headers: REST_HEADERS,
+    body: JSON.stringify({ active: ativo })
+  });
+  await loadBarbers();
 }
 
 // ── Excluir ───────────────────────────────────────────────────
-async function excluirServico(id, nome, btnEl) {
+async function excluir(id, nome, btnEl) {
   if (!btnEl.dataset.confirming) {
     btnEl.textContent = 'Certeza?';
     btnEl.style.color = '#e74c3c';
@@ -347,12 +347,14 @@ async function excluirServico(id, nome, btnEl) {
     return;
   }
 
-  await db.from('services').delete().eq('id', id);
-  await loadServices();
+  await fetch(SB_REST + '/barbers?id=eq.' + id, {
+    method: 'DELETE', headers: REST_HEADERS
+  });
+  await loadBarbers();
 }
 
 function showModalMsg(text, type) {
-  const el = document.getElementById('modal-svc-msg');
+  const el = document.getElementById('modal-eq-msg');
   el.textContent = text;
   el.className = `msg msg-${type} show`;
 }
