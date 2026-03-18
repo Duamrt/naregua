@@ -294,6 +294,13 @@
       <button onclick="copiarLink()" style="flex:1;padding:10px 0;border-radius:8px;border:none;background:var(--verde-acao);color:#000;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;" id="btn-copy">COPIAR LINK</button>
       <button onclick="compartilharWhatsApp()" style="flex:1;padding:10px 0;border-radius:8px;border:none;background:rgba(37,211,102,0.15);color:#25d366;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;">ENVIAR NO ZAP</button>
     </div>
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--borda);">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--texto-muted);margin-bottom:6px;">LINK PRA SUA EQUIPE</div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="copiarLinkBarbeiro()" style="flex:1;padding:10px 0;border-radius:8px;border:1px solid var(--borda);background:transparent;color:var(--texto-secundario);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;" id="btn-copy-barb">COPIAR LINK DO BARBEIRO</button>
+        <button onclick="enviarLinkBarbeiroZap()" style="flex:1;padding:10px 0;border-radius:8px;border:none;background:rgba(37,211,102,0.15);color:#25d366;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;">ENVIAR NO ZAP</button>
+      </div>
+    </div>
   </div>
 
   <!-- Stats -->
@@ -864,6 +871,27 @@ function copiarLink() {
     btn.textContent = 'COPIADO!';
     setTimeout(() => btn.textContent = 'COPIAR LINK', 2000);
   });
+}
+
+function copiarLinkBarbeiro() {
+  const baseUrl = window.location.origin + window.location.pathname.replace('dashboard.html', '');
+  const link = baseUrl + 'barbeiro-cadastro.html';
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = document.getElementById('btn-copy-barb');
+    btn.textContent = 'COPIADO!';
+    setTimeout(() => btn.textContent = 'COPIAR LINK DO BARBEIRO', 2000);
+  });
+}
+
+function enviarLinkBarbeiroZap() {
+  const baseUrl = window.location.origin + window.location.pathname.replace('dashboard.html', '');
+  const link = baseUrl + 'barbeiro-cadastro.html';
+  const msg = 'Fala! Aqui e da *' + shop.name + '*.\n\n'
+    + 'Criei seu acesso no NaRegua pra voce ver sua agenda direto no celular.\n\n'
+    + 'Acessa esse link, coloca seu numero de telefone e cria uma senha:\n'
+    + link + '\n\n'
+    + 'Depois de criar, ja pode instalar no celular como app!';
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
 }
 
 function compartilharWhatsApp() {
