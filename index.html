@@ -10,6 +10,13 @@
   <meta property="og:description" content="Agendamento online, controle financeiro e gestão de equipe para barbearias e salões.">
   <meta property="og:image" content="https://usenaregua.com.br/img/og-preview.png">
   <meta property="og:url" content="https://usenaregua.com.br">
+    <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="NaRegua">
+  <link rel="apple-touch-icon" href="img/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -287,5 +294,6 @@ function hideMsg() {
   document.getElementById('auth-msg').className = 'login-msg';
 }
 </script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script>
 </body>
 </html>
