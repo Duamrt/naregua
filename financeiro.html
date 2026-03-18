@@ -301,7 +301,7 @@ const db = isAdminViewing
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await sb.auth.getSession();
-  if (!session) { window.location.href = 'index.html'; return; }
+  if (!session) { alert('Sessão expirada. Faça login novamente.'); window.location.href = 'index.html'; return; }
 
   if (ADMIN_EMAILS.includes(session.user.email) && !isAdminViewing) {
     window.location.href = 'admin.html';
@@ -348,10 +348,15 @@ function setPeriod(p) {
 }
 
 function changePeriod(delta) {
+  const anoAtual = new Date().getFullYear();
   if (currentPeriod === 'dia') {
     currentDate.setDate(currentDate.getDate() + delta);
   } else {
     currentDate.setMonth(currentDate.getMonth() + delta);
+  }
+  // Limitar entre ano-1 e ano+1
+  if (currentDate.getFullYear() < anoAtual - 1 || currentDate.getFullYear() > anoAtual + 1) {
+    currentDate = new Date(); // volta pra hoje
   }
   renderPeriod();
 }

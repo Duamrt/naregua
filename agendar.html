@@ -615,7 +615,7 @@ async function renderTimes() {
   const el = document.getElementById('times-list');
   const label = document.getElementById('time-label');
 
-  if (!selectedDate || !selectedService) {
+  if (!selectedDate || !selectedService || !selectedBarber) {
     el.innerHTML = '<div style="font-size:12px;color:var(--texto-muted);grid-column:1/-1;">Selecione um serviço e uma data.</div>';
     return;
   }
@@ -757,8 +757,9 @@ async function confirmarAgendamento() {
   const btn = document.getElementById('btn-confirm');
   const msgEl = document.getElementById('ag-msg');
 
-  if (!nome) { showAgMsg('Informe seu nome.', 'error'); return; }
-  if (!phone || phone.length < 10) { showAgMsg('Informe um WhatsApp válido.', 'error'); return; }
+  if (!nome || nome.length < 2) { showAgMsg('Informe seu nome (mínimo 2 caracteres).', 'error'); return; }
+  const phoneLimpo = phone.replace(/\D/g, '');
+  if (!phoneLimpo || phoneLimpo.length < 10) { showAgMsg('Informe um WhatsApp válido com DDD (ex: 87981713987).', 'error'); return; }
 
   btn.disabled = true;
   btn.querySelector('.btn-label').style.display = 'none';

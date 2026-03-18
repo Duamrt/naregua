@@ -769,7 +769,7 @@ function renderApptCard(a) {
     </div>
     <div class="barber-appt-client">${esc(a.client_name)}</div>
     <div class="barber-appt-svc">${svcName} · ${svcPrice}${isDiaInteiro ? ' · <span style="color:#9b59b6;font-weight:700;">DIA INTEIRO</span>' : ''}</div>
-    ${a.client_phone ? `<div class="barber-appt-svc">📱 ${a.client_phone}</div>` : ''}
+    ${a.client_phone ? `<div class="barber-appt-svc">📱 ${esc(a.client_phone)}</div>` : ''}
     ${actions ? `<div class="barber-appt-actions">${actions}</div>` : ''}
   </div>`;
 }
