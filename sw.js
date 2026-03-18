@@ -1,5 +1,5 @@
 // NaRegua — Service Worker (cache-first para assets, network-first para API)
-const CACHE_NAME = 'naregua-v4';
+const CACHE_NAME = 'naregua-v5';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -61,7 +61,10 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Assets estáticos — cache-first, fallback rede
+  // Push notifications — mostrar notificacao com som
+  // (handler fica mais abaixo)
+
+  // Assets estaticos — cache-first, fallback rede
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request).then(resp => {
       if (resp.ok && e.request.method === 'GET') {
@@ -74,6 +77,48 @@ self.addEventListener('fetch', e => {
       if (e.request.mode === 'navigate') {
         return caches.match('/index.html');
       }
+    })
+  );
+});
+
+// ── Push Notifications ──────────────────────────────────────
+self.addEventListener('push', e => {
+  let data = { title: 'NaRegua', body: 'Novo agendamento!' };
+  try {
+    if (e.data) data = e.data.json();
+  } catch (err) {
+    if (e.data) data.body = e.data.text();
+  }
+
+  const options = {
+    body: data.body,
+    icon: '/img/icon-192.png',
+    badge: '/img/icon-192.png',
+    vibrate: [200, 100, 200, 100, 200],
+    tag: 'naregua-' + (data.tag || Date.now()),
+    renotify: true,
+    data: { url: data.url || '/dashboard.html' }
+  };
+
+  e.waitUntil(self.registration.showNotification(data.title, options));
+});
+
+// Ao clicar na notificacao, abre o app
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const url = e.notification.data?.url || '/dashboard.html';
+  e.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+      // Se ja tem aba aberta, foca nela
+      for (const client of list) {
+        if (client.url.includes('naregua') || client.url.includes('usenaregua')) {
+          client.focus();
+          client.navigate(url);
+          return;
+        }
+      }
+      // Senao abre nova aba
+      return clients.openWindow(url);
     })
   );
 });

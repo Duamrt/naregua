@@ -153,6 +153,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="js/supabase.js?v=3"></script>
 <script src="js/utils.js?v=3"></script>
+<script src="js/push.js?v=1"></script>
 <script>
 console.log('Barbeiro dashboard v1');
 
@@ -200,6 +201,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Mostrar conteudo
   document.getElementById('loading').style.display = 'none';
   document.getElementById('content').style.display = 'block';
+
+  // Push notifications
+  initPush(shopData.id);
 
   renderDay();
   setInterval(() => renderDay(), 30000);

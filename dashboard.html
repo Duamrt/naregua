@@ -443,6 +443,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="js/supabase.js?v=3"></script>
 <script src="js/utils.js?v=3"></script>
+<script src="js/push.js?v=1"></script>
 <script>
 console.log('Dashboard v3 carregado');
 // ── Estado ────────────────────────────────────────────────────
@@ -533,8 +534,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const baseUrl = window.location.origin + window.location.pathname.replace('dashboard.html', '');
   document.getElementById('share-link').textContent = baseUrl + 'agendar.html?slug=' + shop.slug;
 
-  // Pedir permissão de notificação
+  // Pedir permissao de notificacao + push
   requestNotificationPermission();
+  initPush(shop.id);
 
   // BUG 14 ALTO FIX: esconder loading e mostrar conteúdo
   document.getElementById('dash-loading').style.display = 'none';
