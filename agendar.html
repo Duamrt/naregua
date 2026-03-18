@@ -766,8 +766,8 @@ async function renderTimes() {
       const allBusy = availableBarbers.every(b => {
         return appointments.some(a => {
           if (a.barber_id !== b.id) return false;
-          const aParts = a.scheduled_at.split('T')[1].split(':');
-          const aStartMin = parseInt(aParts[0]) * 60 + parseInt(aParts[1]);
+          const _aD = new Date(a.scheduled_at);
+          const aStartMin = _aD.getHours() * 60 + _aD.getMinutes();
           const aSvc = services.find(s => s.id === a.service_id);
           const aDur = aSvc ? aSvc.duration_min : 30;
           const aEndMin = aStartMin + aDur;
@@ -777,8 +777,8 @@ async function renderTimes() {
       isOccupied = allBusy;
     } else {
       isOccupied = appointments.some(a => {
-        const aParts = a.scheduled_at.split('T')[1].split(':');
-        const aStartMin = parseInt(aParts[0]) * 60 + parseInt(aParts[1]);
+        const _aD = new Date(a.scheduled_at);
+        const aStartMin = _aD.getHours() * 60 + _aD.getMinutes();
         const aSvc = services.find(s => s.id === a.service_id);
         const aDur = aSvc ? aSvc.duration_min : 30;
         const aEndMin = aStartMin + aDur;
@@ -998,37 +998,36 @@ async function confirmarAgendamento() {
 
   // ── Agendamento normal ──
   const duration = selectedService.duration_min || 30;
-  // BUG 4 FIX: usar Date local apenas pra cálculo de conflito, nunca pra enviar ao banco
-  const scheduledAtLocal = new Date(scheduledAtStr);
-  const slotEnd = new Date(scheduledAtLocal.getTime() + duration * 60000);
+  const slotH = parseInt(selectedTime.split(':')[0]);
+  const slotM = parseInt(selectedTime.split(':')[1]);
+  const slotStartMin = slotH * 60 + slotM;
+  const slotEndMin = slotStartMin + duration;
 
-  // Verificar conflito antes de salvar (evita duplicata)
-  // Usar range: slot ocupa de scheduledAtStr até slotEndStr
-  const slotEndDate = new Date(scheduledAtLocal.getTime() + duration * 60000);
-  const slotEndStr = selectedDate + 'T' + String(slotEndDate.getHours()).padStart(2,'0') + ':' + String(slotEndDate.getMinutes()).padStart(2,'0') + ':00';
-
-  const { data: conflitos } = await sb
+  // Verificar conflito: buscar todos agendamentos do dia pro barbeiro
+  let conflictQuery = sb
     .from('appointments')
-    .select('id,scheduled_at,service_id')
+    .select('id,scheduled_at,service_id,barber_id')
     .eq('barbershop_id', shop.id)
-    .eq('barber_id', selectedBarber.id)
     .in('status', ['pending', 'confirmed'])
-    .lt('scheduled_at', slotEndStr)
     .gte('scheduled_at', selectedDate + 'T00:00:00-03:00')
     .lte('scheduled_at', selectedDate + 'T23:59:59-03:00');
 
-  // Checar overlap: outro agendamento termina depois do nosso início?
+  // Se nao e "any", filtrar pelo barbeiro
+  if (finalBarberId !== 'any') {
+    conflictQuery = conflictQuery.eq('barber_id', finalBarberId);
+  }
+
+  const { data: conflitos } = await conflictQuery;
+
   const temConflito = (conflitos || []).some(a => {
+    // Se "any", so checar conflito pro barbeiro que foi escolhido
+    if (selectedBarber.id === 'any' && a.barber_id !== finalBarberId) return false;
+    const aDate = new Date(a.scheduled_at);
+    const aStartMin = aDate.getHours() * 60 + aDate.getMinutes();
     const aSvc = services.find(s => s.id === a.service_id);
     const aDur = aSvc ? aSvc.duration_min : 30;
-    // Calcular fim do agendamento existente como string
-    const aParts = a.scheduled_at.split('T')[1].split(':');
-    const aMinTotal = parseInt(aParts[0]) * 60 + parseInt(aParts[1]) + aDur;
-    const slotMinTotal = parseInt(selectedTime.split(':')[0]) * 60 + parseInt(selectedTime.split(':')[1]);
-    const slotEndMin = slotMinTotal + duration;
-    const aStartMin = parseInt(aParts[0]) * 60 + parseInt(aParts[1]);
-    // Overlap: slotStart < aEnd AND slotEnd > aStart
-    return slotMinTotal < aMinTotal && slotEndMin > aStartMin;
+    const aEndMin = aStartMin + aDur;
+    return slotStartMin < aEndMin && slotEndMin > aStartMin;
   });
 
   if (temConflito) {
@@ -1083,8 +1082,8 @@ async function confirmarAgendamento() {
       // Verifica se nao esta ocupado
       const busy = appointments.some(a => {
         if (a.barber_id !== b.id) return false;
-        const aParts = a.scheduled_at.split('T')[1].split(':');
-        const aStartMin = parseInt(aParts[0]) * 60 + parseInt(aParts[1]);
+        const _aD = new Date(a.scheduled_at);
+        const aStartMin = _aD.getHours() * 60 + _aD.getMinutes();
         const aSvc = services.find(s => s.id === a.service_id);
         const aDur = aSvc ? aSvc.duration_min : 30;
         return slotMin < aStartMin + aDur && slotEndMin > aStartMin;
@@ -1133,12 +1132,12 @@ async function confirmarAgendamento() {
     return;
   }
 
-  // Verificar se outro agendamento foi inserido no mesmo horário (race condition)
+  // Verificar se outro agendamento foi inserido no mesmo horario (race condition)
   const { data: duplicatas } = await sb
     .from('appointments')
     .select('id,scheduled_at,service_id')
     .eq('barbershop_id', shop.id)
-    .eq('barber_id', selectedBarber.id)
+    .eq('barber_id', finalBarberId)
     .in('status', ['pending', 'confirmed'])
     .gte('scheduled_at', selectedDate + 'T00:00:00-03:00')
     .lte('scheduled_at', selectedDate + 'T23:59:59-03:00')
@@ -1147,12 +1146,10 @@ async function confirmarAgendamento() {
   const conflitoPosInsert = (duplicatas || []).some(a => {
     const aSvc = services.find(s => s.id === a.service_id);
     const aDur = aSvc ? aSvc.duration_min : 30;
-    const aParts = a.scheduled_at.split('T')[1].split(':');
-    const aStartMin = parseInt(aParts[0]) * 60 + parseInt(aParts[1]);
+    const aDate = new Date(a.scheduled_at);
+    const aStartMin = aDate.getHours() * 60 + aDate.getMinutes();
     const aEndMin = aStartMin + aDur;
-    const slotMinTotal = parseInt(selectedTime.split(':')[0]) * 60 + parseInt(selectedTime.split(':')[1]);
-    const slotEndMin = slotMinTotal + duration;
-    return slotMinTotal < aEndMin && slotEndMin > aStartMin;
+    return slotStartMin < aEndMin && slotEndMin > aStartMin;
   });
 
   if (conflitoPosInsert) {
