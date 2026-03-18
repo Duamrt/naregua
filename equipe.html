@@ -282,16 +282,24 @@ function renderScheduleEditor() {
     const endVal = day ? day.end : '19:00';
     const bsVal = day ? (day.break_start || '') : '12:00';
     const beVal = day ? (day.break_end || '') : '13:00';
+    const mode = day ? (day.mode || 'agendamento') : 'agendamento';
+    const isOrdem = mode === 'ordem';
+
+    const modeInfo = isOn ? (isOrdem ? 'Ordem de chegada' : startVal + '-' + endVal) : 'FOLGA';
 
     el.innerHTML += '<div class="sched-day ' + (isOn ? '' : 'off') + '" id="sched-day-' + i + '">'
       + '<div class="sched-header" onclick="toggleSchedDay(' + i + ')">'
         + '<div>'
           + '<span class="sched-label">' + DIAS_FULL[i] + '</span> '
-          + '<span class="sched-info">' + (isOn ? startVal + '-' + endVal : 'FOLGA') + '</span>'
+          + '<span class="sched-info">' + modeInfo + '</span>'
         + '</div>'
         + '<button type="button" class="sched-toggle ' + (isOn ? 'on' : 'off') + '" onclick="event.stopPropagation();toggleSchedDay(' + i + ')"></button>'
       + '</div>'
-      + (isOn ? '<div class="sched-fields">'
+      + (isOn ? '<div style="padding:0 12px 6px;display:flex;gap:6px;">'
+        + '<button type="button" style="flex:1;padding:6px;border-radius:6px;font-size:10px;font-weight:700;font-family:inherit;cursor:pointer;border:1px solid ' + (!isOrdem ? 'var(--verde-acao)' : 'var(--borda)') + ';background:' + (!isOrdem ? 'rgba(212,168,83,0.1)' : 'transparent') + ';color:' + (!isOrdem ? 'var(--verde-acao)' : 'var(--texto-muted)') + ';" onclick="setSchedMode(' + i + ',\'agendamento\')">Agendamento</button>'
+        + '<button type="button" style="flex:1;padding:6px;border-radius:6px;font-size:10px;font-weight:700;font-family:inherit;cursor:pointer;border:1px solid ' + (isOrdem ? 'var(--verde-acao)' : 'var(--borda)') + ';background:' + (isOrdem ? 'rgba(212,168,83,0.1)' : 'transparent') + ';color:' + (isOrdem ? 'var(--verde-acao)' : 'var(--texto-muted)') + ';" onclick="setSchedMode(' + i + ',\'ordem\')">Ordem de chegada</button>'
+      + '</div>' : '')
+      + (isOn && !isOrdem ? '<div class="sched-fields">'
         + '<div><label>ENTRA</label><input type="time" value="' + startVal + '" onchange="updateSched(' + i + ',\'start\',this.value)"></div>'
         + '<div><label>SAI</label><input type="time" value="' + endVal + '" onchange="updateSched(' + i + ',\'end\',this.value)"></div>'
         + '<div><label>PAUSA</label><input type="time" value="' + bsVal + '" onchange="updateSched(' + i + ',\'break_start\',this.value)"></div>'
@@ -308,6 +316,13 @@ function toggleSchedDay(i) {
     editSchedule[i] = { start: shop?.opening_time || '08:00', end: shop?.closing_time || '19:00', break_start: '12:00', break_end: '13:00' };
   }
   renderScheduleEditor();
+}
+
+function setSchedMode(i, mode) {
+  if (editSchedule[i]) {
+    editSchedule[i].mode = mode;
+    renderScheduleEditor();
+  }
 }
 
 function updateSched(i, field, value) {

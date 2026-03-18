@@ -281,8 +281,9 @@
       <div class="shop-city" id="shop-city"></div>
     </div>
     <div class="header-actions">
-      <button class="icon-btn" onclick="abrirEdicao()" title="Editar">✏️</button>
-      <button class="icon-btn" onclick="logout()" title="Sair">⏻</button>
+      <button style="padding:6px 12px;border-radius:8px;border:none;background:var(--verde-acao);color:#000;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;" onclick="abrirEncaixe()">+ ENCAIXE</button>
+      <button class="icon-btn" onclick="abrirEdicao()" title="Editar">&#x270F;&#xFE0F;</button>
+      <button class="icon-btn" onclick="logout()" title="Sair">&#x23FB;</button>
     </div>
   </div>
 
@@ -425,6 +426,37 @@
         <div class="spinner" style="display:none;"></div>
       </button>
     </div>
+  </div>
+</div>
+
+<!-- Modal Encaixe -->
+<div class="modal-overlay" id="modal-encaixe">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-title">
+      <h2>Encaixe rapido</h2>
+      <button class="modal-close" onclick="fecharEncaixe()">&#x2715;</button>
+    </div>
+    <div id="encaixe-msg" class="msg"></div>
+    <div class="field">
+      <label>PROFISSIONAL *</label>
+      <select id="enc-barber" style="width:100%;padding:10px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;"></select>
+    </div>
+    <div class="field">
+      <label>SERVICO *</label>
+      <select id="enc-service" style="width:100%;padding:10px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;"></select>
+    </div>
+    <div class="field">
+      <label>NOME DO CLIENTE</label>
+      <input type="text" id="enc-name" placeholder="Opcional" style="width:100%;padding:10px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;box-sizing:border-box;">
+    </div>
+    <div class="field">
+      <label>TELEFONE</label>
+      <input type="tel" id="enc-phone" placeholder="Opcional" inputmode="numeric" style="width:100%;padding:10px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;box-sizing:border-box;">
+    </div>
+    <button class="btn btn-primary" onclick="salvarEncaixe()" id="btn-encaixe">
+      <span class="btn-label">ENCAIXAR AGORA</span>
+      <div class="spinner" style="display:none;"></div>
+    </button>
   </div>
 </div>
 
@@ -1277,6 +1309,80 @@ function checkNewAppointments(appts) {
 }
 
 // ── Logout ────────────────────────────────────────────────────
+// ── Encaixe rapido ────────────────────────────────────────
+function abrirEncaixe() {
+  const selBarber = document.getElementById('enc-barber');
+  selBarber.innerHTML = barbers.filter(b => b.active).map(b =>
+    '<option value="' + b.id + '">' + esc(b.name) + '</option>'
+  ).join('');
+
+  const selService = document.getElementById('enc-service');
+  selService.innerHTML = services.filter(s => s.active !== false).map(s =>
+    '<option value="' + s.id + '">' + esc(s.name) + ' (' + formatMoney(s.price) + ')</option>'
+  ).join('');
+
+  document.getElementById('enc-name').value = '';
+  document.getElementById('enc-phone').value = '';
+  document.getElementById('encaixe-msg').className = 'msg';
+  document.getElementById('modal-encaixe').classList.add('show');
+}
+
+function fecharEncaixe() {
+  document.getElementById('modal-encaixe').classList.remove('show');
+}
+
+async function salvarEncaixe() {
+  const btn = document.getElementById('btn-encaixe');
+  const barberId = document.getElementById('enc-barber').value;
+  const serviceId = document.getElementById('enc-service').value;
+  const nome = document.getElementById('enc-name').value.trim() || 'Cliente avulso';
+  const phone = document.getElementById('enc-phone').value.trim();
+
+  if (!barberId || !serviceId) {
+    const el = document.getElementById('encaixe-msg');
+    el.textContent = 'Selecione profissional e servico.';
+    el.className = 'msg msg-error show';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.querySelector('.btn-label').style.display = 'none';
+  btn.querySelector('.spinner').style.display = 'inline-block';
+
+  // Horario = agora arredondado pra proximos 15min
+  const agora = new Date();
+  const min = agora.getMinutes();
+  const rounded = Math.ceil(min / 15) * 15;
+  agora.setMinutes(rounded, 0, 0);
+  const dateStr = agora.toISOString().split('T')[0];
+  const timeStr = String(agora.getHours()).padStart(2,'0') + ':' + String(agora.getMinutes()).padStart(2,'0');
+  const scheduledAt = dateStr + 'T' + timeStr + ':00-03:00';
+
+  const { error } = await sb.from('appointments').insert({
+    barbershop_id: shop.id,
+    barber_id: barberId,
+    service_id: serviceId,
+    client_name: nome,
+    client_phone: phone,
+    scheduled_at: scheduledAt,
+    status: 'confirmed'
+  });
+
+  btn.disabled = false;
+  btn.querySelector('.btn-label').style.display = 'inline';
+  btn.querySelector('.spinner').style.display = 'none';
+
+  if (error) {
+    const el = document.getElementById('encaixe-msg');
+    el.textContent = 'Erro ao encaixar. Tente novamente.';
+    el.className = 'msg msg-error show';
+    return;
+  }
+
+  fecharEncaixe();
+  renderDay();
+}
+
 async function logout() {
   await sb.auth.signOut();
   window.location.href = 'index.html';

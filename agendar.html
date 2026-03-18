@@ -722,8 +722,15 @@ async function renderTimes() {
 
   if (sched && sched[dayOfWeek]) {
     dayConfig = sched[dayOfWeek];
+    // Verificar se e modo "ordem de chegada"
+    if (dayConfig.mode === 'ordem') {
+      el.innerHTML = '<div style="text-align:center;padding:20px 0;">'
+        + '<div style="font-size:14px;font-weight:700;color:var(--verde-acao);margin-bottom:8px;">Ordem de chegada</div>'
+        + '<div style="font-size:12px;color:var(--texto-muted);line-height:1.5;">Neste dia o atendimento e por ordem de chegada.<br>Basta comparecer na barbearia!</div>'
+        + '</div>';
+      return;
+    }
   } else if (sched) {
-    // Dia nao esta no schedule = folga
     el.innerHTML = '<div style="font-size:12px;color:var(--texto-muted);text-align:center;padding:20px 0;">Este profissional esta de folga neste dia.</div>';
     return;
   }
