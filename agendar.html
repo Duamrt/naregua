@@ -878,8 +878,8 @@ async function confirmarAgendamento() {
     return;
   }
 
-  // BUG 6 ALTO FIX: verificar se barbeiro ainda está ativo
-  if (selectedBarber && !selectedService.blocks_all_day) {
+  // BUG 6 ALTO FIX: verificar se barbeiro ainda esta ativo (pula se "any")
+  if (selectedBarber && selectedBarber.id !== 'any' && !selectedService.blocks_all_day) {
     const barberCheck = await sb.from('barbers').select('id').eq('id', selectedBarber.id).eq('active', true).single();
     if (!barberCheck.data) {
       btn.disabled = false;
