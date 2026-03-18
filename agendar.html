@@ -546,7 +546,15 @@ function renderBarbers() {
   const btnStep2 = document.querySelector('#ag-step-2 .btn-primary');
   if (btnStep2) btnStep2.disabled = false;
   el.innerHTML = barbers.map(b => {
-    const horario = (b.working_start || shop.opening_time || '08:00') + ' - ' + (b.working_end || shop.closing_time || '19:00');
+    // Resumo do horario a partir do schedule
+    let horario;
+    if (b.schedule && Object.keys(b.schedule).length) {
+      const vals = Object.values(b.schedule);
+      const set = new Set(vals.map(v => v.start + '-' + v.end));
+      horario = set.size === 1 ? [...set][0] : Object.keys(b.schedule).length + ' dias configurados';
+    } else {
+      horario = (b.working_start || shop.opening_time || '08:00') + ' - ' + (b.working_end || shop.closing_time || '19:00');
+    }
     return `
     <div class="option-card ${selectedBarber?.id === b.id ? 'selected' : ''}"
          onclick="selectBarber('${esc(b.id)}')">
@@ -571,10 +579,15 @@ function selectBarber(id) {
 function renderDates() {
   const el = document.getElementById('dates-list');
   const today = new Date();
-  // Usa dias do profissional se tiver, senão da barbearia
-  const daysOpen = (selectedBarber && selectedBarber.working_days && selectedBarber.working_days.length)
-    ? selectedBarber.working_days
-    : (shop.days_open || [1,2,3,4,5,6]);
+  // Usa schedule se tiver, senao working_days, senao dias da barbearia
+  let daysOpen;
+  if (selectedBarber && selectedBarber.schedule && Object.keys(selectedBarber.schedule).length) {
+    daysOpen = Object.keys(selectedBarber.schedule).map(Number);
+  } else if (selectedBarber && selectedBarber.working_days && selectedBarber.working_days.length) {
+    daysOpen = selectedBarber.working_days;
+  } else {
+    daysOpen = shop.days_open || [1,2,3,4,5,6];
+  }
   let html = '';
   let count = 0;
 
@@ -677,17 +690,28 @@ async function renderTimes() {
 
   appointments = dayAppts || [];
 
-  // Gerar slots (usa horario do profissional se tiver, senao da barbearia)
-  const barberStart = selectedBarber.working_start || shop.opening_time || '08:00';
-  const barberEnd = selectedBarber.working_end || shop.closing_time || '19:00';
-  const breakStart = selectedBarber.break_start || '12:00';
-  const breakEnd = selectedBarber.break_end || '13:00';
+  // Gerar slots — usa schedule por dia se tiver, senao campos antigos
+  const dayOfWeek = new Date(selectedDate).getDay();
+  const sched = selectedBarber.schedule;
+  let dayConfig = null;
+
+  if (sched && sched[dayOfWeek]) {
+    dayConfig = sched[dayOfWeek];
+  } else if (sched) {
+    // Dia nao esta no schedule = folga
+    el.innerHTML = '<div style="font-size:12px;color:var(--texto-muted);text-align:center;padding:20px 0;">Este profissional esta de folga neste dia.</div>';
+    return;
+  }
+
+  const barberStart = dayConfig ? dayConfig.start : (selectedBarber.working_start || shop.opening_time || '08:00');
+  const barberEnd = dayConfig ? dayConfig.end : (selectedBarber.working_end || shop.closing_time || '19:00');
+  const breakStart = dayConfig ? (dayConfig.break_start || '') : (selectedBarber.break_start || '12:00');
+  const breakEnd = dayConfig ? (dayConfig.break_end || '') : (selectedBarber.break_end || '13:00');
   const [openH, openM] = barberStart.split(':').map(Number);
   const [closeH, closeM] = barberEnd.split(':').map(Number);
-  const [breakSH, breakSM] = breakStart.split(':').map(Number);
-  const [breakEH, breakEM] = breakEnd.split(':').map(Number);
-  const breakStartMin = breakSH * 60 + breakSM;
-  const breakEndMin = breakEH * 60 + breakEM;
+  const hasBreak = breakStart && breakEnd;
+  const breakStartMin = hasBreak ? breakStart.split(':').map(Number)[0] * 60 + breakStart.split(':').map(Number)[1] : 0;
+  const breakEndMin = hasBreak ? breakEnd.split(':').map(Number)[0] * 60 + breakEnd.split(':').map(Number)[1] : 0;
   const interval = 15; // grade fixa de 15 min — conflito usa duration_min do servico
   const now = new Date();
   const isToday = selectedDate === now.toISOString().split('T')[0];
@@ -717,7 +741,7 @@ async function renderTimes() {
     });
 
     // Verificar se cai no horario de pausa do barbeiro
-    const isOnBreak = slotMin < breakEndMin && slotEndMin > breakStartMin;
+    const isOnBreak = hasBreak && slotMin < breakEndMin && slotEndMin > breakStartMin;
 
     const disabled = isPast || isOccupied || isOnBreak;
     const sel = selectedTime === timeStr && !disabled;

@@ -64,8 +64,8 @@
     .modal-overlay.show { display:flex; }
     .modal {
       background:var(--cinza-escuro); border:1px solid var(--borda);
-      border-radius:12px; width:100%; max-width:400px;
-      padding:24px 20px; animation:fadeUp 0.3s ease;
+      border-radius:12px; width:100%; max-width:400px; max-height:90vh;
+      overflow-y:auto; padding:24px 20px; animation:fadeUp 0.3s ease;
     }
     .modal-title {
       display:flex; justify-content:space-between; align-items:center;
@@ -83,6 +83,39 @@
       background:transparent; color:var(--texto-muted);
     }
     .day-btn.active { border-color:var(--verde-acao); background:rgba(212,168,83,0.15); color:var(--verde-acao); }
+
+    .sched-day {
+      background:var(--cinza-medio); border:1px solid var(--borda); border-radius:8px;
+      margin-bottom:6px; overflow:hidden; transition:all .2s;
+    }
+    .sched-day.off { opacity:0.4; }
+    .sched-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 12px; cursor:pointer;
+    }
+    .sched-header .sched-label { font-size:12px; font-weight:700; }
+    .sched-header .sched-info { font-size:10px; color:var(--texto-muted); }
+    .sched-toggle {
+      width:36px; height:20px; border-radius:10px; border:none; cursor:pointer;
+      position:relative; transition:all .2s;
+    }
+    .sched-toggle.on { background:var(--verde-acao); }
+    .sched-toggle.off { background:var(--cinza-claro); }
+    .sched-toggle::after {
+      content:''; position:absolute; top:2px; width:16px; height:16px;
+      border-radius:50%; background:#fff; transition:all .2s;
+    }
+    .sched-toggle.on::after { left:18px; }
+    .sched-toggle.off::after { left:2px; }
+    .sched-fields {
+      padding:0 12px 10px; display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:6px;
+    }
+    .sched-fields label { font-size:8px; font-weight:700; color:var(--texto-muted); letter-spacing:0.5px; display:block; margin-bottom:2px; }
+    .sched-fields input[type="time"] {
+      width:100%; padding:6px 4px; background:var(--cinza-escuro); border:1px solid var(--borda);
+      border-radius:6px; color:var(--texto-principal); font-size:11px; font-family:inherit;
+    }
+    .sched-fields input:focus { border-color:var(--verde-acao); outline:none; }
 
     .empty-eq {
       text-align:center; padding:40px 20px; color:var(--texto-muted);
@@ -146,28 +179,9 @@
       <div style="font-size:10px;color:var(--texto-muted);margin-top:4px;">Percentual sobre cada atendimento</div>
     </div>
     <div class="field">
-      <label>DIAS QUE TRABALHA</label>
-      <div id="eq-dias" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div class="field">
-        <label>ENTRA AS</label>
-        <input type="time" id="eq-hora-inicio" value="08:00">
-      </div>
-      <div class="field">
-        <label>SAI AS</label>
-        <input type="time" id="eq-hora-fim" value="19:00">
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div class="field">
-        <label>PAUSA DAS</label>
-        <input type="time" id="eq-pausa-inicio" value="12:00">
-      </div>
-      <div class="field">
-        <label>VOLTA AS</label>
-        <input type="time" id="eq-pausa-fim" value="13:00">
-      </div>
+      <label>HORARIOS POR DIA</label>
+      <div style="font-size:10px;color:var(--texto-muted);margin-bottom:8px;">Clique no dia pra ativar/desativar. Configure horario e pausa de cada dia.</div>
+      <div id="eq-schedule"></div>
     </div>
     <button class="btn btn-primary" onclick="salvar()" id="btn-eq-save">
       <span class="btn-label">SALVAR</span>
@@ -211,8 +225,79 @@ document.getElementById('eq-phone').addEventListener('input', function() {
 // ── Estado ────────────────────────────────────────────────────
 let shop = null;
 let barbers = [];
-let editDays = [1,2,3,4,5,6];
-const DIAS_LABEL = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+let editSchedule = {};
+const DIAS_LABEL = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+const DIAS_FULL = ['Domingo', 'Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado'];
+
+function defaultSchedule(shopData) {
+  const s = {};
+  const days = shopData?.days_open || [1,2,3,4,5,6];
+  const open = shopData?.opening_time || '08:00';
+  const close = shopData?.closing_time || '19:00';
+  for (let i = 0; i < 7; i++) {
+    if (days.includes(i)) {
+      s[i] = { start: open, end: close, break_start: '12:00', break_end: '13:00' };
+    }
+  }
+  return s;
+}
+
+function scheduleFromBarber(b, shopData) {
+  if (b.schedule && Object.keys(b.schedule).length > 0) return JSON.parse(JSON.stringify(b.schedule));
+  // Migrar dos campos antigos
+  const s = {};
+  const days = b.working_days || shopData?.days_open || [1,2,3,4,5,6];
+  const open = b.working_start || shopData?.opening_time || '08:00';
+  const close = b.working_end || shopData?.closing_time || '19:00';
+  const bkStart = b.break_start || '12:00';
+  const bkEnd = b.break_end || '13:00';
+  for (const d of days) {
+    s[d] = { start: open, end: close, break_start: bkStart, break_end: bkEnd };
+  }
+  return s;
+}
+
+function renderScheduleEditor() {
+  const el = document.getElementById('eq-schedule');
+  el.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const day = editSchedule[i];
+    const isOn = !!day;
+    const startVal = day ? day.start : '08:00';
+    const endVal = day ? day.end : '19:00';
+    const bsVal = day ? (day.break_start || '') : '12:00';
+    const beVal = day ? (day.break_end || '') : '13:00';
+
+    el.innerHTML += '<div class="sched-day ' + (isOn ? '' : 'off') + '" id="sched-day-' + i + '">'
+      + '<div class="sched-header" onclick="toggleSchedDay(' + i + ')">'
+        + '<div>'
+          + '<span class="sched-label">' + DIAS_FULL[i] + '</span> '
+          + '<span class="sched-info">' + (isOn ? startVal + '-' + endVal : 'FOLGA') + '</span>'
+        + '</div>'
+        + '<button type="button" class="sched-toggle ' + (isOn ? 'on' : 'off') + '" onclick="event.stopPropagation();toggleSchedDay(' + i + ')"></button>'
+      + '</div>'
+      + (isOn ? '<div class="sched-fields">'
+        + '<div><label>ENTRA</label><input type="time" value="' + startVal + '" onchange="updateSched(' + i + ',\'start\',this.value)"></div>'
+        + '<div><label>SAI</label><input type="time" value="' + endVal + '" onchange="updateSched(' + i + ',\'end\',this.value)"></div>'
+        + '<div><label>PAUSA</label><input type="time" value="' + bsVal + '" onchange="updateSched(' + i + ',\'break_start\',this.value)"></div>'
+        + '<div><label>VOLTA</label><input type="time" value="' + beVal + '" onchange="updateSched(' + i + ',\'break_end\',this.value)"></div>'
+      + '</div>' : '')
+    + '</div>';
+  }
+}
+
+function toggleSchedDay(i) {
+  if (editSchedule[i]) {
+    delete editSchedule[i];
+  } else {
+    editSchedule[i] = { start: shop?.opening_time || '08:00', end: shop?.closing_time || '19:00', break_start: '12:00', break_end: '13:00' };
+  }
+  renderScheduleEditor();
+}
+
+function updateSched(i, field, value) {
+  if (editSchedule[i]) editSchedule[i][field] = value;
+}
 
 // BUG 3 FIX: service key centralizada em utils.js (_SK, _SB_REST, getServiceHeaders)
 const SB_REST = _SB_REST;
@@ -286,13 +371,15 @@ function renderBarbers() {
     const toggleCls = b.active ? 'toggle-inactive' : 'toggle-active';
     const inicial = b.name.charAt(0).toUpperCase();
     const comissao = b.commission_pct ? b.commission_pct + '%' : '0%';
-    const dias = b.working_days || [];
-    const diasStr = dias.length === 7 ? 'Todos os dias'
-      : dias.length === 6 && !dias.includes(0) ? 'Seg-Sab'
-      : dias.length > 0 ? dias.map(d => DIAS_LABEL[d]).join(', ')
+    const sched = scheduleFromBarber(b, shop);
+    const activeDays = Object.keys(sched).map(Number).sort();
+    const diasStr = activeDays.length === 7 ? 'Todos os dias'
+      : activeDays.length === 6 && !activeDays.includes(0) ? 'Seg-Sab'
+      : activeDays.length > 0 ? activeDays.map(d => DIAS_LABEL[d]).join(', ')
       : 'Sem dias definidos';
-    const horario = (b.working_start || '08:00') + ' - ' + (b.working_end || '19:00');
-    const pausa = b.break_start && b.break_end ? 'Pausa ' + b.break_start + '-' + b.break_end : '';
+    // Mostrar resumo dos horarios distintos
+    const horariosSet = new Set(activeDays.map(d => sched[d].start + '-' + sched[d].end));
+    const horario = horariosSet.size === 1 ? [...horariosSet][0] : activeDays.length + ' dias configurados';
     const phoneInfo = b.phone ? '<div class="eq-meta">&#x1F4F1; ' + esc(b.phone) + (b.user_id ? ' · vinculado' : ' · aguardando cadastro') + '</div>' : '';
 
     return `<div class="eq-card ${cardCls}">
@@ -302,7 +389,7 @@ function renderBarbers() {
           <div>
             <div class="eq-name">${esc(b.name)}</div>
             <div class="eq-meta">${comissao} comissao · <span class="eq-badge ${badgeCls}">${badgeLabel}</span></div>
-            <div class="eq-meta">${diasStr} · ${horario}${pausa ? ' · ' + pausa : ''}</div>
+            <div class="eq-meta">${diasStr} · ${horario}</div>
             ${phoneInfo}
           </div>
         </div>
@@ -317,29 +404,14 @@ function renderBarbers() {
 }
 
 // ── Modal ─────────────────────────────────────────────────────
-function renderEditDays() {
-  document.getElementById('eq-dias').innerHTML = DIAS_LABEL.map((d, i) =>
-    `<button type="button" class="day-btn ${editDays.includes(i) ? 'active' : ''}" onclick="toggleEditDay(${i})">${d}</button>`
-  ).join('');
-}
-
-function toggleEditDay(i) {
-  editDays = editDays.includes(i) ? editDays.filter(d => d !== i) : [...editDays, i].sort();
-  renderEditDays();
-}
-
 function abrirModal() {
   document.getElementById('modal-eq-title').textContent = 'Novo Profissional';
   document.getElementById('eq-edit-id').value = '';
   document.getElementById('eq-nome').value = '';
   document.getElementById('eq-phone').value = '';
   document.getElementById('eq-comissao').value = '0';
-  editDays = shop.days_open || [1,2,3,4,5,6];
-  renderEditDays();
-  document.getElementById('eq-hora-inicio').value = shop.opening_time || '08:00';
-  document.getElementById('eq-hora-fim').value = shop.closing_time || '19:00';
-  document.getElementById('eq-pausa-inicio').value = '12:00';
-  document.getElementById('eq-pausa-fim').value = '13:00';
+  editSchedule = defaultSchedule(shop);
+  renderScheduleEditor();
   document.getElementById('modal-eq-msg').className = 'msg';
   document.getElementById('modal-eq').classList.add('show');
   setTimeout(() => document.getElementById('eq-nome').focus(), 100);
@@ -353,12 +425,8 @@ function editar(id) {
   document.getElementById('eq-nome').value = b.name;
   document.getElementById('eq-phone').value = b.phone || '';
   document.getElementById('eq-comissao').value = b.commission_pct || 0;
-  editDays = b.working_days || shop.days_open || [1,2,3,4,5,6];
-  renderEditDays();
-  document.getElementById('eq-hora-inicio').value = b.working_start || shop.opening_time || '08:00';
-  document.getElementById('eq-hora-fim').value = b.working_end || shop.closing_time || '19:00';
-  document.getElementById('eq-pausa-inicio').value = b.break_start || '12:00';
-  document.getElementById('eq-pausa-fim').value = b.break_end || '13:00';
+  editSchedule = scheduleFromBarber(b, shop);
+  renderScheduleEditor();
   document.getElementById('modal-eq-msg').className = 'msg';
   document.getElementById('modal-eq').classList.add('show');
   setTimeout(() => document.getElementById('eq-nome').focus(), 100);
@@ -374,8 +442,6 @@ async function salvar() {
   const editId = document.getElementById('eq-edit-id').value;
   const nome = document.getElementById('eq-nome').value.trim();
   const comissao = parseInt(document.getElementById('eq-comissao').value) || 0;
-  const horaInicio = document.getElementById('eq-hora-inicio').value;
-  const horaFim = document.getElementById('eq-hora-fim').value;
 
   if (!nome) { showModalMsg('Informe o nome.', 'error'); return; }
 
@@ -384,13 +450,18 @@ async function salvar() {
   btn.querySelector('.spinner').style.display = 'inline-block';
 
   const phone = document.getElementById('eq-phone').value.replace(/\D/g, '');
-  const pausaInicio = document.getElementById('eq-pausa-inicio').value;
-  const pausaFim = document.getElementById('eq-pausa-fim').value;
+
+  // Montar working_days a partir do schedule (compatibilidade)
+  const activeDays = Object.keys(editSchedule).map(Number).sort();
+  // Pegar primeiro dia como referencia pros campos antigos
+  const firstDay = editSchedule[activeDays[0]] || { start: '08:00', end: '19:00', break_start: '12:00', break_end: '13:00' };
 
   const payload = {
     name: nome, commission_pct: comissao, phone: phone || null,
-    working_days: editDays, working_start: horaInicio, working_end: horaFim,
-    break_start: pausaInicio || '12:00', break_end: pausaFim || '13:00'
+    schedule: editSchedule,
+    working_days: activeDays,
+    working_start: firstDay.start, working_end: firstDay.end,
+    break_start: firstDay.break_start || '12:00', break_end: firstDay.break_end || '13:00'
   };
 
   try {
