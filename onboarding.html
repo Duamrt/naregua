@@ -331,6 +331,10 @@ function addServiceRow(nome, preco, duracao) {
 // ── Finalizar onboarding ──────────────────────────────────────
 async function finishOnboarding() {
   const btn = document.getElementById('btn-finish');
+  // Anti double-click: desabilitar imediatamente
+  if (btn.disabled) return;
+  btn.disabled = true;
+
   const name = document.getElementById('shop-name').value.trim();
   const city = document.getElementById('shop-city').value.trim();
   const phone = document.getElementById('shop-phone').value.trim();
@@ -356,6 +360,15 @@ async function finishOnboarding() {
 
   if (services.length === 0) {
     showOnbMsg('Adicione pelo menos um serviço.', 'error');
+    btn.disabled = false;
+    return;
+  }
+
+  // Verificar se dono já tem barbearia (evita duplicata)
+  const { data: jaExiste } = await sb.from('barbershops').select('id').eq('owner_id', currentUser.id);
+  if (jaExiste && jaExiste.length > 0) {
+    showOnbMsg('Você já tem uma barbearia cadastrada. Redirecionando...', 'error');
+    setTimeout(() => window.location.href = 'dashboard.html', 2000);
     return;
   }
 
