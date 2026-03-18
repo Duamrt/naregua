@@ -261,8 +261,14 @@
 
 <div class="dash-container">
 
+  <!-- BUG 14 ALTO FIX: Loading screen enquanto carrega dados -->
+  <div id="dash-loading" style="text-align:center;padding:60px 0;">
+    <div class="spinner" style="margin:0 auto 12px;width:24px;height:24px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--verde-acao);border-radius:50%;animation:spin .6s linear infinite;"></div>
+    <div style="font-size:13px;color:var(--texto-muted);">Carregando agenda...</div>
+  </div>
+
   <!-- Header -->
-  <div class="dash-header">
+  <div class="dash-header" style="display:none;" id="dash-content-header">
     <div>
       <div class="shop-name" id="shop-name"></div>
       <div class="shop-city" id="shop-city"></div>
@@ -274,7 +280,7 @@
   </div>
 
   <!-- Link público -->
-  <div id="share-bar" style="background:rgba(212,168,83,0.06);border:1.5px solid rgba(212,168,83,0.2);border-radius:12px;padding:14px;margin-bottom:16px;">
+  <div id="share-bar" style="display:none;" style="background:rgba(212,168,83,0.06);border:1.5px solid rgba(212,168,83,0.2);border-radius:12px;padding:14px;margin-bottom:16px;">
     <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--verde-acao);margin-bottom:8px;">📎 SEU LINK DE AGENDAMENTO</div>
     <div style="font-size:12px;color:var(--texto-secundario);word-break:break-all;margin-bottom:10px;line-height:1.4;" id="share-link"></div>
     <div style="display:flex;gap:8px;">
@@ -284,7 +290,7 @@
   </div>
 
   <!-- Stats -->
-  <div class="stats-row" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+  <div class="stats-row" id="dash-stats" style="grid-template-columns:1fr 1fr 1fr 1fr;display:none;">
     <div class="stat-card">
       <div class="stat-num" id="stat-total" style="color:var(--texto-principal);">0</div>
       <div class="stat-label">AGENDADOS</div>
@@ -304,7 +310,7 @@
   </div>
 
   <!-- Navegação de data -->
-  <div class="date-nav">
+  <div class="date-nav" id="dash-date-nav" style="display:none;">
     <button class="date-nav-btn" onclick="changeDay(-1)">‹</button>
     <div style="text-align:center;">
       <div class="date-nav-label" id="date-label"></div>
@@ -314,10 +320,10 @@
   </div>
 
   <!-- Filtros -->
-  <div class="filters" id="filters"></div>
+  <div class="filters" id="filters" style="display:none;"></div>
 
   <!-- Lista de agendamentos -->
-  <div id="appt-list"></div>
+  <div id="appt-list" style="display:none;"></div>
 
 </div>
 
@@ -519,6 +525,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Pedir permissão de notificação
   requestNotificationPermission();
+
+  // BUG 14 ALTO FIX: esconder loading e mostrar conteúdo
+  document.getElementById('dash-loading').style.display = 'none';
+  document.getElementById('dash-content-header').style.display = 'flex';
+  document.getElementById('share-bar').style.display = '';
+  document.getElementById('dash-stats').style.display = 'grid';
+  document.getElementById('dash-date-nav').style.display = 'flex';
+  document.getElementById('filters').style.display = 'flex';
+  document.getElementById('appt-list').style.display = 'block';
 
   renderDay();
 

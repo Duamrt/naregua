@@ -335,18 +335,26 @@ async function toggleServico(id, ativo) {
 }
 
 // ── Excluir ───────────────────────────────────────────────────
+// BUG 9 ALTO FIX: desabilitar botão após primeiro clique pra evitar double-click
 async function excluirServico(id, nome, btnEl) {
   if (!btnEl.dataset.confirming) {
     btnEl.textContent = 'Certeza?';
     btnEl.style.color = '#e74c3c';
     btnEl.dataset.confirming = 'true';
     setTimeout(() => {
-      btnEl.textContent = 'Excluir';
-      btnEl.style.color = '';
-      delete btnEl.dataset.confirming;
+      if (btnEl.dataset.confirming) {
+        btnEl.textContent = 'Excluir';
+        btnEl.style.color = '';
+        delete btnEl.dataset.confirming;
+      }
     }, 3000);
     return;
   }
+
+  // Desabilitar pra evitar double-click
+  btnEl.disabled = true;
+  btnEl.textContent = '...';
+  delete btnEl.dataset.confirming;
 
   await db.from('services').delete().eq('id', id);
   await loadServices();

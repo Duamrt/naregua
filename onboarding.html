@@ -141,12 +141,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!nameInput.value) nameInput.placeholder = `Ex: Studio ${nome.split(' ')[0]}`;
   }
 
+  // BUG 11 ALTO FIX: restaurar draft do Step 1 do localStorage
+  const draft = JSON.parse(localStorage.getItem('naregua_onboarding_draft') || '{}');
+  if (draft.type) selectedType = draft.type;
+  if (draft.name) document.getElementById('shop-name').value = draft.name;
+  if (draft.city) document.getElementById('shop-city').value = draft.city;
+  if (draft.phone) document.getElementById('shop-phone').value = draft.phone;
+
   // Dias da semana
   renderDays();
   // Tipo de negócio
   renderTypes();
   // Serviços padrão (barbearia por default)
   loadDefaultServices();
+
+  // BUG 11 ALTO FIX: salvar draft conforme preenche Step 1
+  ['shop-name', 'shop-city', 'shop-phone'].forEach(id => {
+    document.getElementById(id).addEventListener('input', saveDraft);
+  });
 });
 
 // ── Steps navigation ──────────────────────────────────────────
@@ -256,8 +268,20 @@ function renderTypes() {
   ).join('');
 }
 
+// BUG 11 ALTO FIX: salvar draft do Step 1 no localStorage
+function saveDraft() {
+  const draft = {
+    type: selectedType,
+    name: document.getElementById('shop-name').value,
+    city: document.getElementById('shop-city').value,
+    phone: document.getElementById('shop-phone').value,
+  };
+  localStorage.setItem('naregua_onboarding_draft', JSON.stringify(draft));
+}
+
 function setType(type) {
   selectedType = type;
+  saveDraft();
   renderTypes();
   loadDefaultServices();
   // Atualizar placeholder do nome
@@ -385,6 +409,9 @@ async function finishOnboarding() {
       plan: 'basico',
       expires_at: expires.toISOString()
     });
+
+    // BUG 11 ALTO FIX: limpar draft ao finalizar
+    localStorage.removeItem('naregua_onboarding_draft');
 
     // Redirecionar pro dashboard
     window.location.href = 'dashboard.html';

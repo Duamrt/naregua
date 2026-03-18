@@ -504,6 +504,7 @@ function renderServices() {
       <div>
         <div class="name">${esc(s.name)}</div>
         <div class="detail">${s.blocks_all_day ? 'Dia inteiro — equipe exclusiva' : s.duration_min + ' min'}</div>
+        ${s.blocks_all_day ? '<div style="display:inline-block;margin-top:6px;padding:4px 10px;border-radius:6px;background:rgba(231,76,60,0.15);color:#e74c3c;font-size:11px;font-weight:700;">BLOQUEIA DIA INTEIRO</div>' : ''}
       </div>
       <div class="price">${formatMoney(s.price)}</div>
     </div>
@@ -595,6 +596,15 @@ function renderDates() {
 }
 
 function selectDate(key) {
+  // BUG 2 ALTO FIX: validar range da data
+  const hoje = new Date();
+  hoje.setHours(0,0,0,0);
+  const dataSel = new Date(key + 'T00:00:00');
+  if (dataSel < hoje) { showAgMsg('Não é possível agendar em datas passadas.', 'error'); return; }
+  const limite = new Date(hoje);
+  limite.setDate(limite.getDate() + 30);
+  if (dataSel > limite) { showAgMsg('Agendamento permitido até 30 dias no futuro.', 'error'); return; }
+
   selectedDate = key;
   renderDates();
   renderTimes();
@@ -755,6 +765,39 @@ async function confirmarAgendamento() {
   btn.querySelector('.spinner').style.display = 'inline-block';
   msgEl.className = 'msg';
 
+  // BUG 5 ALTO FIX: verificar se serviço ainda existe
+  const svcCheck = await sb.from('services').select('id').eq('id', selectedService.id).eq('active', true).single();
+  if (!svcCheck.data) {
+    btn.disabled = false;
+    btn.querySelector('.btn-label').style.display = 'inline';
+    btn.querySelector('.spinner').style.display = 'none';
+    showAgMsg('Este serviço não está mais disponível.', 'error');
+    // Recarregar serviços
+    const { data: svcRefresh } = await sb.from('services').select('*').eq('barbershop_id', shop.id).eq('active', true).order('price');
+    services = svcRefresh || [];
+    selectedService = null;
+    renderServices();
+    showStep(1);
+    return;
+  }
+
+  // BUG 6 ALTO FIX: verificar se barbeiro ainda está ativo
+  if (selectedBarber && !selectedService.blocks_all_day) {
+    const barberCheck = await sb.from('barbers').select('id').eq('id', selectedBarber.id).eq('active', true).single();
+    if (!barberCheck.data) {
+      btn.disabled = false;
+      btn.querySelector('.btn-label').style.display = 'inline';
+      btn.querySelector('.spinner').style.display = 'none';
+      showAgMsg('Este profissional não está mais disponível.', 'error');
+      const { data: barbRefresh } = await sb.from('barbers').select('*').eq('barbershop_id', shop.id).eq('active', true);
+      barbers = barbRefresh || [];
+      selectedBarber = barbers.length === 1 ? barbers[0] : null;
+      renderBarbers();
+      showStep(2);
+      return;
+    }
+  }
+
   // BUG 4 FIX: enviar como string pura, sem conversão de timezone
   const scheduledAtStr = selectedDate + 'T' + selectedTime + ':00';
   const isDiaInteiro = selectedService.blocks_all_day;
@@ -779,7 +822,7 @@ async function confirmarAgendamento() {
       return;
     }
 
-    // Inserir 1 appointment por barbeiro com mesmo group_id
+    // BUG 1 ALTO FIX: insert-then-verify para dia inteiro (race condition)
     const groupId = crypto.randomUUID();
     const payload = barbers.map(b => ({
       barbershop_id: shop.id,
@@ -792,17 +835,43 @@ async function confirmarAgendamento() {
       group_id: groupId
     }));
 
-    const { error } = await sb.from('appointments').insert(payload);
-
-    btn.disabled = false;
-    btn.querySelector('.btn-label').style.display = 'inline';
-    btn.querySelector('.spinner').style.display = 'none';
+    const { data: insertedGroup, error } = await sb.from('appointments').insert(payload).select();
 
     if (error) {
+      btn.disabled = false;
+      btn.querySelector('.btn-label').style.display = 'inline';
+      btn.querySelector('.spinner').style.display = 'none';
       console.error(error);
       showAgMsg('Erro ao agendar. Tente novamente.', 'error');
       return;
     }
+
+    // Verificar se outro agendamento foi inserido no mesmo dia (race condition)
+    const insertedIds = (insertedGroup || []).map(a => a.id);
+    const { data: allDayAppts } = await sb
+      .from('appointments')
+      .select('id,group_id')
+      .eq('barbershop_id', shop.id)
+      .gte('scheduled_at', selectedDate + 'T00:00:00')
+      .lte('scheduled_at', selectedDate + 'T23:59:59')
+      .in('status', ['pending', 'confirmed']);
+
+    const outrosAppts = (allDayAppts || []).filter(a => !insertedIds.includes(a.id));
+    if (outrosAppts.length > 0) {
+      // Race condition: desfazer inserção
+      await sb.from('appointments').delete().eq('group_id', groupId);
+      btn.disabled = false;
+      btn.querySelector('.btn-label').style.display = 'inline';
+      btn.querySelector('.spinner').style.display = 'none';
+      showAgMsg('Este dia acabou de ser ocupado por outro cliente. Escolha outro.', 'error');
+      await renderTimes();
+      agBack(3);
+      return;
+    }
+
+    btn.disabled = false;
+    btn.querySelector('.btn-label').style.display = 'inline';
+    btn.querySelector('.spinner').style.display = 'none';
 
     // Sucesso dia inteiro
     const dateFormatted = selectedDate.split('-').reverse().join('/');
@@ -812,8 +881,10 @@ async function confirmarAgendamento() {
     const shopPhone = (shop.phone || '').replace(/\D/g, '');
     const hora = new Date().getHours();
     const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
+    // BUG 13 ALTO FIX: escapar asteriscos no nome do serviço
+    const svcNameWa = selectedService.name.replace(/\*/g, '\u2731');
     const waText = saudacao + '! Acabei de agendar pelo site.\n\n'
-      + '*' + selectedService.name + '*\n'
+      + '*' + svcNameWa + '*\n'
       + 'Dia: ' + dateFormatted + ' (dia inteiro)\n\n'
       + 'Meu nome: ' + nome + '\n'
       + 'Meu contato: ' + phone + '\n\n'
@@ -956,8 +1027,10 @@ async function confirmarAgendamento() {
   const shopPhone = (shop.phone || '').replace(/\D/g, '');
   const hora = new Date().getHours();
   const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
+  // BUG 13 ALTO FIX: escapar asteriscos no nome do serviço
+  const svcNameWa2 = selectedService.name.replace(/\*/g, '\u2731');
   const waText = saudacao + '! Acabei de agendar pelo site.\n\n'
-    + '*' + selectedService.name + '*\n'
+    + '*' + svcNameWa2 + '*\n'
     + 'Com: ' + selectedBarber.name + '\n'
     + 'Dia: ' + dateFormatted + ' as ' + selectedTime + '\n\n'
     + 'Meu nome: ' + nome + '\n'

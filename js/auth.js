@@ -65,6 +65,11 @@ function switchTab(mode) {
   hideMsg();
 }
 
+// BUG 7 ALTO FIX: validação de email com regex
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 // ── Login ─────────────────────────────────────────────────────
 async function handleLogin(e) {
   e.preventDefault();
@@ -74,6 +79,18 @@ async function handleLogin(e) {
 
   if (!email || !senha) {
     showMsg('Preencha todos os campos.', 'error');
+    return;
+  }
+
+  // BUG 7 ALTO FIX: validar email antes de enviar
+  if (!isValidEmail(email)) {
+    showMsg('Informe um e-mail válido.', 'error');
+    return;
+  }
+
+  // BUG 8 ALTO FIX: validar senha mínima no login também
+  if (senha.length < 6) {
+    showMsg('A senha deve ter pelo menos 6 caracteres.', 'error');
     return;
   }
 
@@ -122,6 +139,12 @@ async function handleSignup(e) {
 
   if (!nome || !email || !senha) {
     showMsg('Preencha todos os campos.', 'error');
+    return;
+  }
+
+  // BUG 7 ALTO FIX: validar email no signup
+  if (!isValidEmail(email)) {
+    showMsg('Informe um e-mail válido.', 'error');
     return;
   }
 

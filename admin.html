@@ -353,11 +353,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadAll() {
+  // BUG 15 ALTO FIX: limitar queries pra não carregar tudo de uma vez
   const [shopsRes, barbersRes, svcRes, apptsRes] = await Promise.all([
-    sbAdmin.from('barbershops').select('*').order('created_at', { ascending: false }),
-    sbAdmin.from('barbers').select('*'),
-    sbAdmin.from('services').select('*'),
-    sbAdmin.from('appointments').select('*')
+    sbAdmin.from('barbershops').select('*').order('created_at', { ascending: false }).limit(200),
+    sbAdmin.from('barbers').select('*').limit(500),
+    sbAdmin.from('services').select('*').limit(500),
+    sbAdmin.from('appointments').select('*').limit(2000)
   ]);
 
   allShops = shopsRes.data || [];
