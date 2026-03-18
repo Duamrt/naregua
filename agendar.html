@@ -1005,6 +1005,9 @@ async function confirmarAgendamento() {
   const slotStartMin = slotH * 60 + slotM;
   const slotEndMin = slotStartMin + duration;
 
+  // Definir barbeiro final (pra "any" sera resolvido depois do check de conflito)
+  let finalBarberId = selectedBarber.id;
+
   // Verificar conflito: buscar todos agendamentos do dia pro barbeiro
   let conflictQuery = sb
     .from('appointments')
@@ -1067,7 +1070,6 @@ async function confirmarAgendamento() {
   }
 
   // Se "qualquer profissional", escolher barbeiro disponivel
-  let finalBarberId = selectedBarber.id;
   if (selectedBarber.id === 'any') {
     const duration = selectedService.duration_min || 30;
     const slotH = parseInt(selectedTime.split(':')[0]);
