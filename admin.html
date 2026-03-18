@@ -472,7 +472,7 @@ function renderShops() {
         </div>
       </div>
       <div class="shop-meta">${s.city || '—'}${s.phone ? ' · ' + s.phone : ''} · ${s.opening_time || '08:00'}-${s.closing_time || '19:00'}${s.paid_until ? ' · Pago ate ' + s.paid_until.split('-').reverse().join('/') : ''}</div>
-      <div class="shop-meta" style="margin-top:2px;">Login dono: <strong>${s._owner_email || '—'}</strong></div>
+      <div class="shop-meta" style="margin-top:2px;">Login dono: <strong>${s._owner_email || '—'}</strong> <button class="shop-action-btn" style="padding:2px 8px;font-size:9px;margin-left:4px;" onclick="definirSenha('${esc(s.owner_id)}','${esc(s._owner_email)}')">DEFINIR SENHA</button></div>
       <div class="shop-stats">
         <span>Profissionais: <strong>${shopBarbers.length}</strong></span>
         <span>Serviços: <strong>${shopSvcs.length}</strong></span>
@@ -494,6 +494,27 @@ function renderShops() {
 function entrarComo(shopId) {
   sessionStorage.setItem('admin_viewing_shop', shopId);
   window.location.href = 'dashboard.html?shop=' + shopId;
+}
+
+async function definirSenha(userId, email) {
+  const novaSenha = prompt('Nova senha pra ' + email + '\n(minimo 6 caracteres):');
+  if (!novaSenha || novaSenha.length < 6) {
+    if (novaSenha !== null) alert('Senha deve ter pelo menos 6 caracteres.');
+    return;
+  }
+
+  const r = await fetch(_SB_REST.replace('/rest/v1', '') + '/auth/v1/admin/users/' + userId, {
+    method: 'PUT',
+    headers: { 'apikey': _SK, 'Authorization': 'Bearer ' + _SK, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: novaSenha })
+  });
+
+  if (r.ok) {
+    alert('Senha alterada com sucesso!');
+  } else {
+    const err = await r.json().catch(() => ({}));
+    alert('Erro ao alterar senha: ' + (err.message || r.status));
+  }
 }
 
 function copiarLinkBarbeiro() {
