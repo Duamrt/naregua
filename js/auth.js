@@ -35,20 +35,7 @@ async function checkSession() {
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) return;
-
-    // Admin vai direto pro painel admin
-    if (ADMIN_EMAILS.includes(session.user.email)) {
-      window.location.href = 'admin.html';
-      return;
-    }
-
-    const { data: shop } = await sb
-      .from('barbershops')
-      .select('id')
-      .eq('owner_id', session.user.id)
-      .maybeSingle();
-
-    window.location.href = shop ? 'dashboard.html' : 'onboarding.html';
+    await redirectUser(session.user);
   } catch (e) {
     console.error('checkSession erro:', e);
   }
@@ -115,7 +102,12 @@ async function handleLogin(e) {
   }
 
   // Redirecionar
-  if (ADMIN_EMAILS.includes(data.user.email)) {
+  await redirectUser(data.user);
+}
+
+// Redireciona baseado no role do usuario
+async function redirectUser(user) {
+  if (ADMIN_EMAILS.includes(user.email)) {
     window.location.href = 'admin.html';
     return;
   }
@@ -123,10 +115,42 @@ async function handleLogin(e) {
   const { data: shop } = await sb
     .from('barbershops')
     .select('id')
-    .eq('owner_id', data.user.id)
+    .eq('owner_id', user.id)
     .maybeSingle();
 
-  window.location.href = shop ? 'dashboard.html' : 'onboarding.html';
+  if (shop) { window.location.href = 'dashboard.html'; return; }
+
+  // Verificar se ja esta vinculado como barbeiro
+  const { data: barber } = await sb
+    .from('barbers')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('active', true)
+    .maybeSingle();
+
+  if (barber) { window.location.href = 'barbeiro.html'; return; }
+
+  // Tentar vincular: dono cadastrou o email mas barbeiro ainda nao tinha conta
+  const { data: pending } = await sb
+    .from('barbers')
+    .select('id')
+    .eq('email', user.email)
+    .is('user_id', null)
+    .eq('active', true)
+    .maybeSingle();
+
+  if (pending) {
+    // Vincular user_id via REST (service key pra bypass RLS)
+    await fetch(_SB_REST + '/barbers?id=eq.' + pending.id, {
+      method: 'PATCH',
+      headers: getServiceHeaders(),
+      body: JSON.stringify({ user_id: user.id })
+    });
+    window.location.href = 'barbeiro.html';
+    return;
+  }
+
+  window.location.href = 'onboarding.html';
 }
 
 // ── Criar conta ───────────────────────────────────────────────
@@ -174,10 +198,9 @@ async function handleSignup(e) {
     return;
   }
 
-  // Supabase pode exigir confirmação de e-mail ou não (depende da config)
+  // Supabase pode exigir confirmacao de e-mail ou nao (depende da config)
   if (data.session) {
-    // Login automático — ir pro onboarding
-    window.location.href = 'onboarding.html';
+    await redirectUser(data.user);
   } else {
     // Precisa confirmar e-mail
     showMsg('Conta criada! Verifique seu e-mail para confirmar.', 'success');

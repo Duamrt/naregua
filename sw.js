@@ -1,9 +1,10 @@
 // NaRegua — Service Worker (cache-first para assets, network-first para API)
-const CACHE_NAME = 'naregua-v1';
+const CACHE_NAME = 'naregua-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/dashboard.html',
+  '/barbeiro.html',
   '/agendar.html',
   '/servicos.html',
   '/equipe.html',

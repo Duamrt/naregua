@@ -133,10 +133,15 @@
     <input type="hidden" id="eq-edit-id">
     <div class="field">
       <label>NOME *</label>
-      <input type="text" id="eq-nome" placeholder="Ex: João, Maria">
+      <input type="text" id="eq-nome" placeholder="Ex: Joao, Maria">
     </div>
     <div class="field">
-      <label>COMISSÃO (%)</label>
+      <label>E-MAIL (pra login do barbeiro)</label>
+      <input type="email" id="eq-email" placeholder="barbeiro@email.com">
+      <div style="font-size:10px;color:var(--texto-muted);margin-top:4px;">Se preencher, o barbeiro pode criar conta e ver a agenda dele</div>
+    </div>
+    <div class="field">
+      <label>COMISSAO (%)</label>
       <input type="number" id="eq-comissao" min="0" max="100" step="1" placeholder="0" value="0">
       <div style="font-size:10px;color:var(--texto-muted);margin-top:4px;">Percentual sobre cada atendimento</div>
     </div>
@@ -263,10 +268,11 @@ function renderBarbers() {
     const comissao = b.commission_pct ? b.commission_pct + '%' : '0%';
     const dias = b.working_days || [];
     const diasStr = dias.length === 7 ? 'Todos os dias'
-      : dias.length === 6 && !dias.includes(0) ? 'Seg-Sáb'
+      : dias.length === 6 && !dias.includes(0) ? 'Seg-Sab'
       : dias.length > 0 ? dias.map(d => DIAS_LABEL[d]).join(', ')
       : 'Sem dias definidos';
     const horario = (b.working_start || '08:00') + ' - ' + (b.working_end || '19:00');
+    const emailInfo = b.email ? '<div class="eq-meta">&#x1F4E7; ' + esc(b.email) + (b.user_id ? ' · vinculado' : ' · aguardando cadastro') + '</div>' : '';
 
     return `<div class="eq-card ${cardCls}">
       <div class="eq-top">
@@ -274,8 +280,9 @@ function renderBarbers() {
           <div class="eq-avatar">${inicial}</div>
           <div>
             <div class="eq-name">${esc(b.name)}</div>
-            <div class="eq-meta">${comissao} comissão · <span class="eq-badge ${badgeCls}">${badgeLabel}</span></div>
+            <div class="eq-meta">${comissao} comissao · <span class="eq-badge ${badgeCls}">${badgeLabel}</span></div>
             <div class="eq-meta">${diasStr} · ${horario}</div>
+            ${emailInfo}
           </div>
         </div>
       </div>
@@ -304,6 +311,7 @@ function abrirModal() {
   document.getElementById('modal-eq-title').textContent = 'Novo Profissional';
   document.getElementById('eq-edit-id').value = '';
   document.getElementById('eq-nome').value = '';
+  document.getElementById('eq-email').value = '';
   document.getElementById('eq-comissao').value = '0';
   editDays = shop.days_open || [1,2,3,4,5,6];
   renderEditDays();
@@ -320,6 +328,7 @@ function editar(id) {
   document.getElementById('modal-eq-title').textContent = 'Editar Profissional';
   document.getElementById('eq-edit-id').value = b.id;
   document.getElementById('eq-nome').value = b.name;
+  document.getElementById('eq-email').value = b.email || '';
   document.getElementById('eq-comissao').value = b.commission_pct || 0;
   editDays = b.working_days || shop.days_open || [1,2,3,4,5,6];
   renderEditDays();
@@ -349,8 +358,10 @@ async function salvar() {
   btn.querySelector('.btn-label').style.display = 'none';
   btn.querySelector('.spinner').style.display = 'inline-block';
 
+  const email = document.getElementById('eq-email').value.trim().toLowerCase();
+
   const payload = {
-    name: nome, commission_pct: comissao,
+    name: nome, commission_pct: comissao, email: email || null,
     working_days: editDays, working_start: horaInicio, working_end: horaFim
   };
 
