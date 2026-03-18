@@ -123,12 +123,16 @@ async function redirectUser(user) {
   // Verificar se ja esta vinculado como barbeiro
   const { data: barber } = await sb
     .from('barbers')
-    .select('id')
+    .select('id, is_owner')
     .eq('user_id', user.id)
     .eq('active', true)
     .maybeSingle();
 
-  if (barber) { window.location.href = 'barbeiro.html'; return; }
+  if (barber) {
+    // Se e barbeiro-dono, vai pro dashboard (nao pro barbeiro.html)
+    window.location.href = barber.is_owner ? 'dashboard.html' : 'barbeiro.html';
+    return;
+  }
 
   // Tentar vincular por telefone (email fake = telefone@naregua.app)
   const phoneFromEmail = user.email.replace('@naregua.app', '');

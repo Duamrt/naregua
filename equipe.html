@@ -398,7 +398,7 @@ function renderBarbers() {
         <div style="display:flex;align-items:center;gap:12px;">
           <div class="eq-avatar">${inicial}</div>
           <div>
-            <div class="eq-name">${esc(b.name)}</div>
+            <div class="eq-name">${esc(b.name)}${b.is_owner ? ' <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;background:rgba(212,168,83,0.15);color:#d4a853;margin-left:4px;">DONO</span>' : ''}</div>
             <div class="eq-meta">${comissao} comissao · <span class="eq-badge ${badgeCls}">${badgeLabel}</span></div>
             <div class="eq-meta">${diasStr} · ${horario}</div>
             ${phoneInfo}
@@ -407,8 +407,8 @@ function renderBarbers() {
       </div>
       <div class="eq-actions">
         <button class="eq-btn" onclick="editar('${esc(b.id)}')">Editar</button>
-        <button class="eq-btn ${toggleCls}" onclick="toggle('${esc(b.id)}', ${!b.active})">${toggleLabel}</button>
-        <button class="eq-btn danger" onclick="excluir('${b.id}', '${esc(b.name)}', this)">Excluir</button>
+        ${b.is_owner ? '' : '<button class="eq-btn ' + toggleCls + '" onclick="toggle(\'' + esc(b.id) + '\', ' + !b.active + ')">' + toggleLabel + '</button>'}
+        ${b.is_owner ? '' : '<button class="eq-btn danger" onclick="excluir(\'' + b.id + '\', \'' + esc(b.name) + '\', this)">Excluir</button>'}
       </div>
     </div>`;
   }).join('');

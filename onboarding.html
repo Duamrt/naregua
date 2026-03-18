@@ -404,12 +404,19 @@ async function finishOnboarding() {
 
     if (errShop) throw errShop;
 
-    // 2. Criar barbeiro padrão (o próprio dono)
+    // 2. Criar barbeiro padrao (o proprio dono)
     const nomeUser = currentUser.user_metadata?.nome || name;
     await sb.from('barbers').insert({
       barbershop_id: shop.id,
       name: nomeUser.split(' ')[0],
-      commission_pct: 100
+      commission_pct: 100,
+      is_owner: true,
+      user_id: currentUser.id,
+      working_days: selectedDays,
+      working_start: opening,
+      working_end: closing,
+      break_start: '12:00',
+      break_end: '13:00'
     });
 
     // 3. Criar serviços
