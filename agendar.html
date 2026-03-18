@@ -677,12 +677,18 @@ async function renderTimes() {
 
   appointments = dayAppts || [];
 
-  // Gerar slots (usa horário do profissional se tiver, senão da barbearia)
+  // Gerar slots (usa horario do profissional se tiver, senao da barbearia)
   const barberStart = selectedBarber.working_start || shop.opening_time || '08:00';
   const barberEnd = selectedBarber.working_end || shop.closing_time || '19:00';
+  const breakStart = selectedBarber.break_start || '12:00';
+  const breakEnd = selectedBarber.break_end || '13:00';
   const [openH, openM] = barberStart.split(':').map(Number);
   const [closeH, closeM] = barberEnd.split(':').map(Number);
-  const interval = 15; // grade fixa de 15 min — conflito usa duration_min do serviço
+  const [breakSH, breakSM] = breakStart.split(':').map(Number);
+  const [breakEH, breakEM] = breakEnd.split(':').map(Number);
+  const breakStartMin = breakSH * 60 + breakSM;
+  const breakEndMin = breakEH * 60 + breakEM;
+  const interval = 15; // grade fixa de 15 min — conflito usa duration_min do servico
   const now = new Date();
   const isToday = selectedDate === now.toISOString().split('T')[0];
 
@@ -710,7 +716,10 @@ async function renderTimes() {
       return slotMin < aEndMin && slotEndMin > aStartMin;
     });
 
-    const disabled = isPast || isOccupied;
+    // Verificar se cai no horario de pausa do barbeiro
+    const isOnBreak = slotMin < breakEndMin && slotEndMin > breakStartMin;
+
+    const disabled = isPast || isOccupied || isOnBreak;
     const sel = selectedTime === timeStr && !disabled;
 
     html += `<div class="time-slot ${sel ? 'selected' : ''} ${disabled ? 'disabled' : ''}"

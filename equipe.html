@@ -151,12 +151,22 @@
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
       <div class="field">
-        <label>ENTRA ÀS</label>
+        <label>ENTRA AS</label>
         <input type="time" id="eq-hora-inicio" value="08:00">
       </div>
       <div class="field">
-        <label>SAI ÀS</label>
+        <label>SAI AS</label>
         <input type="time" id="eq-hora-fim" value="19:00">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="field">
+        <label>PAUSA DAS</label>
+        <input type="time" id="eq-pausa-inicio" value="12:00">
+      </div>
+      <div class="field">
+        <label>VOLTA AS</label>
+        <input type="time" id="eq-pausa-fim" value="13:00">
       </div>
     </div>
     <button class="btn btn-primary" onclick="salvar()" id="btn-eq-save">
@@ -282,6 +292,7 @@ function renderBarbers() {
       : dias.length > 0 ? dias.map(d => DIAS_LABEL[d]).join(', ')
       : 'Sem dias definidos';
     const horario = (b.working_start || '08:00') + ' - ' + (b.working_end || '19:00');
+    const pausa = b.break_start && b.break_end ? 'Pausa ' + b.break_start + '-' + b.break_end : '';
     const phoneInfo = b.phone ? '<div class="eq-meta">&#x1F4F1; ' + esc(b.phone) + (b.user_id ? ' · vinculado' : ' · aguardando cadastro') + '</div>' : '';
 
     return `<div class="eq-card ${cardCls}">
@@ -291,7 +302,7 @@ function renderBarbers() {
           <div>
             <div class="eq-name">${esc(b.name)}</div>
             <div class="eq-meta">${comissao} comissao · <span class="eq-badge ${badgeCls}">${badgeLabel}</span></div>
-            <div class="eq-meta">${diasStr} · ${horario}</div>
+            <div class="eq-meta">${diasStr} · ${horario}${pausa ? ' · ' + pausa : ''}</div>
             ${phoneInfo}
           </div>
         </div>
@@ -327,6 +338,8 @@ function abrirModal() {
   renderEditDays();
   document.getElementById('eq-hora-inicio').value = shop.opening_time || '08:00';
   document.getElementById('eq-hora-fim').value = shop.closing_time || '19:00';
+  document.getElementById('eq-pausa-inicio').value = '12:00';
+  document.getElementById('eq-pausa-fim').value = '13:00';
   document.getElementById('modal-eq-msg').className = 'msg';
   document.getElementById('modal-eq').classList.add('show');
   setTimeout(() => document.getElementById('eq-nome').focus(), 100);
@@ -344,6 +357,8 @@ function editar(id) {
   renderEditDays();
   document.getElementById('eq-hora-inicio').value = b.working_start || shop.opening_time || '08:00';
   document.getElementById('eq-hora-fim').value = b.working_end || shop.closing_time || '19:00';
+  document.getElementById('eq-pausa-inicio').value = b.break_start || '12:00';
+  document.getElementById('eq-pausa-fim').value = b.break_end || '13:00';
   document.getElementById('modal-eq-msg').className = 'msg';
   document.getElementById('modal-eq').classList.add('show');
   setTimeout(() => document.getElementById('eq-nome').focus(), 100);
@@ -369,10 +384,13 @@ async function salvar() {
   btn.querySelector('.spinner').style.display = 'inline-block';
 
   const phone = document.getElementById('eq-phone').value.replace(/\D/g, '');
+  const pausaInicio = document.getElementById('eq-pausa-inicio').value;
+  const pausaFim = document.getElementById('eq-pausa-fim').value;
 
   const payload = {
     name: nome, commission_pct: comissao, phone: phone || null,
-    working_days: editDays, working_start: horaInicio, working_end: horaFim
+    working_days: editDays, working_start: horaInicio, working_end: horaFim,
+    break_start: pausaInicio || '12:00', break_end: pausaFim || '13:00'
   };
 
   try {
