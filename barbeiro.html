@@ -258,7 +258,7 @@ function renderDateLabel() {
 
 async function renderDay() {
   renderDateLabel();
-  const dateStr = currentDate.toISOString().split('T')[0];
+  const dateStr = currentDate.getFullYear() + '-' + String(currentDate.getMonth()+1).padStart(2,'0') + '-' + String(currentDate.getDate()).padStart(2,'0');
 
   const { data: appts } = await sb
     .from('appointments')

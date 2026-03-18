@@ -622,7 +622,7 @@ function renderDates() {
     // Só mostrar dias que o profissional/barbearia abre
     if (!daysOpen.includes(dow)) continue;
 
-    const key = d.toISOString().split('T')[0];
+    const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
     const isToday = i === 0;
     const sel = selectedDate === key;
 
@@ -715,7 +715,7 @@ async function renderTimes() {
   appointments = dayAppts || [];
 
   // Se "qualquer profissional", usar horario da barbearia e verificar disponibilidade em qualquer barbeiro
-  const dayOfWeek = new Date(selectedDate).getDay();
+  const dayOfWeek = new Date(selectedDate + 'T12:00:00').getDay();
   const isAny = selectedBarber && selectedBarber.id === 'any';
   const sched = isAny ? null : selectedBarber.schedule;
   let dayConfig = null;
@@ -1083,7 +1083,7 @@ async function confirmarAgendamento() {
     const slotM = parseInt(selectedTime.split(':')[1]);
     const slotMin = slotH * 60 + slotM;
     const slotEndMin = slotMin + duration;
-    const dayOfWeek = new Date(selectedDate).getDay();
+    const dayOfWeek = new Date(selectedDate + 'T12:00:00').getDay();
 
     const available = barbers.filter(b => {
       if (!b.active) return false;

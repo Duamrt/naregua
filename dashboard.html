@@ -631,7 +631,7 @@ function renderDateLabel() {
 async function renderDay() {
   renderDateLabel();
 
-  const dateStr = currentDate.toISOString().split('T')[0];
+  const dateStr = currentDate.getFullYear() + '-' + String(currentDate.getMonth()+1).padStart(2,'0') + '-' + String(currentDate.getDate()).padStart(2,'0');
   const dayStart = dateStr + 'T00:00:00-03:00';
   const dayEnd = dateStr + 'T23:59:59-03:00';
 
@@ -1354,7 +1354,7 @@ async function salvarEncaixe() {
   const min = agora.getMinutes();
   const rounded = Math.ceil(min / 15) * 15;
   agora.setMinutes(rounded, 0, 0);
-  const dateStr = agora.toISOString().split('T')[0];
+  const dateStr = agora.getFullYear() + '-' + String(agora.getMonth()+1).padStart(2,'0') + '-' + String(agora.getDate()).padStart(2,'0');
   const timeStr = String(agora.getHours()).padStart(2,'0') + ':' + String(agora.getMinutes()).padStart(2,'0');
   const scheduledAt = dateStr + 'T' + timeStr + ':00-03:00';
 
