@@ -83,6 +83,11 @@
     .nav-item.active { color:var(--verde-acao); }
     .nav-item .nav-icon { font-size:18px; }
 
+        .btn-back {
+      background:none; border:none; color:var(--texto-secundario); font-size:20px;
+      cursor:pointer; padding:4px 8px 4px 0; font-family:inherit; transition:all .2s;
+    }
+    .btn-back:hover { color:var(--verde-acao); }
     body { padding-bottom:70px; }
   </style>
 </head>
@@ -97,7 +102,7 @@
 
   <div id="content" style="display:none;">
     <div class="cli-header">
-      <h1>Clientes</h1>
+      <div style="display:flex;align-items:center;gap:8px;"><button class="btn-back" onclick="history.back()" title="Voltar">&#x2190;</button><h1>Clientes</h1></div>
       <span class="cli-count" id="cli-total"></span>
     </div>
 
