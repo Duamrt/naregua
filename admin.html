@@ -373,6 +373,25 @@ async function loadAll() {
   allServices = svcRes.data || [];
   allAppointments = apptsRes.data || [];
 
+  // Buscar emails dos donos via auth.users (service key)
+  const ownerIds = [...new Set(allShops.map(s => s.owner_id).filter(Boolean))];
+  for (const s of allShops) {
+    s._owner_email = '—';
+  }
+  if (ownerIds.length) {
+    const usersRes = await fetch(_SB_REST.replace('/rest/v1', '') + '/auth/v1/admin/users', {
+      headers: { 'apikey': _SK, 'Authorization': 'Bearer ' + _SK }
+    });
+    if (usersRes.ok) {
+      const usersData = await usersRes.json();
+      const users = usersData.users || usersData || [];
+      for (const s of allShops) {
+        const u = users.find(u => u.id === s.owner_id);
+        if (u) s._owner_email = u.email;
+      }
+    }
+  }
+
   renderGlobalStats();
   renderShops();
 }
@@ -452,7 +471,8 @@ function renderShops() {
           ${mensBadge}
         </div>
       </div>
-      <div class="shop-meta">${s.city || '—'}${s.phone ? ' · ' + s.phone : ''} · ${s.opening_time || '08:00'}-${s.closing_time || '19:00'}${s.paid_until ? ' · Pago até ' + s.paid_until.split('-').reverse().join('/') : ''}</div>
+      <div class="shop-meta">${s.city || '—'}${s.phone ? ' · ' + s.phone : ''} · ${s.opening_time || '08:00'}-${s.closing_time || '19:00'}${s.paid_until ? ' · Pago ate ' + s.paid_until.split('-').reverse().join('/') : ''}</div>
+      <div class="shop-meta" style="margin-top:2px;">Login dono: <strong>${s._owner_email || '—'}</strong></div>
       <div class="shop-stats">
         <span>Profissionais: <strong>${shopBarbers.length}</strong></span>
         <span>Serviços: <strong>${shopSvcs.length}</strong></span>
@@ -463,7 +483,8 @@ function renderShops() {
         <button class="shop-action-btn" style="border-color:rgba(212,168,83,0.3);color:var(--verde-acao);font-weight:700;" onclick="entrarComo('${esc(s.id)}')">Entrar como</button>
         <button class="shop-action-btn" onclick="editarShop('${esc(s.id)}')">Editar</button>
         <button class="shop-action-btn" onclick="copiarLinkShop('${esc(s.slug)}')">Copiar link</button>
-        <button class="shop-action-btn" onclick="window.open('${baseUrl}agendar.html?slug=${esc(s.slug)}','_blank')">Ver página</button>
+        <button class="shop-action-btn" onclick="window.open('${baseUrl}agendar.html?slug=${esc(s.slug)}','_blank')">Ver pagina</button>
+        <button class="shop-action-btn" onclick="copiarLinkBarbeiro()">Link barbeiro</button>
         <button class="shop-action-btn danger" onclick="excluirShop('${esc(s.id)}')">Excluir</button>
       </div>
     </div>`;
@@ -473,6 +494,12 @@ function renderShops() {
 function entrarComo(shopId) {
   sessionStorage.setItem('admin_viewing_shop', shopId);
   window.location.href = 'dashboard.html?shop=' + shopId;
+}
+
+function copiarLinkBarbeiro() {
+  const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
+  navigator.clipboard.writeText(baseUrl + 'barbeiro-cadastro.html');
+  alert('Link copiado! Envie pro barbeiro: ' + baseUrl + 'barbeiro-cadastro.html');
 }
 
 function copiarLinkShop(slug) {
