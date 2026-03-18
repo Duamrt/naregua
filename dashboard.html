@@ -590,8 +590,8 @@ async function renderDay() {
   renderDateLabel();
 
   const dateStr = currentDate.toISOString().split('T')[0];
-  const dayStart = dateStr + 'T00:00:00';
-  const dayEnd = dateStr + 'T23:59:59';
+  const dayStart = dateStr + 'T00:00:00-03:00';
+  const dayEnd = dateStr + 'T23:59:59-03:00';
 
   const { data: appts } = await sb
     .from('appointments')

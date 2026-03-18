@@ -624,7 +624,7 @@ function selectDate(key) {
   // BUG 2 ALTO FIX: validar range da data
   const hoje = new Date();
   hoje.setHours(0,0,0,0);
-  const dataSel = new Date(key + 'T00:00:00');
+  const dataSel = new Date(key + 'T00:00:00-03:00');
   if (dataSel < hoje) { showAgMsg('Não é possível agendar em datas passadas.', 'error'); return; }
   const limite = new Date(hoje);
   limite.setDate(limite.getDate() + 30);
@@ -654,8 +654,8 @@ async function renderTimes() {
       .from('appointments')
       .select('id')
       .eq('barbershop_id', shop.id)
-      .gte('scheduled_at', selectedDate + 'T00:00:00')
-      .lte('scheduled_at', selectedDate + 'T23:59:59')
+      .gte('scheduled_at', selectedDate + 'T00:00:00-03:00')
+      .lte('scheduled_at', selectedDate + 'T23:59:59-03:00')
       .in('status', ['pending', 'confirmed']);
 
     if ((dayAppts || []).length > 0) {
@@ -675,8 +675,8 @@ async function renderTimes() {
   label.textContent = `Horários para ${selectedDate.split('-').reverse().join('/')}`;
 
   // Buscar agendamentos do dia (pra saber quais estão ocupados)
-  const dayStart = selectedDate + 'T00:00:00';
-  const dayEnd = selectedDate + 'T23:59:59';
+  const dayStart = selectedDate + 'T00:00:00-03:00';
+  const dayEnd = selectedDate + 'T23:59:59-03:00';
   // Filtrar por barbeiro selecionado (se tiver)
   let query = sb
     .from('appointments')
@@ -847,8 +847,8 @@ async function confirmarAgendamento() {
     }
   }
 
-  // BUG 4 FIX: enviar como string pura, sem conversão de timezone
-  const scheduledAtStr = selectedDate + 'T' + selectedTime + ':00';
+  // Enviar com timezone de Brasilia (-03:00) pra Supabase salvar correto
+  const scheduledAtStr = selectedDate + 'T' + selectedTime + ':00-03:00';
   const isDiaInteiro = selectedService.blocks_all_day;
 
   // ── Dia inteiro: verificar se dia ainda está livre ──
@@ -857,8 +857,8 @@ async function confirmarAgendamento() {
       .from('appointments')
       .select('id')
       .eq('barbershop_id', shop.id)
-      .gte('scheduled_at', selectedDate + 'T00:00:00')
-      .lte('scheduled_at', selectedDate + 'T23:59:59')
+      .gte('scheduled_at', selectedDate + 'T00:00:00-03:00')
+      .lte('scheduled_at', selectedDate + 'T23:59:59-03:00')
       .in('status', ['pending', 'confirmed']);
 
     if ((dayCheck || []).length > 0) {
@@ -901,8 +901,8 @@ async function confirmarAgendamento() {
       .from('appointments')
       .select('id,group_id')
       .eq('barbershop_id', shop.id)
-      .gte('scheduled_at', selectedDate + 'T00:00:00')
-      .lte('scheduled_at', selectedDate + 'T23:59:59')
+      .gte('scheduled_at', selectedDate + 'T00:00:00-03:00')
+      .lte('scheduled_at', selectedDate + 'T23:59:59-03:00')
       .in('status', ['pending', 'confirmed']);
 
     const outrosAppts = (allDayAppts || []).filter(a => !insertedIds.includes(a.id));
@@ -968,8 +968,8 @@ async function confirmarAgendamento() {
     .eq('barber_id', selectedBarber.id)
     .in('status', ['pending', 'confirmed'])
     .lt('scheduled_at', slotEndStr)
-    .gte('scheduled_at', selectedDate + 'T00:00:00')
-    .lte('scheduled_at', selectedDate + 'T23:59:59');
+    .gte('scheduled_at', selectedDate + 'T00:00:00-03:00')
+    .lte('scheduled_at', selectedDate + 'T23:59:59-03:00');
 
   // Checar overlap: outro agendamento termina depois do nosso início?
   const temConflito = (conflitos || []).some(a => {
@@ -1050,8 +1050,8 @@ async function confirmarAgendamento() {
     .eq('barbershop_id', shop.id)
     .eq('barber_id', selectedBarber.id)
     .in('status', ['pending', 'confirmed'])
-    .gte('scheduled_at', selectedDate + 'T00:00:00')
-    .lte('scheduled_at', selectedDate + 'T23:59:59')
+    .gte('scheduled_at', selectedDate + 'T00:00:00-03:00')
+    .lte('scheduled_at', selectedDate + 'T23:59:59-03:00')
     .neq('id', inserted.id);
 
   const conflitoPosInsert = (duplicatas || []).some(a => {
