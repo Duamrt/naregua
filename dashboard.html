@@ -39,7 +39,7 @@
       background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:10px;
       padding:12px; text-align:center;
     }
-    .stat-num { font-size:22px; font-weight:800; font-family:'Inter',sans-serif; }
+    .stat-num { font-size:18px; font-weight:800; font-family:'Inter',sans-serif; }
     .stat-label { font-size:9px; color:var(--texto-muted); font-weight:700; letter-spacing:1px; margin-top:4px; }
 
     /* Navegação de data */
@@ -164,14 +164,14 @@
       padding-bottom:max(8px, env(safe-area-inset-bottom));
     }
     .nav-item {
-      flex:1; max-width:70px; display:flex; flex-direction:column;
+      flex:1; max-width:65px; display:flex; flex-direction:column;
       align-items:center; gap:2px; padding:6px 0;
-      color:var(--texto-muted); font-size:10px; font-weight:600;
+      color:var(--texto-muted); font-size:8px; font-weight:600;
       text-decoration:none; cursor:pointer; border:none; background:none;
       font-family:inherit; transition:all .2s;
     }
     .nav-item.active { color:var(--verde-acao); }
-    .nav-item .nav-icon { font-size:18px; }
+    .nav-item .nav-icon { font-size:16px; }
 
     /* Filtros */
     .filters {
@@ -289,11 +289,11 @@
   <!-- Acoes rapidas -->
   <div id="share-bar" style="display:none;">
     <div style="display:flex;gap:8px;margin-bottom:12px;">
-      <button onclick="compartilharWhatsApp()" style="flex:1;padding:14px 8px;border-radius:12px;border:none;background:rgba(37,211,102,0.12);color:#25d366;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;line-height:1.3;">
-        <span style="font-size:22px;">&#x1F4C5;</span>ENVIAR LINK DE<br>AGENDAMENTO
+      <button onclick="compartilharWhatsApp()" style="flex:1;padding:10px 8px;border-radius:12px;border:none;background:rgba(37,211,102,0.12);color:#25d366;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;line-height:1.3;">
+        <span style="font-size:18px;">&#x1F4C5;</span>ENVIAR LINK DE<br>AGENDAMENTO
       </button>
-      <button onclick="enviarLinkBarbeiroZap()" style="flex:1;padding:14px 8px;border-radius:12px;border:none;background:rgba(212,168,83,0.1);color:var(--verde-acao);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;line-height:1.3;">
-        <span style="font-size:22px;">&#x1F4AA;</span>CADASTRAR<br>BARBEIRO
+      <button onclick="enviarLinkBarbeiroZap()" style="flex:1;padding:10px 8px;border-radius:12px;border:none;background:rgba(212,168,83,0.1);color:var(--verde-acao);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;line-height:1.3;">
+        <span style="font-size:18px;">&#x1F4AA;</span>CADASTRAR<br>BARBEIRO
       </button>
     </div>
     <div style="display:flex;gap:8px;">

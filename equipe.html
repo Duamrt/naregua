@@ -110,7 +110,7 @@
     .sched-fields {
       padding:0 12px 10px; display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:6px;
     }
-    .sched-fields label { font-size:8px; font-weight:700; color:var(--texto-muted); letter-spacing:0.5px; display:block; margin-bottom:2px; }
+    .sched-fields label { font-size:10px; font-weight:700; color:var(--texto-muted); letter-spacing:0.5px; display:block; margin-bottom:2px; }
     .sched-fields input[type="time"] {
       width:100%; padding:6px 4px; background:var(--cinza-escuro); border:1px solid var(--borda);
       border-radius:6px; color:var(--texto-principal); font-size:11px; font-family:inherit;
@@ -129,14 +129,18 @@
       padding-bottom:max(8px, env(safe-area-inset-bottom));
     }
     .nav-item {
-      flex:1; max-width:70px; display:flex; flex-direction:column;
+      flex:1; max-width:65px; display:flex; flex-direction:column;
       align-items:center; gap:2px; padding:6px 0;
-      color:var(--texto-muted); font-size:10px; font-weight:600;
+      color:var(--texto-muted); font-size:8px; font-weight:600;
       text-decoration:none; cursor:pointer; border:none; background:none;
       font-family:inherit; transition:all .2s;
     }
     .nav-item.active { color:var(--verde-acao); }
-    .nav-item .nav-icon { font-size:18px; }
+    .nav-item .nav-icon { font-size:16px; }
+
+    @media(max-width:480px) {
+      .sched-fields { grid-template-columns:1fr 1fr !important; }
+    }
 
         .btn-back {
       background:none; border:none; color:var(--texto-secundario); font-size:20px;

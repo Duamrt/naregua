@@ -10,7 +10,7 @@
   --cinza-claro: #1e1e1e;
   --texto-principal: #fafafa;
   --texto-secundario: #a3a3a3;
-  --texto-muted: #525252;
+  --texto-muted: #737373;
   --vermelho: #ef4444;
   --amarelo: #f59e0b;
   --borda: rgba(255,255,255,0.05);
@@ -89,7 +89,7 @@ h3 { font-size: 15px; font-weight: 600; }
 
 .field label {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--texto-muted);
   letter-spacing: 1px;

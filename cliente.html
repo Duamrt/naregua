@@ -211,7 +211,7 @@ if (saved) {
 async function buscar() {
   const raw = phoneInput.value.replace(/\D/g, '');
   if (raw.length < 10) {
-    alert('Informe um telefone valido com DDD.');
+    showToast('Informe um telefone valido com DDD.');
     return;
   }
 
@@ -264,7 +264,7 @@ async function buscar() {
   if (!allAppts.length) {
     document.getElementById('phone-form').style.display = 'block';
     document.getElementById('resultado').style.display = 'none';
-    alert('Nenhum agendamento encontrado com esse telefone.');
+    showToast('Nenhum agendamento encontrado com esse telefone.');
     return;
   }
 
