@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NaRegua — Relatório</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="NaRegua">
+  <link rel="apple-touch-icon" href="img/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .rel-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
+
+    .rel-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 0 16px; border-bottom:1px solid var(--borda); margin-bottom:16px;
+    }
+    .rel-header h1 { font-size:18px; font-weight:700; }
+
+    /* Navegacao mes */
+    .month-nav {
+      display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;
+    }
+    .month-btn {
+      width:36px; height:36px; border-radius:8px; border:1px solid var(--borda);
+      background:transparent; color:var(--texto-secundario); font-size:16px;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      font-family:inherit; transition:all .2s;
+    }
+    .month-btn:hover { border-color:var(--borda-hover); }
+    .month-label { font-size:14px; font-weight:700; text-align:center; }
+
+    /* KPI cards */
+    .kpi-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:24px; }
+    .kpi-card {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:12px;
+      padding:14px; text-align:center;
+    }
+    .kpi-card.full { grid-column:1/-1; }
+    .kpi-card.trio { grid-column:span 1; }
+    .kpi-num { font-size:20px; font-weight:800; }
+    .kpi-label { font-size:9px; color:var(--texto-muted); font-weight:700; letter-spacing:1px; margin-top:4px; }
+
+    /* Secoes */
+    .section-title {
+      font-size:11px; color:var(--texto-muted); font-weight:700;
+      letter-spacing:1.5px; margin:24px 0 12px;
+    }
+
+    /* Grafico barras diario */
+    .chart-daily {
+      display:flex; align-items:flex-end; gap:2px; height:120px;
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:12px;
+      padding:16px 12px 8px; margin-bottom:4px; overflow-x:auto;
+    }
+    .chart-bar-wrap {
+      flex:1; min-width:8px; display:flex; flex-direction:column;
+      align-items:center; justify-content:flex-end; height:100%;
+    }
+    .chart-bar {
+      width:100%; min-width:6px; max-width:16px; background:var(--accent);
+      border-radius:3px 3px 0 0; transition:height .4s ease; cursor:pointer;
+      position:relative;
+    }
+    .chart-bar:hover { opacity:.8; }
+    .chart-bar-label {
+      font-size:7px; color:var(--texto-muted); margin-top:4px; text-align:center;
+    }
+    .chart-tooltip {
+      display:none; position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%);
+      background:var(--cinza-claro); border:1px solid var(--borda-hover); border-radius:6px;
+      padding:4px 8px; font-size:10px; font-weight:600; white-space:nowrap; z-index:10;
+      color:var(--texto-principal);
+    }
+    .chart-bar:hover .chart-tooltip { display:block; }
+    .chart-empty {
+      width:100%; text-align:center; font-size:12px; color:var(--texto-muted);
+      padding:40px 0;
+    }
+
+    /* Ranking barbeiros */
+    .barber-card {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:12px;
+      padding:14px; margin-bottom:10px; display:flex; align-items:center; gap:12px;
+    }
+    .barber-avatar {
+      width:40px; height:40px; border-radius:50%; background:var(--accent);
+      color:#000; font-weight:800; font-size:16px;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .barber-info { flex:1; min-width:0; }
+    .barber-name { font-size:13px; font-weight:700; }
+    .barber-stats { font-size:11px; color:var(--texto-secundario); margin-top:2px; }
+    .barber-stats span { margin-right:10px; }
+    .barber-minibar {
+      height:6px; background:rgba(255,255,255,0.06); border-radius:3px;
+      overflow:hidden; margin-top:6px;
+    }
+    .barber-minibar-fill {
+      height:100%; background:var(--accent); border-radius:3px; transition:width .5s;
+    }
+
+    /* Formas de pagamento */
+    .pay-row {
+      display:flex; align-items:center; gap:10px; padding:8px 0;
+      border-bottom:1px solid var(--borda);
+    }
+    .pay-row:last-child { border:none; }
+    .pay-label { font-size:12px; font-weight:600; width:70px; }
+    .pay-bar-track {
+      flex:1; height:20px; background:rgba(255,255,255,0.04); border-radius:6px;
+      overflow:hidden; position:relative;
+    }
+    .pay-bar-fill {
+      height:100%; border-radius:6px; transition:width .5s;
+      display:flex; align-items:center; justify-content:flex-end; padding-right:6px;
+      font-size:10px; font-weight:700; color:#000; min-width:fit-content;
+    }
+    .pay-val { font-size:12px; font-weight:700; width:80px; text-align:right; }
+
+    /* Despesas por categoria */
+    .cat-row {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:8px 0; border-bottom:1px solid var(--borda);
+    }
+    .cat-row:last-child { border:none; }
+    .cat-name { font-size:12px; font-weight:600; }
+    .cat-val { font-size:12px; font-weight:700; color:#ef4444; }
+
+    /* Comparacao mes anterior */
+    .comp-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+    .comp-card {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:12px;
+      padding:12px 10px; text-align:center;
+    }
+    .comp-arrow { font-size:18px; font-weight:800; }
+    .comp-arrow.up { color:var(--accent); }
+    .comp-arrow.down { color:#ef4444; }
+    .comp-arrow.neutral { color:var(--texto-muted); }
+    .comp-pct { font-size:12px; font-weight:700; margin-top:2px; }
+    .comp-label { font-size:9px; color:var(--texto-muted); font-weight:700; letter-spacing:0.5px; margin-top:2px; }
+
+    /* Pagamentos cores */
+    .pay-pix { background:#00b894; }
+    .pay-dinheiro { background:var(--accent); }
+    .pay-cartao { background:#6c5ce7; }
+
+    /* Loading */
+    .loading-block {
+      text-align:center; padding:60px 0; font-size:12px; color:var(--texto-muted);
+    }
+
+    /* Bottom nav */
+    .bottom-nav {
+      position:fixed; bottom:0; left:0; right:0;
+      background:var(--cinza-escuro); border-top:1px solid var(--borda);
+      display:flex; justify-content:center; gap:0; padding:8px 0;
+      padding-bottom:max(8px, env(safe-area-inset-bottom));
+    }
+    .nav-item {
+      flex:1; max-width:100px; display:flex; flex-direction:column;
+      align-items:center; gap:2px; padding:6px 0;
+      color:var(--texto-muted); font-size:10px; font-weight:600;
+      text-decoration:none; cursor:pointer; border:none; background:none;
+      font-family:inherit; transition:all .2s;
+    }
+    .nav-item.active { color:var(--verde-acao); }
+    .nav-item .nav-icon { font-size:18px; }
+
+    body { padding-bottom:70px; }
+
+    /* Margin bar */
+    .margin-bar {
+      height:8px; background:rgba(255,255,255,0.06); border-radius:4px;
+      overflow:hidden; margin-top:8px;
+    }
+    .margin-fill { height:100%; border-radius:4px; transition:width .5s; }
+  </style>
+</head>
+<body>
+
+<div class="rel-container">
+
+  <div class="rel-header">
+    <h1>Relatorio Mensal</h1>
+  </div>
+
+  <!-- Navegacao mes -->
+  <div class="month-nav">
+    <button class="month-btn" onclick="changeMonth(-1)">&#8249;</button>
+    <div class="month-label" id="month-label"></div>
+    <button class="month-btn" onclick="changeMonth(1)">&#8250;</button>
+  </div>
+
+  <!-- Loading -->
+  <div id="loading" class="loading-block">Carregando dados...</div>
+
+  <!-- Conteudo (escondido ate carregar) -->
+  <div id="content" style="display:none;">
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-num" id="kpi-faturamento" style="color:var(--accent);">R$ 0</div>
+        <div class="kpi-label">FATURAMENTO</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num" id="kpi-atendimentos" style="color:var(--accent);">0</div>
+        <div class="kpi-label">ATENDIMENTOS</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num" id="kpi-ticket" style="color:var(--texto-principal);">R$ 0</div>
+        <div class="kpi-label">TICKET MEDIO</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num" id="kpi-falta" style="color:#ef4444;">0%</div>
+        <div class="kpi-label">TAXA DE FALTA</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num" id="kpi-despesas" style="color:#ef4444;">R$ 0</div>
+        <div class="kpi-label">DESPESAS</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num" id="kpi-lucro" style="color:var(--accent);">R$ 0</div>
+        <div class="kpi-label">LUCRO</div>
+      </div>
+      <div class="kpi-card full">
+        <div class="kpi-num" id="kpi-margem" style="color:var(--accent);">0%</div>
+        <div class="kpi-label">MARGEM DE LUCRO</div>
+        <div class="margin-bar"><div class="margin-fill" id="margin-fill"></div></div>
+      </div>
+    </div>
+
+    <!-- Grafico faturamento diario -->
+    <div class="section-title">FATURAMENTO DIARIO</div>
+    <div class="chart-daily" id="chart-daily"></div>
+
+    <!-- Ranking barbeiros -->
+    <div class="section-title">RANKING BARBEIROS</div>
+    <div id="ranking-barbeiros"></div>
+
+    <!-- Formas de pagamento -->
+    <div class="section-title">FORMAS DE PAGAMENTO</div>
+    <div id="payment-methods" style="background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:12px;padding:12px 14px;margin-bottom:4px;"></div>
+
+    <!-- Despesas por categoria -->
+    <div class="section-title">DESPESAS POR CATEGORIA</div>
+    <div id="expenses-cats" style="background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:12px;padding:12px 14px;margin-bottom:4px;"></div>
+
+    <!-- Comparacao mes anterior -->
+    <div class="section-title">COMPARACAO COM MES ANTERIOR</div>
+    <div class="comp-grid" id="comp-grid"></div>
+
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+  <a class="nav-item" href="dashboard.html">
+    <span class="nav-icon">📅</span>AGENDA
+  </a>
+  <a class="nav-item" href="servicos.html">
+    <span class="nav-icon">✂️</span>SERVICOS
+  </a>
+  <a class="nav-item" href="equipe.html">
+    <span class="nav-icon">👥</span>EQUIPE
+  </a>
+  <a class="nav-item" href="financeiro.html">
+    <span class="nav-icon">💰</span>CAIXA
+  </a>
+  <a class="nav-item active" href="relatorio.html">
+    <span class="nav-icon">📊</span>RELATORIO
+  </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js?v=2"></script>
+<script src="js/utils.js?v=2"></script>
+<script>
+// ── Estado ────────────────────────────────────────────────────
+let shop = null;
+let services = [];
+let barbersList = [];
+let currentDate = new Date();
+
+const MESES = ['Janeiro','Fevereiro','Marco','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const CAT_LABELS = {
+  aluguel:'Aluguel', energia:'Energia', agua:'Agua', internet:'Internet',
+  produtos:'Produtos', manutencao:'Manutencao', equipamento:'Equipamento',
+  comissao:'Comissao', imposto:'Imposto', outros:'Outros'
+};
+const PAY_LABELS = { pix:'PIX', dinheiro:'Dinheiro', cartao:'Cartao' };
+const PAY_COLORS = { pix:'pay-pix', dinheiro:'pay-dinheiro', cartao:'pay-cartao' };
+
+const SB_REST = _SB_REST;
+const REST_HEADERS = getServiceHeaders();
+
+const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
+const _params = new URLSearchParams(window.location.search);
+const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_viewing_shop');
+if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
+const isAdminViewing = !!adminViewingShop;
+const db = isAdminViewing
+  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', _SK)
+  : sb;
+
+async function restGet(table, filter) {
+  const r = await fetch(SB_REST + '/' + table + '?' + filter, { headers: REST_HEADERS });
+  return r.ok ? await r.json() : [];
+}
+
+// ── Init ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { alert('Sessao expirada. Faca login novamente.'); window.location.href = 'index.html'; return; }
+
+  if (ADMIN_EMAILS.includes(session.user.email) && !isAdminViewing) {
+    window.location.href = 'admin.html';
+    return;
+  }
+
+  let shopData;
+  if (isAdminViewing) {
+    const { data } = await db.from('barbershops').select('*').eq('id', adminViewingShop).single();
+    shopData = data;
+  } else {
+    const { data } = await db.from('barbershops').select('*').eq('owner_id', session.user.id).maybeSingle();
+    shopData = data;
+  }
+
+  if (!shopData) { window.location.href = isAdminViewing ? 'admin.html' : 'onboarding.html'; return; }
+  shop = shopData;
+
+  // Banner admin
+  if (isAdminViewing) {
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3);border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;';
+    banner.innerHTML = '<span style="font-size:11px;color:#e74c3c;font-weight:700;">ADMIN \u00b7 ' + esc(shop.name) + '</span>'
+      + '<button onclick="sessionStorage.removeItem(\'admin_viewing_shop\');location.href=\'admin.html\'" style="background:#e74c3c;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">VOLTAR</button>';
+    document.querySelector('.rel-container').insertBefore(banner, document.querySelector('.rel-header'));
+  }
+
+  const [svcRes, barbRes] = await Promise.all([
+    db.from('services').select('*').eq('barbershop_id', shop.id),
+    db.from('barbers').select('*').eq('barbershop_id', shop.id)
+  ]);
+  services = svcRes.data || [];
+  barbersList = barbRes.data || [];
+
+  renderReport();
+});
+
+// ── Navegacao ─────────────────────────────────────────────────
+function changeMonth(delta) {
+  currentDate.setMonth(currentDate.getMonth() + delta);
+  renderReport();
+}
+
+function getMonthRange(date) {
+  const y = date.getFullYear();
+  const m = date.getMonth();
+  const start = y + '-' + String(m + 1).padStart(2, '0') + '-01';
+  const lastDay = new Date(y, m + 1, 0).getDate();
+  const end = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(lastDay).padStart(2, '0');
+  return { start, end, lastDay, year: y, month: m };
+}
+
+function getPrevMonthRange(date) {
+  const prev = new Date(date.getFullYear(), date.getMonth() - 1, 1);
+  return getMonthRange(prev);
+}
+
+// ── Buscar dados ──────────────────────────────────────────────
+async function fetchMonthData(range) {
+  const [appointments, expenses] = await Promise.all([
+    restGet('appointments',
+      'barbershop_id=eq.' + shop.id
+      + '&scheduled_at=gte.' + range.start + 'T00:00:00'
+      + '&scheduled_at=lte.' + range.end + 'T23:59:59'
+      + '&order=scheduled_at.asc'),
+    restGet('expenses',
+      'barbershop_id=eq.' + shop.id
+      + '&date=gte.' + range.start
+      + '&date=lte.' + range.end
+      + '&order=date.asc')
+  ]);
+  return { appointments, expenses };
+}
+
+function getPrice(appt) {
+  if (appt.price_paid != null && Number(appt.price_paid) > 0) return Number(appt.price_paid);
+  const svc = services.find(s => s.id === appt.service_id);
+  return svc ? Number(svc.price) : 0;
+}
+
+// ── Render principal ──────────────────────────────────────────
+async function renderReport() {
+  // Label do mes
+  document.getElementById('month-label').textContent = MESES[currentDate.getMonth()] + ' ' + currentDate.getFullYear();
+
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('content').style.display = 'none';
+
+  const range = getMonthRange(currentDate);
+  const prevRange = getPrevMonthRange(currentDate);
+
+  const [data, prevData] = await Promise.all([
+    fetchMonthData(range),
+    fetchMonthData(prevRange)
+  ]);
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
+
+  // Separar por status
+  const done = data.appointments.filter(a => a.status === 'done');
+  const noShow = data.appointments.filter(a => a.status === 'no_show');
+  const scheduled = data.appointments.filter(a => ['pending', 'confirmed', 'done', 'no_show'].includes(a.status));
+
+  // KPIs
+  const faturamento = done.reduce((s, a) => s + getPrice(a), 0);
+  const atendimentos = done.length;
+  const ticket = atendimentos > 0 ? faturamento / atendimentos : 0;
+  const taxaFalta = scheduled.length > 0 ? (noShow.length / scheduled.length * 100) : 0;
+  const despesasTotal = data.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
+  const lucro = faturamento - despesasTotal;
+  const margem = faturamento > 0 ? (lucro / faturamento * 100) : 0;
+
+  document.getElementById('kpi-faturamento').textContent = formatMoney(faturamento);
+  document.getElementById('kpi-atendimentos').textContent = atendimentos;
+  document.getElementById('kpi-ticket').textContent = formatMoney(ticket);
+  document.getElementById('kpi-falta').textContent = taxaFalta.toFixed(1) + '%';
+  document.getElementById('kpi-despesas').textContent = formatMoney(despesasTotal);
+  document.getElementById('kpi-lucro').textContent = formatMoney(lucro);
+  document.getElementById('kpi-lucro').style.color = lucro >= 0 ? 'var(--accent)' : '#ef4444';
+  document.getElementById('kpi-margem').textContent = margem.toFixed(1) + '%';
+  document.getElementById('kpi-margem').style.color = margem >= 0 ? 'var(--accent)' : '#ef4444';
+
+  const fill = document.getElementById('margin-fill');
+  fill.style.width = Math.max(0, Math.min(100, margem)) + '%';
+  fill.style.background = margem >= 50 ? 'var(--accent)' : margem >= 20 ? '#f59e0b' : '#ef4444';
+
+  // Grafico diario
+  renderDailyChart(done, range);
+
+  // Ranking barbeiros
+  renderBarberRanking(done);
+
+  // Formas de pagamento
+  renderPaymentMethods(done);
+
+  // Despesas por categoria
+  renderExpenseCategories(data.expenses);
+
+  // Comparacao mes anterior
+  renderComparison(data, prevData);
+}
+
+// ── Grafico faturamento diario ────────────────────────────────
+function renderDailyChart(done, range) {
+  const container = document.getElementById('chart-daily');
+
+  if (!done.length) {
+    container.innerHTML = '<div class="chart-empty">Nenhum atendimento no periodo.</div>';
+    return;
+  }
+
+  // Agrupar por dia
+  const dailyMap = {};
+  for (let d = 1; d <= range.lastDay; d++) dailyMap[d] = 0;
+
+  done.forEach(a => {
+    const day = new Date(a.scheduled_at).getDate();
+    dailyMap[day] += getPrice(a);
+  });
+
+  const values = Object.values(dailyMap);
+  const maxVal = Math.max(...values, 1);
+
+  let html = '';
+  for (let d = 1; d <= range.lastDay; d++) {
+    const val = dailyMap[d];
+    const pct = (val / maxVal * 100);
+    const heightPx = val > 0 ? Math.max(4, pct) : 0;
+    html += '<div class="chart-bar-wrap">'
+      + '<div class="chart-bar" style="height:' + heightPx + '%;">'
+      + '<div class="chart-tooltip">' + d + '/' + String(range.month + 1).padStart(2, '0') + ' - ' + formatMoney(val) + '</div>'
+      + '</div>'
+      + '<div class="chart-bar-label">' + d + '</div>'
+      + '</div>';
+  }
+  container.innerHTML = html;
+}
+
+// ── Ranking barbeiros ─────────────────────────────────────────
+function renderBarberRanking(done) {
+  const container = document.getElementById('ranking-barbeiros');
+
+  if (!barbersList.length) {
+    container.innerHTML = '<div style="padding:16px 0;font-size:12px;color:var(--texto-muted);text-align:center;">Nenhum barbeiro cadastrado.</div>';
+    return;
+  }
+
+  // Agrupar por barbeiro
+  const stats = {};
+  barbersList.forEach(b => {
+    stats[b.id] = { name: b.name, count: 0, revenue: 0, commission_pct: b.commission_pct || 0 };
+  });
+
+  done.forEach(a => {
+    if (stats[a.barber_id]) {
+      stats[a.barber_id].count++;
+      stats[a.barber_id].revenue += getPrice(a);
+    }
+  });
+
+  // Ordenar por faturamento desc
+  const sorted = Object.values(stats).sort((a, b) => b.revenue - a.revenue);
+  const maxRevenue = sorted.length ? sorted[0].revenue : 1;
+
+  let html = '';
+  sorted.forEach((b, i) => {
+    const comissao = b.revenue * (b.commission_pct / 100);
+    const barPct = maxRevenue > 0 ? (b.revenue / maxRevenue * 100) : 0;
+    const initial = b.name.charAt(0).toUpperCase();
+    const medal = i === 0 && b.revenue > 0 ? ' 🥇' : i === 1 && b.revenue > 0 ? ' 🥈' : i === 2 && b.revenue > 0 ? ' 🥉' : '';
+
+    html += '<div class="barber-card">'
+      + '<div class="barber-avatar">' + esc(initial) + '</div>'
+      + '<div class="barber-info">'
+      + '<div class="barber-name">' + esc(b.name) + medal + '</div>'
+      + '<div class="barber-stats">'
+      + '<span>' + b.count + ' atend.</span>'
+      + '<span style="color:var(--accent);">' + formatMoney(b.revenue) + '</span>'
+      + (b.commission_pct > 0 ? '<span style="color:var(--texto-muted);">Comissao: ' + formatMoney(comissao) + ' (' + b.commission_pct + '%)</span>' : '')
+      + '</div>'
+      + '<div class="barber-minibar"><div class="barber-minibar-fill" style="width:' + barPct + '%;"></div></div>'
+      + '</div>'
+      + '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+// ── Formas de pagamento ───────────────────────────────────────
+function renderPaymentMethods(done) {
+  const container = document.getElementById('payment-methods');
+
+  const totals = { pix: 0, dinheiro: 0, cartao: 0 };
+  done.forEach(a => {
+    const method = a.payment_method || 'dinheiro';
+    const key = totals.hasOwnProperty(method) ? method : 'dinheiro';
+    totals[key] += getPrice(a);
+  });
+
+  const grandTotal = Object.values(totals).reduce((s, v) => s + v, 0);
+
+  if (grandTotal === 0) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--texto-muted);text-align:center;padding:8px 0;">Nenhum pagamento registrado.</div>';
+    return;
+  }
+
+  let html = '';
+  Object.entries(totals).forEach(([key, val]) => {
+    const pct = grandTotal > 0 ? (val / grandTotal * 100) : 0;
+    html += '<div class="pay-row">'
+      + '<div class="pay-label">' + (PAY_LABELS[key] || key) + '</div>'
+      + '<div class="pay-bar-track">'
+      + '<div class="pay-bar-fill ' + (PAY_COLORS[key] || '') + '" style="width:' + Math.max(pct, 0) + '%;' + (pct > 15 ? '' : 'padding-right:0;') + '">'
+      + (pct > 15 ? pct.toFixed(0) + '%' : '')
+      + '</div>'
+      + '</div>'
+      + '<div class="pay-val">' + formatMoney(val) + '</div>'
+      + '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+// ── Despesas por categoria ────────────────────────────────────
+function renderExpenseCategories(expenses) {
+  const container = document.getElementById('expenses-cats');
+
+  if (!expenses.length) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--texto-muted);text-align:center;padding:8px 0;">Nenhuma despesa no periodo.</div>';
+    return;
+  }
+
+  const cats = {};
+  expenses.forEach(e => {
+    const cat = e.category || 'outros';
+    if (!cats[cat]) cats[cat] = 0;
+    cats[cat] += Number(e.amount || 0);
+  });
+
+  // Ordenar por valor desc
+  const sorted = Object.entries(cats).sort((a, b) => b[1] - a[1]);
+
+  let html = '';
+  sorted.forEach(([cat, val]) => {
+    html += '<div class="cat-row">'
+      + '<div class="cat-name">' + (CAT_LABELS[cat] || cat) + '</div>'
+      + '<div class="cat-val">-' + formatMoney(val) + '</div>'
+      + '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+// ── Comparacao mes anterior ───────────────────────────────────
+function renderComparison(data, prevData) {
+  const container = document.getElementById('comp-grid');
+
+  const done = data.appointments.filter(a => a.status === 'done');
+  const prevDone = prevData.appointments.filter(a => a.status === 'done');
+
+  const fat = done.reduce((s, a) => s + getPrice(a), 0);
+  const prevFat = prevDone.reduce((s, a) => s + getPrice(a), 0);
+
+  const atend = done.length;
+  const prevAtend = prevDone.length;
+
+  const desp = data.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
+  const prevDesp = prevData.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
+
+  const lucro = fat - desp;
+  const prevLucro = prevFat - prevDesp;
+
+  function compCard(label, current, prev) {
+    let pct = 0;
+    let arrow = '—';
+    let cls = 'neutral';
+    if (prev > 0) {
+      pct = ((current - prev) / prev * 100);
+      arrow = pct > 0 ? '↑' : pct < 0 ? '↓' : '—';
+      cls = pct > 0 ? 'up' : pct < 0 ? 'down' : 'neutral';
+    } else if (current > 0) {
+      pct = 100;
+      arrow = '↑';
+      cls = 'up';
+    }
+    return '<div class="comp-card">'
+      + '<div class="comp-arrow ' + cls + '">' + arrow + '</div>'
+      + '<div class="comp-pct" style="color:' + (cls === 'up' ? 'var(--accent)' : cls === 'down' ? '#ef4444' : 'var(--texto-muted)') + ';">'
+      + (pct > 0 ? '+' : '') + pct.toFixed(1) + '%</div>'
+      + '<div class="comp-label">' + label + '</div>'
+      + '</div>';
+  }
+
+  container.innerHTML = compCard('FATURAMENTO', fat, prevFat)
+    + compCard('ATENDIMENTOS', atend, prevAtend)
+    + compCard('LUCRO', lucro, prevLucro);
+}
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script>
+</body>
+</html>
