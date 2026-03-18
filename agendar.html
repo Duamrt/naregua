@@ -319,7 +319,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const diasLabel = diasOpen.length === 7 ? 'Todos os dias'
     : diasOpen.length === 6 && !diasOpen.includes(0) ? 'Seg a Sab'
     : diasNome[primeiro] + ' a ' + diasNome[ultimo];
-  detailsHtml += `<span class="info-badge">🕐 ${diasLabel} · ${shop.opening_time || '08:00'} - ${shop.closing_time || '19:00'}</span>`;
+  const openFmt = (shop.opening_time || '08:00').slice(0,5);
+  const closeFmt = (shop.closing_time || '19:00').slice(0,5);
+  detailsHtml += '<span class="info-badge">&#x1F550; ' + diasLabel + ' · ' + openFmt + ' - ' + closeFmt + '</span>';
 
   // Endereço
   if (shop.address) {
