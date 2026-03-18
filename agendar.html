@@ -687,12 +687,15 @@ async function renderTimes() {
     // Verificar se conflita com agendamento existente
     const duration = selectedService.duration_min || 30;
     const slotEnd = new Date(slotDate.getTime() + duration * 60000);
+    const slotMin = h * 60 + m;
+    const slotEndMin = slotMin + duration;
     const isOccupied = appointments.some(a => {
-      const aStart = new Date(a.scheduled_at);
+      const aParts = a.scheduled_at.split('T')[1].split(':');
+      const aStartMin = parseInt(aParts[0]) * 60 + parseInt(aParts[1]);
       const aSvc = services.find(s => s.id === a.service_id);
       const aDur = aSvc ? aSvc.duration_min : 30;
-      const aEnd = new Date(aStart.getTime() + aDur * 60000);
-      return slotDate < aEnd && slotEnd > aStart;
+      const aEndMin = aStartMin + aDur;
+      return slotMin < aEndMin && slotEndMin > aStartMin;
     });
 
     const disabled = isPast || isOccupied;
@@ -909,21 +912,32 @@ async function confirmarAgendamento() {
   const slotEnd = new Date(scheduledAtLocal.getTime() + duration * 60000);
 
   // Verificar conflito antes de salvar (evita duplicata)
+  // Usar range: slot ocupa de scheduledAtStr até slotEndStr
+  const slotEndDate = new Date(scheduledAtLocal.getTime() + duration * 60000);
+  const slotEndStr = selectedDate + 'T' + String(slotEndDate.getHours()).padStart(2,'0') + ':' + String(slotEndDate.getMinutes()).padStart(2,'0') + ':00';
+
   const { data: conflitos } = await sb
     .from('appointments')
     .select('id,scheduled_at,service_id')
     .eq('barbershop_id', shop.id)
     .eq('barber_id', selectedBarber.id)
     .in('status', ['pending', 'confirmed'])
+    .lt('scheduled_at', slotEndStr)
     .gte('scheduled_at', selectedDate + 'T00:00:00')
     .lte('scheduled_at', selectedDate + 'T23:59:59');
 
+  // Checar overlap: outro agendamento termina depois do nosso início?
   const temConflito = (conflitos || []).some(a => {
-    const aStart = new Date(a.scheduled_at);
     const aSvc = services.find(s => s.id === a.service_id);
     const aDur = aSvc ? aSvc.duration_min : 30;
-    const aEnd = new Date(aStart.getTime() + aDur * 60000);
-    return scheduledAtLocal < aEnd && slotEnd > aStart;
+    // Calcular fim do agendamento existente como string
+    const aParts = a.scheduled_at.split('T')[1].split(':');
+    const aMinTotal = parseInt(aParts[0]) * 60 + parseInt(aParts[1]) + aDur;
+    const slotMinTotal = parseInt(selectedTime.split(':')[0]) * 60 + parseInt(selectedTime.split(':')[1]);
+    const slotEndMin = slotMinTotal + duration;
+    const aStartMin = parseInt(aParts[0]) * 60 + parseInt(aParts[1]);
+    // Overlap: slotStart < aEnd AND slotEnd > aStart
+    return slotMinTotal < aMinTotal && slotEndMin > aStartMin;
   });
 
   if (temConflito) {
@@ -996,11 +1010,14 @@ async function confirmarAgendamento() {
     .neq('id', inserted.id);
 
   const conflitoPosInsert = (duplicatas || []).some(a => {
-    const aStart = new Date(a.scheduled_at);
     const aSvc = services.find(s => s.id === a.service_id);
     const aDur = aSvc ? aSvc.duration_min : 30;
-    const aEnd = new Date(aStart.getTime() + aDur * 60000);
-    return scheduledAtLocal < aEnd && slotEnd > aStart;
+    const aParts = a.scheduled_at.split('T')[1].split(':');
+    const aStartMin = parseInt(aParts[0]) * 60 + parseInt(aParts[1]);
+    const aEndMin = aStartMin + aDur;
+    const slotMinTotal = parseInt(selectedTime.split(':')[0]) * 60 + parseInt(selectedTime.split(':')[1]);
+    const slotEndMin = slotMinTotal + duration;
+    return slotMinTotal < aEndMin && slotEndMin > aStartMin;
   });
 
   if (conflitoPosInsert) {
