@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NaRegua — Clientes</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="NaRegua">
+  <link rel="apple-touch-icon" href="img/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .cli-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
+
+    .cli-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 0 16px; border-bottom:1px solid var(--borda); margin-bottom:16px;
+    }
+    .cli-header h1 { font-size:18px; font-weight:700; }
+    .cli-count { font-size:12px; color:var(--texto-muted); font-weight:600; }
+
+    .search-bar {
+      margin-bottom:16px;
+    }
+    .search-bar input {
+      width:100%; padding:12px 14px; background:var(--cinza-escuro); border:1px solid var(--borda);
+      border-radius:10px; color:var(--texto-principal); font-size:14px; font-family:inherit;
+      box-sizing:border-box;
+    }
+    .search-bar input:focus { border-color:var(--verde-acao); outline:none; }
+    .search-bar input::placeholder { color:var(--texto-muted); }
+
+    .client-card {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:12px;
+      padding:14px; margin-bottom:8px; transition:all .2s;
+    }
+    .client-card:hover { border-color:var(--borda-hover); }
+    .client-top { display:flex; justify-content:space-between; align-items:center; }
+    .client-name { font-size:14px; font-weight:700; }
+    .client-phone { font-size:12px; color:var(--texto-muted); margin-top:2px; }
+    .client-stats { font-size:11px; color:var(--texto-muted); margin-top:4px; }
+    .client-stats strong { color:var(--verde-acao); }
+
+    .client-avatar {
+      width:36px; height:36px; border-radius:50%;
+      background:var(--verde-medio); display:flex; align-items:center;
+      justify-content:center; font-size:16px; font-weight:800; color:#fff;
+      flex-shrink:0;
+    }
+
+    .client-actions { display:flex; gap:6px; margin-top:10px; }
+    .client-btn {
+      padding:7px 14px; border-radius:8px; border:1px solid var(--borda);
+      background:transparent; color:var(--texto-secundario); font-size:11px;
+      font-weight:600; font-family:inherit; cursor:pointer; transition:all .2s;
+      text-decoration:none;
+    }
+    .client-btn:hover { border-color:var(--verde-acao); color:var(--verde-acao); }
+    .client-btn.whatsapp { border-color:rgba(37,211,102,0.3); color:#25d366; }
+    .client-btn.whatsapp:hover { background:rgba(37,211,102,0.1); }
+
+    .empty-state {
+      text-align:center; padding:40px 20px; color:var(--texto-muted);
+    }
+
+    .bottom-nav {
+      position:fixed; bottom:0; left:0; right:0;
+      background:var(--cinza-escuro); border-top:1px solid var(--borda);
+      display:flex; justify-content:center; gap:0; padding:8px 0;
+      padding-bottom:max(8px, env(safe-area-inset-bottom));
+    }
+    .nav-item {
+      flex:1; max-width:80px; display:flex; flex-direction:column;
+      align-items:center; gap:2px; padding:6px 0;
+      color:var(--texto-muted); font-size:9px; font-weight:600;
+      text-decoration:none; font-family:inherit; transition:all .2s;
+    }
+    .nav-item.active { color:var(--verde-acao); }
+    .nav-item .nav-icon { font-size:18px; }
+
+    body { padding-bottom:70px; }
+  </style>
+</head>
+<body>
+
+<div class="cli-container">
+
+  <div id="loading" style="text-align:center;padding:60px 0;">
+    <div class="spinner" style="margin:0 auto 12px;width:24px;height:24px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--verde-acao);border-radius:50%;animation:spin .6s linear infinite;"></div>
+    <div style="font-size:13px;color:var(--texto-muted);">Carregando clientes...</div>
+  </div>
+
+  <div id="content" style="display:none;">
+    <div class="cli-header">
+      <h1>Clientes</h1>
+      <span class="cli-count" id="cli-total"></span>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="search" placeholder="Buscar por nome ou telefone..." oninput="filtrar()">
+    </div>
+
+    <div id="cli-list"></div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <a class="nav-item" href="dashboard.html">
+    <span class="nav-icon">&#x1F4C5;</span>AGENDA
+  </a>
+  <a class="nav-item" href="servicos.html">
+    <span class="nav-icon">&#x2702;&#xFE0F;</span>SERVICOS
+  </a>
+  <a class="nav-item" href="equipe.html">
+    <span class="nav-icon">&#x1F465;</span>EQUIPE
+  </a>
+  <a class="nav-item" href="financeiro.html">
+    <span class="nav-icon">&#x1F4B0;</span>CAIXA
+  </a>
+  <a class="nav-item active" href="clientes.html">
+    <span class="nav-icon">&#x1F4CB;</span>CLIENTES
+  </a>
+  <a class="nav-item" href="relatorio.html">
+    <span class="nav-icon">&#x1F4CA;</span>RELATORIO
+  </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js?v=3"></script>
+<script src="js/utils.js?v=3"></script>
+<script>
+let shop = null;
+let allClients = [];
+
+const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
+const _params = new URLSearchParams(window.location.search);
+const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_viewing_shop');
+if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
+const isAdminViewing = !!adminViewingShop;
+const db = isAdminViewing
+  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', _SK)
+  : sb;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'index.html'; return; }
+
+  if (ADMIN_EMAILS.includes(session.user.email) && !isAdminViewing) {
+    window.location.href = 'admin.html';
+    return;
+  }
+
+  let shopData;
+  if (isAdminViewing) {
+    const { data } = await db.from('barbershops').select('*').eq('id', adminViewingShop).single();
+    shopData = data;
+  } else {
+    const { data } = await db.from('barbershops').select('*').eq('owner_id', session.user.id).maybeSingle();
+    shopData = data;
+  }
+
+  if (!shopData) { window.location.href = 'onboarding.html'; return; }
+  shop = shopData;
+
+  // Buscar todos os agendamentos done/confirmed pra consolidar clientes
+  const r = await fetch(_SB_REST + '/appointments?barbershop_id=eq.' + shop.id + '&status=in.(done,confirmed,pending)&select=client_name,client_phone,scheduled_at,status&order=scheduled_at.desc', {
+    headers: getServiceHeaders()
+  });
+  const appts = r.ok ? await r.json() : [];
+
+  // Consolidar clientes unicos por telefone
+  const map = {};
+  for (const a of appts) {
+    const phone = (a.client_phone || '').replace(/\D/g, '');
+    if (!phone) continue;
+    if (!map[phone]) {
+      map[phone] = {
+        name: a.client_name,
+        phone: a.client_phone,
+        phoneClean: phone,
+        visits: 0,
+        done: 0,
+        lastVisit: null,
+        firstVisit: null
+      };
+    }
+    map[phone].visits++;
+    if (a.status === 'done') map[phone].done++;
+    // Nome mais recente
+    if (!map[phone].lastVisit || a.scheduled_at > map[phone].lastVisit) {
+      map[phone].lastVisit = a.scheduled_at;
+      map[phone].name = a.client_name;
+    }
+    if (!map[phone].firstVisit || a.scheduled_at < map[phone].firstVisit) {
+      map[phone].firstVisit = a.scheduled_at;
+    }
+  });
+
+  allClients = Object.values(map).sort((a, b) => (b.lastVisit || '').localeCompare(a.lastVisit || ''));
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
+  document.getElementById('cli-total').textContent = allClients.length + ' cliente' + (allClients.length !== 1 ? 's' : '');
+
+  renderClients(allClients);
+});
+
+function filtrar() {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  if (!q) { renderClients(allClients); return; }
+  const filtered = allClients.filter(c =>
+    c.name.toLowerCase().includes(q) || c.phone.includes(q) || c.phoneClean.includes(q)
+  );
+  renderClients(filtered);
+}
+
+function renderClients(list) {
+  const el = document.getElementById('cli-list');
+
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div style="font-size:40px;margin-bottom:12px;">&#x1F4CB;</div><div>Nenhum cliente encontrado.</div></div>';
+    return;
+  }
+
+  el.innerHTML = list.map(c => {
+    const inicial = c.name.charAt(0).toUpperCase();
+    const ultima = c.lastVisit ? formatDate(c.lastVisit) : '—';
+    const primeira = c.firstVisit ? formatDate(c.firstVisit) : '—';
+
+    return '<div class="client-card">' +
+      '<div class="client-top">' +
+        '<div style="display:flex;align-items:center;gap:12px;">' +
+          '<div class="client-avatar">' + inicial + '</div>' +
+          '<div>' +
+            '<div class="client-name">' + esc(c.name) + '</div>' +
+            '<div class="client-phone">' + esc(c.phone) + '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="client-stats">' +
+        '<strong>' + c.done + '</strong> atendimento' + (c.done !== 1 ? 's' : '') +
+        ' · Ultima visita: ' + ultima +
+        ' · Cliente desde: ' + primeira +
+      '</div>' +
+      '<div class="client-actions">' +
+        '<a href="https://wa.me/55' + c.phoneClean + '" target="_blank" class="client-btn whatsapp">ZAP</a>' +
+        '<button class="client-btn" onclick="copiarTelefone(\'' + esc(c.phoneClean) + '\',this)">COPIAR TEL</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function copiarTelefone(phone, btn) {
+  navigator.clipboard.writeText(phone).then(() => {
+    btn.textContent = 'COPIADO!';
+    setTimeout(() => btn.textContent = 'COPIAR TEL', 2000);
+  });
+}
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script>
+</body>
+</html>
