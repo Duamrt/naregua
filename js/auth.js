@@ -130,24 +130,26 @@ async function redirectUser(user) {
 
   if (barber) { window.location.href = 'barbeiro.html'; return; }
 
-  // Tentar vincular: dono cadastrou o email mas barbeiro ainda nao tinha conta
-  const { data: pending } = await sb
-    .from('barbers')
-    .select('id')
-    .eq('email', user.email)
-    .is('user_id', null)
-    .eq('active', true)
-    .maybeSingle();
+  // Tentar vincular por telefone (email fake = telefone@naregua.app)
+  const phoneFromEmail = user.email.replace('@naregua.app', '');
+  if (user.email.endsWith('@naregua.app') && phoneFromEmail) {
+    const { data: pending } = await sb
+      .from('barbers')
+      .select('id')
+      .eq('phone', phoneFromEmail)
+      .is('user_id', null)
+      .eq('active', true)
+      .maybeSingle();
 
-  if (pending) {
-    // Vincular user_id via REST (service key pra bypass RLS)
-    await fetch(_SB_REST + '/barbers?id=eq.' + pending.id, {
-      method: 'PATCH',
-      headers: getServiceHeaders(),
-      body: JSON.stringify({ user_id: user.id })
-    });
-    window.location.href = 'barbeiro.html';
-    return;
+    if (pending) {
+      await fetch(_SB_REST + '/barbers?id=eq.' + pending.id, {
+        method: 'PATCH',
+        headers: getServiceHeaders(),
+        body: JSON.stringify({ user_id: user.id })
+      });
+      window.location.href = 'barbeiro.html';
+      return;
+    }
   }
 
   window.location.href = 'onboarding.html';

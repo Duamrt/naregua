@@ -265,8 +265,71 @@
     </div>
   </div>
 
+  <!-- Link barbeiro -->
+  <div style="margin-top:24px;position:relative;z-index:1;">
+    <a href="#" onclick="mostrarLoginBarbeiro();return false;" style="font-size:12px;color:#525252;text-decoration:none;font-weight:600;letter-spacing:0.5px;">Sou barbeiro</a>
+  </div>
+
   <div class="login-footer">NaRegua &copy; 2026</div>
 
+</div>
+
+<!-- Modal Login Barbeiro -->
+<div id="modal-barbeiro" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#0a0a0a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px 24px;width:100%;max-width:380px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div style="font-size:16px;font-weight:700;">Entrar como barbeiro</div>
+      <button onclick="fecharModalBarbeiro()" style="background:none;border:none;color:#525252;font-size:18px;cursor:pointer;">&#x2715;</button>
+    </div>
+    <div id="barb-msg" class="login-msg" style="margin-bottom:12px;"></div>
+
+    <!-- Tab: login ou criar -->
+    <div style="display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid rgba(255,255,255,0.06);">
+      <button class="barb-tab active" data-tab="login" onclick="switchBarbTab('login')" style="flex:1;padding:10px 0;background:none;border:none;border-bottom:2px solid #d4a853;color:#d4a853;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:1px;">ENTRAR</button>
+      <button class="barb-tab" data-tab="signup" onclick="switchBarbTab('signup')" style="flex:1;padding:10px 0;background:none;border:none;border-bottom:2px solid transparent;color:#525252;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:1px;">PRIMEIRO ACESSO</button>
+    </div>
+
+    <!-- Form login barbeiro -->
+    <div id="barb-form-login">
+      <div class="login-field">
+        <label class="login-label">TELEFONE</label>
+        <input class="login-input" type="tel" id="barb-phone-login" placeholder="(00) 00000-0000" inputmode="numeric" autocomplete="tel">
+      </div>
+      <div class="login-field">
+        <label class="login-label">SENHA</label>
+        <div class="login-input-wrap">
+          <input class="login-input" type="password" id="barb-senha-login" placeholder="Sua senha" autocomplete="current-password" style="padding-right:44px;">
+          <button type="button" class="login-eye" onclick="toggleBarbPass(this)">&#x1F441;</button>
+        </div>
+      </div>
+      <button onclick="loginBarbeiro()" id="btn-barb-login" class="login-btn login-btn-primary">
+        <span class="btn-label">ENTRAR</span>
+        <div class="spinner" style="display:none;"></div>
+      </button>
+    </div>
+
+    <!-- Form primeiro acesso -->
+    <div id="barb-form-signup" style="display:none;">
+      <div style="font-size:12px;color:var(--texto-muted);margin-bottom:16px;line-height:1.5;">
+        O dono da barbearia precisa ter cadastrado seu telefone na equipe. Digite o mesmo numero e crie uma senha.
+      </div>
+      <div class="login-field">
+        <label class="login-label">TELEFONE</label>
+        <input class="login-input" type="tel" id="barb-phone-signup" placeholder="(00) 00000-0000" inputmode="numeric" autocomplete="tel">
+      </div>
+      <div class="login-field">
+        <label class="login-label">CRIAR SENHA</label>
+        <div class="login-input-wrap">
+          <input class="login-input" type="password" id="barb-senha-signup" placeholder="Minimo 6 caracteres" autocomplete="new-password" style="padding-right:44px;">
+          <button type="button" class="login-eye" onclick="toggleBarbPass(this)">&#x1F441;</button>
+        </div>
+      </div>
+      <button onclick="signupBarbeiro()" id="btn-barb-signup" class="login-btn login-btn-primary">
+        <span class="btn-label">CRIAR ACESSO</span>
+        <div class="spinner" style="display:none;"></div>
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- Supabase CDN -->
@@ -292,6 +355,149 @@ function showMsg(text, type) {
 }
 function hideMsg() {
   document.getElementById('auth-msg').className = 'login-msg';
+}
+
+// ── Modal Barbeiro ──────────────────────────────────────────
+function phoneToEmail(phone) {
+  return phone.replace(/\D/g, '') + '@naregua.app';
+}
+
+function maskPhone(input) {
+  let v = input.value.replace(/\D/g, '');
+  if (v.length > 11) v = v.slice(0, 11);
+  if (v.length > 6) v = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+  else if (v.length > 2) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
+  else if (v.length > 0) v = '(' + v;
+  input.value = v;
+}
+
+// Aplicar mascara nos inputs
+['barb-phone-login','barb-phone-signup'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', () => maskPhone(el));
+});
+
+function mostrarLoginBarbeiro() {
+  document.getElementById('modal-barbeiro').style.display = 'flex';
+  document.getElementById('barb-phone-login').focus();
+}
+
+function fecharModalBarbeiro() {
+  document.getElementById('modal-barbeiro').style.display = 'none';
+  document.getElementById('barb-msg').className = 'login-msg';
+}
+
+function toggleBarbPass(btn) {
+  const input = btn.previousElementSibling;
+  const isPass = input.type === 'password';
+  input.type = isPass ? 'text' : 'password';
+  btn.textContent = isPass ? '\u{1F648}' : '\u{1F441}';
+}
+
+function switchBarbTab(tab) {
+  document.querySelectorAll('.barb-tab').forEach(t => {
+    t.style.borderBottomColor = t.dataset.tab === tab ? '#d4a853' : 'transparent';
+    t.style.color = t.dataset.tab === tab ? '#d4a853' : '#525252';
+  });
+  document.getElementById('barb-form-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('barb-form-signup').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('barb-msg').className = 'login-msg';
+}
+
+function showBarbMsg(text, type) {
+  const el = document.getElementById('barb-msg');
+  el.textContent = text;
+  el.className = 'login-msg login-msg-' + type + ' show';
+}
+
+async function loginBarbeiro() {
+  const phone = document.getElementById('barb-phone-login').value.replace(/\D/g, '');
+  const senha = document.getElementById('barb-senha-login').value;
+  const btn = document.getElementById('btn-barb-login');
+
+  if (phone.length < 10) { showBarbMsg('Informe um telefone valido com DDD.', 'error'); return; }
+  if (senha.length < 6) { showBarbMsg('Senha deve ter pelo menos 6 caracteres.', 'error'); return; }
+
+  setLoading(btn, true);
+  const email = phoneToEmail(phone);
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: senha });
+  setLoading(btn, false);
+
+  if (error) {
+    showBarbMsg('Telefone ou senha incorretos.', 'error');
+    return;
+  }
+
+  // Verificar se realmente e barbeiro
+  const { data: barber } = await sb.from('barbers').select('id').eq('user_id', data.user.id).eq('active', true).maybeSingle();
+  if (!barber) {
+    await sb.auth.signOut();
+    showBarbMsg('Sua conta nao esta vinculada a nenhuma barbearia.', 'error');
+    return;
+  }
+
+  window.location.href = 'barbeiro.html';
+}
+
+async function signupBarbeiro() {
+  const phone = document.getElementById('barb-phone-signup').value.replace(/\D/g, '');
+  const senha = document.getElementById('barb-senha-signup').value;
+  const btn = document.getElementById('btn-barb-signup');
+
+  if (phone.length < 10) { showBarbMsg('Informe um telefone valido com DDD.', 'error'); return; }
+  if (senha.length < 6) { showBarbMsg('Senha deve ter pelo menos 6 caracteres.', 'error'); return; }
+
+  // Verificar se o telefone foi cadastrado pelo dono
+  const r = await fetch(_SB_REST + '/barbers?phone=eq.' + phone + '&active=is.true&user_id=is.null&select=id,name', {
+    headers: getServiceHeaders()
+  });
+  const pendentes = r.ok ? await r.json() : [];
+
+  if (!pendentes.length) {
+    showBarbMsg('Telefone nao encontrado. Peca ao dono da barbearia pra cadastrar seu numero na equipe.', 'error');
+    return;
+  }
+
+  setLoading(btn, true);
+  const email = phoneToEmail(phone);
+
+  const { data, error } = await sb.auth.signUp({
+    email,
+    password: senha,
+    options: { data: { nome: pendentes[0].name, role: 'barber' } }
+  });
+
+  if (error) {
+    setLoading(btn, false);
+    if (error.message.includes('already registered')) {
+      showBarbMsg('Esse telefone ja tem conta. Use ENTRAR.', 'error');
+    } else {
+      showBarbMsg('Erro ao criar conta. Tente novamente.', 'error');
+    }
+    return;
+  }
+
+  // Vincular user_id no barbeiro
+  if (data.user) {
+    await fetch(_SB_REST + '/barbers?id=eq.' + pendentes[0].id, {
+      method: 'PATCH',
+      headers: getServiceHeaders(),
+      body: JSON.stringify({ user_id: data.user.id })
+    });
+  }
+
+  setLoading(btn, false);
+
+  if (data.session) {
+    window.location.href = 'barbeiro.html';
+  } else {
+    // Caso precise confirmar email (nao deve, pq e @naregua.app)
+    showBarbMsg('Conta criada! Agora faca login.', 'success');
+    switchBarbTab('login');
+    document.getElementById('barb-phone-login').value = document.getElementById('barb-phone-signup').value;
+    document.getElementById('barb-senha-login').focus();
+  }
 }
 </script>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js')}</script>

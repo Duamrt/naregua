@@ -136,8 +136,8 @@
       <input type="text" id="eq-nome" placeholder="Ex: Joao, Maria">
     </div>
     <div class="field">
-      <label>E-MAIL (pra login do barbeiro)</label>
-      <input type="email" id="eq-email" placeholder="barbeiro@email.com">
+      <label>TELEFONE (pra login do barbeiro)</label>
+      <input type="tel" id="eq-phone" placeholder="(00) 00000-0000" inputmode="numeric">
       <div style="font-size:10px;color:var(--texto-muted);margin-top:4px;">Se preencher, o barbeiro pode criar conta e ver a agenda dele</div>
     </div>
     <div class="field">
@@ -186,7 +186,17 @@
 <script src="js/supabase.js?v=3"></script>
 <script src="js/utils.js?v=3"></script>
 <script>
-console.log('Equipe v1 carregado');
+console.log('Equipe v2 carregado');
+
+// Mascara telefone
+document.getElementById('eq-phone').addEventListener('input', function() {
+  let v = this.value.replace(/\D/g, '');
+  if (v.length > 11) v = v.slice(0, 11);
+  if (v.length > 6) v = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+  else if (v.length > 2) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
+  else if (v.length > 0) v = '(' + v;
+  this.value = v;
+});
 
 // ── Estado ────────────────────────────────────────────────────
 let shop = null;
@@ -272,7 +282,7 @@ function renderBarbers() {
       : dias.length > 0 ? dias.map(d => DIAS_LABEL[d]).join(', ')
       : 'Sem dias definidos';
     const horario = (b.working_start || '08:00') + ' - ' + (b.working_end || '19:00');
-    const emailInfo = b.email ? '<div class="eq-meta">&#x1F4E7; ' + esc(b.email) + (b.user_id ? ' · vinculado' : ' · aguardando cadastro') + '</div>' : '';
+    const phoneInfo = b.phone ? '<div class="eq-meta">&#x1F4F1; ' + esc(b.phone) + (b.user_id ? ' · vinculado' : ' · aguardando cadastro') + '</div>' : '';
 
     return `<div class="eq-card ${cardCls}">
       <div class="eq-top">
@@ -282,7 +292,7 @@ function renderBarbers() {
             <div class="eq-name">${esc(b.name)}</div>
             <div class="eq-meta">${comissao} comissao · <span class="eq-badge ${badgeCls}">${badgeLabel}</span></div>
             <div class="eq-meta">${diasStr} · ${horario}</div>
-            ${emailInfo}
+            ${phoneInfo}
           </div>
         </div>
       </div>
@@ -311,7 +321,7 @@ function abrirModal() {
   document.getElementById('modal-eq-title').textContent = 'Novo Profissional';
   document.getElementById('eq-edit-id').value = '';
   document.getElementById('eq-nome').value = '';
-  document.getElementById('eq-email').value = '';
+  document.getElementById('eq-phone').value = '';
   document.getElementById('eq-comissao').value = '0';
   editDays = shop.days_open || [1,2,3,4,5,6];
   renderEditDays();
@@ -328,7 +338,7 @@ function editar(id) {
   document.getElementById('modal-eq-title').textContent = 'Editar Profissional';
   document.getElementById('eq-edit-id').value = b.id;
   document.getElementById('eq-nome').value = b.name;
-  document.getElementById('eq-email').value = b.email || '';
+  document.getElementById('eq-phone').value = b.phone || '';
   document.getElementById('eq-comissao').value = b.commission_pct || 0;
   editDays = b.working_days || shop.days_open || [1,2,3,4,5,6];
   renderEditDays();
@@ -358,10 +368,10 @@ async function salvar() {
   btn.querySelector('.btn-label').style.display = 'none';
   btn.querySelector('.spinner').style.display = 'inline-block';
 
-  const email = document.getElementById('eq-email').value.trim().toLowerCase();
+  const phone = document.getElementById('eq-phone').value.replace(/\D/g, '');
 
   const payload = {
-    name: nome, commission_pct: comissao, email: email || null,
+    name: nome, commission_pct: comissao, phone: phone || null,
     working_days: editDays, working_start: horaInicio, working_end: horaFim
   };
 
