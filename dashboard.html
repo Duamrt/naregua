@@ -719,9 +719,17 @@ function renderAppointments() {
   el.innerHTML = `<div class="barbers-grid">${columns.map(col => {
     const inicial = col.barber.name.charAt(0).toUpperCase();
     const cards = col.appts.map(a => renderApptCard(a)).join('');
-    const empty = col.appts.length === 0
-      ? `<div class="barber-empty">Livre${isToday(currentDate) ? ' hoje' : ''}</div>`
-      : '';
+    // Verificar se e folga ou livre
+    let empty = '';
+    if (col.appts.length === 0) {
+      const dow = currentDate.getDay();
+      const sched = col.barber.schedule;
+      const workDays = col.barber.working_days || [];
+      const isFolga = sched ? !sched[dow] : (workDays.length > 0 && !workDays.includes(dow));
+      empty = isFolga
+        ? '<div class="barber-empty" style="color:#f59e0b;">FOLGA</div>'
+        : '<div class="barber-empty">Sem agendamentos</div>';
+    }
 
     return `<div class="barber-column">
       <div class="barber-header">
