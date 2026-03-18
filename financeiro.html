@@ -506,7 +506,7 @@ async function renderPeriod() {
         </div>
         <div style="display:flex;align-items:center;">
           <div class="fin-item-val" style="color:#e74c3c;">-${formatMoney(e.amount)}</div>
-          <button class="fin-item-del" onclick="excluirDespesa('${e.id}', this)">✕</button>
+          <button class="fin-item-del" onclick="excluirDespesa('${esc(e.id)}', this)">✕</button>
         </div>
       </div>`;
     }).join('');

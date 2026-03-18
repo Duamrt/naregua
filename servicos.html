@@ -246,8 +246,8 @@ function renderServices() {
         <div class="svc-price">${formatMoney(s.price)}</div>
       </div>
       <div class="svc-actions">
-        <button class="svc-btn" onclick="editarServico('${s.id}')">Editar</button>
-        <button class="svc-btn ${toggleCls}" onclick="toggleServico('${s.id}', ${!s.active})">${toggleLabel}</button>
+        <button class="svc-btn" onclick="editarServico('${esc(s.id)}')">Editar</button>
+        <button class="svc-btn ${toggleCls}" onclick="toggleServico('${esc(s.id)}', ${!s.active})">${toggleLabel}</button>
         <button class="svc-btn danger" onclick="excluirServico('${s.id}', '${esc(s.name)}', this)">Excluir</button>
       </div>
     </div>`;

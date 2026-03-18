@@ -500,7 +500,7 @@ function renderServices() {
 
   el.innerHTML = filtered.map(s => `
     <div class="option-card ${selectedService?.id === s.id ? 'selected' : ''}"
-         onclick="selectService('${s.id}')">
+         onclick="selectService('${esc(s.id)}')">
       <div>
         <div class="name">${esc(s.name)}</div>
         <div class="detail">${s.blocks_all_day ? 'Dia inteiro — equipe exclusiva' : s.duration_min + ' min'}</div>
@@ -537,7 +537,7 @@ function renderBarbers() {
     const horario = (b.working_start || shop.opening_time || '08:00') + ' - ' + (b.working_end || shop.closing_time || '19:00');
     return `
     <div class="option-card ${selectedBarber?.id === b.id ? 'selected' : ''}"
-         onclick="selectBarber('${b.id}')">
+         onclick="selectBarber('${esc(b.id)}')">
       <div>
         <div class="name">${esc(b.name)}</div>
         <div class="detail">${horario}</div>

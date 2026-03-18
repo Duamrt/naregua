@@ -273,8 +273,8 @@ function renderBarbers() {
         </div>
       </div>
       <div class="eq-actions">
-        <button class="eq-btn" onclick="editar('${b.id}')">Editar</button>
-        <button class="eq-btn ${toggleCls}" onclick="toggle('${b.id}', ${!b.active})">${toggleLabel}</button>
+        <button class="eq-btn" onclick="editar('${esc(b.id)}')">Editar</button>
+        <button class="eq-btn ${toggleCls}" onclick="toggle('${esc(b.id)}', ${!b.active})">${toggleLabel}</button>
         <button class="eq-btn danger" onclick="excluir('${b.id}', '${esc(b.name)}', this)">Excluir</button>
       </div>
     </div>`;
@@ -413,6 +413,8 @@ async function excluir(id, nome, btnEl) {
   }
 
   // Segundo clique: cancelar agendamentos pendentes e deletar barbeiro
+  btnEl.disabled = true;
+  btnEl.textContent = '...';
   const pendentesCount = parseInt(btnEl.dataset.pendentes || '0');
   if (pendentesCount > 0) {
     await fetch(SB_REST + '/appointments?barber_id=eq.' + id + '&status=in.(pending,confirmed)', {

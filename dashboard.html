@@ -740,22 +740,21 @@ function renderApptCard(a) {
   let actions = '';
   if (a.status === 'pending') {
     actions = `
-      <button class="appt-btn btn-confirm-appt" onclick="updateStatus('${a.id}','confirmed',this)">CONFIRMAR</button>
-      <button class="appt-btn btn-cancel-appt" onclick="cancelarComVaga('${a.id}',this)">CANCELAR</button>
-      ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${a.id}')">ZAP</button>` : ''}
+      <button class="appt-btn btn-confirm-appt" onclick="updateStatus('${esc(a.id)}','confirmed',this)">CONFIRMAR</button>
+      <button class="appt-btn btn-cancel-appt" onclick="cancelarComVaga('${esc(a.id)}',this)">CANCELAR</button>
+      ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${esc(a.id)}')">ZAP</button>` : ''}
     `;
   } else if (a.status === 'confirmed') {
     if (jaPassou) {
-      // Horário já passou — mostrar ATENDIDO ou FALTOU
       actions = `
-        <button class="appt-btn btn-done-appt" onclick="abrirModalPagamento('${a.id}')">ATENDIDO</button>
-        <button class="appt-btn btn-noshow" onclick="updateStatus('${a.id}','no_show',this)">FALTOU</button>
+        <button class="appt-btn btn-done-appt" onclick="abrirModalPagamento('${esc(a.id)}')">ATENDIDO</button>
+        <button class="appt-btn btn-noshow" onclick="updateStatus('${esc(a.id)}','no_show',this)">FALTOU</button>
       `;
     } else {
       actions = `
-        <button class="appt-btn btn-done-appt" onclick="abrirModalPagamento('${a.id}')">CONCLUIR</button>
-        <button class="appt-btn btn-cancel-appt" onclick="cancelarComVaga('${a.id}',this)">CANCELAR</button>
-        ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${a.id}')">ZAP</button>` : ''}
+        <button class="appt-btn btn-done-appt" onclick="abrirModalPagamento('${esc(a.id)}')">CONCLUIR</button>
+        <button class="appt-btn btn-cancel-appt" onclick="cancelarComVaga('${esc(a.id)}',this)">CANCELAR</button>
+        ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${esc(a.id)}')">ZAP</button>` : ''}
       `;
     }
   } else if (a.status === 'cancelled' || a.status === 'no_show') {

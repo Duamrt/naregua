@@ -453,11 +453,11 @@ function renderShops() {
         <span>Faturado: <strong>${formatMoney(shopRevenue)}</strong></span>
       </div>
       <div class="shop-actions">
-        <button class="shop-action-btn" style="border-color:rgba(212,168,83,0.3);color:var(--verde-acao);font-weight:700;" onclick="entrarComo('${s.id}')">Entrar como</button>
-        <button class="shop-action-btn" onclick="editarShop('${s.id}')">Editar</button>
-        <button class="shop-action-btn" onclick="copiarLinkShop('${s.slug}')">Copiar link</button>
-        <button class="shop-action-btn" onclick="window.open('${baseUrl}agendar.html?slug=${s.slug}','_blank')">Ver página</button>
-        <button class="shop-action-btn danger" onclick="excluirShop('${s.id}')">Excluir</button>
+        <button class="shop-action-btn" style="border-color:rgba(212,168,83,0.3);color:var(--verde-acao);font-weight:700;" onclick="entrarComo('${esc(s.id)}')">Entrar como</button>
+        <button class="shop-action-btn" onclick="editarShop('${esc(s.id)}')">Editar</button>
+        <button class="shop-action-btn" onclick="copiarLinkShop('${esc(s.slug)}')">Copiar link</button>
+        <button class="shop-action-btn" onclick="window.open('${baseUrl}agendar.html?slug=${esc(s.slug)}','_blank')">Ver página</button>
+        <button class="shop-action-btn danger" onclick="excluirShop('${esc(s.id)}')">Excluir</button>
       </div>
     </div>`;
   }).join('');
@@ -615,6 +615,14 @@ async function salvarAdmin() {
   let slug = gerarSlug(name);
 
   if (!name) { showAdmMsg('Informe o nome.', 'error'); return; }
+
+  // Avisar se slug vai mudar (quebra links antigos)
+  if (editId) {
+    const shopAtual = allShops.find(s => s.id === editId);
+    if (shopAtual && shopAtual.slug !== slug && shopAtual.slug) {
+      if (!confirm('Mudar o nome altera o link de agendamento. Links antigos vão parar de funcionar. Continuar?')) return;
+    }
+  }
 
   // BUG 9 FIX: verificar se slug já existe (excluindo o próprio registro se editando)
   let slugQuery = sbAdmin.from('barbershops').select('id').eq('slug', slug);
