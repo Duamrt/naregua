@@ -531,7 +531,7 @@ function editarShop(id) {
   editDays = [...(s.days_open || [1,2,3,4,5,6])];
   renderAdmDays();
 
-  editShopBarbers = allBarbers.filter(b => b.barbershop_id === id).map(b => ({ id: b.id, name: b.name }));
+  editShopBarbers = allBarbers.filter(b => b.barbershop_id === id).map(b => ({ id: b.id, name: b.name, phone: b.phone || '', user_id: b.user_id, active: b.active }));
   renderAdmBarbers();
 
   editShopServices = allServices.filter(sv => sv.barbershop_id === id).map(sv => ({ id: sv.id, name: sv.name, price: sv.price, duration_min: sv.duration_min }));
@@ -600,12 +600,19 @@ function toggleAdmDay(i) {
 }
 
 function renderAdmBarbers() {
-  document.getElementById('adm-barbers').innerHTML = editShopBarbers.map((b, i) =>
-    `<div class="barber-row">
-      <input type="text" value="${esc(b.name)}" onchange="editShopBarbers[${i}].name=this.value">
-      <button class="barber-row-del" onclick="editShopBarbers.splice(${i},1);renderAdmBarbers()">✕</button>
-    </div>`
-  ).join('');
+  document.getElementById('adm-barbers').innerHTML = editShopBarbers.map((b, i) => {
+    const status = b.user_id ? '<span style="font-size:9px;color:#22c55e;font-weight:700;">VINCULADO</span>' : (b.phone ? '<span style="font-size:9px;color:#f59e0b;font-weight:700;">AGUARDANDO</span>' : '');
+    return `<div style="background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;padding:10px;margin-bottom:6px;">
+      <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
+        <input type="text" value="${esc(b.name)}" onchange="editShopBarbers[${i}].name=this.value" placeholder="Nome" style="flex:1;padding:6px 8px;background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:6px;color:var(--texto-principal);font-size:12px;font-family:inherit;">
+        <button class="barber-row-del" onclick="editShopBarbers.splice(${i},1);renderAdmBarbers()">&#x2715;</button>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <input type="tel" value="${esc(b.phone || '')}" onchange="editShopBarbers[${i}].phone=this.value.replace(/\\D/g,'')" placeholder="Telefone (login)" style="flex:1;padding:6px 8px;background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:6px;color:var(--texto-principal);font-size:12px;font-family:inherit;">
+        ${status}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function renderAdmServices() {
@@ -627,7 +634,7 @@ function admAddService() {
 }
 
 function admAddBarber() {
-  editShopBarbers.push({ id: null, name: '' });
+  editShopBarbers.push({ id: null, name: '', phone: '' });
   renderAdmBarbers();
   const inputs = document.querySelectorAll('#adm-barbers input');
   if (inputs.length) inputs[inputs.length - 1].focus();
@@ -728,10 +735,10 @@ async function salvarAdmin() {
     for (const b of editShopBarbers) {
       if (!b.name.trim()) continue;
       if (b.id) {
-        await sbAdmin.from('barbers').update({ name: b.name.trim() }).eq('id', b.id);
+        await sbAdmin.from('barbers').update({ name: b.name.trim(), phone: b.phone || null }).eq('id', b.id);
       } else {
         await sbAdmin.from('barbers').insert({
-          barbershop_id: shopId, name: b.name.trim(), commission_pct: 0, active: true
+          barbershop_id: shopId, name: b.name.trim(), phone: b.phone || null, commission_pct: 0, active: true
         });
       }
     }
