@@ -189,7 +189,7 @@
 </div>
 
 <!-- Modal despesa -->
-<div class="modal-overlay" id="modal-despesa">
+<div class="modal-overlay" id="modal-despesa" onclick="if(event.target===this)fecharModalDespesa()">
   <div class="modal">
     <div class="modal-title">
       <h2 id="modal-desp-title">Nova Despesa</h2>
@@ -256,6 +256,7 @@
 // ── Estado ────────────────────────────────────────────────────
 let shop = null;
 let services = [];
+let barbersList = []; // BUG 5 FIX: barbeiros pra calcular comissão
 let currentPeriod = 'dia'; // 'dia' ou 'mes'
 let currentDate = new Date();
 const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -265,12 +266,9 @@ const CAT_LABELS = {
   comissao:'Comissão', imposto:'Imposto', outros:'Outros'
 };
 
-const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs';
-const SB_REST = 'https://jsydprrcyrjjxdmzrqpz.supabase.co/rest/v1';
-const REST_HEADERS = {
-  'apikey': SERVICE_KEY,
-  'Authorization': 'Bearer ' + SERVICE_KEY
-};
+// BUG 3 FIX: service key centralizada em utils.js (_SK, _SB_REST, getServiceHeaders)
+const SB_REST = _SB_REST;
+const REST_HEADERS = getServiceHeaders();
 
 async function restGet(table, filter) {
   const r = await fetch(SB_REST + '/' + table + '?' + filter, { headers: REST_HEADERS });
@@ -297,7 +295,7 @@ const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_vi
 if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
 const isAdminViewing = !!adminViewingShop;
 const db = isAdminViewing
-  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs')
+  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', _SK)
   : sb;
 
 // ── Init ──────────────────────────────────────────────────────
@@ -331,8 +329,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelector('.fin-container').insertBefore(banner, document.querySelector('.fin-header'));
   }
 
-  const { data: svcData } = await db.from('services').select('*').eq('barbershop_id', shop.id);
-  services = svcData || [];
+  const [svcRes, barbRes] = await Promise.all([
+    db.from('services').select('*').eq('barbershop_id', shop.id),
+    db.from('barbers').select('*').eq('barbershop_id', shop.id)
+  ]);
+  services = svcRes.data || [];
+  barbersList = barbRes.data || [];
 
   document.getElementById('desp-data').value = new Date().toISOString().split('T')[0];
   renderPeriod();
@@ -419,13 +421,27 @@ async function renderPeriod() {
     + '&order=date.asc');
 
   // Calcular totais
+  // BUG 7 FIX: price_paid como fonte primária, service.price como fallback
   const totalReceita = entradas.reduce((s, a) => {
-    if (a.price_paid != null) return s + Number(a.price_paid);
-    const svc = services.find(sv => sv.id === a.service_id);
-    return s + (svc ? Number(svc.price) : 0);
+    const valor = Number(a.price_paid) || (() => { const svc = services.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })();
+    return s + valor;
   }, 0);
   const totalDespesa = saidas.reduce((s, e) => s + Number(e.amount || 0), 0);
-  const lucro = totalReceita - totalDespesa;
+
+  // BUG 5 FIX: calcular comissão por barbeiro
+  let totalComissao = 0;
+  const comissaoPorBarbeiro = {};
+  entradas.forEach(a => {
+    const barber = barbersList.find(b => b.id === a.barber_id);
+    if (!barber || !barber.commission_pct) return;
+    const valor = Number(a.price_paid) || (() => { const svc = services.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })();
+    const comissao = valor * (barber.commission_pct / 100);
+    totalComissao += comissao;
+    if (!comissaoPorBarbeiro[barber.id]) comissaoPorBarbeiro[barber.id] = { name: barber.name, pct: barber.commission_pct, total: 0 };
+    comissaoPorBarbeiro[barber.id].total += comissao;
+  });
+
+  const lucro = totalReceita - totalDespesa - totalComissao;
   const margem = totalReceita > 0 ? (lucro / totalReceita * 100) : 0;
 
   // Cards
@@ -436,7 +452,13 @@ async function renderPeriod() {
 
   document.getElementById('fin-lucro').textContent = formatMoney(lucro);
   document.getElementById('fin-lucro').style.color = lucro >= 0 ? 'var(--verde-acao)' : '#e74c3c';
-  document.getElementById('fin-margem').textContent = totalReceita > 0 ? `Margem ${margem.toFixed(0)}%` : '';
+  // BUG 5 FIX: mostrar comissão no detalhe do lucro
+  let margemText = totalReceita > 0 ? `Margem ${margem.toFixed(0)}%` : '';
+  if (totalComissao > 0) {
+    const comissaoDetail = Object.values(comissaoPorBarbeiro).map(c => `${esc(c.name)}: ${formatMoney(c.total)} (${c.pct}%)`).join(' · ');
+    margemText += (margemText ? ' · ' : '') + `Comissões: ${formatMoney(totalComissao)} — ${comissaoDetail}`;
+  }
+  document.getElementById('fin-margem').textContent = margemText;
 
   const fill = document.getElementById('margin-fill');
   fill.style.width = Math.max(0, Math.min(100, margem)) + '%';

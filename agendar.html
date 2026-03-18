@@ -519,10 +519,19 @@ function selectService(id) {
 // ── Barbeiros ─────────────────────────────────────────────────
 function renderBarbers() {
   const el = document.getElementById('barbers-list');
+  // BUG 2 FIX: Se não tem barbeiros, mostrar mensagem e desabilitar avanço
+  if (barbers.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;font-size:13px;color:var(--texto-muted);">Esta barbearia ainda não cadastrou profissionais.</div>';
+    const btnStep2 = document.querySelector('#ag-step-2 .btn-primary');
+    if (btnStep2) btnStep2.disabled = true;
+    return;
+  }
   // Se só tem 1 barbeiro, seleciona automaticamente
   if (barbers.length === 1) {
     selectedBarber = barbers[0];
   }
+  const btnStep2 = document.querySelector('#ag-step-2 .btn-primary');
+  if (btnStep2) btnStep2.disabled = false;
   el.innerHTML = barbers.map(b => {
     const horario = (b.working_start || shop.opening_time || '08:00') + ' - ' + (b.working_end || shop.closing_time || '19:00');
     return `
@@ -746,7 +755,8 @@ async function confirmarAgendamento() {
   btn.querySelector('.spinner').style.display = 'inline-block';
   msgEl.className = 'msg';
 
-  const scheduledAt = new Date(selectedDate + 'T' + selectedTime + ':00');
+  // BUG 4 FIX: enviar como string pura, sem conversão de timezone
+  const scheduledAtStr = selectedDate + 'T' + selectedTime + ':00';
   const isDiaInteiro = selectedService.blocks_all_day;
 
   // ── Dia inteiro: verificar se dia ainda está livre ──
@@ -777,7 +787,7 @@ async function confirmarAgendamento() {
       service_id: selectedService.id,
       client_name: nome,
       client_phone: phone,
-      scheduled_at: scheduledAt.toISOString(),
+      scheduled_at: scheduledAtStr,
       status: 'pending',
       group_id: groupId
     }));
@@ -822,7 +832,9 @@ async function confirmarAgendamento() {
 
   // ── Agendamento normal ──
   const duration = selectedService.duration_min || 30;
-  const slotEnd = new Date(scheduledAt.getTime() + duration * 60000);
+  // BUG 4 FIX: usar Date local apenas pra cálculo de conflito, nunca pra enviar ao banco
+  const scheduledAtLocal = new Date(scheduledAtStr);
+  const slotEnd = new Date(scheduledAtLocal.getTime() + duration * 60000);
 
   // Verificar conflito antes de salvar (evita duplicata)
   const { data: conflitos } = await sb
@@ -839,7 +851,7 @@ async function confirmarAgendamento() {
     const aSvc = services.find(s => s.id === a.service_id);
     const aDur = aSvc ? aSvc.duration_min : 30;
     const aEnd = new Date(aStart.getTime() + aDur * 60000);
-    return scheduledAt < aEnd && slotEnd > aStart;
+    return scheduledAtLocal < aEnd && slotEnd > aStart;
   });
 
   if (temConflito) {
@@ -876,7 +888,8 @@ async function confirmarAgendamento() {
     return;
   }
 
-  const { error } = await sb
+  // BUG 1 FIX: inserir primeiro, depois verificar race condition
+  const { data: inserted, error } = await sb
     .from('appointments')
     .insert({
       barbershop_id: shop.id,
@@ -884,19 +897,55 @@ async function confirmarAgendamento() {
       service_id: selectedService.id,
       client_name: nome,
       client_phone: phone,
-      scheduled_at: scheduledAt.toISOString(),
+      scheduled_at: scheduledAtStr,
       status: 'pending'
-    });
-
-  btn.disabled = false;
-  btn.querySelector('.btn-label').style.display = 'inline';
-  btn.querySelector('.spinner').style.display = 'none';
+    })
+    .select()
+    .single();
 
   if (error) {
+    btn.disabled = false;
+    btn.querySelector('.btn-label').style.display = 'inline';
+    btn.querySelector('.spinner').style.display = 'none';
     console.error(error);
     showAgMsg('Erro ao agendar. Tente novamente.', 'error');
     return;
   }
+
+  // Verificar se outro agendamento foi inserido no mesmo horário (race condition)
+  const { data: duplicatas } = await sb
+    .from('appointments')
+    .select('id,scheduled_at,service_id')
+    .eq('barbershop_id', shop.id)
+    .eq('barber_id', selectedBarber.id)
+    .in('status', ['pending', 'confirmed'])
+    .gte('scheduled_at', selectedDate + 'T00:00:00')
+    .lte('scheduled_at', selectedDate + 'T23:59:59')
+    .neq('id', inserted.id);
+
+  const conflitoPosInsert = (duplicatas || []).some(a => {
+    const aStart = new Date(a.scheduled_at);
+    const aSvc = services.find(s => s.id === a.service_id);
+    const aDur = aSvc ? aSvc.duration_min : 30;
+    const aEnd = new Date(aStart.getTime() + aDur * 60000);
+    return scheduledAtLocal < aEnd && slotEnd > aStart;
+  });
+
+  if (conflitoPosInsert) {
+    // Desfazer: deletar o que acabou de inserir
+    await sb.from('appointments').delete().eq('id', inserted.id);
+    btn.disabled = false;
+    btn.querySelector('.btn-label').style.display = 'inline';
+    btn.querySelector('.spinner').style.display = 'none';
+    showAgMsg('Horário acabou de ser ocupado por outro cliente. Escolha outro.', 'error');
+    await renderTimes();
+    agBack(3);
+    return;
+  }
+
+  btn.disabled = false;
+  btn.querySelector('.btn-label').style.display = 'inline';
+  btn.querySelector('.spinner').style.display = 'none';
 
   // Sucesso
   const dateFormatted = selectedDate.split('-').reverse().join('/');

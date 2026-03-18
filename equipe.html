@@ -116,7 +116,7 @@
 </div>
 
 <!-- Modal -->
-<div class="modal-overlay" id="modal-eq">
+<div class="modal-overlay" id="modal-eq" onclick="if(event.target===this)fecharModal()">
   <div class="modal">
     <div class="modal-title">
       <h2 id="modal-eq-title">Novo Profissional</h2>
@@ -182,14 +182,9 @@ let barbers = [];
 let editDays = [1,2,3,4,5,6];
 const DIAS_LABEL = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
-const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs';
-const SB_REST = 'https://jsydprrcyrjjxdmzrqpz.supabase.co/rest/v1';
-const REST_HEADERS = {
-  'apikey': SERVICE_KEY,
-  'Authorization': 'Bearer ' + SERVICE_KEY,
-  'Content-Type': 'application/json',
-  'Prefer': 'return=representation'
-};
+// BUG 3 FIX: service key centralizada em utils.js (_SK, _SB_REST, getServiceHeaders)
+const SB_REST = _SB_REST;
+const REST_HEADERS = getServiceHeaders();
 
 const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
 const _params = new URLSearchParams(window.location.search);
@@ -197,7 +192,7 @@ const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_vi
 if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
 const isAdminViewing = !!adminViewingShop;
 const db = isAdminViewing
-  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', SERVICE_KEY)
+  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', _SK)
   : sb;
 
 // ── Init ──────────────────────────────────────────────────────
@@ -390,17 +385,40 @@ async function toggle(id, ativo) {
 }
 
 // ── Excluir ───────────────────────────────────────────────────
+// BUG 6 FIX: verificar agendamentos pendentes antes de deletar
 async function excluir(id, nome, btnEl) {
   if (!btnEl.dataset.confirming) {
-    btnEl.textContent = 'Certeza?';
-    btnEl.style.color = '#e74c3c';
+    // Primeiro clique: verificar agendamentos pendentes
+    const r = await fetch(SB_REST + '/appointments?barber_id=eq.' + id + '&status=in.(pending,confirmed)&select=id', {
+      headers: REST_HEADERS
+    });
+    const pendentes = r.ok ? await r.json() : [];
+
+    if (pendentes.length > 0) {
+      btnEl.textContent = `${pendentes.length} agendamento${pendentes.length > 1 ? 's' : ''} pendente${pendentes.length > 1 ? 's' : ''}. Cancelar todos e excluir?`;
+      btnEl.style.cssText = 'color:#e74c3c;font-size:10px;white-space:normal;text-align:left;';
+    } else {
+      btnEl.textContent = 'Certeza?';
+      btnEl.style.color = '#e74c3c';
+    }
     btnEl.dataset.confirming = 'true';
+    btnEl.dataset.pendentes = pendentes.length;
     setTimeout(() => {
       btnEl.textContent = 'Excluir';
-      btnEl.style.color = '';
+      btnEl.style.cssText = '';
       delete btnEl.dataset.confirming;
-    }, 3000);
+      delete btnEl.dataset.pendentes;
+    }, 5000);
     return;
+  }
+
+  // Segundo clique: cancelar agendamentos pendentes e deletar barbeiro
+  const pendentesCount = parseInt(btnEl.dataset.pendentes || '0');
+  if (pendentesCount > 0) {
+    await fetch(SB_REST + '/appointments?barber_id=eq.' + id + '&status=in.(pending,confirmed)', {
+      method: 'PATCH', headers: REST_HEADERS,
+      body: JSON.stringify({ status: 'cancelled' })
+    });
   }
 
   await fetch(SB_REST + '/barbers?id=eq.' + id, {

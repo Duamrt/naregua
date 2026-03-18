@@ -312,7 +312,13 @@ async function finishOnboarding() {
   const phone = document.getElementById('shop-phone').value.trim();
   const opening = document.getElementById('shop-open').value;
   const closing = document.getElementById('shop-close').value;
-  const slug = gerarSlug(name);
+  let slug = gerarSlug(name);
+
+  // BUG 9 FIX: verificar se slug já existe
+  const { data: existingSlug } = await sb.from('barbershops').select('id').eq('slug', slug);
+  if (existingSlug && existingSlug.length > 0) {
+    slug = slug + '-' + Math.random().toString(36).slice(2, 6);
+  }
 
   // Coletar serviços
   const svcRows = document.querySelectorAll('#services-list > div');

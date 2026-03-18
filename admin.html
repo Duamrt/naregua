@@ -167,7 +167,7 @@
 </div>
 
 <!-- Modal edição -->
-<div class="modal-overlay" id="modal-admin-edit">
+<div class="modal-overlay" id="modal-admin-edit" onclick="if(event.target===this)fecharModalAdmin()">
   <div class="modal">
     <div class="modal-title">
       <h2 id="modal-admin-title">Editar Cliente</h2>
@@ -256,7 +256,7 @@
 </div>
 
 <!-- Modal confirmação exclusão -->
-<div class="modal-overlay" id="modal-delete">
+<div class="modal-overlay" id="modal-delete" onclick="if(event.target===this)fecharModalDelete()">
   <div class="modal" style="max-width:360px;text-align:center;">
     <div style="font-size:40px;margin-bottom:12px;">⚠️</div>
     <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Confirma exclusão?</div>
@@ -280,10 +280,9 @@
 // ── Config admin — só seu e-mail tem acesso ───────────────────
 const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
 
-// Service key pra acesso total (necessário pra ver todas as barbearias)
-const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs';
+// BUG 3 FIX: service key centralizada em utils.js (_SK, _SB_REST, getServiceHeaders)
 const sbAdmin = window.supabase.createClient(
-  'https://jsydprrcyrjjxdmzrqpz.supabase.co', SERVICE_KEY
+  'https://jsydprrcyrjjxdmzrqpz.supabase.co', _SK
 );
 
 let allShops = [];
@@ -377,9 +376,10 @@ function renderGlobalStats() {
   const totalAppts = allAppointments.length;
   const totalDone = allAppointments.filter(a => a.status === 'done').length;
   const totalNoShow = allAppointments.filter(a => a.status === 'no_show').length;
+  // BUG 7 FIX: price_paid como fonte primária
   const revenue = allAppointments.filter(a => a.status === 'done').reduce((s, a) => {
-    const svc = allServices.find(sv => sv.id === a.service_id);
-    return s + (svc ? Number(svc.price) : 0);
+    const valor = Number(a.price_paid) || (() => { const svc = allServices.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })();
+    return s + valor;
   }, 0);
 
   document.getElementById('global-stats').innerHTML = `
@@ -406,9 +406,10 @@ function renderShops() {
     const shopSvcs = allServices.filter(sv => sv.barbershop_id === s.id && sv.active);
     const shopAppts = allAppointments.filter(a => a.barbershop_id === s.id);
     const shopDone = shopAppts.filter(a => a.status === 'done');
+    // BUG 7 FIX: price_paid como fonte primária
     const shopRevenue = shopDone.reduce((sum, a) => {
-      const svc = allServices.find(sv => sv.id === a.service_id);
-      return sum + (svc ? Number(svc.price) : 0);
+      const valor = Number(a.price_paid) || (() => { const svc = allServices.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })();
+      return sum + valor;
     }, 0);
 
     const planCls = s.plan === 'premium' ? 'plan-premium' : s.plan === 'profissional' ? 'plan-profissional' : 'plan-basico';
@@ -610,9 +611,17 @@ async function salvarAdmin() {
   const paidUntil = document.getElementById('adm-paid-until').value || null;
   const opening = document.getElementById('adm-open').value;
   const closing = document.getElementById('adm-close').value;
-  const slug = gerarSlug(name);
+  let slug = gerarSlug(name);
 
   if (!name) { showAdmMsg('Informe o nome.', 'error'); return; }
+
+  // BUG 9 FIX: verificar se slug já existe (excluindo o próprio registro se editando)
+  let slugQuery = sbAdmin.from('barbershops').select('id').eq('slug', slug);
+  if (editId) slugQuery = slugQuery.neq('id', editId);
+  const { data: existingSlug } = await slugQuery;
+  if (existingSlug && existingSlug.length > 0) {
+    slug = slug + '-' + Math.random().toString(36).slice(2, 6);
+  }
 
   btn.disabled = true;
   btn.querySelector('.btn-label').style.display = 'none';
@@ -731,13 +740,8 @@ async function confirmarExclusao() {
   errEl.style.display = 'none';
 
   const id = _deleteShopId;
-  const SB_URL = 'https://jsydprrcyrjjxdmzrqpz.supabase.co/rest/v1';
-  const headers = {
-    'apikey': SERVICE_KEY,
-    'Authorization': 'Bearer ' + SERVICE_KEY,
-    'Content-Type': 'application/json',
-    'Prefer': 'return=representation'
-  };
+  const SB_URL = _SB_REST;
+  const headers = getServiceHeaders();
 
   try {
     // Deletar filhas via REST API na ordem certa

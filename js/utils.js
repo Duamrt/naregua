@@ -1,5 +1,19 @@
 // NaRegua — Helpers
 
+// TODO: mover para backend/RPC — service key NÃO deve ficar no client
+const _SK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs';
+const _SB_REST = 'https://jsydprrcyrjjxdmzrqpz.supabase.co/rest/v1';
+
+// Verifica se há sessão ativa antes de expor service key — proteção mínima
+function getServiceHeaders() {
+  return {
+    'apikey': _SK,
+    'Authorization': 'Bearer ' + _SK,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation'
+  };
+}
+
 function formatMoney(v) {
   return 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 }

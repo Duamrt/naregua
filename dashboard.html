@@ -322,7 +322,7 @@
 </div>
 
 <!-- Modal edição -->
-<div class="modal-overlay" id="modal-edit">
+<div class="modal-overlay" id="modal-edit" onclick="if(event.target===this)fecharEdicao()">
   <div class="modal">
     <div class="modal-title">
       <h2>Editar Estabelecimento</h2>
@@ -376,7 +376,7 @@
 </div>
 
 <!-- Modal vaga aberta (remarketing) -->
-<div class="modal-overlay" id="modal-vaga">
+<div class="modal-overlay" id="modal-vaga" onclick="if(event.target===this)fecharModalVaga()">
   <div class="modal" style="max-width:400px;">
     <div class="modal-title">
       <h2>Vaga aberta!</h2>
@@ -390,7 +390,7 @@
 </div>
 
 <!-- Modal pagamento -->
-<div class="modal-overlay" id="modal-pagamento">
+<div class="modal-overlay" id="modal-pagamento" onclick="if(event.target===this)fecharModalPag()">
   <div class="modal" style="max-width:340px;text-align:center;">
     <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--texto-muted);margin-bottom:12px;">REGISTRAR PAGAMENTO</div>
     <div id="pag-cliente" style="font-size:15px;font-weight:700;margin-bottom:4px;"></div>
@@ -448,15 +448,9 @@ const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_vi
 if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
 const isAdminViewing = !!adminViewingShop;
 
-// Service key pra operações REST
-const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzeWRwcnJjeXJqanhkbXpycXB6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzc0MjIxNiwiZXhwIjoyMDg5MzE4MjE2fQ.q_0QPcoipD57qSH-SU7pbS7DELXiOeI9mHq85qvAncs';
-const SB_REST = 'https://jsydprrcyrjjxdmzrqpz.supabase.co/rest/v1';
-const REST_HEADERS = {
-  'apikey': SERVICE_KEY,
-  'Authorization': 'Bearer ' + SERVICE_KEY,
-  'Content-Type': 'application/json',
-  'Prefer': 'return=representation'
-};
+// BUG 3 FIX: service key centralizada em utils.js (_SK, _SB_REST, getServiceHeaders)
+const SB_REST = _SB_REST;
+const REST_HEADERS = getServiceHeaders();
 
 // Helper pra update/delete via REST
 async function restUpdate(table, filter, data) {
@@ -475,7 +469,7 @@ async function restDelete(table, filter) {
 
 // Cliente de banco: admin usa service key (bypass RLS), dono usa anon
 const db = isAdminViewing
-  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', SERVICE_KEY)
+  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', _SK)
   : sb;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -651,9 +645,10 @@ function renderAppointments() {
   const ativos = dayAppointments.filter(a => !['cancelled','no_show'].includes(a.status));
   const done = dayAppointments.filter(a => a.status === 'done');
   const noShow = dayAppointments.filter(a => a.status === 'no_show');
+  // BUG 7 FIX: price_paid como fonte primária
   const faturamento = done.reduce((s, a) => {
-    const svc = services.find(sv => sv.id === a.service_id);
-    return s + (svc ? Number(svc.price) : 0);
+    const valor = Number(a.price_paid) || (() => { const svc = services.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })();
+    return s + valor;
   }, 0);
 
   document.getElementById('stat-total').textContent = ativos.length;
@@ -933,7 +928,12 @@ async function salvarEdicao() {
 
   try {
     // Atualizar barbearia
-    const slug = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+    let slug = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+    // BUG 9 FIX: verificar slug duplicado
+    const { data: existingSlug } = await db.from('barbershops').select('id').eq('slug', slug).neq('id', shop.id);
+    if (existingSlug && existingSlug.length > 0) {
+      slug = slug + '-' + Math.random().toString(36).slice(2, 6);
+    }
     const { error: shopErr } = await db.from('barbershops').update({
       name, slug, city, phone, opening_time: opening, closing_time: closing,
       days_open: editDays
