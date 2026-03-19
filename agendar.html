@@ -364,6 +364,10 @@
           <div id="resumo-content"></div>
         </div>
 
+        <div style="text-align:center;margin-bottom:12px;">
+          <a id="link-politicas" href="#" target="_blank" style="font-size:11px;color:var(--texto-muted);text-decoration:underline;">&#x1F4DC; Ver politicas de cancelamento e termos</a>
+        </div>
+
         <div id="ag-msg" class="msg"></div>
 
         <div style="display:flex;gap:10px;">
@@ -484,6 +488,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Atualizar título da página
   document.title = `${shop.name} — Agendar | NaRegua`;
+
+  // Link politicas
+  document.getElementById('link-politicas').href = 'politicas.html?shop=' + encodeURIComponent(shop.slug);
 
   // Renderizar header
   document.getElementById('shop-name').textContent = shop.name;

@@ -24,7 +24,14 @@
     }
     .dash-header .shop-name { font-size:16px; font-weight:700; }
     .dash-header .shop-city { font-size:11px; color:var(--texto-muted); }
-    .header-actions { display:flex; gap:8px; }
+    .header-actions { display:flex; gap:8px; align-items:center; }
+    .bell-wrapper { position:relative; }
+    .bell-badge {
+      position:absolute; top:-4px; right:-4px; background:#ef4444; color:#fff;
+      font-size:8px; font-weight:800; min-width:14px; height:14px; line-height:14px;
+      text-align:center; border-radius:7px; padding:0 3px;
+      display:none; /* hidden until count > 0 */
+    }
     .icon-btn {
       width:36px; height:36px; border-radius:8px; border:1px solid var(--borda);
       background:transparent; color:var(--texto-secundario); font-size:16px;
@@ -300,6 +307,10 @@
     </div>
     <div class="header-actions">
       <a href="busca.html" class="icon-btn" title="Buscar" style="text-decoration:none;">&#x1F50D;</a>
+      <div class="bell-wrapper">
+        <a href="notificacoes.html" class="icon-btn" title="Notificações" style="text-decoration:none;" id="bell-btn">&#x1F514;</a>
+        <span class="bell-badge" id="bell-badge">0</span>
+      </div>
       <a href="agenda-semana.html" style="padding:6px 12px;border-radius:8px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;text-decoration:none;display:flex;align-items:center;">SEMANA</a>
       <button style="padding:6px 12px;border-radius:8px;border:none;background:var(--verde-acao);color:#000;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;" onclick="abrirEncaixe()">+ ENCAIXE</button>
       <button class="icon-btn" onclick="abrirEdicao()" title="Editar">&#x270F;&#xFE0F;</button>
@@ -513,6 +524,10 @@
   <a href="combos.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F500; Combos</a>
   <a href="busca.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F50D; Busca</a>
   <a href="planos.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4B3; Meu Plano</a>
+  <a href="qrcode.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4F1; QR Code</a>
+  <a href="notificacoes.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F514; Notificações</a>
+  <a href="galeria.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4F7; Galeria</a>
+  <a href="politicas.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4DC; Políticas</a>
 </div>
 <script>
 function toggleMore(){var m=document.getElementById('more-menu');m.style.display=m.style.display==='none'?'block':'none';}
@@ -1473,6 +1488,77 @@ async function logout() {
   await sb.auth.signOut();
   window.location.href = 'app.html';
 }
+
+// ── Bell badge — lightweight notification count ───────────────
+const BELL_CACHE_KEY = 'naregua_bell_cache';
+const BELL_CACHE_TTL = 5 * 60 * 1000; // 5 min
+
+async function checkBellCount() {
+  if (!shop) return;
+  // Check cache
+  try {
+    const raw = sessionStorage.getItem(BELL_CACHE_KEY);
+    if (raw) {
+      const { ts, count } = JSON.parse(raw);
+      if (Date.now() - ts < BELL_CACHE_TTL) { updateBell(count); return; }
+    }
+  } catch {}
+
+  let total = 0;
+  const today = new Date().toISOString().slice(0, 10);
+  const dayStart = today + 'T00:00:00';
+  const dayEnd = today + 'T23:59:59';
+
+  try {
+    const results = await Promise.allSettled([
+      // Appointments today
+      sb.from('appointments').select('id,status', { count: 'exact', head: true })
+        .eq('barbershop_id', shop.id).gte('scheduled_at', dayStart).lte('scheduled_at', dayEnd),
+      // Low stock products
+      sb.from('products').select('id,quantity,min_stock').eq('barbershop_id', shop.id),
+    ]);
+
+    // Count today's appointments as 1 notif if > 0
+    if (results[0].status === 'fulfilled' && results[0].value.count > 0) total++;
+
+    // Count low stock
+    if (results[1].status === 'fulfilled') {
+      const prods = results[1].value.data || [];
+      const low = prods.filter(p => p.min_stock != null && p.quantity != null && p.quantity <= p.min_stock);
+      if (low.length > 0) total++;
+    }
+
+    // Trial expiring
+    if (shop.plan === 'trial' && shop.trial_ends_at) {
+      const daysLeft = Math.ceil((new Date(shop.trial_ends_at) - new Date()) / 86400000);
+      if (daysLeft <= 7) total++;
+    }
+
+  } catch (e) { console.error('Bell check error:', e); }
+
+  // Subtract read notifs
+  try {
+    const read = JSON.parse(localStorage.getItem('naregua_read_notifs') || '[]');
+    total = Math.max(0, total - Math.min(read.length, total));
+  } catch {}
+
+  sessionStorage.setItem(BELL_CACHE_KEY, JSON.stringify({ ts: Date.now(), count: total }));
+  updateBell(total);
+}
+
+function updateBell(count) {
+  const badge = document.getElementById('bell-badge');
+  if (!badge) return;
+  if (count > 0) {
+    badge.textContent = count > 9 ? '9+' : count;
+    badge.style.display = 'block';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// Run bell check after shop loads (inside DOMContentLoaded, after renderDay)
+setTimeout(() => { if (shop) checkBellCount(); }, 2000);
 </script>
 <script src="js/ajuda.js"></script>
 <script src="js/sw-update.js"></script>
