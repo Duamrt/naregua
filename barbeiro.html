@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     .maybeSingle();
 
   if (!barberData) {
-    alert('Sua conta de barbeiro nao foi encontrada. Fale com o dono da barbearia.');
+    alert('Sua conta de barbeiro não foi encontrada. Fale com o dono da barbearia.');
     await sb.auth.signOut();
     window.location.href = 'index.html';
     return;
@@ -312,10 +312,10 @@ async function renderDay() {
       actions = '<div class="appt-actions">';
       actions += '<button class="appt-btn btn-done-appt" onclick="marcarAtendido(\'' + esc(a.id) + '\',this)">ATENDIDO</button>';
       actions += '<button class="appt-btn btn-noshow" onclick="marcarFalta(\'' + esc(a.id) + '\',this)">FALTOU</button>';
-      if (phone) actions += '<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp(\'' + esc(a.id) + '\',\'' + esc(a.client_name) + '\',\'' + phone + '\')">ZAP</button>';
+      if (phone) actions += '<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp(\'' + esc(a.id) + '\',\'' + esc(a.client_name) + '\',\'' + esc(phone) + '\')">ZAP</button>';
       actions += '</div>';
     } else if (a.status === 'pending' && phone) {
-      actions = '<div class="appt-actions"><button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp(\'' + esc(a.id) + '\',\'' + esc(a.client_name) + '\',\'' + phone + '\')">ZAP</button></div>';
+      actions = '<div class="appt-actions"><button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp(\'' + esc(a.id) + '\',\'' + esc(a.client_name) + '\',\'' + esc(phone) + '\')">ZAP</button></div>';
     }
 
     return '<div class="appt-card">' +
@@ -366,7 +366,7 @@ async function marcarFalta(id, btn) {
 function abrirWhatsApp(id, nome, phone) {
   const h = new Date().getHours();
   const saudacao = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
-  const msg = saudacao + ', ' + nome + '! Aqui e o ' + barber.name + ' da *' + shopData.name + '*.\nSeu horario ta confirmado. Te espero!';
+  const msg = saudacao + ', ' + nome + '! Aqui é o ' + barber.name + ' da *' + shopData.name + '*.\nSeu horário tá confirmado. Te espero!';
   window.open('https://wa.me/55' + phone + '?text=' + encodeURIComponent(msg), '_blank');
 }
 

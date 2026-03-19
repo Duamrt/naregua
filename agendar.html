@@ -239,7 +239,7 @@
           <div class="success-icon">&#x2705;</div>
           <div class="success-title">Confirmado!</div>
           <div class="success-sub" id="success-msg"></div>
-          <div style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:12px;margin-bottom:12px;font-size:12px;color:#22c55e;font-weight:600;">Seu horario esta confirmado automaticamente. So comparecer!</div>
+          <div style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:12px;margin-bottom:12px;font-size:12px;color:#22c55e;font-weight:600;">Seu horário está confirmado automaticamente. Basta comparecer!</div>
           <a id="whatsapp-link" href="#" target="_blank" class="btn btn-primary" style="text-decoration:none;margin-bottom:12px;">
             &#x1F4F1; ENVIAR COMPROVANTE NO WHATSAPP
           </a>
@@ -556,7 +556,7 @@ function renderBarbers() {
          onclick="selectBarber('any')" style="border-color:rgba(212,168,83,0.3);">
       <div>
         <div class="name">Qualquer profissional</div>
-        <div class="detail">Primeiro horario disponivel</div>
+        <div class="detail">Primeiro horário disponível</div>
       </div>
       <div style="font-size:18px;">&#x2728;</div>
     </div>`;
@@ -727,7 +727,7 @@ async function renderTimes() {
     if (dayConfig.mode === 'ordem') {
       el.innerHTML = '<div style="text-align:center;padding:20px 0;">'
         + '<div style="font-size:14px;font-weight:700;color:var(--verde-acao);margin-bottom:8px;">Ordem de chegada</div>'
-        + '<div style="font-size:12px;color:var(--texto-muted);line-height:1.5;">Neste dia o atendimento e por ordem de chegada.<br>Basta comparecer na barbearia!</div>'
+        + '<div style="font-size:12px;color:var(--texto-muted);line-height:1.5;">Neste dia o atendimento é por ordem de chegada.<br>Basta comparecer na barbearia!</div>'
         + '</div>';
       return;
     }
@@ -813,13 +813,13 @@ async function renderTimes() {
   }
 
   if (!hasSlots) {
-    html = '<div style="font-size:12px;color:var(--texto-muted);grid-column:1/-1;text-align:center;padding:20px 0;">Sem horários disponíveis neste dia.</div>';
+    html = '<div style="font-size:12px;color:var(--texto-muted);grid-column:1/-1;text-align:center;padding:20px 0;">Todos os horários estão ocupados neste dia. Tente outro dia ou outro profissional.</div>';
   }
 
   el.innerHTML = html;
   } catch (err) {
     console.error('Erro ao carregar horarios:', err);
-    el.innerHTML = '<div style="font-size:12px;color:#e74c3c;grid-column:1/-1;text-align:center;padding:20px 0;">Erro ao carregar horarios. Verifique sua conexao.</div>';
+    el.innerHTML = '<div style="font-size:12px;color:#e74c3c;grid-column:1/-1;text-align:center;padding:20px 0;">Erro ao carregar horários. Verifique sua conexão.</div>';
   }
 }
 
@@ -1058,20 +1058,20 @@ async function confirmarAgendamento() {
     const dateFormatted = selectedDate.split('-').reverse().join('/');
     const linkAgendamento = window.location.href.split('?')[0] + '?slug=' + shop.slug;
 
-    const waText = saudacao + ' ' + nome + '! Aqui e da ' + shop.name + '.\n\n'
-      + 'O horario que voce escolheu (' + dateFormatted + ' as ' + selectedTime + ') nao esta mais disponivel.\n\n'
-      + 'Mas ainda temos horarios livres! Acesse o link abaixo pra verificar e remarcar:\n'
+    const waText = saudacao + ' ' + nome + '! Aqui é da ' + shop.name + '.\n\n'
+      + 'O horário que você escolheu (' + dateFormatted + ' às ' + selectedTime + ') não está mais disponível.\n\n'
+      + 'Mas ainda temos horários livres! Acesse o link abaixo pra verificar e remarcar:\n'
       + linkAgendamento + '\n\n'
-      + 'Obrigado pela preferencia!';
+      + 'Obrigado pela preferência!';
 
     const phoneClean = phone.replace(/\D/g, '');
     const waLink = phoneClean ? 'https://wa.me/55' + phoneClean + '?text=' + encodeURIComponent(waText) : '';
 
     // Mostrar erro + botão WhatsApp
     const msgEl = document.getElementById('ag-msg');
-    msgEl.innerHTML = `<div style="margin-bottom:8px;">Esse horario acabou de ser ocupado por outro cliente.</div>`
+    msgEl.innerHTML = `<div style="margin-bottom:8px;">Esse horário acabou de ser ocupado por outro cliente.</div>`
       + (waLink ? `<a href="${waLink}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.3);border-radius:8px;color:#25d366;font-size:11px;font-weight:700;text-decoration:none;margin-top:4px;">AVISAR PELO WHATSAPP</a>` : '')
-      + `<div style="margin-top:8px;font-size:11px;color:var(--texto-muted);">Escolha outro horario abaixo.</div>`;
+      + `<div style="margin-top:8px;font-size:11px;color:var(--texto-muted);">Escolha outro horário abaixo.</div>`;
     msgEl.className = 'msg msg-error show';
     msgEl.style.flexDirection = 'column';
     msgEl.style.alignItems = 'flex-start';
@@ -1119,7 +1119,7 @@ async function confirmarAgendamento() {
       btn.disabled = false;
       btn.querySelector('.btn-label').style.display = 'inline';
       btn.querySelector('.spinner').style.display = 'none';
-      showAgMsg('Nenhum profissional disponivel nesse horario.', 'error');
+      showAgMsg('Nenhum profissional disponível nesse horário.', 'error');
       return;
     }
   }

@@ -83,7 +83,7 @@
     /* Inputs refinados */
     .login-field { margin-bottom:16px; }
     .login-label {
-      font-size:12px; font-weight:700; color:#525252; letter-spacing:1.5px;
+      font-size:12px; font-weight:700; color:#a3a3a3; letter-spacing:1.5px;
       text-transform:uppercase; margin-bottom:6px; display:block;
     }
     .login-input-wrap { position:relative; }
@@ -93,7 +93,7 @@
       color:#fafafa; font-size:16px; font-family:inherit; outline:none;
       transition:all .2s;
     }
-    .login-input::placeholder { color:#3f3f46; }
+    .login-input::placeholder { color:#525252; }
     .login-input:focus {
       border-color:rgba(212,168,83,0.3);
       box-shadow:0 0 0 3px rgba(212,168,83,0.08);
@@ -311,7 +311,7 @@
     <!-- Form primeiro acesso -->
     <div id="barb-form-signup" style="display:none;">
       <div style="font-size:12px;color:var(--texto-muted);margin-bottom:16px;line-height:1.5;">
-        O dono da barbearia precisa ter cadastrado seu telefone na equipe. Digite o mesmo numero e crie uma senha.
+        O dono da barbearia precisa ter cadastrado seu telefone na equipe. Digite o mesmo número e crie uma senha.
       </div>
       <div class="login-field">
         <label class="login-label">TELEFONE</label>
@@ -320,7 +320,7 @@
       <div class="login-field">
         <label class="login-label">CRIAR SENHA</label>
         <div class="login-input-wrap">
-          <input class="login-input" type="password" id="barb-senha-signup" placeholder="Minimo 6 caracteres" autocomplete="new-password" style="padding-right:44px;">
+          <input class="login-input" type="password" id="barb-senha-signup" placeholder="Mínimo 6 caracteres" autocomplete="new-password" style="padding-right:44px;">
           <button type="button" class="login-eye" onclick="toggleBarbPass(this)">&#x1F441;</button>
         </div>
       </div>
@@ -415,7 +415,7 @@ async function loginBarbeiro() {
   const senha = document.getElementById('barb-senha-login').value;
   const btn = document.getElementById('btn-barb-login');
 
-  if (phone.length < 10) { showBarbMsg('Informe um telefone valido com DDD.', 'error'); return; }
+  if (phone.length < 10) { showBarbMsg('Informe um telefone válido com DDD.', 'error'); return; }
   if (senha.length < 6) { showBarbMsg('Senha deve ter pelo menos 6 caracteres.', 'error'); return; }
 
   setLoading(btn, true);
@@ -433,7 +433,7 @@ async function loginBarbeiro() {
   const { data: barber } = await sb.from('barbers').select('id').eq('user_id', data.user.id).eq('active', true).maybeSingle();
   if (!barber) {
     await sb.auth.signOut();
-    showBarbMsg('Sua conta nao esta vinculada a nenhuma barbearia.', 'error');
+    showBarbMsg('Sua conta não está vinculada a nenhuma barbearia.', 'error');
     return;
   }
 
@@ -445,17 +445,17 @@ async function signupBarbeiro() {
   const senha = document.getElementById('barb-senha-signup').value;
   const btn = document.getElementById('btn-barb-signup');
 
-  if (phone.length < 10) { showBarbMsg('Informe um telefone valido com DDD.', 'error'); return; }
+  if (phone.length < 10) { showBarbMsg('Informe um telefone válido com DDD.', 'error'); return; }
   if (senha.length < 6) { showBarbMsg('Senha deve ter pelo menos 6 caracteres.', 'error'); return; }
 
   // Verificar se o telefone foi cadastrado pelo dono
   const { data: barberData, error: rpcErr } = await sb.rpc('check_barber_phone', { p_phone: phone });
   if (rpcErr) { showBarbMsg('Erro ao verificar. Tente novamente.', 'error'); return; }
-  if (barberData && barberData.user_id) { showBarbMsg('Esse telefone ja tem acesso. Use a aba ENTRAR.', 'error'); return; }
+  if (barberData && barberData.user_id) { showBarbMsg('Esse telefone já tem acesso. Use a aba ENTRAR.', 'error'); return; }
   const pendentes = barberData && barberData.id ? [barberData] : [];
 
   if (!pendentes.length) {
-    showBarbMsg('Telefone nao encontrado. Peca ao dono da barbearia pra cadastrar seu numero na equipe.', 'error');
+    showBarbMsg('Telefone não encontrado. Peça ao dono da barbearia pra cadastrar seu número na equipe.', 'error');
     return;
   }
 
@@ -471,7 +471,7 @@ async function signupBarbeiro() {
   if (error) {
     setLoading(btn, false);
     if (error.message.includes('already registered')) {
-      showBarbMsg('Esse telefone ja tem conta. Use ENTRAR.', 'error');
+      showBarbMsg('Esse telefone já tem conta. Use ENTRAR.', 'error');
     } else {
       showBarbMsg('Erro ao criar conta. Tente novamente.', 'error');
     }
@@ -489,7 +489,7 @@ async function signupBarbeiro() {
     window.location.href = 'barbeiro.html';
   } else {
     // Caso precise confirmar email (nao deve, pq e @naregua.app)
-    showBarbMsg('Conta criada! Agora faca login.', 'success');
+    showBarbMsg('Conta criada! Agora faça login.', 'success');
     switchBarbTab('login');
     document.getElementById('barb-phone-login').value = document.getElementById('barb-phone-signup').value;
     document.getElementById('barb-senha-login').focus();

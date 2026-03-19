@@ -126,7 +126,7 @@
   <div class="cli-header">
     <img src="img/logo.png" alt="NaRegua">
     <h1>Meus Agendamentos</h1>
-    <p>Consulte, cancele ou reagende seus horarios</p>
+    <p>Consulte, cancele ou reagende seus horários</p>
   </div>
 
   <!-- Busca por telefone -->
@@ -211,7 +211,7 @@ if (saved) {
 async function buscar() {
   const raw = phoneInput.value.replace(/\D/g, '');
   if (raw.length < 10) {
-    showToast('Informe um telefone valido com DDD.');
+    showToast('Informe um telefone válido com DDD.');
     return;
   }
 
@@ -306,7 +306,7 @@ function renderList() {
   }
 
   if (!list.length) {
-    const msg = currentTab === 'proximos' ? 'Nenhum horario agendado.' : 'Nenhum historico ainda.';
+    const msg = currentTab === 'proximos' ? 'Nenhum horário agendado.' : 'Nenhum histórico ainda.';
     el.innerHTML = '<div class="empty-state"><div class="empty-icon">' + (currentTab === 'proximos' ? '&#x1F4C5;' : '&#x1F4CB;') + '</div><div>' + msg + '</div></div>';
     return;
   }

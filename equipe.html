@@ -188,8 +188,8 @@
       <div style="font-size:10px;color:var(--texto-muted);margin-top:4px;">Percentual sobre cada atendimento</div>
     </div>
     <div class="field">
-      <label>HORARIOS POR DIA</label>
-      <div style="font-size:10px;color:var(--texto-muted);margin-bottom:8px;">Clique no dia pra ativar/desativar. Configure horario e pausa de cada dia.</div>
+      <label>HORÁRIOS POR DIA</label>
+      <div style="font-size:10px;color:var(--texto-muted);margin-bottom:8px;">Clique no dia pra ativar/desativar. Configure horário e pausa de cada dia.</div>
       <div id="eq-schedule"></div>
     </div>
     <button class="btn btn-primary" onclick="salvar()" id="btn-eq-save">
@@ -207,10 +207,10 @@
   <button class="nav-item" onclick="toggleMore()" id="btn-more"><span class="nav-icon">&#x2630;</span>MAIS</button>
 </div>
 <div id="more-menu" style="display:none;position:fixed;bottom:56px;right:8px;background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:12px;padding:8px;z-index:999;min-width:160px;">
-  <a href="servicos.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x2702;&#xFE0F; Servicos</a>
+  <a href="servicos.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x2702;&#xFE0F; Serviços</a>
   <a href="clientes.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4CB; Clientes</a>
   <a href="estoque.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4E6; Estoque</a>
-  <a href="relatorio.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4CA; Relatorio</a>
+  <a href="relatorio.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4CA; Relatório</a>
 </div>
 <script>
 function toggleMore(){var m=document.getElementById('more-menu');m.style.display=m.style.display==='none'?'block':'none';}
@@ -463,11 +463,14 @@ async function salvar() {
 
   if (!nome) { showModalMsg('Informe o nome.', 'error'); return; }
 
+  const phone = document.getElementById('eq-phone').value.replace(/\D/g, '');
+  if (!editId && !phone) {
+    if (!confirm('Sem telefone, o profissional não conseguirá criar acesso próprio. Continuar mesmo assim?')) return;
+  }
+
   btn.disabled = true;
   btn.querySelector('.btn-label').style.display = 'none';
   btn.querySelector('.spinner').style.display = 'inline-block';
-
-  const phone = document.getElementById('eq-phone').value.replace(/\D/g, '');
 
   // Montar working_days a partir do schedule (compatibilidade)
   const activeDays = Object.keys(editSchedule).map(Number).sort();
@@ -493,6 +496,13 @@ async function salvar() {
 
     fecharModal();
     await loadBarbers();
+
+    if (!editId) {
+      const baseUrl = window.location.origin + window.location.pathname.replace('equipe.html', '');
+      const link = baseUrl + 'barbeiro-cadastro.html';
+      alert('Profissional adicionado!\n\nEnvie este link pra ele criar o acesso:\n' + link);
+      navigator.clipboard.writeText(link).catch(() => {});
+    }
 
   } catch (e) {
     console.error(e);

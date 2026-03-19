@@ -113,7 +113,7 @@
 
   <div class="card">
     <div class="card-title">Area do Barbeiro</div>
-    <div class="card-sub">Use seu numero de telefone pra entrar ou criar seu acesso</div>
+    <div class="card-sub">Use seu número de telefone pra entrar ou criar seu acesso</div>
 
     <div class="tabs">
       <button class="tab active" onclick="switchTab('login')" id="tab-login">ENTRAR</button>
@@ -144,7 +144,7 @@
     <!-- PRIMEIRO ACESSO -->
     <div id="form-signup" style="display:none;">
       <div class="help" style="margin-top:0;margin-bottom:16px;text-align:left;">
-        O dono da barbearia ja cadastrou seu telefone. Digite o <strong>mesmo numero</strong> e crie uma senha pra acessar sua agenda.
+        O dono da barbearia já cadastrou seu telefone. Digite o <strong>mesmo número</strong> e crie uma senha pra acessar sua agenda.
       </div>
       <div class="field">
         <label class="label">SEU TELEFONE</label>
@@ -153,7 +153,7 @@
       <div class="field">
         <label class="label">CRIAR UMA SENHA</label>
         <div class="input-wrap">
-          <input class="input" type="password" id="senha-signup" placeholder="Minimo 6 caracteres" autocomplete="new-password" style="padding-right:44px;">
+          <input class="input" type="password" id="senha-signup" placeholder="Mínimo 6 caracteres" autocomplete="new-password" style="padding-right:44px;">
           <button type="button" class="eye" onclick="togglePass(this)">&#x1F441;</button>
         </div>
       </div>
@@ -241,7 +241,7 @@ async function doLogin() {
   const { data: barber } = await sb.from('barbers').select('id').eq('user_id', data.user.id).eq('active', true).maybeSingle();
   if (!barber) {
     await sb.auth.signOut();
-    showMsg('Sua conta nao esta vinculada a nenhuma barbearia. Fale com o dono.', 'error');
+    showMsg('Sua conta não está vinculada a nenhuma barbearia. Fale com o dono.', 'error');
     return;
   }
 
@@ -259,11 +259,11 @@ async function doSignup() {
   // Verificar se telefone foi cadastrado pelo dono
   const { data: barberData, error: rpcErr } = await sb.rpc('check_barber_phone', { p_phone: phone });
   if (rpcErr) { showMsg('Erro ao verificar. Tente novamente.', 'error'); return; }
-  if (barberData && barberData.user_id) { showMsg('Esse telefone ja tem acesso. Use a aba ENTRAR.', 'error'); return; }
+  if (barberData && barberData.user_id) { showMsg('Esse telefone já tem acesso. Use a aba ENTRAR.', 'error'); return; }
   const pendentes = barberData && barberData.id ? [barberData] : [];
 
   if (!pendentes.length) {
-    showMsg('Telefone nao encontrado. O dono da barbearia precisa cadastrar seu numero primeiro na aba Equipe.', 'error');
+    showMsg('Telefone não encontrado. O dono da barbearia precisa cadastrar seu número primeiro na aba Equipe.', 'error');
     return;
   }
 

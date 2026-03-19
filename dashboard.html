@@ -451,7 +451,7 @@
     </div>
     <div class="field">
       <label>TELEFONE</label>
-      <input type="tel" autocomplete="tel" id="enc-phone" placeholder="Opcional" inputmode="numeric" style="width:100%;padding:10px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;box-sizing:border-box;">
+      <input type="tel" autocomplete="tel" id="enc-phone" placeholder="Opcional" inputmode="tel" style="width:100%;padding:10px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;box-sizing:border-box;">
     </div>
     <button class="btn btn-primary" onclick="salvarEncaixe()" id="btn-encaixe">
       <span class="btn-label">ENCAIXAR AGORA</span>
@@ -468,10 +468,10 @@
   <button class="nav-item" onclick="toggleMore()" id="btn-more"><span class="nav-icon">&#x2630;</span>MAIS</button>
 </div>
 <div id="more-menu" style="display:none;position:fixed;bottom:56px;right:8px;background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:12px;padding:8px;z-index:999;min-width:160px;">
-  <a href="servicos.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x2702;&#xFE0F; Servicos</a>
+  <a href="servicos.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x2702;&#xFE0F; Serviços</a>
   <a href="clientes.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4CB; Clientes</a>
   <a href="estoque.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4E6; Estoque</a>
-  <a href="relatorio.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4CA; Relatorio</a>
+  <a href="relatorio.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4CA; Relatório</a>
 </div>
 <script>
 function toggleMore(){var m=document.getElementById('more-menu');m.style.display=m.style.display==='none'?'block':'none';}
@@ -489,7 +489,7 @@ let shop = null;
 let services = [];
 let barbers = [];
 let currentDate = new Date();
-let currentFilter = 'all';
+let currentFilter = localStorage.getItem('naregua_dash_filter') || 'all';
 let dayAppointments = [];
 let _knownApptIds = new Set(); // pra detectar novos agendamentos
 let _firstLoad = true;
@@ -690,6 +690,7 @@ function renderFilters() {
 
 function setFilter(f) {
   currentFilter = f;
+  localStorage.setItem('naregua_dash_filter', f);
   renderFilters();
   renderAppointments();
 }
@@ -736,9 +737,20 @@ function renderAppointments() {
     columns.push({ barber: { id: null, name: 'Sem barbeiro' }, appts: semBarbeiro });
   }
 
+  // Identificar proximo agendamento (confirmado, futuro, mais proximo de agora)
+  const agora = new Date();
+  let nextApptId = null;
+  if (isToday(currentDate)) {
+    const futuros = dayAppointments.filter(a => a.status === 'confirmed' && new Date(a.scheduled_at) > agora);
+    if (futuros.length) {
+      futuros.sort((a, b) => new Date(a.scheduled_at) - new Date(b.scheduled_at));
+      nextApptId = futuros[0].id;
+    }
+  }
+
   el.innerHTML = `<div class="barbers-grid">${columns.map(col => {
     const inicial = col.barber.name.charAt(0).toUpperCase();
-    const cards = col.appts.map(a => renderApptCard(a)).join('');
+    const cards = col.appts.map(a => renderApptCard(a, a.id === nextApptId)).join('');
     // Verificar se e folga ou livre
     let empty = '';
     if (col.appts.length === 0) {
@@ -762,7 +774,7 @@ function renderAppointments() {
   }).join('')}</div>`;
 }
 
-function renderApptCard(a) {
+function renderApptCard(a, isNext) {
   const svc = services.find(s => s.id === a.service_id);
   const hora = new Date(a.scheduled_at);
   const timeStr = hora.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
@@ -811,10 +823,11 @@ function renderApptCard(a) {
     actions = `<button class="btn-delete" onclick="excluirAgendamento('${a.id}',this)">EXCLUIR</button>`;
   }
 
-  return `<div class="barber-appt">
+  const nextStyle = isNext ? 'border-left:3px solid var(--verde-acao);' : '';
+  return `<div class="barber-appt" style="${nextStyle}">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
       <div class="barber-appt-time">${timeStr}</div>
-      <span class="appt-status ${st.cls}">${st.label}</span>
+      <div style="display:flex;align-items:center;gap:6px;">${isNext ? '<span style="font-size:8px;font-weight:800;letter-spacing:1px;padding:2px 6px;border-radius:4px;background:rgba(212,168,83,0.2);color:var(--verde-acao);">PROXIMO</span>' : ''}<span class="appt-status ${st.cls}">${st.label}</span></div>
     </div>
     <div class="barber-appt-client">${esc(a.client_name)}</div>
     <div class="barber-appt-svc">${svcName} · ${svcPrice}${isDiaInteiro ? ' · <span style="color:#9b59b6;font-weight:700;">DIA INTEIRO</span>' : ''}</div>
@@ -888,11 +901,11 @@ function abrirWhatsApp(apptId) {
   const h = new Date().getHours();
   const saudacao = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
 
-  const msg = saudacao + ', ' + a.client_name + '! Aqui e da *' + shop.name + '*.\n\n'
-    + 'Seu horario ta confirmado:\n\n'
-    + '*' + (svc ? svc.name : 'Servico') + '*\n'
-    + 'Dia: ' + dataStr + ' as ' + horaStr + '\n\n'
-    + 'Se precisar remarcar, avisa com pelo menos 2h de antecedencia pra gente encaixar outro cliente.\n\n'
+  const msg = saudacao + ', ' + a.client_name + '! Aqui é da *' + shop.name + '*.\n\n'
+    + 'Seu horário tá confirmado:\n\n'
+    + '*' + (svc ? svc.name : 'Serviço') + '*\n'
+    + 'Dia: ' + dataStr + ' às ' + horaStr + '\n\n'
+    + 'Se precisar remarcar, avisa com pelo menos 2h de antecedência pra gente encaixar outro cliente.\n\n'
     + 'Te esperamos!';
 
   window.open('https://wa.me/55' + phone + '?text=' + encodeURIComponent(msg), '_blank');
@@ -921,19 +934,19 @@ function copiarLinkBarbeiro() {
 function enviarLinkBarbeiroZap() {
   const baseUrl = window.location.origin + window.location.pathname.replace('dashboard.html', '');
   const link = baseUrl + 'barbeiro-cadastro.html';
-  const msg = 'Fala! Aqui e da *' + shop.name + '*.\n\n'
-    + 'Criei seu acesso no NaRegua pra voce ver sua agenda direto no celular.\n\n'
-    + 'Acessa esse link, coloca seu numero de telefone e cria uma senha:\n'
+  const msg = 'Fala! Aqui é da *' + shop.name + '*.\n\n'
+    + 'Criei seu acesso no NaRegua pra você ver sua agenda direto no celular.\n\n'
+    + 'Acessa esse link, coloca seu número de telefone e cria uma senha:\n'
     + link + '\n\n'
-    + 'Depois de criar, ja pode instalar no celular como app!';
+    + 'Depois de criar, já pode instalar no celular como app!';
   window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
 }
 
 function compartilharWhatsApp() {
   const link = document.getElementById('share-link').textContent;
-  const msg = 'Ola! Aqui e da *' + shop.name + '*.\n\n'
-    + 'Agora voce pode agendar seu horario online, sem precisar ligar ou mandar mensagem!\n\n'
-    + 'E rapido, so escolher o servico, o dia e o horario:\n'
+  const msg = 'Olá! Aqui é da *' + shop.name + '*.\n\n'
+    + 'Agora você pode agendar seu horário online, sem precisar ligar ou mandar mensagem!\n\n'
+    + 'É rápido, só escolher o serviço, o dia e o horário:\n'
     + link + '\n\n'
     + 'Te esperamos!';
   window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
@@ -1209,10 +1222,10 @@ async function cancelarComVaga(apptId, btnEl) {
       const phone = (a.client_phone || '').replace(/\D/g, '');
       const h = new Date().getHours();
       const saudacao = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
-      const waMsg = saudacao + ', ' + a.client_name + '! Aqui e da *' + shop.name + '*.\n\n'
+      const waMsg = saudacao + ', ' + a.client_name + '! Aqui é da *' + shop.name + '*.\n\n'
         + 'Abriu uma vaga mais cedo: *' + horaVaga + '*\n'
-        + 'Seu horario atual: ' + horaStr + '\n\n'
-        + 'Quer antecipar? Me responde aqui que eu troco pra voce!';
+        + 'Seu horário atual: ' + horaStr + '\n\n'
+        + 'Quer antecipar? Me responde aqui que eu troco pra você!';
       const waLink = phone ? 'https://wa.me/55' + phone + '?text=' + encodeURIComponent(waMsg) : '';
 
       return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--borda);">
