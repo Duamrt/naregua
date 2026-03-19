@@ -377,6 +377,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('loading').style.display = 'none';
   document.getElementById('content').style.display = 'block';
+
+  // Pre-fill dados do cliente se veio de reagendamento
+  const prefillNome = params.get('nome');
+  const prefillPhone = params.get('phone');
+  if (prefillNome) document.getElementById('client-name').value = decodeURIComponent(prefillNome);
+  if (prefillPhone) {
+    const raw = decodeURIComponent(prefillPhone).replace(/\D/g, '');
+    let formatted = raw;
+    if (raw.length > 6) formatted = '(' + raw.slice(0,2) + ') ' + raw.slice(2,7) + '-' + raw.slice(7);
+    else if (raw.length > 2) formatted = '(' + raw.slice(0,2) + ') ' + raw.slice(2);
+    else if (raw.length > 0) formatted = '(' + raw;
+    document.getElementById('client-phone').value = formatted;
+  }
 });
 
 function showError() {
@@ -1084,7 +1097,7 @@ async function confirmarAgendamento() {
 
     // Mostrar erro + botão WhatsApp
     const msgEl = document.getElementById('ag-msg');
-    msgEl.innerHTML = `<div style="margin-bottom:8px;">Esse horário acabou de ser ocupado por outro cliente.</div>`
+    msgEl.innerHTML = `<div style="margin-bottom:8px;">O horário ${selectedTime} acabou de ser ocupado por outro cliente.</div>`
       + (waLink ? `<a href="${waLink}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.3);border-radius:8px;color:#25d366;font-size:11px;font-weight:700;text-decoration:none;margin-top:4px;">AVISAR PELO WHATSAPP</a>` : '')
       + `<div style="margin-top:8px;font-size:11px;color:var(--texto-muted);">Escolha outro horário abaixo.</div>`;
     msgEl.className = 'msg msg-error show';
@@ -1189,7 +1202,7 @@ async function confirmarAgendamento() {
     btn.disabled = false;
     btn.querySelector('.btn-label').style.display = 'inline';
     btn.querySelector('.spinner').style.display = 'none';
-    showAgMsg('Horário acabou de ser ocupado por outro cliente. Escolha outro.', 'error');
+    showAgMsg('O horário ' + selectedTime + ' acabou de ser ocupado. Escolha outro horário.', 'error');
     await renderTimes();
     agBack(3);
     return;

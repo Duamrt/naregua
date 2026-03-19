@@ -307,17 +307,13 @@
 
   <!-- Acoes rapidas -->
   <div id="share-bar" style="display:none;">
-    <div style="display:flex;gap:8px;margin-bottom:12px;">
-      <button onclick="compartilharWhatsApp()" style="flex:1;padding:10px 8px;border-radius:12px;border:none;background:rgba(37,211,102,0.12);color:#25d366;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;line-height:1.3;">
-        <span style="font-size:18px;">&#x1F4C5;</span>ENVIAR LINK DE<br>AGENDAMENTO
-      </button>
-      <button onclick="enviarLinkBarbeiroZap()" style="flex:1;padding:10px 8px;border-radius:12px;border:none;background:rgba(212,168,83,0.1);color:var(--verde-acao);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;line-height:1.3;">
-        <span style="font-size:18px;">&#x1F4AA;</span>CADASTRAR<br>BARBEIRO
-      </button>
+    <div style="display:flex;gap:8px;margin-bottom:8px;">
+      <button onclick="copiarLink()" id="btn-copy" style="flex:1;padding:12px 14px;border-radius:10px;border:none;background:var(--verde-acao);color:#000;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">&#x1F4CB; COPIAR LINK DE AGENDAMENTO</button>
+      <button onclick="compartilharWhatsApp()" style="padding:12px 14px;border-radius:10px;border:none;background:rgba(37,211,102,0.15);color:#25d366;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;">&#x1F4F1; ZAP</button>
     </div>
     <div style="display:flex;gap:8px;">
-      <button onclick="copiarLink()" id="btn-copy" style="flex:1;padding:10px 14px;border-radius:6px;border:1px solid var(--borda);background:transparent;color:var(--texto-muted);font-size:9px;font-weight:600;font-family:inherit;cursor:pointer;">copiar link agendamento</button>
-      <button onclick="copiarLinkBarbeiro()" id="btn-copy-barb" style="flex:1;padding:10px 14px;border-radius:6px;border:1px solid var(--borda);background:transparent;color:var(--texto-muted);font-size:9px;font-weight:600;font-family:inherit;cursor:pointer;">copiar link barbeiro</button>
+      <button onclick="copiarLinkBarbeiro()" id="btn-copy-barb" style="flex:1;padding:6px 10px;border-radius:6px;border:1px solid var(--borda);background:transparent;color:var(--texto-muted);font-size:9px;font-weight:600;font-family:inherit;cursor:pointer;">copiar link barbeiro</button>
+      <button onclick="enviarLinkBarbeiroZap()" style="flex:1;padding:6px 10px;border-radius:6px;border:1px solid var(--borda);background:transparent;color:var(--texto-muted);font-size:9px;font-weight:600;font-family:inherit;cursor:pointer;">cadastrar barbeiro via zap</button>
     </div>
     <div style="font-size:10px;color:var(--texto-muted);word-break:break-all;margin-top:6px;display:none;" id="share-link"></div>
   </div>
@@ -370,39 +366,45 @@
 
     <div id="edit-msg" class="msg"></div>
 
-    <div class="modal-section">Dados</div>
-    <div class="field">
-      <label>NOME DO ESTABELECIMENTO</label>
-      <input type="text" id="edit-name">
-    </div>
-    <div class="field">
-      <label>CIDADE</label>
-      <input type="text" id="edit-city">
-    </div>
-    <div class="field">
-      <label>WHATSAPP</label>
-      <input type="tel" autocomplete="tel" id="edit-phone">
-    </div>
-
-    <div class="modal-section">Horários</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+    <div class="modal-section" style="cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;" onclick="toggleEditSection(this)">DADOS <span style="font-size:14px;">&#x25BE;</span></div>
+    <div class="edit-section-content">
       <div class="field">
-        <label>ABRE ÀS</label>
-        <input type="time" id="edit-open">
+        <label>NOME DO ESTABELECIMENTO</label>
+        <input type="text" id="edit-name">
       </div>
       <div class="field">
-        <label>FECHA ÀS</label>
-        <input type="time" id="edit-close">
+        <label>CIDADE</label>
+        <input type="text" id="edit-city">
+      </div>
+      <div class="field">
+        <label>WHATSAPP</label>
+        <input type="tel" autocomplete="tel" id="edit-phone">
       </div>
     </div>
-    <div class="field">
-      <label>DIAS QUE ABRE</label>
-      <div class="days-modal" id="edit-days"></div>
+
+    <div class="modal-section" style="cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;" onclick="toggleEditSection(this)">HORARIOS <span style="font-size:14px;">&#x25BE;</span></div>
+    <div class="edit-section-content" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="field">
+          <label>ABRE ÀS</label>
+          <input type="time" id="edit-open">
+        </div>
+        <div class="field">
+          <label>FECHA ÀS</label>
+          <input type="time" id="edit-close">
+        </div>
+      </div>
+      <div class="field">
+        <label>DIAS QUE ABRE</label>
+        <div class="days-modal" id="edit-days"></div>
+      </div>
     </div>
 
-    <div class="modal-section">Profissionais</div>
-    <div id="edit-barbers"></div>
-    <button class="btn btn-outline" onclick="addBarberRow()" style="margin:10px 0 16px;font-size:12px;">+ ADICIONAR BARBEIRO</button>
+    <div class="modal-section" style="cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;" onclick="toggleEditSection(this)">PROFISSIONAIS <span style="font-size:14px;">&#x25BE;</span></div>
+    <div class="edit-section-content" style="display:none;">
+      <div id="edit-barbers"></div>
+      <button class="btn btn-outline" onclick="addBarberRow()" style="margin:10px 0 16px;font-size:12px;">+ ADICIONAR BARBEIRO</button>
+    </div>
 
     <div style="display:flex;gap:10px;">
       <button class="btn btn-outline" onclick="fecharEdicao()" style="flex:0.4;">CANCELAR</button>
@@ -948,8 +950,8 @@ function copiarLink() {
   const link = document.getElementById('share-link').textContent;
   navigator.clipboard.writeText(link).then(() => {
     const btn = document.getElementById('btn-copy');
-    btn.textContent = 'COPIADO!';
-    setTimeout(() => btn.textContent = 'COPIAR LINK', 2000);
+    btn.innerHTML = '&#x2705; COPIADO!';
+    setTimeout(() => btn.innerHTML = '&#x1F4CB; COPIAR LINK DE AGENDAMENTO', 2000);
   });
 }
 
@@ -959,7 +961,7 @@ function copiarLinkBarbeiro() {
   navigator.clipboard.writeText(link).then(() => {
     const btn = document.getElementById('btn-copy-barb');
     btn.textContent = 'COPIADO!';
-    setTimeout(() => btn.textContent = 'COPIAR LINK DO BARBEIRO', 2000);
+    setTimeout(() => btn.textContent = 'copiar link barbeiro', 2000);
   });
 }
 
@@ -989,6 +991,18 @@ const DIAS_LABEL = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 let editDays = [];
 let editBarbersList = [];
 
+function toggleEditSection(header) {
+  const content = header.nextElementSibling;
+  const arrow = header.querySelector('span');
+  if (content.style.display === 'none') {
+    content.style.display = 'block';
+    arrow.innerHTML = '&#x25BE;';
+  } else {
+    content.style.display = 'none';
+    arrow.innerHTML = '&#x25B8;';
+  }
+}
+
 function abrirEdicao() {
   if (isAdminViewing) { alert('Use o painel Admin pra editar.'); return; }
   document.getElementById('edit-name').value = shop.name || '';
@@ -1003,6 +1017,18 @@ function abrirEdicao() {
   renderEditBarbers();
 
   document.getElementById('edit-msg').className = 'msg';
+
+  // Resetar secoes colapsaveis: Dados aberta, Horarios e Profissionais fechadas
+  const sections = document.querySelectorAll('#modal-edit .edit-section-content');
+  sections.forEach((sec, i) => {
+    sec.style.display = i === 0 ? 'block' : 'none';
+    const header = sec.previousElementSibling;
+    if (header) {
+      const arrow = header.querySelector('span');
+      if (arrow) arrow.innerHTML = i === 0 ? '&#x25BE;' : '&#x25B8;';
+    }
+  });
+
   document.getElementById('modal-edit').classList.add('show');
 }
 

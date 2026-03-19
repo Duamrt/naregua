@@ -334,8 +334,11 @@ function renderList() {
     const cancelBtn = canCancel
       ? '<button class="btn-cancel-appt" onclick="cancelar(\'' + a.id + '\',this)">CANCELAR AGENDAMENTO</button>'
       : '';
-    const reagendarBtn = canCancel && shopSlug
-      ? '<button class="btn-reagendar" onclick="window.location.href=\'agendar.html?slug=' + esc(shopSlug) + '\'">REAGENDAR</button>'
+    const reagendarUrl = canCancel && shopSlug
+      ? 'agendar.html?slug=' + encodeURIComponent(shopSlug) + '&nome=' + encodeURIComponent(a.client_name || '') + '&phone=' + encodeURIComponent((a.client_phone || '').replace(/\D/g, ''))
+      : '';
+    const reagendarBtn = reagendarUrl
+      ? '<button class="btn-reagendar" onclick="window.location.href=\'' + reagendarUrl + '\'">REAGENDAR</button>'
       : '';
 
     return '<div class="appt-card">' +
