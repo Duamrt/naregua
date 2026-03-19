@@ -187,6 +187,150 @@
       overflow:hidden; margin-top:8px;
     }
     .margin-fill { height:100%; border-radius:4px; transition:width .5s; }
+
+    /* ═══ RANKING BARBEIROS V2 — Barras horizontais ═══ */
+    .rank-row {
+      display:flex; align-items:center; gap:10px; padding:10px 14px;
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:12px;
+      margin-bottom:8px; position:relative; overflow:hidden;
+    }
+    .rank-pos {
+      width:24px; height:24px; border-radius:50%; font-size:11px; font-weight:800;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+      background:var(--cinza-claro); color:var(--texto-muted);
+    }
+    .rank-row:first-child .rank-pos { background:var(--accent); color:#000; }
+    .rank-info { flex:1; min-width:0; }
+    .rank-name { font-size:13px; font-weight:700; margin-bottom:4px; }
+    .rank-meta { font-size:10px; color:var(--texto-secundario); display:flex; gap:10px; flex-wrap:wrap; }
+    .rank-meta .accent { color:var(--accent); font-weight:700; }
+    .rank-bar-bg {
+      position:absolute; left:0; top:0; bottom:0;
+      background:rgba(212,168,83,0.06); border-radius:12px; transition:width .6s ease;
+    }
+    .rank-row:first-child .rank-bar-bg { background:rgba(212,168,83,0.12); }
+    .rank-star { color:#f59e0b; font-size:10px; }
+
+    /* ═══ COMPARATIVO MÊS A MÊS V2 ═══ */
+    .comp-v2 {
+      display:grid; grid-template-columns:1fr 1fr; gap:10px;
+    }
+    .comp-v2-card {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:12px;
+      padding:14px; text-align:center;
+    }
+    .comp-v2-card.full { grid-column:1/-1; }
+    .comp-v2-current { font-size:18px; font-weight:800; }
+    .comp-v2-prev { font-size:11px; color:var(--texto-muted); margin-top:2px; }
+    .comp-v2-badge {
+      display:inline-flex; align-items:center; gap:3px;
+      font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; margin-top:6px;
+    }
+    .comp-v2-badge.up { background:rgba(34,197,94,0.15); color:#22c55e; }
+    .comp-v2-badge.down { background:rgba(239,68,68,0.15); color:#ef4444; }
+    .comp-v2-badge.neutral { background:rgba(115,115,115,0.15); color:var(--texto-muted); }
+    .comp-v2-label { font-size:9px; color:var(--texto-muted); font-weight:700; letter-spacing:1px; margin-top:6px; }
+
+    /* ═══ DONUT CHART — Formas de Pagamento ═══ */
+    .donut-wrap {
+      display:flex; align-items:center; gap:20px; padding:16px;
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:12px;
+    }
+    .donut-chart {
+      width:120px; height:120px; border-radius:50%; flex-shrink:0; position:relative;
+    }
+    .donut-hole {
+      position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+      width:70px; height:70px; background:var(--cinza-escuro); border-radius:50%;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+    }
+    .donut-total { font-size:12px; font-weight:800; color:var(--texto-principal); }
+    .donut-sub { font-size:8px; color:var(--texto-muted); font-weight:600; }
+    .donut-legend { flex:1; }
+    .donut-leg-row {
+      display:flex; align-items:center; gap:8px; padding:5px 0;
+    }
+    .donut-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .donut-leg-label { font-size:11px; font-weight:600; flex:1; }
+    .donut-leg-val { font-size:11px; font-weight:700; }
+    .donut-leg-pct { font-size:10px; color:var(--texto-muted); width:36px; text-align:right; }
+
+    /* ═══ TOP SERVIÇOS ═══ */
+    .svc-row {
+      display:flex; align-items:center; gap:10px; padding:10px 0;
+      border-bottom:1px solid var(--borda);
+    }
+    .svc-row:last-child { border:none; }
+    .svc-pos { font-size:11px; font-weight:800; color:var(--texto-muted); width:20px; text-align:center; }
+    .svc-info { flex:1; min-width:0; }
+    .svc-name { font-size:12px; font-weight:700; }
+    .svc-bar-bg {
+      height:5px; background:rgba(255,255,255,0.04); border-radius:3px;
+      overflow:hidden; margin-top:4px;
+    }
+    .svc-bar-fill { height:100%; background:var(--accent); border-radius:3px; transition:width .5s; }
+    .svc-stats { text-align:right; flex-shrink:0; }
+    .svc-count { font-size:12px; font-weight:700; }
+    .svc-rev { font-size:10px; color:var(--accent); font-weight:600; }
+
+    /* ═══ HORÁRIOS DE PICO ═══ */
+    .peak-grid {
+      display:grid; grid-template-columns:repeat(6,1fr); gap:4px;
+    }
+    .peak-cell {
+      aspect-ratio:1; border-radius:6px; display:flex; flex-direction:column;
+      align-items:center; justify-content:center; font-size:10px; font-weight:700;
+      transition:all .3s;
+    }
+    .peak-cell .peak-hour { font-size:9px; color:var(--texto-muted); margin-top:1px; }
+    .peak-cell.l0 { background:rgba(255,255,255,0.02); color:var(--texto-muted); }
+    .peak-cell.l1 { background:rgba(212,168,83,0.10); color:var(--accent); }
+    .peak-cell.l2 { background:rgba(212,168,83,0.25); color:var(--accent); }
+    .peak-cell.l3 { background:rgba(212,168,83,0.45); color:#000; }
+    .peak-cell.l4 { background:var(--accent); color:#000; font-weight:800; }
+    .peak-busiest {
+      margin-top:10px; text-align:center; font-size:12px; color:var(--texto-secundario);
+    }
+    .peak-busiest strong { color:var(--accent); font-size:16px; }
+
+    /* ═══ BOTÃO EXPORTAR ═══ */
+    .export-bar {
+      display:flex; gap:10px; margin-bottom:20px;
+    }
+    .btn-export {
+      flex:1; padding:12px; border:1px solid var(--borda); border-radius:10px;
+      background:var(--cinza-escuro); color:var(--texto-principal); font-family:inherit;
+      font-size:11px; font-weight:700; letter-spacing:1px; cursor:pointer;
+      transition:all .2s; display:flex; align-items:center; justify-content:center; gap:6px;
+    }
+    .btn-export:hover { border-color:var(--accent); color:var(--accent); }
+
+    /* ═══ PRINT STYLES ═══ */
+    @media print {
+      body { background:#fff !important; color:#111 !important; padding-bottom:0 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      .bottom-nav, #more-menu, .btn-export, .export-bar, .month-btn, .nav-item { display:none !important; }
+      .rel-container { max-width:100%; padding:0 16px; }
+      .rel-header { border-bottom:2px solid #333; }
+      .rel-header h1, .month-label { color:#111 !important; }
+      .kpi-card, .rank-row, .comp-v2-card, .donut-wrap, #top-servicos-wrap, #peak-hours-wrap {
+        background:#f9f9f9 !important; border:1px solid #ddd !important; color:#111 !important;
+      }
+      .kpi-num, .rank-name, .svc-name, .svc-count, .comp-v2-current, .donut-total { color:#111 !important; }
+      .kpi-label, .comp-v2-label, .section-title { color:#555 !important; }
+      .rank-bar-bg { background:rgba(212,168,83,0.12) !important; }
+      .barber-minibar-fill, .svc-bar-fill { background:#d4a853 !important; }
+      .chart-bar { background:#d4a853 !important; }
+      .peak-cell.l1, .peak-cell.l2, .peak-cell.l3, .peak-cell.l4 {
+        -webkit-print-color-adjust:exact; print-color-adjust:exact;
+      }
+      .donut-chart { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      .print-header {
+        display:block !important; text-align:center; padding:20px 0 10px;
+        border-bottom:2px solid #d4a853; margin-bottom:16px;
+      }
+      .print-header h2 { font-size:20px; color:#111; }
+      .print-header p { font-size:11px; color:#555; margin-top:4px; }
+    }
   </style>
 </head>
 <body>
@@ -202,6 +346,11 @@
     <button class="month-btn" onclick="changeMonth(-1)">&#8249;</button>
     <div class="month-label" id="month-label"></div>
     <button class="month-btn" onclick="changeMonth(1)">&#8250;</button>
+  </div>
+
+  <!-- Export bar -->
+  <div class="export-bar">
+    <button class="btn-export" onclick="exportPDF()">&#x1F5A8; EXPORTAR PDF</button>
   </div>
 
   <!-- Loading -->
@@ -251,17 +400,31 @@
     <div class="section-title">RANKING BARBEIROS</div>
     <div id="ranking-barbeiros"></div>
 
-    <!-- Formas de pagamento -->
-    <div class="section-title">FORMAS DE PAGAMENTO</div>
-    <div id="payment-methods" style="background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:12px;padding:12px 14px;margin-bottom:4px;"></div>
-
     <!-- Despesas por categoria -->
     <div class="section-title">DESPESAS POR CATEGORIA</div>
     <div id="expenses-cats" style="background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:12px;padding:12px 14px;margin-bottom:4px;"></div>
 
-    <!-- Comparacao mes anterior -->
-    <div class="section-title">COMPARAÇÃO COM MÊS ANTERIOR</div>
-    <div class="comp-grid" id="comp-grid"></div>
+    <!-- Comparativo Mês a Mês V2 -->
+    <div class="section-title">COMPARATIVO MÊS A MÊS</div>
+    <div class="comp-v2" id="comp-v2"></div>
+
+    <!-- Donut Formas de Pagamento -->
+    <div class="section-title">FORMAS DE PAGAMENTO</div>
+    <div id="donut-payment"></div>
+
+    <!-- Top Serviços -->
+    <div class="section-title">TOP SERVIÇOS</div>
+    <div id="top-servicos-wrap" style="background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:12px;padding:12px 14px;"></div>
+
+    <!-- Horários de Pico -->
+    <div class="section-title">HORÁRIOS DE PICO</div>
+    <div id="peak-hours-wrap" style="background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:12px;padding:14px;"></div>
+
+    <!-- Print header (only visible on print) -->
+    <div class="print-header" style="display:none;">
+      <h2>NaRegua — Relatório Mensal</h2>
+      <p id="print-period"></p>
+    </div>
 
   </div>
 </div>
@@ -285,6 +448,8 @@
   <a href="cupons.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F3AB; Cupons</a>
   <a href="retencao.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F504; Retenção</a>
   <a href="satisfacao.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x2B50; Satisfação</a>
+  <a href="agenda-semana.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F5D3; Agenda Semanal</a>
+  <a href="configuracoes.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x2699; Configurações</a>
 </div>
 <script>
 function toggleMore(){var m=document.getElementById('more-menu');m.style.display=m.style.display==='none'?'block':'none';}
@@ -479,17 +644,27 @@ async function renderReport() {
   // Grafico diario
   renderDailyChart(done, range);
 
-  // Ranking barbeiros
-  renderBarberRanking(done);
-
-  // Formas de pagamento
-  renderPaymentMethods(done);
+  // Ranking barbeiros (com nota média)
+  await renderBarberRanking(done, range);
 
   // Despesas por categoria
   renderExpenseCategories(data.expenses);
 
-  // Comparacao mes anterior
-  renderComparison(data, prevData);
+  // Comparativo mês a mês V2
+  renderComparisonV2(data, prevData);
+
+  // Donut formas de pagamento
+  renderDonutPayment(done);
+
+  // Top serviços
+  renderTopServicos(done);
+
+  // Horários de pico
+  renderPeakHours(data.appointments);
+
+  // Print period label
+  const pp = document.getElementById('print-period');
+  if (pp) pp.textContent = MESES[currentDate.getMonth()] + ' ' + currentDate.getFullYear() + ' — ' + (shop ? esc(shop.name) : '');
 }
 
 // ── Grafico faturamento diario ────────────────────────────────
@@ -529,8 +704,8 @@ function renderDailyChart(done, range) {
   container.innerHTML = html;
 }
 
-// ── Ranking barbeiros ─────────────────────────────────────────
-function renderBarberRanking(done) {
+// ── Ranking barbeiros V2 (barras horizontais + nota média) ───
+async function renderBarberRanking(done, range) {
   const container = document.getElementById('ranking-barbeiros');
 
   if (!barbersList.length) {
@@ -538,10 +713,26 @@ function renderBarberRanking(done) {
     return;
   }
 
+  // Tentar buscar notas de satisfação (tabela pode não existir)
+  let ratings = {};
+  try {
+    const { data: satData } = await db.from('respostas_satisfacao').select('barber_id, rating')
+      .eq('barbershop_id', shop.id)
+      .gte('responded_at', range.start + 'T00:00:00')
+      .lte('responded_at', range.end + 'T23:59:59');
+    if (satData && satData.length) {
+      satData.forEach(r => {
+        if (!ratings[r.barber_id]) ratings[r.barber_id] = { sum: 0, count: 0 };
+        ratings[r.barber_id].sum += Number(r.rating);
+        ratings[r.barber_id].count++;
+      });
+    }
+  } catch (e) { /* tabela respostas_satisfacao ainda não existe */ }
+
   // Agrupar por barbeiro
   const stats = {};
   barbersList.forEach(b => {
-    stats[b.id] = { name: b.name, count: 0, revenue: 0, commission_pct: b.commission_pct || 0 };
+    stats[b.id] = { id: b.id, name: b.name, count: 0, revenue: 0, commission_pct: b.commission_pct || 0 };
   });
 
   done.forEach(a => {
@@ -551,63 +742,29 @@ function renderBarberRanking(done) {
     }
   });
 
-  // Ordenar por faturamento desc
+  const totalRevenue = Object.values(stats).reduce((s, b) => s + b.revenue, 0);
   const sorted = Object.values(stats).sort((a, b) => b.revenue - a.revenue);
   const maxRevenue = sorted.length ? sorted[0].revenue : 1;
 
   let html = '';
   sorted.forEach((b, i) => {
-    const comissao = b.revenue * (b.commission_pct / 100);
     const barPct = maxRevenue > 0 ? (b.revenue / maxRevenue * 100) : 0;
-    const initial = b.name.charAt(0).toUpperCase();
-    const medal = i === 0 && b.revenue > 0 ? ' 🥇' : i === 1 && b.revenue > 0 ? ' 🥈' : i === 2 && b.revenue > 0 ? ' 🥉' : '';
+    const pctOfTotal = totalRevenue > 0 ? (b.revenue / totalRevenue * 100) : 0;
+    const rat = ratings[b.id];
+    const avgRating = rat ? (rat.sum / rat.count).toFixed(1) : null;
 
-    html += '<div class="barber-card">'
-      + '<div class="barber-avatar">' + esc(initial) + '</div>'
-      + '<div class="barber-info">'
-      + '<div class="barber-name">' + esc(b.name) + medal + '</div>'
-      + '<div class="barber-stats">'
+    html += '<div class="rank-row">'
+      + '<div class="rank-bar-bg" style="width:' + barPct + '%;"></div>'
+      + '<div class="rank-pos">' + (i + 1) + '</div>'
+      + '<div class="rank-info">'
+      + '<div class="rank-name">' + esc(b.name) + '</div>'
+      + '<div class="rank-meta">'
       + '<span>' + b.count + ' atend.</span>'
-      + '<span style="color:var(--accent);">' + formatMoney(b.revenue) + '</span>'
-      + (b.commission_pct > 0 ? '<span style="color:var(--texto-muted);">Comissao: ' + formatMoney(comissao) + ' (' + b.commission_pct + '%)</span>' : '')
-      + '</div>'
-      + '<div class="barber-minibar"><div class="barber-minibar-fill" style="width:' + barPct + '%;"></div></div>'
-      + '</div>'
-      + '</div>';
-  });
-
-  container.innerHTML = html;
-}
-
-// ── Formas de pagamento ───────────────────────────────────────
-function renderPaymentMethods(done) {
-  const container = document.getElementById('payment-methods');
-
-  const totals = { pix: 0, dinheiro: 0, cartao: 0 };
-  done.forEach(a => {
-    const method = a.payment_method || 'dinheiro';
-    const key = totals.hasOwnProperty(method) ? method : 'dinheiro';
-    totals[key] += getPrice(a);
-  });
-
-  const grandTotal = Object.values(totals).reduce((s, v) => s + v, 0);
-
-  if (grandTotal === 0) {
-    container.innerHTML = '<div style="font-size:12px;color:var(--texto-muted);text-align:center;padding:8px 0;">Nenhum pagamento registrado.</div>';
-    return;
-  }
-
-  let html = '';
-  Object.entries(totals).forEach(([key, val]) => {
-    const pct = grandTotal > 0 ? (val / grandTotal * 100) : 0;
-    html += '<div class="pay-row">'
-      + '<div class="pay-label">' + (PAY_LABELS[key] || key) + '</div>'
-      + '<div class="pay-bar-track">'
-      + '<div class="pay-bar-fill ' + (PAY_COLORS[key] || '') + '" style="width:' + Math.max(pct, 0) + '%;' + (pct > 15 ? '' : 'padding-right:0;') + '">'
-      + (pct > 15 ? pct.toFixed(0) + '%' : '')
+      + '<span class="accent">' + formatMoney(b.revenue) + '</span>'
+      + '<span>' + pctOfTotal.toFixed(0) + '% do total</span>'
+      + (avgRating ? '<span class="rank-star">\u2605 ' + avgRating + '</span>' : '')
       + '</div>'
       + '</div>'
-      + '<div class="pay-val">' + formatMoney(val) + '</div>'
       + '</div>';
   });
 
@@ -644,9 +801,9 @@ function renderExpenseCategories(expenses) {
   container.innerHTML = html;
 }
 
-// ── Comparacao mes anterior ───────────────────────────────────
-function renderComparison(data, prevData) {
-  const container = document.getElementById('comp-grid');
+// ── Comparativo Mês a Mês V2 ─────────────────────────────────
+function renderComparisonV2(data, prevData) {
+  const container = document.getElementById('comp-v2');
 
   const done = data.appointments.filter(a => a.status === 'done');
   const prevDone = prevData.appointments.filter(a => a.status === 'done');
@@ -663,30 +820,196 @@ function renderComparison(data, prevData) {
   const lucro = fat - desp;
   const prevLucro = prevFat - prevDesp;
 
-  function compCard(label, current, prev) {
-    let pct = 0;
-    let arrow = '—';
-    let cls = 'neutral';
+  const ticket = atend > 0 ? fat / atend : 0;
+  const prevTicket = prevAtend > 0 ? prevFat / prevAtend : 0;
+
+  function calcChange(cur, prev, invertColor) {
+    let pct = 0, cls = 'neutral', arrow = '—';
     if (prev > 0) {
-      pct = ((current - prev) / prev * 100);
-      arrow = pct > 0 ? '↑' : pct < 0 ? '↓' : '—';
-      cls = pct > 0 ? 'up' : pct < 0 ? 'down' : 'neutral';
-    } else if (current > 0) {
+      pct = ((cur - prev) / prev * 100);
+    } else if (cur > 0) {
       pct = 100;
-      arrow = '↑';
-      cls = 'up';
     }
-    return '<div class="comp-card">'
-      + '<div class="comp-arrow ' + cls + '">' + arrow + '</div>'
-      + '<div class="comp-pct" style="color:' + (cls === 'up' ? 'var(--accent)' : cls === 'down' ? '#ef4444' : 'var(--texto-muted)') + ';">'
-      + (pct > 0 ? '+' : '') + pct.toFixed(1) + '%</div>'
-      + '<div class="comp-label">' + label + '</div>'
+    if (pct > 0) { arrow = '\u2191'; cls = invertColor ? 'down' : 'up'; }
+    else if (pct < 0) { arrow = '\u2193'; cls = invertColor ? 'up' : 'down'; }
+    return { pct, cls, arrow };
+  }
+
+  function compV2Card(label, current, prev, isMoney, invertColor, full) {
+    const ch = calcChange(current, prev, invertColor);
+    const curStr = isMoney ? formatMoney(current) : current;
+    const prevStr = isMoney ? formatMoney(prev) : prev;
+    return '<div class="comp-v2-card' + (full ? ' full' : '') + '">'
+      + '<div class="comp-v2-current">' + curStr + '</div>'
+      + '<div class="comp-v2-prev">ant: ' + prevStr + '</div>'
+      + '<div class="comp-v2-badge ' + ch.cls + '">' + ch.arrow + ' ' + (ch.pct > 0 ? '+' : '') + ch.pct.toFixed(1) + '%</div>'
+      + '<div class="comp-v2-label">' + label + '</div>'
       + '</div>';
   }
 
-  container.innerHTML = compCard('FATURAMENTO', fat, prevFat)
-    + compCard('ATENDIMENTOS', atend, prevAtend)
-    + compCard('LUCRO', lucro, prevLucro);
+  container.innerHTML =
+    compV2Card('FATURAMENTO', fat, prevFat, true, false)
+    + compV2Card('ATENDIMENTOS', atend, prevAtend, false, false)
+    + compV2Card('DESPESAS', desp, prevDesp, true, true)
+    + compV2Card('TICKET MÉDIO', ticket, prevTicket, true, false)
+    + compV2Card('LUCRO', lucro, prevLucro, true, false, true);
+}
+
+// ── Donut Formas de Pagamento ────────────────────────────────
+function renderDonutPayment(done) {
+  const container = document.getElementById('donut-payment');
+
+  const PAY_DONUT = {
+    pix:      { label: 'PIX',      color: '#00b4d8' },
+    dinheiro: { label: 'Dinheiro', color: '#2d6a4f' },
+    debito:   { label: 'Debito',   color: '#e76f51' },
+    credito:  { label: 'Credito',  color: '#9b59b6' },
+    cartao:   { label: 'Cartao',   color: '#6c5ce7' }
+  };
+
+  const totals = {};
+  done.forEach(a => {
+    const method = a.payment_method || 'dinheiro';
+    if (!totals[method]) totals[method] = 0;
+    totals[method] += getPrice(a);
+  });
+
+  const grandTotal = Object.values(totals).reduce((s, v) => s + v, 0);
+
+  if (grandTotal === 0) {
+    container.innerHTML = '<div class="donut-wrap"><div style="width:100%;text-align:center;font-size:12px;color:var(--texto-muted);padding:8px 0;">Nenhum pagamento registrado.</div></div>';
+    return;
+  }
+
+  // Build conic-gradient segments
+  const entries = Object.entries(totals).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+  let gradParts = [];
+  let cumPct = 0;
+  entries.forEach(([key, val]) => {
+    const pct = (val / grandTotal) * 100;
+    const color = (PAY_DONUT[key] || { color: '#555' }).color;
+    gradParts.push(color + ' ' + cumPct.toFixed(2) + '% ' + (cumPct + pct).toFixed(2) + '%');
+    cumPct += pct;
+  });
+
+  const donutStyle = 'background:conic-gradient(' + gradParts.join(', ') + ');';
+
+  let legendHtml = '';
+  entries.forEach(([key, val]) => {
+    const pct = (val / grandTotal * 100).toFixed(1);
+    const info = PAY_DONUT[key] || { label: key, color: '#555' };
+    legendHtml += '<div class="donut-leg-row">'
+      + '<div class="donut-dot" style="background:' + info.color + ';"></div>'
+      + '<div class="donut-leg-label">' + info.label + '</div>'
+      + '<div class="donut-leg-val">' + formatMoney(val) + '</div>'
+      + '<div class="donut-leg-pct">' + pct + '%</div>'
+      + '</div>';
+  });
+
+  container.innerHTML = '<div class="donut-wrap">'
+    + '<div class="donut-chart" style="' + donutStyle + '">'
+    + '<div class="donut-hole"><div class="donut-total">' + formatMoney(grandTotal) + '</div><div class="donut-sub">TOTAL</div></div>'
+    + '</div>'
+    + '<div class="donut-legend">' + legendHtml + '</div>'
+    + '</div>';
+}
+
+// ── Top Serviços ─────────────────────────────────────────────
+function renderTopServicos(done) {
+  const container = document.getElementById('top-servicos-wrap');
+
+  if (!done.length) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--texto-muted);text-align:center;padding:8px 0;">Nenhum atendimento no periodo.</div>';
+    return;
+  }
+
+  const svcStats = {};
+  done.forEach(a => {
+    const svc = services.find(s => s.id === a.service_id);
+    const name = svc ? svc.name : 'Servico #' + (a.service_id || '?');
+    const key = a.service_id || name;
+    if (!svcStats[key]) svcStats[key] = { name: name, count: 0, revenue: 0 };
+    svcStats[key].count++;
+    svcStats[key].revenue += getPrice(a);
+  });
+
+  const totalCount = done.length;
+  const sorted = Object.values(svcStats).sort((a, b) => b.count - a.count);
+  const maxCount = sorted.length ? sorted[0].count : 1;
+
+  let html = '';
+  sorted.slice(0, 10).forEach((s, i) => {
+    const barPct = (s.count / maxCount * 100);
+    const pctOfTotal = (s.count / totalCount * 100).toFixed(0);
+    html += '<div class="svc-row">'
+      + '<div class="svc-pos">' + (i + 1) + '</div>'
+      + '<div class="svc-info">'
+      + '<div class="svc-name">' + esc(s.name) + '</div>'
+      + '<div class="svc-bar-bg"><div class="svc-bar-fill" style="width:' + barPct + '%;"></div></div>'
+      + '</div>'
+      + '<div class="svc-stats">'
+      + '<div class="svc-count">' + s.count + 'x <span style="font-size:9px;color:var(--texto-muted);">(' + pctOfTotal + '%)</span></div>'
+      + '<div class="svc-rev">' + formatMoney(s.revenue) + '</div>'
+      + '</div>'
+      + '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+// ── Horários de Pico ─────────────────────────────────────────
+function renderPeakHours(appointments) {
+  const container = document.getElementById('peak-hours-wrap');
+  const allValid = appointments.filter(a => ['done', 'pending', 'confirmed'].includes(a.status));
+
+  if (!allValid.length) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--texto-muted);text-align:center;padding:8px 0;">Sem dados de horario.</div>';
+    return;
+  }
+
+  // Count by hour (7h to 21h typically)
+  const hourMap = {};
+  for (let h = 7; h <= 21; h++) hourMap[h] = 0;
+
+  allValid.forEach(a => {
+    const hour = new Date(a.scheduled_at).getHours();
+    if (hourMap[hour] !== undefined) hourMap[hour]++;
+    else hourMap[hour] = 1;
+  });
+
+  // Remove hours with 0 that are outside the range of actual data
+  const hours = Object.entries(hourMap).filter(([, c]) => true).sort((a, b) => Number(a[0]) - Number(b[0]));
+  const maxH = Math.max(...hours.map(h => h[1]), 1);
+  let busiestHour = 0, busiestCount = 0;
+
+  hours.forEach(([h, c]) => {
+    if (c > busiestCount) { busiestCount = c; busiestHour = h; }
+  });
+
+  let html = '<div class="peak-grid">';
+  hours.forEach(([h, c]) => {
+    let level = 'l0';
+    const ratio = maxH > 0 ? c / maxH : 0;
+    if (ratio > 0.8) level = 'l4';
+    else if (ratio > 0.5) level = 'l3';
+    else if (ratio > 0.25) level = 'l2';
+    else if (c > 0) level = 'l1';
+
+    html += '<div class="peak-cell ' + level + '">'
+      + c
+      + '<div class="peak-hour">' + String(h).padStart(2, '0') + 'h</div>'
+      + '</div>';
+  });
+  html += '</div>';
+
+  html += '<div class="peak-busiest">Horario mais movimentado: <strong>' + String(busiestHour).padStart(2, '0') + ':00</strong> (' + busiestCount + ' agendamentos)</div>';
+
+  container.innerHTML = html;
+}
+
+// ── Export PDF ────────────────────────────────────────────────
+function exportPDF() {
+  window.print();
 }
 </script>
 <script src="js/ajuda.js"></script>
