@@ -145,9 +145,9 @@
   function init() {
     handleResize();
     window.addEventListener('resize', handleResize);
-    // Observer leve: só atualiza nome, não move DOM
-    var observer = new MutationObserver(updateShopName);
-    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    // Atualizar nome da barbearia após 2s (tempo pro async carregar)
+    setTimeout(updateShopName, 2000);
+    setTimeout(updateShopName, 5000);
   }
 
   if (document.readyState === 'loading') {
