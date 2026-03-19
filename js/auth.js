@@ -146,11 +146,7 @@ async function redirectUser(user) {
       .maybeSingle();
 
     if (pending) {
-      await fetch(_SB_REST + '/barbers?id=eq.' + pending.id, {
-        method: 'PATCH',
-        headers: getServiceHeaders(),
-        body: JSON.stringify({ user_id: user.id })
-      });
+      await sb.rpc('link_barber_user', { p_barber_id: pending.id, p_user_id: user.id });
       window.location.href = 'barbeiro.html';
       return;
     }

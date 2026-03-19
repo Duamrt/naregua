@@ -503,29 +503,21 @@ const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_vi
 if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
 const isAdminViewing = !!adminViewingShop;
 
-// BUG 3 FIX: service key centralizada em utils.js (_SK, _SB_REST, getServiceHeaders)
-const SB_REST = _SB_REST;
-const REST_HEADERS = getServiceHeaders();
-
-// Helper pra update/delete via REST
+// Helpers — usam sb autenticado (RLS cuida do acesso)
 async function restUpdate(table, filter, data) {
-  const r = await fetch(SB_REST + '/' + table + '?' + filter, {
-    method: 'PATCH', headers: REST_HEADERS, body: JSON.stringify(data)
-  });
-  return r.ok ? await r.json() : null;
+  // filter no formato "id=eq.xxx"
+  const [col, val] = filter.replace('=eq.', '|').split('|');
+  const { data: result } = await sb.from(table).update(data).eq(col, val).select();
+  return result;
 }
 
 async function restDelete(table, filter) {
-  const r = await fetch(SB_REST + '/' + table + '?' + filter, {
-    method: 'DELETE', headers: REST_HEADERS
-  });
-  return r.ok;
+  const [col, val] = filter.replace('=eq.', '|').split('|');
+  const { error } = await sb.from(table).delete().eq(col, val);
+  return !error;
 }
 
-// Cliente de banco: admin usa service key (bypass RLS), dono usa anon
-const db = isAdminViewing
-  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', _SK)
-  : sb;
+const db = sb;
 
 document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await sb.auth.getSession();

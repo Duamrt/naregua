@@ -301,21 +301,35 @@ const CAT_LABELS = {
 const PAY_LABELS = { pix:'PIX', dinheiro:'Dinheiro', cartao:'Cartao' };
 const PAY_COLORS = { pix:'pay-pix', dinheiro:'pay-dinheiro', cartao:'pay-cartao' };
 
-const SB_REST = _SB_REST;
-const REST_HEADERS = getServiceHeaders();
-
 const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
 const _params = new URLSearchParams(window.location.search);
 const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_viewing_shop');
 if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
 const isAdminViewing = !!adminViewingShop;
-const db = isAdminViewing
-  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', _SK)
-  : sb;
+const db = sb;
 
-async function restGet(table, filter) {
-  const r = await fetch(SB_REST + '/' + table + '?' + filter, { headers: REST_HEADERS });
-  return r.ok ? await r.json() : [];
+async function restGet(table, filterStr) {
+  let query = sb.from(table).select('*');
+  const parts = filterStr.split('&');
+  for (const part of parts) {
+    const eqIdx = part.indexOf('=');
+    const key = part.substring(0, eqIdx);
+    const val = part.substring(eqIdx + 1);
+    if (key === 'order') {
+      const [col, dir] = val.split('.');
+      query = query.order(col, { ascending: dir !== 'desc' });
+      continue;
+    }
+    const dotIdx = val.indexOf('.');
+    const op = val.substring(0, dotIdx);
+    const v = val.substring(dotIdx + 1);
+    if (op === 'eq') query = query.eq(key, v);
+    else if (op === 'gte') query = query.gte(key, v);
+    else if (op === 'lte') query = query.lte(key, v);
+    else if (op === 'in') query = query.in(key, v.replace(/[()]/g, '').split(','));
+  }
+  const { data } = await query;
+  return data || [];
 }
 
 // ── Init ──────────────────────────────────────────────────────

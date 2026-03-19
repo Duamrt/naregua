@@ -222,40 +222,16 @@ async function buscar() {
   clientPhone = raw;
   localStorage.setItem('naregua_client_phone', phoneInput.value);
 
-  // Buscar agendamentos pelo telefone (todas as barbearias)
-  // appointments tem leitura publica pra pending/confirmed, e done precisa de outra abordagem
-  // Usamos service key via REST pra pegar todos os status
-  const r = await fetch(_SB_REST + '/appointments?client_phone=like.*' + raw + '*&order=scheduled_at.desc&limit=100', {
-    headers: getServiceHeaders()
-  });
-  const appts = r.ok ? await r.json() : [];
+  // Buscar agendamentos via RPC (retorna tudo enriquecido)
+  const { data: rpcData } = await sb.rpc('client_lookup_by_phone', { p_phone: raw });
+  const appts = rpcData || [];
 
-  // Buscar dados relacionados (servicos e barbearias)
-  const shopIds = [...new Set(appts.map(a => a.barbershop_id))];
-  const barberIds = [...new Set(appts.filter(a => a.barber_id).map(a => a.barber_id))];
-  const serviceIds = [...new Set(appts.filter(a => a.service_id).map(a => a.service_id))];
-
-  let shops = [], barbersList = [], servicesList = [];
-
-  if (shopIds.length) {
-    const r2 = await fetch(_SB_REST + '/barbershops?id=in.(' + shopIds.join(',') + ')&select=id,name,slug,phone', { headers: getServiceHeaders() });
-    shops = r2.ok ? await r2.json() : [];
-  }
-  if (barberIds.length) {
-    const r3 = await fetch(_SB_REST + '/barbers?id=in.(' + barberIds.join(',') + ')&select=id,name', { headers: getServiceHeaders() });
-    barbersList = r3.ok ? await r3.json() : [];
-  }
-  if (serviceIds.length) {
-    const r4 = await fetch(_SB_REST + '/services?id=in.(' + serviceIds.join(',') + ')&select=id,name,price', { headers: getServiceHeaders() });
-    servicesList = r4.ok ? await r4.json() : [];
-  }
-
-  // Enriquecer agendamentos
+  // Mapear dados enriquecidos
   allAppts = appts.map(a => ({
     ...a,
-    _shop: shops.find(s => s.id === a.barbershop_id),
-    _barber: barbersList.find(b => b.id === a.barber_id),
-    _service: servicesList.find(s => s.id === a.service_id)
+    _shop: { id: a.barbershop_id, name: a.barbershop_name, slug: a.barbershop_slug, phone: a.barbershop_phone },
+    _barber: a.barber_name ? { id: a.barber_id, name: a.barber_name } : null,
+    _service: a.service_name ? { id: a.service_id, name: a.service_name, price: a.service_price } : null
   }));
 
   btn.disabled = false;
@@ -381,18 +357,16 @@ async function cancelar(id, btn) {
   btn.textContent = 'CANCELANDO...';
   btn.disabled = true;
 
-  // Cancelar via REST
+  // Cancelar via RPC
   const appt = allAppts.find(a => a.id === id);
   if (appt && appt.group_id) {
-    await fetch(_SB_REST + '/appointments?group_id=eq.' + appt.group_id, {
-      method: 'PATCH', headers: getServiceHeaders(),
-      body: JSON.stringify({ status: 'cancelled' })
-    });
+    // Cancelar todos do grupo
+    const groupAppts = allAppts.filter(a => a.group_id === appt.group_id);
+    for (const ga of groupAppts) {
+      await sb.rpc('client_cancel_appointment', { p_id: ga.id, p_phone: clientPhone });
+    }
   } else {
-    await fetch(_SB_REST + '/appointments?id=eq.' + id, {
-      method: 'PATCH', headers: getServiceHeaders(),
-      body: JSON.stringify({ status: 'cancelled' })
-    });
+    await sb.rpc('client_cancel_appointment', { p_id: id, p_phone: clientPhone });
   }
 
   // Atualizar local

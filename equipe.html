@@ -325,18 +325,12 @@ function updateSched(i, field, value) {
   if (editSchedule[i]) editSchedule[i][field] = value;
 }
 
-// BUG 3 FIX: service key centralizada em utils.js (_SK, _SB_REST, getServiceHeaders)
-const SB_REST = _SB_REST;
-const REST_HEADERS = getServiceHeaders();
-
 const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
 const _params = new URLSearchParams(window.location.search);
 const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_viewing_shop');
 if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
 const isAdminViewing = !!adminViewingShop;
-const db = isAdminViewing
-  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', _SK)
-  : sb;
+const db = sb;
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
@@ -373,10 +367,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadBarbers() {
-  const r = await fetch(SB_REST + '/barbers?barbershop_id=eq.' + shop.id + '&order=active.desc,name.asc', {
-    headers: REST_HEADERS
-  });
-  barbers = r.ok ? await r.json() : [];
+  const { data } = await sb.from('barbers').select('*').eq('barbershop_id', shop.id).order('active', { ascending: false }).order('name');
+  barbers = data || [];
   renderBarbers();
 }
 
@@ -492,17 +484,11 @@ async function salvar() {
 
   try {
     if (editId) {
-      const r = await fetch(SB_REST + '/barbers?id=eq.' + editId, {
-        method: 'PATCH', headers: REST_HEADERS,
-        body: JSON.stringify(payload)
-      });
-      if (!r.ok) throw new Error(await r.text());
+      const { error } = await sb.from('barbers').update(payload).eq('id', editId);
+      if (error) throw error;
     } else {
-      const r = await fetch(SB_REST + '/barbers', {
-        method: 'POST', headers: REST_HEADERS,
-        body: JSON.stringify({ barbershop_id: shop.id, active: true, ...payload })
-      });
-      if (!r.ok) throw new Error(await r.text());
+      const { error } = await sb.from('barbers').insert({ barbershop_id: shop.id, active: true, ...payload });
+      if (error) throw error;
     }
 
     fecharModal();
@@ -520,10 +506,7 @@ async function salvar() {
 
 // ── Toggle ativo/inativo ──────────────────────────────────────
 async function toggle(id, ativo) {
-  await fetch(SB_REST + '/barbers?id=eq.' + id, {
-    method: 'PATCH', headers: REST_HEADERS,
-    body: JSON.stringify({ active: ativo })
-  });
+  await sb.from('barbers').update({ active: ativo }).eq('id', id);
   await loadBarbers();
 }
 
@@ -532,20 +515,18 @@ async function toggle(id, ativo) {
 async function excluir(id, nome, btnEl) {
   if (!btnEl.dataset.confirming) {
     // Primeiro clique: verificar agendamentos pendentes
-    const r = await fetch(SB_REST + '/appointments?barber_id=eq.' + id + '&status=in.(pending,confirmed)&select=id', {
-      headers: REST_HEADERS
-    });
-    const pendentes = r.ok ? await r.json() : [];
+    const { data: pendentes } = await sb.from('appointments').select('id').eq('barber_id', id).in('status', ['pending','confirmed']);
+    const pendentesArr = pendentes || [];
 
-    if (pendentes.length > 0) {
-      btnEl.textContent = `${pendentes.length} agendamento${pendentes.length > 1 ? 's' : ''} pendente${pendentes.length > 1 ? 's' : ''}. Cancelar todos e excluir?`;
+    if (pendentesArr.length > 0) {
+      btnEl.textContent = `${pendentesArr.length} agendamento${pendentesArr.length > 1 ? 's' : ''} pendente${pendentesArr.length > 1 ? 's' : ''}. Cancelar todos e excluir?`;
       btnEl.style.cssText = 'color:#e74c3c;font-size:10px;white-space:normal;text-align:left;';
     } else {
       btnEl.textContent = 'Certeza?';
       btnEl.style.color = '#e74c3c';
     }
     btnEl.dataset.confirming = 'true';
-    btnEl.dataset.pendentes = pendentes.length;
+    btnEl.dataset.pendentes = pendentesArr.length;
     setTimeout(() => {
       btnEl.textContent = 'Excluir';
       btnEl.style.cssText = '';
@@ -560,15 +541,10 @@ async function excluir(id, nome, btnEl) {
   btnEl.textContent = '...';
   const pendentesCount = parseInt(btnEl.dataset.pendentes || '0');
   if (pendentesCount > 0) {
-    await fetch(SB_REST + '/appointments?barber_id=eq.' + id + '&status=in.(pending,confirmed)', {
-      method: 'PATCH', headers: REST_HEADERS,
-      body: JSON.stringify({ status: 'cancelled' })
-    });
+    await sb.from('appointments').update({ status: 'cancelled' }).eq('barber_id', id).in('status', ['pending','confirmed']);
   }
 
-  await fetch(SB_REST + '/barbers?id=eq.' + id, {
-    method: 'DELETE', headers: REST_HEADERS
-  });
+  await sb.from('barbers').delete().eq('id', id);
   await loadBarbers();
 }
 

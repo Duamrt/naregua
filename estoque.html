@@ -280,9 +280,7 @@ const _params = new URLSearchParams(window.location.search);
 const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_viewing_shop');
 if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
 const isAdminViewing = !!adminViewingShop;
-const db = isAdminViewing
-  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', _SK)
-  : sb;
+const db = sb;
 
 document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await sb.auth.getSession();
@@ -310,10 +308,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadProducts() {
-  const r = await fetch(_SB_REST + '/products?barbershop_id=eq.' + shop.id + '&active=is.true&order=name.asc', {
-    headers: getServiceHeaders()
-  });
-  products = r.ok ? await r.json() : [];
+  const { data } = await sb.from('products').select('*').eq('barbershop_id', shop.id).eq('active', true).order('name');
+  products = data || [];
   renderStats();
   renderCatFilters();
   renderProducts();
@@ -444,14 +440,9 @@ async function salvarProduto() {
 
   try {
     if (editId) {
-      await fetch(_SB_REST + '/products?id=eq.' + editId, {
-        method: 'PATCH', headers: getServiceHeaders(), body: JSON.stringify(payload)
-      });
+      await sb.from('products').update(payload).eq('id', editId);
     } else {
-      await fetch(_SB_REST + '/products', {
-        method: 'POST', headers: getServiceHeaders(),
-        body: JSON.stringify({ barbershop_id: shop.id, ...payload })
-      });
+      await sb.from('products').insert({ barbershop_id: shop.id, ...payload });
     }
     fecharModal();
     await loadProducts();
@@ -480,7 +471,7 @@ async function excluirProduto(id, btn) {
   }
   btn.textContent = '...';
   btn.disabled = true;
-  await fetch(_SB_REST + '/products?id=eq.' + id, { method: 'DELETE', headers: getServiceHeaders() });
+  await sb.from('products').delete().eq('id', id);
   await loadProducts();
 }
 
@@ -531,23 +522,17 @@ async function salvarMov() {
   btn.querySelector('.spinner').style.display = 'inline-block';
 
   // Registrar movimentacao
-  await fetch(_SB_REST + '/stock_movements', {
-    method: 'POST', headers: getServiceHeaders(),
-    body: JSON.stringify({
-      product_id: prodId,
-      barbershop_id: shop.id,
-      type: type,
-      quantity: qty,
-      notes: notes
-    })
+  await sb.from('stock_movements').insert({
+    product_id: prodId,
+    barbershop_id: shop.id,
+    type: type,
+    quantity: qty,
+    notes: notes
   });
 
   // Atualizar quantidade do produto
   const newQty = type === 'entrada' ? p.quantity + qty : p.quantity - qty;
-  await fetch(_SB_REST + '/products?id=eq.' + prodId, {
-    method: 'PATCH', headers: getServiceHeaders(),
-    body: JSON.stringify({ quantity: newQty })
-  });
+  await sb.from('products').update({ quantity: newQty }).eq('id', prodId);
 
   btn.disabled = false;
   btn.querySelector('.btn-label').style.display = 'inline';

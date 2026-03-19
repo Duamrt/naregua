@@ -27,20 +27,14 @@ async function initPush(shopId) {
     if (!session) return;
 
     // Upsert: se endpoint ja existe, atualiza
-    await fetch(_SB_REST + '/push_subscriptions?endpoint=eq.' + encodeURIComponent(sub.endpoint), {
-      method: 'DELETE', headers: getServiceHeaders()
-    });
+    await sb.from('push_subscriptions').delete().eq('endpoint', sub.endpoint);
 
-    await fetch(_SB_REST + '/push_subscriptions', {
-      method: 'POST',
-      headers: getServiceHeaders(),
-      body: JSON.stringify({
-        user_id: session.user.id,
-        barbershop_id: shopId,
-        endpoint: sub.endpoint,
-        p256dh: keys.p256dh,
-        auth: keys.auth
-      })
+    await sb.from('push_subscriptions').insert({
+      user_id: session.user.id,
+      barbershop_id: shopId,
+      endpoint: sub.endpoint,
+      p256dh: keys.p256dh,
+      auth: keys.auth
     });
 
     console.log('Push subscription ativa');

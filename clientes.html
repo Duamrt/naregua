@@ -143,9 +143,7 @@ const _params = new URLSearchParams(window.location.search);
 const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_viewing_shop');
 if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
 const isAdminViewing = !!adminViewingShop;
-const db = isAdminViewing
-  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', _SK)
-  : sb;
+const db = sb;
 
 document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await sb.auth.getSession();
@@ -169,14 +167,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   shop = shopData;
 
   // Buscar todos os agendamentos done/confirmed pra consolidar clientes
-  const r = await fetch(_SB_REST + '/appointments?barbershop_id=eq.' + shop.id + '&status=in.(done,confirmed,pending)&select=client_name,client_phone,scheduled_at,status&order=scheduled_at.desc', {
-    headers: getServiceHeaders()
-  });
-  const appts = r.ok ? await r.json() : [];
+  const { data: appts } = await sb.from('appointments')
+    .select('client_name,client_phone,scheduled_at,status')
+    .eq('barbershop_id', shop.id)
+    .in('status', ['done','confirmed','pending'])
+    .order('scheduled_at', { ascending: false });
+  const apptList = appts || [];
 
   // Consolidar clientes unicos por telefone
   const map = {};
-  for (const a of appts) {
+  for (const a of apptList) {
     const phone = (a.client_phone || '').replace(/\D/g, '');
     if (!phone) continue;
     if (!map[phone]) {

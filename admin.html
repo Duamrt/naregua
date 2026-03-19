@@ -287,10 +287,7 @@
 // ── Config admin — só seu e-mail tem acesso ───────────────────
 const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
 
-// BUG 3 FIX: service key centralizada em utils.js (_SK, _SB_REST, getServiceHeaders)
-const sbAdmin = window.supabase.createClient(
-  'https://jsydprrcyrjjxdmzrqpz.supabase.co', _SK
-);
+// Admin usa sb normal — RLS policy is_admin() libera acesso total
 
 let allShops = [];
 let allBarbers = [];
@@ -362,10 +359,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadAll() {
   // BUG 15 ALTO FIX: limitar queries pra não carregar tudo de uma vez
   const [shopsRes, barbersRes, svcRes, apptsRes] = await Promise.all([
-    sbAdmin.from('barbershops').select('*').order('created_at', { ascending: false }).limit(200),
-    sbAdmin.from('barbers').select('*').limit(500),
-    sbAdmin.from('services').select('*').limit(500),
-    sbAdmin.from('appointments').select('*').limit(2000)
+    sb.from('barbershops').select('*').order('created_at', { ascending: false }).limit(200),
+    sb.from('barbers').select('*').limit(500),
+    sb.from('services').select('*').limit(500),
+    sb.from('appointments').select('*').limit(2000)
   ]);
 
   allShops = shopsRes.data || [];
@@ -379,16 +376,11 @@ async function loadAll() {
     s._owner_email = '—';
   }
   if (ownerIds.length) {
-    const usersRes = await fetch(_SB_REST.replace('/rest/v1', '') + '/auth/v1/admin/users', {
-      headers: { 'apikey': _SK, 'Authorization': 'Bearer ' + _SK }
-    });
-    if (usersRes.ok) {
-      const usersData = await usersRes.json();
-      const users = usersData.users || usersData || [];
-      for (const s of allShops) {
-        const u = users.find(u => u.id === s.owner_id);
-        if (u) s._owner_email = u.email;
-      }
+    const { data: users } = await sb.rpc('admin_list_auth_users');
+    const userList = users || [];
+    for (const s of allShops) {
+      const u = userList.find(u => u.id === s.owner_id);
+      if (u) s._owner_email = u.email;
     }
   }
 
@@ -503,17 +495,12 @@ async function definirSenha(userId, email) {
     return;
   }
 
-  const r = await fetch(_SB_REST.replace('/rest/v1', '') + '/auth/v1/admin/users/' + userId, {
-    method: 'PUT',
-    headers: { 'apikey': _SK, 'Authorization': 'Bearer ' + _SK, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password: novaSenha })
-  });
+  const { data, error } = await sb.rpc('admin_set_password', { p_user_id: userId, p_password: novaSenha });
 
-  if (r.ok) {
+  if (!error && data && data.success) {
     alert('Senha alterada com sucesso!');
   } else {
-    const err = await r.json().catch(() => ({}));
-    alert('Erro ao alterar senha: ' + (err.message || r.status));
+    alert('Erro ao alterar senha: ' + (error?.message || data?.error || 'desconhecido'));
   }
 }
 
@@ -687,7 +674,7 @@ async function salvarAdmin() {
   }
 
   // BUG 9 FIX: verificar se slug já existe (excluindo o próprio registro se editando)
-  let slugQuery = sbAdmin.from('barbershops').select('id').eq('slug', slug);
+  let slugQuery = sb.from('barbershops').select('id').eq('slug', slug);
   if (editId) slugQuery = slugQuery.neq('id', editId);
   const { data: existingSlug } = await slugQuery;
   if (existingSlug && existingSlug.length > 0) {
@@ -703,7 +690,7 @@ async function salvarAdmin() {
 
     if (editId) {
       // Atualizar
-      const { error } = await sbAdmin.from('barbershops').update({
+      const { error } = await sb.from('barbershops').update({
         name, slug, city, phone, address, instagram, payment_methods: editPayments,
         business_type: businessType, plan, paid_until: paidUntil, opening_time: opening, closing_time: closing, days_open: editDays
       }).eq('id', editId);
@@ -711,7 +698,7 @@ async function salvarAdmin() {
     } else {
       // Criar nova — pegar o owner_id do admin logado
       const { data: { session } } = await sb.auth.getSession();
-      const { data, error } = await sbAdmin.from('barbershops').insert({
+      const { data, error } = await sb.from('barbershops').insert({
         owner_id: session.user.id, name, slug, city, phone, address, instagram,
         payment_methods: editPayments, business_type: businessType, plan, paid_until: paidUntil,
         opening_time: opening, closing_time: closing, days_open: editDays
@@ -726,16 +713,16 @@ async function salvarAdmin() {
 
     for (const sv of existingServices) {
       if (!editSvcIds.includes(sv.id)) {
-        await sbAdmin.from('services').delete().eq('id', sv.id);
+        await sb.from('services').delete().eq('id', sv.id);
       }
     }
 
     for (const sv of editShopServices) {
       if (!sv.name.trim()) continue;
       if (sv.id) {
-        await sbAdmin.from('services').update({ name: sv.name.trim(), price: sv.price, duration_min: sv.duration_min }).eq('id', sv.id);
+        await sb.from('services').update({ name: sv.name.trim(), price: sv.price, duration_min: sv.duration_min }).eq('id', sv.id);
       } else {
-        await sbAdmin.from('services').insert({
+        await sb.from('services').insert({
           barbershop_id: shopId, name: sv.name.trim(), price: sv.price || 0, duration_min: sv.duration_min || 30, active: true
         });
       }
@@ -748,7 +735,7 @@ async function salvarAdmin() {
     // Remover
     for (const b of existingBarbers) {
       if (!editIds.includes(b.id)) {
-        await sbAdmin.from('barbers').delete().eq('id', b.id);
+        await sb.from('barbers').delete().eq('id', b.id);
       }
     }
 
@@ -756,9 +743,9 @@ async function salvarAdmin() {
     for (const b of editShopBarbers) {
       if (!b.name.trim()) continue;
       if (b.id) {
-        await sbAdmin.from('barbers').update({ name: b.name.trim(), phone: b.phone || null }).eq('id', b.id);
+        await sb.from('barbers').update({ name: b.name.trim(), phone: b.phone || null }).eq('id', b.id);
       } else {
-        await sbAdmin.from('barbers').insert({
+        await sb.from('barbers').insert({
           barbershop_id: shopId, name: b.name.trim(), phone: b.phone || null, commission_pct: 0, active: true
         });
       }
@@ -811,33 +798,28 @@ async function confirmarExclusao() {
   errEl.style.display = 'none';
 
   const id = _deleteShopId;
-  const SB_URL = _SB_REST;
-  const headers = getServiceHeaders();
 
   try {
-    // Deletar filhas via REST API na ordem certa
+    // Deletar filhas na ordem certa
     const filhas = ['payments','appointments','services','barbers','subscriptions'];
     for (const t of filhas) {
-      const r = await fetch(SB_URL + '/' + t + '?barbershop_id=eq.' + id, { method: 'DELETE', headers });
-      if (!r.ok) {
-        const msg = await r.text();
-        errEl.textContent = 'Erro em ' + t + ': ' + msg;
+      const { error } = await sb.from(t).delete().eq('barbershop_id', id);
+      if (error) {
+        errEl.textContent = 'Erro em ' + t + ': ' + error.message;
         errEl.style.display = 'block';
-        throw new Error(msg);
+        throw error;
       }
     }
 
     // Deletar a barbearia
-    const r = await fetch(SB_URL + '/barbershops?id=eq.' + id, { method: 'DELETE', headers });
-    if (!r.ok) {
-      const msg = await r.text();
-      errEl.textContent = 'Erro em barbershops: ' + msg;
+    const { data: deleted, error } = await sb.from('barbershops').delete().eq('id', id).select();
+    if (error) {
+      errEl.textContent = 'Erro em barbershops: ' + error.message;
       errEl.style.display = 'block';
-      throw new Error(msg);
+      throw error;
     }
 
-    const deleted = await r.json();
-    if (!deleted.length) {
+    if (!deleted || !deleted.length) {
       errEl.textContent = 'Nenhum registro excluído. ID: ' + id;
       errEl.style.display = 'block';
     } else {

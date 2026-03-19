@@ -257,10 +257,8 @@ async function doSignup() {
   if (senha.length < 6) { showMsg('Senha deve ter pelo menos 6 caracteres.', 'error'); return; }
 
   // Verificar se telefone foi cadastrado pelo dono
-  const r = await fetch(_SB_REST + '/barbers?phone=eq.' + phone + '&active=is.true&user_id=is.null&select=id,name', {
-    headers: getServiceHeaders()
-  });
-  const pendentes = r.ok ? await r.json() : [];
+  const { data: barberData } = await sb.rpc('check_barber_phone', { p_phone: phone });
+  const pendentes = barberData && barberData.id && !barberData.user_id ? [barberData] : [];
 
   if (!pendentes.length) {
     showMsg('Telefone nao encontrado. O dono da barbearia precisa cadastrar seu numero primeiro na aba Equipe.', 'error');
@@ -286,10 +284,7 @@ async function doSignup() {
 
   // Vincular user_id
   if (data.user) {
-    await fetch(_SB_REST + '/barbers?id=eq.' + pendentes[0].id, {
-      method: 'PATCH', headers: getServiceHeaders(),
-      body: JSON.stringify({ user_id: data.user.id })
-    });
+    await sb.rpc('link_barber_user', { p_barber_id: pendentes[0].id, p_user_id: data.user.id });
   }
 
   setLoading(btn, false);

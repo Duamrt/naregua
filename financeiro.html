@@ -280,27 +280,39 @@ const CAT_LABELS = {
   comissao:'Comissão', imposto:'Imposto', outros:'Outros'
 };
 
-// BUG 3 FIX: service key centralizada em utils.js (_SK, _SB_REST, getServiceHeaders)
-const SB_REST = _SB_REST;
-const REST_HEADERS = getServiceHeaders();
-
-async function restGet(table, filter) {
-  const r = await fetch(SB_REST + '/' + table + '?' + filter, { headers: REST_HEADERS });
-  return r.ok ? await r.json() : [];
+// Helpers — usam sb autenticado
+async function restGet(table, filterStr) {
+  let query = sb.from(table).select('*');
+  const parts = filterStr.split('&');
+  for (const part of parts) {
+    const eqIdx = part.indexOf('=');
+    const key = part.substring(0, eqIdx);
+    const val = part.substring(eqIdx + 1);
+    if (key === 'order') {
+      const [col, dir] = val.split('.');
+      query = query.order(col, { ascending: dir !== 'desc' });
+      continue;
+    }
+    const dotIdx = val.indexOf('.');
+    const op = val.substring(0, dotIdx);
+    const v = val.substring(dotIdx + 1);
+    if (op === 'eq') query = query.eq(key, v);
+    else if (op === 'gte') query = query.gte(key, v);
+    else if (op === 'lte') query = query.lte(key, v);
+    else if (op === 'in') query = query.in(key, v.replace(/[()]/g, '').split(','));
+  }
+  const { data } = await query;
+  return data || [];
 }
 
 async function restDeleteRow(table, filter) {
-  await fetch(SB_REST + '/' + table + '?' + filter, {
-    method: 'DELETE', headers: { ...REST_HEADERS, 'Prefer': 'return=representation' }
-  });
+  const [col, val] = filter.replace('=eq.', '|').split('|');
+  await sb.from(table).delete().eq(col, val);
 }
 
 async function restInsert(table, data) {
-  const r = await fetch(SB_REST + '/' + table, {
-    method: 'POST', headers: { ...REST_HEADERS, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-    body: JSON.stringify(data)
-  });
-  return r.ok ? await r.json() : null;
+  const { data: result } = await sb.from(table).insert(data).select();
+  return result;
 }
 
 const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
@@ -308,9 +320,7 @@ const _params = new URLSearchParams(window.location.search);
 const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_viewing_shop');
 if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
 const isAdminViewing = !!adminViewingShop;
-const db = isAdminViewing
-  ? window.supabase.createClient('https://jsydprrcyrjjxdmzrqpz.supabase.co', _SK)
-  : sb;
+const db = sb;
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
