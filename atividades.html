@@ -375,15 +375,16 @@ async function loadActivities() {
 
   allActivities = [];
 
-  // Fetch todas as fontes em paralelo
-  const [apptRes, expRes, stockRes, cmdRes] = await Promise.all([
+  // Fetch todas as fontes em paralelo (cada uma com try/catch interno)
+  const results = await Promise.allSettled([
     fetchAppointments(dateStart, dateEnd),
     fetchExpenses(dateStart, dateEnd),
     fetchStockMovements(dateStart, dateEnd),
     fetchComandas(dateStart, dateEnd)
   ]);
 
-  allActivities = [...apptRes, ...expRes, ...stockRes, ...cmdRes];
+  allActivities = [];
+  results.forEach(r => { if (r.status === 'fulfilled' && r.value) allActivities.push(...r.value); });
   allActivities.sort((a, b) => new Date(b.time) - new Date(a.time));
 
   applyFilters();
@@ -487,7 +488,11 @@ async function fetchExpenses(start, end) {
 async function fetchStockMovements(start, end) {
   const items = [];
   try {
+    // Buscar apenas movimentações dos produtos desta barbearia
+    const prodIds = products.map(p => p.id);
+    if (!prodIds.length) return items;
     const { data } = await db.from('stock_movements').select('*')
+      .in('product_id', prodIds)
       .gte('created_at', start)
       .lte('created_at', end)
       .order('created_at', { ascending: false })
