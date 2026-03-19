@@ -131,6 +131,110 @@
     .success-title { font-size:18px; font-weight:700; margin-bottom:8px; }
     .success-sub { font-size:13px; color:var(--texto-muted); margin-bottom:24px; line-height:1.5; }
 
+    /* ── Combos section ── */
+    .combos-divider {
+      display:flex; align-items:center; gap:12px; margin:20px 0 12px;
+      font-size:11px; font-weight:700; letter-spacing:1px; color:var(--verde-acao);
+      text-transform:uppercase;
+    }
+    .combos-divider::before, .combos-divider::after {
+      content:''; flex:1; height:1px; background:rgba(212,168,83,0.25);
+    }
+    .combo-card {
+      padding:14px 16px; background:var(--cinza-medio); border:1.5px solid var(--borda);
+      border-radius:10px; cursor:pointer; transition:all .2s; position:relative;
+    }
+    .combo-card:hover { border-color:var(--borda-hover); }
+    .combo-card.selected { border-color:var(--verde-acao); background:rgba(212,168,83,0.08); }
+    .combo-card .combo-name { font-size:14px; font-weight:700; margin-bottom:6px; }
+    .combo-card .combo-services-tags { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:8px; }
+    .combo-card .combo-tag {
+      font-size:10px; padding:3px 8px; border-radius:12px;
+      background:rgba(255,255,255,0.06); border:1px solid var(--borda); color:var(--texto-muted);
+    }
+    .combo-card .combo-prices { display:flex; align-items:center; gap:8px; }
+    .combo-card .combo-original { font-size:12px; color:var(--texto-muted); text-decoration:line-through; }
+    .combo-card .combo-price { font-size:15px; font-weight:700; color:var(--verde-acao); }
+    .combo-card .combo-savings {
+      position:absolute; top:-8px; right:12px;
+      font-size:10px; font-weight:700; padding:3px 8px; border-radius:10px;
+      background:rgba(34,197,94,0.15); color:#22c55e; border:1px solid rgba(34,197,94,0.3);
+    }
+
+    /* ── Cupom section ── */
+    .coupon-section {
+      margin-top:16px; border:1px solid var(--borda); border-radius:10px; overflow:hidden;
+    }
+    .coupon-toggle {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 14px; cursor:pointer; font-size:12px; font-weight:600;
+      color:var(--texto-muted); background:var(--cinza-medio); transition:all .2s;
+    }
+    .coupon-toggle:hover { color:var(--texto-secundario); }
+    .coupon-toggle .chevron { transition:transform .2s; }
+    .coupon-toggle.open .chevron { transform:rotate(180deg); }
+    .coupon-body { display:none; padding:12px 14px; }
+    .coupon-body.open { display:block; }
+    .coupon-row { display:flex; gap:8px; }
+    .coupon-row input {
+      flex:1; padding:8px 12px; border-radius:8px; font-size:13px;
+      background:var(--cinza-medio); border:1.5px solid var(--borda); color:var(--texto-primario);
+      font-family:inherit; text-transform:uppercase; letter-spacing:1px;
+    }
+    .coupon-row input:focus { border-color:var(--verde-acao); outline:none; }
+    .coupon-row button {
+      padding:8px 16px; border-radius:8px; font-size:12px; font-weight:700;
+      background:rgba(212,168,83,0.15); border:1.5px solid rgba(212,168,83,0.3);
+      color:var(--verde-acao); cursor:pointer; font-family:inherit; white-space:nowrap;
+      transition:all .2s;
+    }
+    .coupon-row button:hover { background:rgba(212,168,83,0.25); }
+    .coupon-result { margin-top:8px; font-size:12px; padding:6px 10px; border-radius:6px; display:none; }
+    .coupon-result.success { display:block; background:rgba(34,197,94,0.1); color:#22c55e; border:1px solid rgba(34,197,94,0.2); }
+    .coupon-result.error { display:block; background:rgba(231,76,60,0.1); color:#e74c3c; border:1px solid rgba(231,76,60,0.2); }
+    .coupon-applied {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:8px 12px; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.2);
+      border-radius:8px; font-size:12px; color:#22c55e; font-weight:600;
+    }
+    .coupon-applied .remove-coupon {
+      cursor:pointer; padding:2px 6px; border-radius:4px; font-size:10px;
+      background:rgba(231,76,60,0.15); color:#e74c3c; border:none; font-family:inherit; font-weight:700;
+    }
+
+    /* ── Recorrencia section ── */
+    .recurrence-section {
+      margin-top:16px; padding:14px; background:var(--cinza-medio);
+      border:1.5px solid var(--borda); border-radius:10px;
+    }
+    .recurrence-toggle-row {
+      display:flex; align-items:center; justify-content:space-between; cursor:pointer;
+    }
+    .recurrence-toggle-row .rec-label { font-size:13px; font-weight:600; }
+    .recurrence-toggle-row .rec-sub { font-size:11px; color:var(--texto-muted); margin-top:2px; }
+    .rec-switch {
+      width:40px; height:22px; border-radius:11px; position:relative;
+      background:rgba(255,255,255,0.1); border:1.5px solid var(--borda);
+      transition:all .2s; cursor:pointer; flex-shrink:0;
+    }
+    .rec-switch::after {
+      content:''; position:absolute; top:2px; left:2px;
+      width:16px; height:16px; border-radius:50%; background:#fff;
+      transition:all .2s;
+    }
+    .rec-switch.on { background:rgba(212,168,83,0.3); border-color:var(--verde-acao); }
+    .rec-switch.on::after { left:20px; background:var(--verde-acao); }
+    .recurrence-dates {
+      margin-top:12px; padding-top:12px; border-top:1px solid var(--borda);
+      font-size:12px; color:var(--texto-muted); line-height:1.8; display:none;
+    }
+    .recurrence-dates.open { display:block; }
+    .recurrence-dates .rec-date {
+      display:inline-flex; align-items:center; gap:4px;
+      padding:2px 8px; background:rgba(212,168,83,0.08); border:1px solid rgba(212,168,83,0.15);
+      border-radius:6px; margin:2px 4px 2px 0; font-weight:600; color:var(--texto-secundario);
+    }
+
     @media (max-width: 400px) {
       .time-grid { grid-template-columns:repeat(3, 1fr); }
     }
@@ -178,6 +282,31 @@
         <h3 style="margin-bottom:8px;">Escolha o serviço</h3>
         <div id="cat-filters" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;"></div>
         <div class="option-grid" id="services-list"></div>
+
+        <!-- Combos (carregados dinamicamente) -->
+        <div id="combos-section" style="display:none;">
+          <div class="combos-divider">&#x1F525; Combos</div>
+          <div class="option-grid" id="combos-list"></div>
+        </div>
+
+        <!-- Cupom -->
+        <div class="coupon-section" id="coupon-section">
+          <div class="coupon-toggle" onclick="toggleCoupon()">
+            <span>&#x1F3AB; Tem cupom de desconto?</span>
+            <span class="chevron">&#x25BC;</span>
+          </div>
+          <div class="coupon-body" id="coupon-body">
+            <div id="coupon-input-area">
+              <div class="coupon-row">
+                <input type="text" id="coupon-code" placeholder="Digite o código" maxlength="30">
+                <button onclick="aplicarCupom()">APLICAR</button>
+              </div>
+            </div>
+            <div id="coupon-applied-area" style="display:none;"></div>
+            <div class="coupon-result" id="coupon-result"></div>
+          </div>
+        </div>
+
         <button class="btn btn-primary" style="margin-top:16px;" onclick="agNext(2)" id="btn-step1">CONTINUAR</button>
       </div>
 
@@ -198,6 +327,19 @@
         <h3 style="margin-top:16px;margin-bottom:4px;">Horário disponível</h3>
         <div style="font-size:11px;color:var(--texto-muted);margin-bottom:8px;" id="time-label"></div>
         <div class="time-grid" id="times-list"></div>
+
+        <!-- Recorrencia semanal -->
+        <div class="recurrence-section" id="recurrence-section" style="display:none;">
+          <div class="recurrence-toggle-row" onclick="toggleRecurrence()">
+            <div>
+              <div class="rec-label">&#x1F504; Repetir toda semana?</div>
+              <div class="rec-sub">Agendaremos automaticamente para as próximas 4 semanas</div>
+            </div>
+            <div class="rec-switch" id="rec-switch"></div>
+          </div>
+          <div class="recurrence-dates" id="recurrence-dates"></div>
+        </div>
+
         <div style="display:flex;gap:10px;margin-top:16px;">
           <button class="btn btn-outline" onclick="agBack(2)" style="flex:0.4;padding:10px 16px;font-size:14px;">VOLTAR</button>
           <button class="btn btn-primary" onclick="agNext(4)" style="flex:0.6;">CONTINUAR</button>
@@ -280,6 +422,13 @@ let selectedTime = null;
 let currentStep = 1;
 const TOTAL_STEPS = 5;
 
+// ── Novos: Combos, Cupons, Recorrencia ──
+let combos = [];
+let selectedCombo = null;
+let appliedCoupon = null;
+let discountAmount = 0;
+let recurrenceEnabled = false;
+
 const DIAS_SEMANA = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
 const MESES = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
 
@@ -310,6 +459,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   barbers = barbRes.data || [];
 
   if (!services.length) { showError(); return; }
+
+  // Carregar combos (tabela pode não existir)
+  try {
+    const { data: combosData } = await sb
+      .from('combos')
+      .select('*, combo_services(service_id)')
+      .eq('barbershop_id', shop.id)
+      .eq('active', true);
+    if (combosData && combosData.length) {
+      combos = combosData.map(c => ({
+        ...c,
+        serviceNames: (c.combo_services || []).map(cs => {
+          const svc = services.find(s => s.id === cs.service_id);
+          return svc ? svc.name : '';
+        }).filter(Boolean),
+        originalPrice: (c.combo_services || []).reduce((sum, cs) => {
+          const svc = services.find(s => s.id === cs.service_id);
+          return sum + (svc ? Number(svc.price) : 0);
+        }, 0)
+      }));
+    }
+  } catch (e) { console.log('Tabela combos não encontrada, seguindo sem combos.'); }
 
   // Atualizar título da página
   document.title = `${shop.name} — Agendar | NaRegua`;
@@ -372,6 +543,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderStepDots();
   renderCatFilters();
   renderServices();
+  renderCombos();
   renderBarbers();
   renderDates();
 
@@ -540,7 +712,7 @@ function renderServices() {
   }
 
   el.innerHTML = filtered.map(s => `
-    <div class="option-card ${selectedService?.id === s.id ? 'selected' : ''}"
+    <div class="option-card ${selectedService?.id === s.id && !selectedCombo ? 'selected' : ''}"
          onclick="selectService('${esc(s.id)}')">
       <div>
         <div class="name">${esc(s.name)}</div>
@@ -552,11 +724,7 @@ function renderServices() {
   `).join('');
 }
 
-function selectService(id) {
-  selectedService = services.find(s => s.id === id);
-  renderServices();
-  renderTimes();
-}
+// selectService movida para seção de Combos/Cupons abaixo
 
 // ── Barbeiros ─────────────────────────────────────────────────
 function renderBarbers() {
@@ -682,6 +850,8 @@ function selectDate(key) {
   selectedDate = key;
   renderDates();
   renderTimes();
+  // Atualizar recorrencia se ativo
+  if (recurrenceEnabled) renderRecurrenceDates();
 }
 
 // ── Horários ──────────────────────────────────────────────────
@@ -852,6 +1022,11 @@ async function renderTimes() {
 function selectTime(t) {
   selectedTime = t;
   renderTimes();
+  // Mostrar recorrencia se não é dia inteiro
+  if (selectedService && !selectedService.blocks_all_day && selectedDate && selectedTime) {
+    document.getElementById('recurrence-section').style.display = 'block';
+    if (recurrenceEnabled) renderRecurrenceDates();
+  }
 }
 
 // ── Resumo ────────────────────────────────────────────────────
@@ -859,11 +1034,13 @@ function renderResumo() {
   const dateFormatted = selectedDate.split('-').reverse().join('/');
   const el = document.getElementById('resumo-content');
   const isDiaInteiro = selectedService.blocks_all_day;
+  const precoFinal = getPrecoFinal();
+  const temDesconto = appliedCoupon && discountAmount > 0;
 
-  el.innerHTML = `
+  let html = `
     <div class="resumo-item">
       <span class="resumo-label">Serviço</span>
-      <span class="resumo-valor">${esc(selectedService.name)}</span>
+      <span class="resumo-valor">${esc(selectedService.name)}${selectedCombo ? ' (combo)' : ''}</span>
     </div>
     ${isDiaInteiro ? '' : `<div class="resumo-item">
       <span class="resumo-label">Profissional</span>
@@ -876,12 +1053,42 @@ function renderResumo() {
     <div class="resumo-item">
       <span class="resumo-label">${isDiaInteiro ? 'Tipo' : 'Horário'}</span>
       <span class="resumo-valor">${isDiaInteiro ? 'Dia inteiro — equipe exclusiva' : selectedTime}</span>
+    </div>`;
+
+  if (temDesconto) {
+    html += `
+    <div class="resumo-item">
+      <span class="resumo-label">Subtotal</span>
+      <span class="resumo-valor" style="text-decoration:line-through;color:var(--texto-muted);">${formatMoney(selectedService.price)}</span>
     </div>
     <div class="resumo-item">
-      <span class="resumo-label">Valor</span>
-      <span class="resumo-valor" style="color:var(--verde-acao);">${formatMoney(selectedService.price)}</span>
+      <span class="resumo-label">Cupom (${esc(appliedCoupon.code)})</span>
+      <span class="resumo-valor" style="color:#22c55e;">-${formatMoney(discountAmount)}</span>
+    </div>`;
+  }
+
+  html += `
+    <div class="resumo-item">
+      <span class="resumo-label">Valor${temDesconto ? ' final' : ''}</span>
+      <span class="resumo-valor" style="color:var(--verde-acao);font-size:16px;">${formatMoney(precoFinal)}</span>
+    </div>`;
+
+  // Recorrencia
+  if (recurrenceEnabled && !isDiaInteiro) {
+    const dates = getRecurrenceDates();
+    const total = precoFinal * dates.length;
+    html += `
+    <div class="resumo-item" style="border-top:1px dashed var(--borda);padding-top:10px;margin-top:4px;">
+      <span class="resumo-label">&#x1F504; Recorrência</span>
+      <span class="resumo-valor">${dates.length} semanas</span>
     </div>
-  `;
+    <div class="resumo-item">
+      <span class="resumo-label">Total (${dates.length}x)</span>
+      <span class="resumo-valor" style="color:var(--verde-acao);">${formatMoney(total)}</span>
+    </div>`;
+  }
+
+  el.innerHTML = html;
 }
 
 // ── Confirmar ─────────────────────────────────────────────────
@@ -1152,20 +1359,37 @@ async function confirmarAgendamento() {
     }
   }
 
-  // Inserir agendamento
-  const { data: inserted, error } = await sb
-    .from('appointments')
-    .insert({
+  // ── Preparar lista de agendamentos (recorrencia ou single) ──
+  const appointmentsToInsert = [];
+  const recDates = recurrenceEnabled ? getRecurrenceDates() : [selectedDate];
+  const recGroupId = recurrenceEnabled ? crypto.randomUUID() : null;
+
+  for (const dt of recDates) {
+    const payload = {
       barbershop_id: shop.id,
       barber_id: finalBarberId,
-      service_id: selectedService.id,
+      service_id: selectedCombo ? null : selectedService.id,
       client_name: nome,
       client_phone: phone,
-      scheduled_at: scheduledAtStr,
+      scheduled_at: dt + 'T' + selectedTime + ':00-03:00',
       status: 'confirmed'
-    })
-    .select()
-    .single();
+    };
+    // Adicionar group_id se recorrencia
+    if (recGroupId) payload.group_id = recGroupId;
+    // Adicionar info de combo/cupom no notes se aplicável
+    const notes = [];
+    if (selectedCombo) notes.push('Combo: ' + selectedService.name + ' (combo_id: ' + selectedCombo.id + ')');
+    if (appliedCoupon) notes.push('Cupom: ' + appliedCoupon.code + ' (-' + formatMoney(discountAmount) + ')');
+    if (notes.length) payload.notes = notes.join(' | ');
+    appointmentsToInsert.push(payload);
+  }
+
+  // Inserir agendamento(s)
+  const isSingle = appointmentsToInsert.length === 1;
+  const { data: insertedData, error } = isSingle
+    ? await sb.from('appointments').insert(appointmentsToInsert[0]).select().single()
+    : await sb.from('appointments').insert(appointmentsToInsert).select();
+  const inserted = isSingle ? insertedData : (insertedData || [])[0];
 
   if (error) {
     btn.disabled = false;
@@ -1208,16 +1432,45 @@ async function confirmarAgendamento() {
     return;
   }
 
+  // ── Registrar uso do cupom ──
+  if (appliedCoupon) {
+    try {
+      // Incrementar uses_count
+      await sb.from('cupons').update({ uses_count: (appliedCoupon.uses_count || 0) + 1 }).eq('id', appliedCoupon.id);
+      // Inserir em cupom_usos
+      await sb.from('cupom_usos').insert({
+        cupom_id: appliedCoupon.id,
+        barbershop_id: shop.id,
+        appointment_id: inserted.id,
+        client_phone: phone,
+        discount_applied: discountAmount
+      });
+    } catch (e) { console.log('Erro ao registrar uso do cupom (tabela pode não existir):', e); }
+  }
+
   btn.disabled = false;
   btn.querySelector('.btn-label').style.display = 'inline';
   btn.querySelector('.spinner').style.display = 'none';
 
   // Sucesso
+  const precoFinal = getPrecoFinal();
   const dateFormatted = selectedDate.split('-').reverse().join('/');
-  document.getElementById('success-msg').innerHTML =
-    'Voce agendou:<br><strong>' + esc(selectedService.name) + '</strong> com ' + esc(selectedBarber.name) +
+  let successHtml = 'Voce agendou:<br><strong>' + esc(selectedService.name) + '</strong> com ' + esc(selectedBarber.name) +
     '<br>' + dateFormatted + ' as ' + selectedTime +
-    '<br>' + formatMoney(selectedService.price);
+    '<br>' + formatMoney(precoFinal);
+
+  if (appliedCoupon) {
+    successHtml += '<br><span style="color:#22c55e;font-size:12px;">Cupom ' + esc(appliedCoupon.code) + ' aplicado: -' + formatMoney(discountAmount) + '</span>';
+  }
+
+  if (recurrenceEnabled) {
+    const dates = getRecurrenceDates();
+    successHtml += '<br><br><span style="font-size:12px;color:var(--texto-muted);">&#x1F504; ' + dates.length + ' horários agendados:<br>';
+    successHtml += dates.map(d => d.split('-').reverse().join('/')).join(', ');
+    successHtml += '</span>';
+  }
+
+  document.getElementById('success-msg').innerHTML = successHtml;
 
   // Link WhatsApp: prioridade barbeiro selecionado, senao dono da barbearia
   const barberPhone = (selectedBarber.phone || '').replace(/\D/g, '');
@@ -1227,11 +1480,15 @@ async function confirmarAgendamento() {
   const hora = new Date().getHours();
   const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
   const svcNameWa2 = selectedService.name.replace(/\*/g, '\u2731');
-  const waText = saudacao + ', ' + destNome + '! Acabei de agendar pelo NaRegua.\n\n'
+  let waText = saudacao + ', ' + destNome + '! Acabei de agendar pelo NaRegua.\n\n'
     + '*' + svcNameWa2 + '*\n'
-    + 'Dia: ' + dateFormatted + ' as ' + selectedTime + '\n\n'
-    + 'Meu nome: ' + nome + '\n'
-    + 'Meu contato: ' + phone;
+    + 'Dia: ' + dateFormatted + ' as ' + selectedTime + '\n';
+  if (appliedCoupon) waText += 'Cupom: ' + appliedCoupon.code + ' (-' + formatMoney(discountAmount) + ')\n';
+  if (recurrenceEnabled) {
+    const dates = getRecurrenceDates();
+    waText += '\nRepetir toda semana (' + dates.length + 'x): ' + dates.map(d => d.split('-').reverse().join('/')).join(', ') + '\n';
+  }
+  waText += '\nMeu nome: ' + nome + '\nMeu contato: ' + phone;
   const waMsg = encodeURIComponent(waText);
   const waLink = document.getElementById('whatsapp-link');
   if (destPhone) {
@@ -1248,6 +1505,192 @@ function showAgMsg(text, type) {
   const el = document.getElementById('ag-msg');
   el.textContent = text;
   el.className = `msg msg-${type} show`;
+}
+
+// ── Combos ─────────────────────────────────────────────────────
+function renderCombos() {
+  const section = document.getElementById('combos-section');
+  const el = document.getElementById('combos-list');
+  if (!combos.length) { section.style.display = 'none'; return; }
+
+  section.style.display = 'block';
+  el.innerHTML = combos.map(c => {
+    const savings = c.originalPrice - Number(c.price);
+    const pct = c.originalPrice > 0 ? Math.round((savings / c.originalPrice) * 100) : 0;
+    return `
+    <div class="combo-card ${selectedCombo?.id === c.id ? 'selected' : ''}"
+         onclick="selectCombo('${esc(c.id)}')">
+      ${savings > 0 ? `<div class="combo-savings">-${pct}%</div>` : ''}
+      <div class="combo-name">${esc(c.name)}</div>
+      <div class="combo-services-tags">
+        ${c.serviceNames.map(n => `<span class="combo-tag">${esc(n)}</span>`).join('')}
+      </div>
+      <div class="combo-prices">
+        ${savings > 0 ? `<span class="combo-original">${formatMoney(c.originalPrice)}</span>` : ''}
+        <span class="combo-price">${formatMoney(c.price)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selectCombo(id) {
+  const combo = combos.find(c => c.id === id);
+  if (selectedCombo?.id === id) {
+    // Deselect combo
+    selectedCombo = null;
+    selectedService = null;
+  } else {
+    selectedCombo = combo;
+    // Criar pseudo-serviço a partir do combo
+    selectedService = {
+      id: combo.id,
+      name: combo.name,
+      price: combo.price,
+      duration_min: combo.duration_min || 60,
+      blocks_all_day: false,
+      _isCombo: true,
+      _comboId: combo.id
+    };
+  }
+  renderServices();
+  renderCombos();
+  renderTimes();
+}
+
+function selectService(id) {
+  selectedService = services.find(s => s.id === id);
+  selectedCombo = null; // Desmarcar combo ao selecionar serviço avulso
+  renderServices();
+  renderCombos();
+  renderTimes();
+}
+
+// ── Cupom ──────────────────────────────────────────────────────
+function toggleCoupon() {
+  const toggle = document.querySelector('.coupon-toggle');
+  const body = document.getElementById('coupon-body');
+  toggle.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+async function aplicarCupom() {
+  const code = document.getElementById('coupon-code').value.trim().toUpperCase();
+  const resultEl = document.getElementById('coupon-result');
+
+  if (!code) { resultEl.textContent = 'Digite um código.'; resultEl.className = 'coupon-result error'; return; }
+  if (!selectedService) { resultEl.textContent = 'Selecione um serviço primeiro.'; resultEl.className = 'coupon-result error'; return; }
+
+  try {
+    const now = new Date().toISOString();
+    const { data: cupom, error } = await sb
+      .from('cupons')
+      .select('*')
+      .eq('barbershop_id', shop.id)
+      .eq('code', code)
+      .eq('active', true)
+      .maybeSingle();
+
+    if (error || !cupom) {
+      resultEl.textContent = 'Cupom inválido ou expirado.';
+      resultEl.className = 'coupon-result error';
+      return;
+    }
+
+    // Validar validade
+    if (cupom.valid_until && new Date(cupom.valid_until) < new Date()) {
+      resultEl.textContent = 'Cupom inválido ou expirado.';
+      resultEl.className = 'coupon-result error';
+      return;
+    }
+
+    // Validar usos
+    if (cupom.max_uses !== null && cupom.max_uses !== undefined && cupom.uses_count >= cupom.max_uses) {
+      resultEl.textContent = 'Cupom esgotado.';
+      resultEl.className = 'coupon-result error';
+      return;
+    }
+
+    // Aplicar desconto
+    appliedCoupon = cupom;
+    const price = Number(selectedService.price);
+
+    if (cupom.discount_type === 'percent' || cupom.discount_type === 'percentual') {
+      discountAmount = Math.round(price * (Number(cupom.discount_value) / 100) * 100) / 100;
+    } else {
+      // fixo
+      discountAmount = Math.min(Number(cupom.discount_value), price);
+    }
+
+    // Mostrar cupom aplicado
+    document.getElementById('coupon-input-area').style.display = 'none';
+    const appliedArea = document.getElementById('coupon-applied-area');
+    appliedArea.style.display = 'block';
+    appliedArea.innerHTML = `
+      <div class="coupon-applied">
+        <span>&#x2705; ${esc(cupom.code)} — Desconto de ${formatMoney(discountAmount)}</span>
+        <button class="remove-coupon" onclick="removerCupom()">REMOVER</button>
+      </div>`;
+    resultEl.className = 'coupon-result';
+    resultEl.style.display = 'none';
+
+  } catch (e) {
+    console.log('Erro ao validar cupom:', e);
+    resultEl.textContent = 'Cupom inválido ou expirado.';
+    resultEl.className = 'coupon-result error';
+  }
+}
+
+function removerCupom() {
+  appliedCoupon = null;
+  discountAmount = 0;
+  document.getElementById('coupon-input-area').style.display = 'block';
+  document.getElementById('coupon-applied-area').style.display = 'none';
+  document.getElementById('coupon-code').value = '';
+  const resultEl = document.getElementById('coupon-result');
+  resultEl.className = 'coupon-result';
+  resultEl.style.display = 'none';
+}
+
+function getPrecoFinal() {
+  if (!selectedService) return 0;
+  const price = Number(selectedService.price);
+  return Math.max(0, price - discountAmount);
+}
+
+// ── Recorrencia ────────────────────────────────────────────────
+function toggleRecurrence() {
+  recurrenceEnabled = !recurrenceEnabled;
+  document.getElementById('rec-switch').classList.toggle('on', recurrenceEnabled);
+  const datesEl = document.getElementById('recurrence-dates');
+  datesEl.classList.toggle('open', recurrenceEnabled);
+  if (recurrenceEnabled) renderRecurrenceDates();
+}
+
+function renderRecurrenceDates() {
+  const datesEl = document.getElementById('recurrence-dates');
+  if (!selectedDate || !selectedTime) {
+    datesEl.innerHTML = '<div style="color:var(--texto-muted);">Selecione data e horário primeiro.</div>';
+    return;
+  }
+  const dates = getRecurrenceDates();
+  datesEl.innerHTML = '<div style="margin-bottom:6px;font-weight:700;color:var(--texto-secundario);">4 horários serão agendados:</div>' +
+    dates.map((d, i) => {
+      const parts = d.split('-');
+      const label = parts[2] + '/' + parts[1];
+      return `<span class="rec-date">${i === 0 ? '&#x2705;' : '&#x1F504;'} ${label} às ${selectedTime}</span>`;
+    }).join('');
+}
+
+function getRecurrenceDates() {
+  if (!selectedDate) return [];
+  const dates = [selectedDate];
+  const base = new Date(selectedDate + 'T12:00:00');
+  for (let i = 1; i <= 3; i++) {
+    const next = new Date(base);
+    next.setDate(next.getDate() + (7 * i));
+    dates.push(next.getFullYear() + '-' + String(next.getMonth()+1).padStart(2,'0') + '-' + String(next.getDate()).padStart(2,'0'));
+  }
+  return dates;
 }
 
 // ── Adicionar ao calendario ───────────────────────────────────
@@ -1273,7 +1716,15 @@ function resetar() {
   selectedBarber = barbers.length === 1 ? barbers[0] : null;
   selectedDate = null;
   selectedTime = null;
+  selectedCombo = null;
+  appliedCoupon = null;
+  discountAmount = 0;
+  recurrenceEnabled = false;
+  document.getElementById('rec-switch').classList.remove('on');
+  document.getElementById('recurrence-dates').classList.remove('open');
+  removerCupom();
   renderServices();
+  renderCombos();
   renderBarbers();
   renderDates();
   showStep(1);

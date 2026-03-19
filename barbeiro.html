@@ -100,6 +100,90 @@
 
     body { padding-bottom:70px; }
 
+    /* ── Stats Pro Section ── */
+    .section-title {
+      font-size:13px; font-weight:700; letter-spacing:0.5px; color:var(--texto-muted);
+      margin:20px 0 10px; text-transform:uppercase;
+    }
+
+    .stats-grid {
+      display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px;
+    }
+    .stats-grid .stat-card { text-align:left; padding:14px; }
+    .stat-card-icon { font-size:16px; margin-bottom:6px; }
+    .stat-card-val { font-size:18px; font-weight:800; }
+    .stat-card-sub { font-size:10px; color:var(--texto-muted); font-weight:600; margin-top:2px; }
+
+    .stat-card-wide {
+      grid-column: 1 / -1;
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:10px;
+      padding:14px;
+    }
+    .stars { color:#f59e0b; font-size:16px; letter-spacing:2px; }
+    .stars-empty { color:rgba(255,255,255,0.1); }
+
+    /* ── Ranking ── */
+    .ranking-card {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:12px;
+      padding:16px; margin-bottom:16px;
+    }
+    .ranking-pos {
+      font-size:20px; font-weight:800; color:var(--accent);
+    }
+    .ranking-label { font-size:11px; color:var(--texto-muted); font-weight:600; }
+    .ranking-bar-wrap {
+      display:flex; align-items:center; gap:10px; margin-top:10px;
+    }
+    .ranking-bar {
+      flex:1; height:8px; background:rgba(255,255,255,0.05); border-radius:4px; overflow:hidden;
+      position:relative;
+    }
+    .ranking-bar-fill {
+      height:100%; border-radius:4px; transition:width .6s ease;
+    }
+    .ranking-bar-you { background:var(--accent); }
+    .ranking-bar-team { background:rgba(255,255,255,0.15); }
+    .ranking-vals {
+      display:flex; justify-content:space-between; margin-top:6px; font-size:10px; color:var(--texto-muted); font-weight:600;
+    }
+
+    /* ── Proximos ── */
+    .upcoming-card {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:10px;
+      padding:12px 14px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;
+    }
+    .upcoming-time { font-size:13px; font-weight:700; color:var(--accent); }
+    .upcoming-client { font-size:13px; font-weight:600; margin-top:2px; }
+    .upcoming-svc { font-size:11px; color:var(--texto-muted); }
+    .upcoming-countdown {
+      font-size:10px; font-weight:700; color:var(--accent);
+      background:rgba(212,168,83,0.12); padding:4px 10px; border-radius:12px;
+      white-space:nowrap;
+    }
+
+    /* ── Performance chart ── */
+    .perf-chart {
+      display:flex; align-items:flex-end; gap:6px; height:80px; margin-top:8px;
+      padding:8px 0;
+    }
+    .perf-bar-wrap {
+      flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;
+    }
+    .perf-bar {
+      width:100%; min-height:4px; border-radius:4px 4px 0 0;
+      background:var(--accent); transition:height .4s ease;
+    }
+    .perf-bar-label { font-size:8px; color:var(--texto-muted); font-weight:700; }
+    .perf-bar-val { font-size:9px; color:var(--texto-secundario); font-weight:700; }
+
+    .perf-ticket {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-top:12px; padding:10px 14px;
+      background:rgba(212,168,83,0.08); border-radius:8px;
+    }
+    .perf-ticket-label { font-size:11px; color:var(--texto-muted); font-weight:600; }
+    .perf-ticket-val { font-size:16px; font-weight:800; color:var(--accent); }
+
     .barber-logout-bar {
       position:fixed; bottom:0; left:0; right:0;
       background:var(--cinza-escuro); border-top:1px solid var(--borda);
@@ -162,6 +246,94 @@
     </div>
 
     <div id="appt-list"></div>
+
+    <!-- Stats Pro -->
+    <div class="section-title">Seus numeros</div>
+    <div class="stats-grid" id="stats-pro">
+      <div class="stat-card">
+        <div class="stat-card-icon">&#x1F4C5;</div>
+        <div class="stat-card-val" id="sp-atend-hoje">0</div>
+        <div class="stat-card-sub">ATENDIMENTOS HOJE</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">&#x1F4B0;</div>
+        <div class="stat-card-val" id="sp-fat-hoje" style="color:var(--accent);">R$ 0</div>
+        <div class="stat-card-sub">FATURAMENTO HOJE</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">&#x1F4C8;</div>
+        <div class="stat-card-val" id="sp-atend-sem">0</div>
+        <div class="stat-card-sub">ATEND. SEMANA</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">&#x1F4B5;</div>
+        <div class="stat-card-val" id="sp-fat-sem" style="color:var(--accent);">R$ 0</div>
+        <div class="stat-card-sub">FAT. SEMANA</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">&#x1F4CA;</div>
+        <div class="stat-card-val" id="sp-atend-mes">0</div>
+        <div class="stat-card-sub">ATEND. MES</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">&#x1F4B8;</div>
+        <div class="stat-card-val" id="sp-fat-mes" style="color:var(--accent);">R$ 0</div>
+        <div class="stat-card-sub">FAT. MES</div>
+      </div>
+      <div class="stat-card-wide">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:10px;color:var(--texto-muted);font-weight:700;">COMISSAO DO MES</div>
+            <div style="font-size:20px;font-weight:800;color:var(--accent);margin-top:4px;" id="sp-comissao">R$ 0</div>
+            <div style="font-size:10px;color:var(--texto-muted);margin-top:2px;" id="sp-comissao-pct"></div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:10px;color:var(--texto-muted);font-weight:700;">NOTA MEDIA</div>
+            <div class="stars" id="sp-stars">&#x2606;&#x2606;&#x2606;&#x2606;&#x2606;</div>
+            <div style="font-size:11px;font-weight:700;margin-top:2px;" id="sp-rating">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mini Ranking -->
+    <div class="section-title">Ranking</div>
+    <div class="ranking-card" id="ranking-section">
+      <div style="display:flex;align-items:baseline;gap:8px;">
+        <div class="ranking-pos" id="rank-pos">#—</div>
+        <div class="ranking-label" id="rank-label">de — barbeiros</div>
+      </div>
+      <div class="ranking-bar-wrap">
+        <div style="flex:1;">
+          <div class="ranking-bar">
+            <div class="ranking-bar-fill ranking-bar-you" id="rank-bar-you" style="width:0%;"></div>
+          </div>
+          <div class="ranking-vals">
+            <span id="rank-you-label">Voce: R$ 0</span>
+            <span id="rank-team-label">Equipe media: R$ 0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Proximos agendamentos -->
+    <div class="section-title">Proximos agendamentos</div>
+    <div id="upcoming-list">
+      <div class="empty-state" style="padding:20px;">
+        <div style="font-size:12px;">Nenhum proximo agendamento</div>
+      </div>
+    </div>
+
+    <!-- Performance do mes -->
+    <div class="section-title">Performance (ultimos 7 dias)</div>
+    <div style="background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:12px;padding:16px;margin-bottom:16px;">
+      <div class="perf-chart" id="perf-chart"></div>
+      <div class="perf-ticket">
+        <div class="perf-ticket-label">Ticket medio do mes</div>
+        <div class="perf-ticket-val" id="perf-ticket">R$ 0</div>
+      </div>
+    </div>
+
   </div>
 
 </div>
@@ -226,7 +398,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   initPush(shopData.id);
 
   renderDay();
+  loadStatsPro();
   setInterval(() => renderDay(), 30000);
+  setInterval(() => loadStatsPro(), 60000);
 });
 
 function changeDay(delta) {
@@ -369,6 +543,238 @@ function abrirWhatsApp(id, nome, phone) {
   const saudacao = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
   const msg = saudacao + ', ' + nome + '! Aqui é o ' + barber.name + ' da *' + shopData.name + '*.\nSeu horário tá confirmado. Te espero!';
   window.open('https://wa.me/55' + phone + '?text=' + encodeURIComponent(msg), '_blank');
+}
+
+// ══════════════════════════════════════════════════════════════
+// STATS PRO — carrega uma vez ao iniciar e a cada 60s
+// ══════════════════════════════════════════════════════════════
+
+async function loadStatsPro() {
+  try {
+    const now = new Date();
+    const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+
+    // Inicio da semana (segunda)
+    const weekStart = new Date(now);
+    const dow = weekStart.getDay();
+    weekStart.setDate(weekStart.getDate() - (dow === 0 ? 6 : dow - 1));
+    weekStart.setHours(0,0,0,0);
+    const weekStr = weekStart.getFullYear() + '-' + String(weekStart.getMonth()+1).padStart(2,'0') + '-' + String(weekStart.getDate()).padStart(2,'0');
+
+    // Inicio do mes
+    const monthStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-01';
+
+    // Buscar TODOS os atendimentos do mes (done) deste barbeiro
+    const { data: mesAppts } = await sb
+      .from('appointments')
+      .select('scheduled_at, price_paid, service_id')
+      .eq('barbershop_id', shopData.id)
+      .eq('barber_id', barber.id)
+      .eq('status', 'done')
+      .gte('scheduled_at', monthStr + 'T00:00:00-03:00')
+      .order('scheduled_at', { ascending: true });
+
+    const all = mesAppts || [];
+
+    function getPrice(a) {
+      const p = Number(a.price_paid);
+      if (p > 0) return p;
+      const svc = services.find(s => s.id === a.service_id);
+      return svc ? Number(svc.price) : 0;
+    }
+
+    // Separar por periodo
+    const hoje = all.filter(a => a.scheduled_at.startsWith(todayStr));
+    const semana = all.filter(a => a.scheduled_at >= weekStr + 'T00:00:00');
+
+    const fatHoje = hoje.reduce((s,a) => s + getPrice(a), 0);
+    const fatSem = semana.reduce((s,a) => s + getPrice(a), 0);
+    const fatMes = all.reduce((s,a) => s + getPrice(a), 0);
+
+    document.getElementById('sp-atend-hoje').textContent = hoje.length;
+    document.getElementById('sp-fat-hoje').textContent = formatMoney(fatHoje);
+    document.getElementById('sp-atend-sem').textContent = semana.length;
+    document.getElementById('sp-fat-sem').textContent = formatMoney(fatSem);
+    document.getElementById('sp-atend-mes').textContent = all.length;
+    document.getElementById('sp-fat-mes').textContent = formatMoney(fatMes);
+
+    // Comissao
+    const pct = barber.commission_pct || 0;
+    const comissao = fatMes * (pct / 100);
+    document.getElementById('sp-comissao').textContent = formatMoney(comissao);
+    document.getElementById('sp-comissao-pct').textContent = pct > 0 ? (pct + '% de ' + formatMoney(fatMes)) : 'Sem comissao definida';
+
+    // Nota media (try/catch pois tabela pode nao existir)
+    try {
+      const { data: ratings } = await sb
+        .from('respostas_satisfacao')
+        .select('rating')
+        .eq('barbershop_id', shopData.id)
+        .eq('barber_id', barber.id);
+
+      if (ratings && ratings.length > 0) {
+        const avg = ratings.reduce((s,r) => s + Number(r.rating), 0) / ratings.length;
+        const rounded = Math.round(avg * 10) / 10;
+        document.getElementById('sp-rating').textContent = rounded.toFixed(1) + ' (' + ratings.length + ' avaliacoes)';
+        // Render stars
+        let starsHtml = '';
+        for (let i = 1; i <= 5; i++) {
+          starsHtml += i <= Math.round(avg) ? '\u2605' : '<span class="stars-empty">\u2606</span>';
+        }
+        document.getElementById('sp-stars').innerHTML = starsHtml;
+      } else {
+        document.getElementById('sp-rating').textContent = 'Sem avaliacoes';
+      }
+    } catch(e) {
+      console.log('Tabela respostas_satisfacao nao encontrada:', e.message);
+      document.getElementById('sp-rating').textContent = 'Indisponivel';
+    }
+
+    // ── Ranking ──
+    try {
+      // Buscar faturamento de TODOS os barbeiros ativos do mes
+      const { data: allBarbers } = await sb
+        .from('barbers')
+        .select('id, name')
+        .eq('barbershop_id', shopData.id)
+        .eq('active', true);
+
+      if (allBarbers && allBarbers.length > 1) {
+        const { data: allAppts } = await sb
+          .from('appointments')
+          .select('barber_id, price_paid, service_id')
+          .eq('barbershop_id', shopData.id)
+          .eq('status', 'done')
+          .gte('scheduled_at', monthStr + 'T00:00:00-03:00');
+
+        const fatByBarber = {};
+        (allBarbers || []).forEach(b => fatByBarber[b.id] = 0);
+        (allAppts || []).forEach(a => {
+          if (fatByBarber[a.barber_id] !== undefined) {
+            fatByBarber[a.barber_id] += getPrice(a);
+          }
+        });
+
+        // Ordenar desc
+        const sorted = Object.entries(fatByBarber).sort((a,b) => b[1] - a[1]);
+        const myPos = sorted.findIndex(([id]) => id === barber.id) + 1;
+        const totalBarbers = allBarbers.length;
+        const myFat = fatByBarber[barber.id] || 0;
+        const othersFat = sorted.filter(([id]) => id !== barber.id).reduce((s,[,v]) => s + v, 0);
+        const teamAvg = totalBarbers > 1 ? othersFat / (totalBarbers - 1) : 0;
+
+        document.getElementById('rank-pos').textContent = '#' + myPos;
+        document.getElementById('rank-label').textContent = 'de ' + totalBarbers + ' barbeiros';
+        document.getElementById('rank-you-label').textContent = 'Voce: ' + formatMoney(myFat);
+        document.getElementById('rank-team-label').textContent = 'Equipe media: ' + formatMoney(teamAvg);
+
+        const maxVal = Math.max(myFat, teamAvg, 1);
+        document.getElementById('rank-bar-you').style.width = Math.round((myFat / maxVal) * 100) + '%';
+      } else {
+        document.getElementById('ranking-section').innerHTML =
+          '<div style="text-align:center;padding:8px;font-size:12px;color:var(--texto-muted);">Voce e o unico barbeiro</div>';
+      }
+    } catch(e) { console.log('Ranking error:', e.message); }
+
+    // ── Proximos agendamentos ──
+    try {
+      const nowISO = now.toISOString();
+      const { data: upcoming } = await sb
+        .from('appointments')
+        .select('*')
+        .eq('barbershop_id', shopData.id)
+        .eq('barber_id', barber.id)
+        .in('status', ['confirmed', 'pending'])
+        .gte('scheduled_at', nowISO)
+        .order('scheduled_at', { ascending: true })
+        .limit(5);
+
+      const upEl = document.getElementById('upcoming-list');
+      if (upcoming && upcoming.length > 0) {
+        upEl.innerHTML = upcoming.map(a => {
+          const hora = new Date(a.scheduled_at);
+          const timeStr = hora.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+          const svc = services.find(s => s.id === a.service_id);
+          const svcName = svc ? svc.name : '—';
+          const dur = svc ? (svc.duration_min || 30) : 30;
+
+          // Countdown
+          const diffMs = hora - now;
+          const diffMin = Math.round(diffMs / 60000);
+          let countdown = '';
+          if (diffMin <= 0) countdown = 'agora';
+          else if (diffMin < 60) countdown = 'em ' + diffMin + ' min';
+          else {
+            const h = Math.floor(diffMin / 60);
+            const m = diffMin % 60;
+            countdown = 'em ' + h + 'h' + (m > 0 ? m + 'min' : '');
+          }
+
+          return '<div class="upcoming-card">'
+            + '<div>'
+            + '<div class="upcoming-time">' + timeStr + '</div>'
+            + '<div class="upcoming-client">' + esc(a.client_name) + '</div>'
+            + '<div class="upcoming-svc">' + esc(svcName) + ' · ' + dur + 'min</div>'
+            + '</div>'
+            + '<div class="upcoming-countdown">' + countdown + '</div>'
+            + '</div>';
+        }).join('');
+      } else {
+        upEl.innerHTML = '<div style="text-align:center;padding:20px;font-size:12px;color:var(--texto-muted);">Nenhum proximo agendamento</div>';
+      }
+    } catch(e) { console.log('Upcoming error:', e.message); }
+
+    // ── Performance chart (ultimos 7 dias) ──
+    try {
+      const days = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        days.push({
+          date: d,
+          str: d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'),
+          label: ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'][d.getDay()]
+        });
+      }
+
+      // Buscar atendimentos dos ultimos 7 dias
+      const { data: perfAppts } = await sb
+        .from('appointments')
+        .select('scheduled_at, price_paid, service_id')
+        .eq('barbershop_id', shopData.id)
+        .eq('barber_id', barber.id)
+        .eq('status', 'done')
+        .gte('scheduled_at', days[0].str + 'T00:00:00-03:00')
+        .lte('scheduled_at', days[6].str + 'T23:59:59-03:00');
+
+      const perfAll = perfAppts || [];
+
+      const dayCounts = days.map(d => {
+        const count = perfAll.filter(a => a.scheduled_at.startsWith(d.str)).length;
+        return { label: d.label, count, isToday: d.str === todayStr };
+      });
+
+      const maxCount = Math.max(...dayCounts.map(d => d.count), 1);
+
+      document.getElementById('perf-chart').innerHTML = dayCounts.map(d => {
+        const h = Math.max(4, Math.round((d.count / maxCount) * 60));
+        const opacity = d.isToday ? '1' : '0.6';
+        return '<div class="perf-bar-wrap">'
+          + '<div class="perf-bar-val">' + d.count + '</div>'
+          + '<div class="perf-bar" style="height:' + h + 'px;opacity:' + opacity + ';"></div>'
+          + '<div class="perf-bar-label">' + d.label + '</div>'
+          + '</div>';
+      }).join('');
+
+      // Ticket medio do mes
+      const ticketMedio = all.length > 0 ? fatMes / all.length : 0;
+      document.getElementById('perf-ticket').textContent = formatMoney(ticketMedio);
+
+    } catch(e) { console.log('Perf chart error:', e.message); }
+
+  } catch(e) {
+    console.error('loadStatsPro error:', e);
+  }
 }
 
 async function logout() {
