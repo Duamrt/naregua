@@ -154,6 +154,37 @@ const AJUDA = {
       ]},
       { dica: 'Use as setas pra ver a agenda de amanhã e se preparar.' }
     ]
+  },
+  'admin': {
+    titulo: 'Painel Admin',
+    secoes: [
+      { titulo: 'Visão geral', itens: [
+        'Veja todos os clientes (barbearias) cadastrados no NaRegua',
+        'Stats globais: profissionais, agendamentos e faturamento total',
+        'Cada card mostra login, senha, barbeiros e status de pagamento'
+      ]},
+      { titulo: 'Criar novo cliente', passos: [
+        'Clique em + NOVA',
+        'Preencha email e senha do dono (cria a conta automaticamente)',
+        'Defina tipo, nome, cidade, horários e serviços',
+        'O primeiro barbeiro é marcado como DONO automaticamente',
+        'Clique em SALVAR — tudo criado de uma vez'
+      ]},
+      { titulo: 'Gerenciar cliente', itens: [
+        'Entrar como — acessa o dashboard como se fosse o dono',
+        'Editar — altera dados, serviços, barbeiros e plano',
+        'DEFINIR SENHA — redefine senha do dono (fica visível no card)',
+        'SENHA (barbeiro) — redefine senha de um barbeiro específico',
+        'Copiar link — copia link de agendamento público',
+        'Link barbeiro — copia link pra barbeiro criar acesso'
+      ]},
+      { titulo: 'Excluir cliente', itens: [
+        'Clique em Excluir no card',
+        'Digite o nome da barbearia pra confirmar',
+        'Todos os dados são apagados permanentemente'
+      ]},
+      { dica: 'O badge DONO no barbeiro indica que ele usa o login de email (não o de telefone). A senha dele é a mesma do dono.' }
+    ]
   }
 };
 
