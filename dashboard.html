@@ -982,11 +982,12 @@ function enviarLinkBarbeiroZap() {
 
 function compartilharWhatsApp() {
   const link = document.getElementById('share-link').textContent;
-  const msg = 'Olá! Aqui é da *' + shop.name + '*.\n\n'
-    + 'Agora você pode agendar seu horário online, sem precisar ligar ou mandar mensagem!\n\n'
-    + 'É rápido, só escolher o serviço, o dia e o horário:\n'
-    + link + '\n\n'
-    + 'Te esperamos!';
+  const msg = 'Fala! Aqui é da *' + shop.name + '* ✂️\n\n'
+    + 'Agora dá pra agendar seu horário direto pelo celular, sem precisar ligar ou mandar mensagem.\n\n'
+    + 'É só clicar no link, escolher o serviço e o horário que fica melhor pra você:\n\n'
+    + '👉 ' + link + '\n\n'
+    + 'Rápido, prático e disponível 24h.\n'
+    + 'Te esperamos! 💈';
   window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
 }
 
