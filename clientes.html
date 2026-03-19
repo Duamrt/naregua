@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!map[phone].firstVisit || a.scheduled_at < map[phone].firstVisit) {
       map[phone].firstVisit = a.scheduled_at;
     }
-  });
+  }
 
   allClients = Object.values(map).sort((a, b) => (b.lastVisit || '').localeCompare(a.lastVisit || ''));
 
