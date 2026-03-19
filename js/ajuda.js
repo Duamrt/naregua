@@ -244,11 +244,16 @@ function toggleAjudaPainel() {
   const painel = document.createElement('div');
   painel.id = 'ajuda-painel';
   painel.style.cssText = 'position:fixed;top:0;right:0;width:340px;max-width:90vw;height:100vh;background:rgba(10,10,10,0.95);border-left:1px solid rgba(212,168,83,0.15);z-index:9999;overflow-y:auto;padding:20px;backdrop-filter:blur(12px);animation:ajudaSlide .2s ease;';
+  const tourBtn = (typeof window.startDashboardTour === 'function')
+    ? '<button onclick="fecharAjuda();window.startDashboardTour();" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border-radius:8px;border:1px solid rgba(212,168,83,0.25);background:rgba(212,168,83,0.08);color:#d4a853;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:16px;transition:.15s;">▶ VER TOUR GUIADO</button>'
+    : '';
+
   painel.innerHTML =
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">' +
       '<div style="font-weight:700;font-size:13px;color:var(--verde-acao);letter-spacing:1px;">❓ AJUDA</div>' +
       '<button onclick="fecharAjuda()" style="background:none;border:none;color:var(--texto-muted);font-size:20px;cursor:pointer;padding:4px 8px;">&times;</button>' +
     '</div>' +
+    tourBtn +
     '<div style="font-weight:800;font-size:16px;color:var(--texto-principal);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--borda);">' + data.titulo + '</div>' +
     conteudo;
   document.body.appendChild(painel);
