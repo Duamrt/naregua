@@ -1,276 +1,479 @@
 // ══════════════════════════════════════════
 // NAREGUA — SISTEMA DE AJUDA CONTEXTUAL
-// Botão "?" flutuante + painel lateral
+// Botão "?" flutuante + painel slide-up
 // ══════════════════════════════════════════
 
 const AJUDA = {
   'dashboard': {
     titulo: 'Agenda do Dia',
-    secoes: [
-      { titulo: 'Visão geral', itens: [
-        'Veja todos os agendamentos do dia organizados por profissional',
-        'O próximo cliente aparece destacado com borda dourada',
-        'Use as setas para navegar entre dias'
-      ]},
-      { titulo: 'Ações nos agendamentos', passos: [
-        'CONCLUIR — marca como atendido e registra o pagamento',
-        'CANCELAR — cancela e oferece avisar o próximo cliente da fila',
-        'FALTOU — marca que o cliente não compareceu',
-        'ZAP — envia confirmação pelo WhatsApp do cliente'
-      ]},
-      { titulo: 'Encaixe rápido', passos: [
-        'Clique em + ENCAIXE no topo',
-        'Selecione o profissional e o serviço',
-        'Nome e telefone são opcionais (cliente avulso)',
-        'O sistema encaixa no próximo horário disponível'
-      ]},
-      { titulo: 'Compartilhar', itens: [
-        'ENVIAR LINK DE AGENDAMENTO — manda o link pro cliente pelo WhatsApp',
-        'CADASTRAR BARBEIRO — envia link de acesso pro profissional',
-        'Copiar link — copia pra colar onde quiser'
-      ]},
-      { dica: 'A agenda atualiza automaticamente a cada 30 segundos. Novos agendamentos aparecem sem precisar recarregar.' }
+    itens: [
+      'Veja os agendamentos do dia, confirme, conclua ou cancele',
+      'Use +ENCAIXE pra clientes sem hora marcada',
+      'Navegue entre dias com as setas',
+      'O próximo cliente aparece destacado com borda dourada',
+      'A agenda atualiza automaticamente a cada 30 segundos'
     ]
   },
-
-  'equipe': {
-    titulo: 'Equipe / Profissionais',
-    secoes: [
-      { titulo: 'Adicionar profissional', passos: [
-        'Clique em + NOVO',
-        'Preencha o nome e telefone',
-        'Configure os dias e horários de trabalho',
-        'Escolha o modo: Agendamento (cliente escolhe horário) ou Ordem de chegada',
-        'Clique em SALVAR — o link de acesso será copiado automaticamente'
-      ]},
-      { titulo: 'Horários por dia', itens: [
-        'Cada dia pode ter horário diferente (entrada, saída, pausa)',
-        'Agendamento: cliente escolhe horário online',
-        'Ordem de chegada: atendimento sem horário fixo, por ordem'
-      ]},
-      { titulo: 'Desativar / Excluir', itens: [
-        'Desativar — profissional some da agenda mas mantém histórico',
-        'Excluir — remove permanentemente (agendamentos pendentes serão cancelados)',
-        'O dono (is_owner) não pode ser excluído'
-      ]},
-      { dica: 'O telefone é necessário pra o profissional criar seu próprio acesso pelo app.' }
+  'agenda-semana': {
+    titulo: 'Agenda Semanal',
+    itens: [
+      'Visão completa da semana por barbeiro',
+      'Dias fechados e folgas são destacados em cinza',
+      'Clique num card pra ir direto pro dia na agenda',
+      'Use as setas pra navegar entre semanas'
     ]
   },
-
   'financeiro': {
-    titulo: 'Caixa / Financeiro',
-    secoes: [
-      { titulo: 'Visão geral', itens: [
-        'Veja receita, despesas, comissões e lucro do dia ou do mês',
-        'Use os filtros DIA / MÊS pra alternar o período',
-        'A margem mostra quanto sobra após custos e comissões'
-      ]},
-      { titulo: 'Lançar despesa', passos: [
-        'Clique em + DESPESA',
-        'Preencha: descrição, valor, data e categoria',
-        'Clique em SALVAR'
-      ]},
-      { titulo: 'Comissões', itens: [
-        'Calculadas automaticamente com base no percentual de cada profissional',
-        'Configure o percentual na tela de Equipe'
-      ]},
-      { dica: 'A receita vem dos atendimentos marcados como CONCLUÍDO no dashboard.' }
+    titulo: 'Caixa',
+    itens: [
+      'Faturamento e despesas do dia ou mês',
+      'Registre despesas com + DESPESA',
+      'Alterne entre DIA e MÊS nos filtros',
+      'A margem mostra quanto sobra após custos e comissões',
+      'A receita vem dos atendimentos concluídos no dashboard'
     ]
   },
-
+  'equipe': {
+    titulo: 'Equipe',
+    itens: [
+      'Gerencie seus profissionais e seus horários',
+      'Configure horário por dia, pausa e modo de agendamento',
+      'Defina a comissão (%) de cada barbeiro',
+      'Desativar mantém o histórico, excluir apaga tudo',
+      'O telefone é necessário pro barbeiro criar acesso no app'
+    ]
+  },
   'servicos': {
     titulo: 'Serviços',
-    secoes: [
-      { titulo: 'Gerenciar serviços', passos: [
-        'Clique em + NOVO pra criar um serviço',
-        'Defina: nome, preço e duração em minutos',
-        'Dia inteiro: reserva todos os profissionais (ex: noiva, evento)',
-        'Desativar: serviço some do agendamento mas mantém histórico'
-      ]},
-      { dica: 'O preço e a duração podem ser editados a qualquer momento sem afetar agendamentos já feitos.' }
+    itens: [
+      'Cadastre os serviços que você oferece',
+      'Defina nome, preço e duração em minutos',
+      'Desativar um serviço esconde do agendamento mas mantém histórico',
+      'Preço e duração podem ser editados sem afetar agendamentos já feitos'
     ]
   },
-
   'clientes': {
     titulo: 'Clientes',
-    secoes: [
-      { titulo: 'Lista de clientes', itens: [
-        'Todos os clientes que já agendaram aparecem aqui',
-        'Consolidados por telefone (mesmo cliente = mesmo número)',
-        'Veja quantos atendimentos cada um fez e quando foi a última visita'
-      ]},
-      { titulo: 'Ações', itens: [
-        'ZAP — abre conversa no WhatsApp direto com o cliente',
-        'COPIAR TEL — copia o telefone pra área de transferência'
-      ]},
-      { dica: 'Use a busca pra encontrar rapidamente por nome ou telefone.' }
+    itens: [
+      'Lista de todos os clientes que já agendaram',
+      'Clique no nome pra ver o histórico completo',
+      'Use a busca pra encontrar por nome ou telefone',
+      'ZAP abre conversa no WhatsApp direto com o cliente'
     ]
   },
-
   'estoque': {
-    titulo: 'Estoque de Produtos',
-    secoes: [
-      { titulo: 'Gerenciar produtos', passos: [
-        'Clique em + NOVO pra cadastrar um produto',
-        'Defina: nome, preço de venda, custo, quantidade e estoque mínimo',
-        'Produtos com estoque abaixo do mínimo ficam destacados em vermelho'
-      ]},
-      { titulo: 'Movimentações', passos: [
-        '+ ENTRADA — quando comprar/receber produtos',
-        '- SAÍDA — quando vender/usar produtos',
-        'O estoque atualiza automaticamente'
-      ]},
-      { dica: 'O lucro por produto é calculado automaticamente (preço de venda - custo).' }
+    titulo: 'Estoque',
+    itens: [
+      'Controle de produtos com entradas e saídas',
+      'Cadastre com preço de venda, custo e estoque mínimo',
+      'Produtos com estoque baixo ficam em vermelho',
+      '+ ENTRADA quando comprar, - SAÍDA quando vender/usar'
     ]
   },
-
   'relatorio': {
-    titulo: 'Relatório Mensal',
-    secoes: [
-      { titulo: 'O que mostra', itens: [
-        'Faturamento total e ticket médio do mês',
-        'Taxa de falta (no-show) e margem de lucro',
-        'Gráfico de faturamento diário',
-        'Ranking dos profissionais por faturamento',
-        'Formas de pagamento mais usadas',
-        'Despesas por categoria',
-        'Comparação com o mês anterior'
-      ]},
-      { dica: 'Use as setas pra navegar entre meses e comparar evolução.' }
+    titulo: 'Relatório',
+    itens: [
+      'Análise completa: ranking de barbeiros, comparativo mensal',
+      'Formas de pagamento mais usadas e despesas por categoria',
+      'Gráfico de faturamento diário e horários de pico',
+      'Use as setas pra navegar entre meses',
+      'Exporte em PDF pra compartilhar'
     ]
   },
-
-  'barbeiro': {
-    titulo: 'Agenda do Barbeiro',
-    secoes: [
-      { titulo: 'Seu dia', itens: [
-        'Veja seus agendamentos do dia com horário, cliente e serviço',
-        'Stats no topo: quantos agendados, atendidos e quanto faturou'
-      ]},
-      { titulo: 'Ações', passos: [
-        'ATENDIDO — marca que você atendeu o cliente (registra pagamento)',
-        'FALTOU — marca que o cliente não apareceu',
-        'ZAP — manda mensagem de confirmação pro cliente'
-      ]},
-      { dica: 'Use as setas pra ver a agenda de amanhã e se preparar.' }
+  'resumo': {
+    titulo: 'Resumo',
+    itens: [
+      'Visão geral do negócio em cards coloridos',
+      'Cada card mostra um KPI importante',
+      'Faturamento, atendimentos, ticket médio e mais',
+      'Acompanhe a evolução mês a mês'
+    ]
+  },
+  'comandas': {
+    titulo: 'Comandas',
+    itens: [
+      'Abra uma comanda quando o cliente sentar na cadeira',
+      'Adicione serviços e produtos à comanda',
+      'Feche com a forma de pagamento quando terminar',
+      'O valor é somado automaticamente no financeiro'
+    ]
+  },
+  'pacotes': {
+    titulo: 'Pacotes',
+    itens: [
+      'Crie pacotes como "5 cortes por R$100"',
+      'Venda pro cliente e controle os usos restantes',
+      'Quando o cliente agendar, o uso do pacote é descontado',
+      'Pacotes vencidos ou esgotados ficam inativos'
+    ]
+  },
+  'assinaturas': {
+    titulo: 'Assinaturas',
+    itens: [
+      'Clubes mensais: o cliente paga fixo por mês',
+      'Defina os serviços inclusos no plano',
+      'Controle de validade e renovação automática',
+      'Acompanhe assinantes ativos e receita recorrente'
+    ]
+  },
+  'cupons': {
+    titulo: 'Cupons',
+    itens: [
+      'Crie cupons de desconto em % ou valor fixo (R$)',
+      'Compartilhe via WhatsApp com seus clientes',
+      'Defina validade e limite de usos',
+      'Acompanhe quantos foram usados e por quem'
+    ]
+  },
+  'retencao': {
+    titulo: 'Retenção',
+    itens: [
+      'Veja clientes que sumiram há mais de 30 dias',
+      'Aniversariantes do mês pra mandar parabéns',
+      'Nota de satisfação média da barbearia',
+      'Chame clientes de volta pelo WhatsApp com um toque'
+    ]
+  },
+  'satisfacao': {
+    titulo: 'Satisfação',
+    itens: [
+      'Pesquisa de satisfação de 1 a 5 estrelas',
+      'Envie o link pro cliente avaliar após o atendimento',
+      'Veja a nota média e os comentários recebidos',
+      'Identifique pontos de melhoria no atendimento'
+    ]
+  },
+  'configuracoes': {
+    titulo: 'Configurações',
+    itens: [
+      'Ajuste o intervalo entre horários de agendamento',
+      'Limite de antecedência pra agendar',
+      'Comissão padrão aplicada a novos barbeiros',
+      'Formas de pagamento aceitas',
+      'Tema visual (claro/escuro) da barbearia'
+    ]
+  },
+  'lista-espera': {
+    titulo: 'Lista de Espera',
+    itens: [
+      'Fila pra clientes que chegam sem agendar',
+      'Adicione o cliente e ele entra na fila',
+      'Chame o próximo quando a cadeira liberar',
+      'Reordene a fila arrastando os cards'
+    ]
+  },
+  'comissoes': {
+    titulo: 'Comissões',
+    itens: [
+      'Quanto cada barbeiro faturou no período',
+      'Valor da comissão calculado automaticamente',
+      'Edite a % de comissão direto nesta tela',
+      'Filtre por mês pra fechar o pagamento'
+    ]
+  },
+  'historico-cliente': {
+    titulo: 'Histórico do Cliente',
+    itens: [
+      'Todas as visitas deste cliente com data e serviço',
+      'Total gasto e frequência de visitas',
+      'Pacotes e assinaturas vinculados',
+      'Avaliações de satisfação que ele deixou'
+    ]
+  },
+  'combos': {
+    titulo: 'Combos',
+    itens: [
+      'Combine serviços com preço especial',
+      'Ex: Cabelo + Barba por menos que os dois separados',
+      'O combo aparece como opção no agendamento',
+      'Edite ou desative a qualquer momento'
+    ]
+  },
+  'promocoes': {
+    titulo: 'Promoções',
+    itens: [
+      'Envie mensagens em massa pros seus clientes via WhatsApp',
+      'Escolha o público-alvo: todos, sumidos, aniversariantes',
+      'Use templates prontos ou escreva sua mensagem',
+      'Acompanhe quantas mensagens foram enviadas'
+    ]
+  },
+  'planos': {
+    titulo: 'Meu Plano',
+    itens: [
+      'Veja seu plano atual e recursos disponíveis',
+      'Dias restantes do período de teste (trial)',
+      'Compare os planos e faça upgrade',
+      'Histórico de pagamentos e faturas'
+    ]
+  },
+  'busca': {
+    titulo: 'Busca',
+    itens: [
+      'Encontre qualquer coisa: clientes, agendamentos, serviços',
+      'Pesquise também produtos, barbeiros e comandas',
+      'Digite e veja os resultados em tempo real',
+      'Clique no resultado pra ir direto pra página'
+    ]
+  },
+  'qrcode': {
+    titulo: 'QR Code',
+    itens: [
+      'QR Code da sua barbearia pra imprimir',
+      'Coloque no balcão, espelho ou cartão de visita',
+      'Cada barbeiro tem seu QR Code individual',
+      'O cliente escaneia e agenda direto pelo celular'
+    ]
+  },
+  'notificacoes': {
+    titulo: 'Notificações',
+    itens: [
+      'Alertas do sistema em tempo real',
+      'Novos agendamentos e confirmações',
+      'Clientes sumidos e estoque baixo',
+      'Vencimentos de pacotes e assinaturas'
+    ]
+  },
+  'galeria': {
+    titulo: 'Galeria',
+    itens: [
+      'Portfólio de fotos dos trabalhos realizados',
+      'Upload de imagens organizadas por barbeiro',
+      'Categorize por tipo: cabelo, barba, sobrancelha',
+      'As fotos aparecem no perfil público da barbearia'
+    ]
+  },
+  'politicas': {
+    titulo: 'Políticas',
+    itens: [
+      'Configure regras de cancelamento e atraso',
+      'Defina política de pagamento e no-show',
+      'O cliente vê as regras na hora de agendar',
+      'Proteja seu tempo e reduza faltas'
+    ]
+  },
+  'importar-clientes': {
+    titulo: 'Importar Clientes',
+    itens: [
+      'Importe clientes de uma planilha CSV',
+      'Ou cole direto do Excel (nome e telefone)',
+      'Clientes duplicados são identificados pelo telefone',
+      'Revise antes de confirmar a importação'
+    ]
+  },
+  'recibo-barbeiro': {
+    titulo: 'Recibo',
+    itens: [
+      'Recibo de comissão do barbeiro',
+      'Detalhamento de atendimentos e valores',
+      'Imprimível direto do navegador',
+      'Compartilhável via WhatsApp'
+    ]
+  },
+  'backup': {
+    titulo: 'Backup',
+    itens: [
+      'Exporte todos os seus dados da barbearia',
+      'Formatos disponíveis: CSV e JSON',
+      'Seus dados são seus, leve quando quiser',
+      'Recomendamos fazer backup mensalmente'
+    ]
+  },
+  'atividades': {
+    titulo: 'Atividades',
+    itens: [
+      'Log de tudo que aconteceu na barbearia',
+      'Agendamentos, despesas, estoque e comandas',
+      'Filtre por período e tipo de atividade',
+      'Acompanhe quem fez o quê e quando'
+    ]
+  },
+  'metas': {
+    titulo: 'Metas',
+    itens: [
+      'Defina metas mensais de faturamento',
+      'Acompanhe atendimentos e novos clientes',
+      'Barra de progresso mostra quanto falta',
+      'Compare com o mês anterior pra ver evolução'
+    ]
+  },
+  'folha-pagamento': {
+    titulo: 'Folha de Pagamento',
+    itens: [
+      'Salário fixo + comissão - deduções = líquido a pagar',
+      'Detalhamento completo por barbeiro',
+      'Imprimível pra assinatura do profissional',
+      'Filtre por mês e exporte se precisar'
+    ]
+  },
+  'horarios-ociosos': {
+    titulo: 'Horários Ociosos',
+    itens: [
+      'Descubra onde sua agenda tem buracos',
+      'Veja quanto você perde em receita potencial',
+      'Sugestões pra preencher os horários vazios',
+      'Identifique padrões: dias e horários mais fracos'
     ]
   },
   'admin': {
     titulo: 'Painel Admin',
-    secoes: [
-      { titulo: 'Visão geral', itens: [
-        'Veja todos os clientes (barbearias) cadastrados no NaRegua',
-        'Stats globais: profissionais, agendamentos e faturamento total',
-        'Cada card mostra login, senha, barbeiros e status de pagamento'
-      ]},
-      { titulo: 'Criar novo cliente', passos: [
-        'Clique em + NOVA',
-        'Preencha email e senha do dono (cria a conta automaticamente)',
-        'Defina tipo, nome, cidade, horários e serviços',
-        'O primeiro barbeiro é marcado como DONO automaticamente',
-        'Clique em SALVAR — tudo criado de uma vez'
-      ]},
-      { titulo: 'Gerenciar cliente', itens: [
-        'Entrar como — acessa o dashboard como se fosse o dono',
-        'Editar — altera dados, serviços, barbeiros e plano',
-        'DEFINIR SENHA — redefine senha do dono (fica visível no card)',
-        'SENHA (barbeiro) — redefine senha de um barbeiro específico',
-        'Copiar link — copia link de agendamento público',
-        'Link barbeiro — copia link pra barbeiro criar acesso'
-      ]},
-      { titulo: 'Excluir cliente', itens: [
-        'Clique em Excluir no card',
-        'Digite o nome da barbearia pra confirmar',
-        'Todos os dados são apagados permanentemente'
-      ]},
-      { dica: 'O badge DONO no barbeiro indica que ele usa o login de email (não o de telefone). A senha dele é a mesma do dono.' }
+    itens: [
+      'Gerenciamento de todas as barbearias do NaRegua',
+      'Crie, edite e acesse qualquer barbearia',
+      'Veja stats globais: barbeiros, agendamentos, faturamento',
+      '"Entrar como" acessa o dashboard como se fosse o dono'
+    ]
+  },
+  'barbeiro': {
+    titulo: 'Minha Agenda',
+    itens: [
+      'Sua agenda pessoal do dia com horários e clientes',
+      'Marque como ATENDIDO, FALTOU ou envie ZAP',
+      'Stats no topo: agendados, atendidos e faturamento',
+      'Use as setas pra ver a agenda de amanhã'
+    ]
+  },
+  'agendar': {
+    titulo: 'Agendar',
+    itens: [
+      'Escolha o barbeiro e o serviço desejado',
+      'Selecione o dia e horário disponível',
+      'Confirme com seu nome e telefone',
+      'Você receberá confirmação pelo WhatsApp'
+    ]
+  },
+  'barbearia': {
+    titulo: 'Minha Barbearia',
+    itens: [
+      'Perfil público da sua barbearia',
+      'Informações que o cliente vê antes de agendar',
+      'Endereço, horário de funcionamento e contato',
+      'Galeria de fotos e serviços oferecidos'
+    ]
+  },
+  'cliente': {
+    titulo: 'Área do Cliente',
+    itens: [
+      'Veja seus agendamentos futuros e passados',
+      'Cancele ou reagende se precisar',
+      'Confira seus pacotes e assinaturas ativos',
+      'Avalie o atendimento após cada visita'
+    ]
+  },
+  'minha-conta': {
+    titulo: 'Minha Conta',
+    itens: [
+      'Seus dados pessoais e de acesso',
+      'Altere nome, telefone ou senha',
+      'Veja e gerencie suas notificações',
+      'Configurações de privacidade e preferências'
+    ]
+  },
+  'onboarding': {
+    titulo: 'Configuração Inicial',
+    itens: [
+      'Preencha os dados da sua barbearia passo a passo',
+      'Configure horários, serviços e barbeiros',
+      'Ao final, sua barbearia estará pronta pra receber agendamentos',
+      'Você pode ajustar tudo depois nas Configurações'
+    ]
+  },
+  'barbeiro-cadastro': {
+    titulo: 'Cadastro do Barbeiro',
+    itens: [
+      'Crie seu acesso como profissional',
+      'Use o telefone cadastrado pelo dono da barbearia',
+      'Defina sua senha de acesso',
+      'Após o cadastro, acesse sua agenda pessoal'
     ]
   }
 };
+
+// ── DETECTAR PÁGINA ────────────────────────────────
+function getPageId() {
+  const path = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
+  return AJUDA[path] ? path : null;
+}
 
 // ── RENDERIZAR CONTEÚDO ────────────────────────────
 function renderAjuda(pageId) {
   const data = AJUDA[pageId];
   if (!data) return '<p style="color:var(--texto-muted);">Sem ajuda disponível pra esta tela.</p>';
 
-  let html = '';
-  data.secoes.forEach(s => {
-    if (s.titulo) {
-      html += '<div style="font-weight:700;font-size:13px;color:var(--verde-acao);margin:16px 0 8px;">' + s.titulo + '</div>';
-    }
-    if (s.itens) {
-      html += '<ul style="margin:0 0 8px 16px;font-size:12px;color:var(--texto-secundario);line-height:1.8;">';
-      s.itens.forEach(i => html += '<li>' + i + '</li>');
-      html += '</ul>';
-    }
-    if (s.passos) {
-      html += '<ol style="margin:0 0 8px 16px;font-size:12px;color:var(--texto-secundario);line-height:1.8;">';
-      s.passos.forEach(p => html += '<li>' + p + '</li>');
-      html += '</ol>';
-    }
-    if (s.dica) {
-      html += '<div style="background:rgba(212,168,83,0.08);border:1px solid rgba(212,168,83,0.2);border-radius:8px;padding:10px 12px;margin:8px 0;font-size:11px;color:var(--verde-acao);">💡 ' + s.dica + '</div>';
-    }
-  });
+  let html = '<ul style="margin:0;padding:0 0 0 18px;font-size:13px;color:var(--texto-secundario,#aaa);line-height:2;">';
+  data.itens.forEach(i => html += '<li>' + i + '</li>');
+  html += '</ul>';
   return html;
-}
-
-// ── DETECTAR PÁGINA ────────────────────────────────
-function getPageId() {
-  const path = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
-  const map = {
-    'dashboard': 'dashboard',
-    'equipe': 'equipe',
-    'financeiro': 'financeiro',
-    'servicos': 'servicos',
-    'clientes': 'clientes',
-    'estoque': 'estoque',
-    'relatorio': 'relatorio',
-    'barbeiro': 'barbeiro'
-  };
-  return map[path] || null;
 }
 
 // ── ABRIR/FECHAR PAINEL ────────────────────────────
 function toggleAjudaPainel() {
   const existing = document.getElementById('ajuda-painel');
-  if (existing) { existing.remove(); return; }
+  if (existing) { fecharAjuda(); return; }
 
   const pageId = getPageId();
   if (!pageId || !AJUDA[pageId]) return;
 
   const data = AJUDA[pageId];
   const conteudo = renderAjuda(pageId);
+
+  // Overlay escuro
+  const overlay = document.createElement('div');
+  overlay.id = 'ajuda-overlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9998;opacity:0;transition:opacity .2s ease;';
+  overlay.onclick = fecharAjuda;
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.style.opacity = '1');
+
+  // Painel slide-up
   const painel = document.createElement('div');
   painel.id = 'ajuda-painel';
-  painel.style.cssText = 'position:fixed;top:0;right:0;width:340px;max-width:90vw;height:100vh;background:rgba(10,10,10,0.95);border-left:1px solid rgba(212,168,83,0.15);z-index:9999;overflow-y:auto;padding:20px;backdrop-filter:blur(12px);animation:ajudaSlide .2s ease;';
-  const tourBtn = (typeof window.startDashboardTour === 'function')
-    ? '<button onclick="fecharAjuda();window.startDashboardTour();" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border-radius:8px;border:1px solid rgba(212,168,83,0.25);background:rgba(212,168,83,0.08);color:#d4a853;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:16px;transition:.15s;">▶ VER TOUR GUIADO</button>'
+  painel.style.cssText = 'position:fixed;bottom:0;left:0;right:0;max-height:70vh;background:var(--bg-card,#1a1a1a);border-top:2px solid rgba(212,168,83,0.3);border-radius:16px 16px 0 0;z-index:9999;overflow-y:auto;padding:0 20px 24px;transform:translateY(100%);transition:transform .25s cubic-bezier(0.4,0,0.2,1);';
+
+  // Botão de tour guiado (se disponível no dashboard)
+  const tourBtn = (typeof window.startDashboardTour === 'function' && pageId === 'dashboard')
+    ? '<button onclick="fecharAjuda();setTimeout(function(){window.startDashboardTour();},300);" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:12px;border-radius:10px;border:1px solid rgba(212,168,83,0.3);background:rgba(212,168,83,0.08);color:#d4a853;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;margin:0 0 16px;transition:.15s;">&#9654; VER TOUR GUIADO</button>'
     : '';
 
   painel.innerHTML =
+    // Handle bar
+    '<div style="display:flex;justify-content:center;padding:12px 0 8px;">' +
+      '<div style="width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,0.15);"></div>' +
+    '</div>' +
+    // Header
     '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">' +
-      '<div style="font-weight:700;font-size:13px;color:var(--verde-acao);letter-spacing:1px;">❓ AJUDA</div>' +
-      '<button onclick="fecharAjuda()" style="background:none;border:none;color:var(--texto-muted);font-size:20px;cursor:pointer;padding:4px 8px;">&times;</button>' +
+      '<div style="display:flex;align-items:center;gap:8px;">' +
+        '<span style="font-size:18px;">&#10068;</span>' +
+        '<span style="font-weight:800;font-size:17px;color:var(--texto-principal,#fff);">' + data.titulo + '</span>' +
+      '</div>' +
+      '<button onclick="fecharAjuda()" style="background:none;border:none;color:var(--texto-muted,#666);font-size:22px;cursor:pointer;padding:4px 8px;line-height:1;">&times;</button>' +
     '</div>' +
     tourBtn +
-    '<div style="font-weight:800;font-size:16px;color:var(--texto-principal);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--borda);">' + data.titulo + '</div>' +
     conteudo;
-  document.body.appendChild(painel);
 
-  setTimeout(() => document.addEventListener('click', fecharAjudaFora), 100);
+  document.body.appendChild(painel);
+  requestAnimationFrame(() => painel.style.transform = 'translateY(0)');
+
+  // Swipe down pra fechar
+  let startY = 0;
+  painel.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
+  painel.addEventListener('touchend', e => {
+    const diff = e.changedTouches[0].clientY - startY;
+    if (diff > 60) fecharAjuda();
+  }, { passive: true });
 }
 
 function fecharAjuda() {
-  const p = document.getElementById('ajuda-painel');
-  if (p) p.remove();
-  document.removeEventListener('click', fecharAjudaFora);
-}
-
-function fecharAjudaFora(e) {
   const painel = document.getElementById('ajuda-painel');
-  if (!painel) return;
-  if (!painel.contains(e.target) && !e.target.closest('#ajuda-fab')) fecharAjuda();
+  const overlay = document.getElementById('ajuda-overlay');
+  if (painel) {
+    painel.style.transform = 'translateY(100%)';
+    setTimeout(() => painel.remove(), 250);
+  }
+  if (overlay) {
+    overlay.style.opacity = '0';
+    setTimeout(() => overlay.remove(), 200);
+  }
 }
 
 // ── BOTÃO FLUTUANTE ────────────────────────────────
@@ -282,10 +485,9 @@ function initAjuda() {
     const style = document.createElement('style');
     style.id = 'ajuda-css';
     style.textContent =
-      '@keyframes ajudaSlide { from { transform:translateX(100%);opacity:0; } to { transform:translateX(0);opacity:1; } }' +
-      '#ajuda-fab { position:fixed;bottom:80px;right:16px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(212,168,83,0.2);background:rgba(10,10,10,0.9);color:var(--verde-acao);font-size:18px;font-weight:800;cursor:pointer;z-index:900;display:flex;align-items:center;justify-content:center;font-family:inherit;backdrop-filter:blur(8px);transition:.2s;box-shadow:0 2px 12px rgba(0,0,0,0.4); }' +
-      '#ajuda-fab:hover { background:rgba(212,168,83,0.1);border-color:rgba(212,168,83,0.4);transform:scale(1.1); }' +
-      '@media(max-width:768px) { #ajuda-painel { width:100vw !important;max-width:100vw !important; } }';
+      '#ajuda-fab { position:fixed;bottom:80px;right:16px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(212,168,83,0.3);background:rgba(212,168,83,0.9);color:#1a1a1a;font-size:20px;font-weight:900;cursor:pointer;z-index:999;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:.2s;box-shadow:0 2px 12px rgba(212,168,83,0.3); }' +
+      '#ajuda-fab:hover { background:rgba(212,168,83,1);transform:scale(1.1);box-shadow:0 4px 20px rgba(212,168,83,0.5); }' +
+      '#ajuda-fab:active { transform:scale(0.95); }';
     document.head.appendChild(style);
   }
 
@@ -293,6 +495,7 @@ function initAjuda() {
   fab.id = 'ajuda-fab';
   fab.textContent = '?';
   fab.title = 'Ajuda';
+  fab.setAttribute('aria-label', 'Ajuda');
   fab.onclick = toggleAjudaPainel;
   document.body.appendChild(fab);
 }
