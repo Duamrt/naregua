@@ -243,6 +243,7 @@
           <a id="whatsapp-link" href="#" target="_blank" class="btn btn-primary" style="text-decoration:none;margin-bottom:12px;">
             &#x1F4F1; ENVIAR COMPROVANTE NO WHATSAPP
           </a>
+          <button id="btn-calendar" class="btn btn-outline" onclick="addToCalendar()" style="margin-bottom:12px;">&#x1F4C5; ADICIONAR AO CALENDARIO</button>
           <button class="btn btn-outline" onclick="resetar()">AGENDAR OUTRO</button>
           <a href="cliente.html" style="display:block;margin-top:12px;font-size:12px;color:var(--texto-muted);text-decoration:none;">Ver meus agendamentos</a>
         </div>
@@ -305,7 +306,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Renderizar header
   document.getElementById('shop-name').textContent = shop.name;
-  document.getElementById('shop-info').textContent = shop.city || '';
+  var shopInfoText = shop.city || '';
+  if (shop.address) shopInfoText += (shopInfoText ? ' · ' : '') + shop.address;
+  document.getElementById('shop-info').textContent = shopInfoText;
 
   // Info badges (horário, endereço)
   const detailsEl = document.getElementById('shop-details');
@@ -1218,6 +1221,23 @@ function showAgMsg(text, type) {
   const el = document.getElementById('ag-msg');
   el.textContent = text;
   el.className = `msg msg-${type} show`;
+}
+
+// ── Adicionar ao calendario ───────────────────────────────────
+function addToCalendar() {
+  if (!selectedService || !selectedDate || !selectedTime) return;
+  const duration = selectedService.blocks_all_day ? 480 : (selectedService.duration_min || 30);
+  const title = selectedService.name + ' - ' + (shop ? shop.name : 'NaRegua');
+  const start = new Date(selectedDate + 'T' + selectedTime + ':00');
+  const end = new Date(start.getTime() + duration * 60000);
+  const fmt = function(d) { return d.toISOString().replace(/[-:]/g,'').replace('.000',''); };
+  var url = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+    + '&text=' + encodeURIComponent(title)
+    + '&dates=' + fmt(start) + '/' + fmt(end);
+  if (shop && shop.address) {
+    url += '&location=' + encodeURIComponent(shop.address);
+  }
+  window.open(url, '_blank');
 }
 
 // ── Resetar ───────────────────────────────────────────────────
