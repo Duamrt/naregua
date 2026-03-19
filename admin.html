@@ -282,7 +282,7 @@
     <div style="font-size:13px;color:var(--texto-muted);margin-bottom:8px;" id="delete-shop-name"></div>
     <div style="font-size:11px;color:#e74c3c;margin-bottom:20px;">Todos os dados serão apagados (barbeiros, serviços, agendamentos).</div>
     <div style="margin-bottom:12px;">
-      <input type="text" id="delete-confirm-input" placeholder="Digite o nome pra confirmar" style="width:100%;padding:10px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;box-sizing:border-box;">
+      <input type="text" id="delete-confirm-input" style="width:100%;padding:10px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;box-sizing:border-box;">
     </div>
     <div id="delete-error" style="display:none;font-size:11px;color:#e74c3c;background:rgba(231,76,60,0.1);border-radius:8px;padding:10px;margin-bottom:12px;text-align:left;word-break:break-all;"></div>
     <div style="display:flex;gap:10px;">
@@ -870,6 +870,7 @@ function excluirShop(id) {
   _deleteShopId = id;
   document.getElementById('delete-shop-name').textContent = s.name + ' · ' + (s.city || '');
   document.getElementById('delete-confirm-input').value = '';
+  document.getElementById('delete-confirm-input').placeholder = 'Digite "' + s.name + '" pra confirmar';
   document.getElementById('delete-error').style.display = 'none';
   document.getElementById('modal-delete').classList.add('show');
 }
