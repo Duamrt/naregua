@@ -67,11 +67,11 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div class="field">
           <label>ABRE ÀS</label>
-          <input type="time" id="shop-open" value="08:00">
+          <select id="shop-open" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;"></select>
         </div>
         <div class="field">
           <label>FECHA ÀS</label>
-          <input type="time" id="shop-close" value="19:00">
+          <select id="shop-close" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;"></select>
         </div>
       </div>
 
@@ -121,6 +121,20 @@ let currentUser = null;
 
 const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
 
+function populateTimeSelect(id, defaultVal) {
+  const sel = document.getElementById(id);
+  for (let h = 6; h <= 23; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      const val = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+      const opt = document.createElement('option');
+      opt.value = val;
+      opt.textContent = val;
+      if (val === defaultVal) opt.selected = true;
+      sel.appendChild(opt);
+    }
+  }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session }, error: sessErr } = await sb.auth.getSession();
   if (!session) { window.location.href = 'index.html'; return; }
@@ -154,6 +168,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (draft.name) document.getElementById('shop-name').value = draft.name;
   if (draft.city) document.getElementById('shop-city').value = draft.city;
   if (draft.phone) document.getElementById('shop-phone').value = draft.phone;
+
+  // Preencher selects de horário
+  populateTimeSelect('shop-open', '08:00');
+  populateTimeSelect('shop-close', '19:00');
 
   // Dias da semana
   renderDays();

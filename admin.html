@@ -269,6 +269,9 @@
     <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Confirma exclusão?</div>
     <div style="font-size:13px;color:var(--texto-muted);margin-bottom:8px;" id="delete-shop-name"></div>
     <div style="font-size:11px;color:#e74c3c;margin-bottom:20px;">Todos os dados serão apagados (barbeiros, serviços, agendamentos).</div>
+    <div style="margin-bottom:12px;">
+      <input type="text" id="delete-confirm-input" placeholder="Digite o nome pra confirmar" style="width:100%;padding:10px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;box-sizing:border-box;">
+    </div>
     <div id="delete-error" style="display:none;font-size:11px;color:#e74c3c;background:rgba(231,76,60,0.1);border-radius:8px;padding:10px;margin-bottom:12px;text-align:left;word-break:break-all;"></div>
     <div style="display:flex;gap:10px;">
       <button class="btn btn-outline" onclick="fecharModalDelete()" style="flex:1;">CANCELAR</button>
@@ -788,6 +791,7 @@ function excluirShop(id) {
   if (!s) return;
   _deleteShopId = id;
   document.getElementById('delete-shop-name').textContent = s.name + ' · ' + (s.city || '');
+  document.getElementById('delete-confirm-input').value = '';
   document.getElementById('delete-error').style.display = 'none';
   document.getElementById('modal-delete').classList.add('show');
 }
@@ -801,6 +805,16 @@ async function confirmarExclusao() {
   if (!_deleteShopId) return;
   const btn = document.getElementById('btn-delete-confirm');
   const errEl = document.getElementById('delete-error');
+
+  // Validar que digitou o nome correto
+  const typedName = document.getElementById('delete-confirm-input').value.trim();
+  const shop = allShops.find(x => x.id === _deleteShopId);
+  if (!shop || typedName.toLowerCase() !== shop.name.toLowerCase()) {
+    errEl.textContent = 'Nome nao confere. Digite "' + (shop ? shop.name : '') + '" pra confirmar.';
+    errEl.style.display = 'block';
+    return;
+  }
+
   btn.disabled = true;
   btn.querySelector('.btn-label').style.display = 'none';
   btn.querySelector('.spinner').style.display = 'inline-block';
