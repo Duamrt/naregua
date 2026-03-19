@@ -115,6 +115,8 @@
       background:var(--cinza-escuro); border-top:1px solid var(--borda);
       display:flex; justify-content:center; gap:0; padding:8px 0;
       padding-bottom:max(8px, env(safe-area-inset-bottom));
+      padding-left:max(0px, env(safe-area-inset-left));
+      padding-right:max(0px, env(safe-area-inset-right));
     }
     .nav-item {
       flex:1; max-width:65px; display:flex; flex-direction:column;
@@ -286,6 +288,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'index.html'; return; }
 
+  if (!ADMIN_EMAILS.includes(session.user.email)) {
+    sessionStorage.removeItem('admin_viewing_shop');
+  }
+
   if (ADMIN_EMAILS.includes(session.user.email) && !isAdminViewing) {
     window.location.href = 'admin.html'; return;
   }
@@ -423,7 +429,7 @@ async function salvarProduto() {
   const btn = document.getElementById('btn-prod-save');
   const editId = document.getElementById('prod-edit-id').value;
   const nome = document.getElementById('prod-nome').value.trim();
-  if (!nome) { showProdMsg('Informe o nome.', 'error'); return; }
+  if (!nome) { showProdMsg('Digite o nome do produto.', 'error'); return; }
 
   const payload = {
     name: nome,

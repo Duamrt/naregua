@@ -127,6 +127,8 @@
       background:var(--cinza-escuro); border-top:1px solid var(--borda);
       display:flex; justify-content:center; gap:0; padding:8px 0;
       padding-bottom:max(8px, env(safe-area-inset-bottom));
+      padding-left:max(0px, env(safe-area-inset-left));
+      padding-right:max(0px, env(safe-area-inset-right));
     }
     .nav-item {
       flex:1; max-width:65px; display:flex; flex-direction:column;
@@ -335,7 +337,11 @@ const db = sb;
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await sb.auth.getSession();
-  if (!session) { alert('Sessão expirada. Faça login novamente.'); window.location.href = 'index.html'; return; }
+  if (!session) { alert('Sua sessão expirou. Entre de novo.'); window.location.href = 'index.html'; return; }
+
+  if (!ADMIN_EMAILS.includes(session.user.email)) {
+    sessionStorage.removeItem('admin_viewing_shop');
+  }
 
   if (ADMIN_EMAILS.includes(session.user.email) && !isAdminViewing) {
     window.location.href = 'admin.html';
@@ -461,7 +467,7 @@ async function salvar() {
   const nome = document.getElementById('eq-nome').value.trim();
   const comissao = parseInt(document.getElementById('eq-comissao').value) || 0;
 
-  if (!nome) { showModalMsg('Informe o nome.', 'error'); return; }
+  if (!nome) { showModalMsg('Digite o nome do profissional.', 'error'); return; }
 
   const phone = document.getElementById('eq-phone').value.replace(/\D/g, '');
   if (!editId && !phone) {

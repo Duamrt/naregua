@@ -484,6 +484,7 @@ function renderShops() {
 }
 
 function entrarComo(shopId) {
+  sessionStorage.removeItem('admin_viewing_shop');
   sessionStorage.setItem('admin_viewing_shop', shopId);
   window.location.href = 'dashboard.html?shop=' + shopId;
 }
@@ -666,7 +667,7 @@ async function salvarAdmin() {
   const closing = document.getElementById('adm-close').value;
   let slug = gerarSlug(name);
 
-  if (!name) { showAdmMsg('Informe o nome.', 'error'); return; }
+  if (!name) { showAdmMsg('Digite o nome do estabelecimento.', 'error'); return; }
 
   // Avisar se slug vai mudar (quebra links antigos)
   if (editId) {

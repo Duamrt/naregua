@@ -257,6 +257,16 @@
 <script src="js/supabase.js"></script>
 <script src="js/utils.js"></script>
 <script>
+// ── Mascara telefone ──────────────────────────────────────────
+document.getElementById('client-phone').addEventListener('input', function() {
+  let v = this.value.replace(/\D/g, '');
+  if (v.length > 11) v = v.slice(0, 11);
+  if (v.length > 6) v = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+  else if (v.length > 2) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
+  else if (v.length > 0) v = '(' + v;
+  this.value = v;
+});
+
 // ── Estado ────────────────────────────────────────────────────
 let shop = null;
 let services = [];
@@ -651,7 +661,7 @@ function selectDate(key) {
   const hoje = new Date();
   hoje.setHours(0,0,0,0);
   const dataSel = new Date(key + 'T00:00:00-03:00');
-  if (dataSel < hoje) { showAgMsg('Não é possível agendar em datas passadas.', 'error'); return; }
+  if (dataSel < hoje) { showAgMsg('Escolha uma data a partir de hoje.', 'error'); return; }
   const limite = new Date(hoje);
   limite.setDate(limite.getDate() + 30);
   if (dataSel > limite) { showAgMsg('Agendamento permitido até 30 dias no futuro.', 'error'); return; }
@@ -868,9 +878,9 @@ async function confirmarAgendamento() {
   const btn = document.getElementById('btn-confirm');
   const msgEl = document.getElementById('ag-msg');
 
-  if (!nome || nome.length < 2) { showAgMsg('Informe seu nome (mínimo 2 caracteres).', 'error'); return; }
+  if (!nome || nome.length < 2) { showAgMsg('Digite seu nome (pelo menos 2 letras).', 'error'); return; }
   const phoneLimpo = phone.replace(/\D/g, '');
-  if (!phoneLimpo || phoneLimpo.length < 10) { showAgMsg('Informe um WhatsApp válido com DDD (ex: 87981713987).', 'error'); return; }
+  if (!phoneLimpo || phoneLimpo.length < 10) { showAgMsg('Digite um WhatsApp válido com DDD.', 'error'); return; }
 
   btn.disabled = true;
   btn.querySelector('.btn-label').style.display = 'none';

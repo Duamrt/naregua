@@ -172,8 +172,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 function goStep2() {
   const name = document.getElementById('shop-name').value.trim();
   const city = document.getElementById('shop-city').value.trim();
-  if (!name) { showOnbMsg('Informe o nome do estabelecimento.', 'error'); return; }
-  if (!city) { showOnbMsg('Informe a cidade.', 'error'); return; }
+  if (!name) { showOnbMsg('Digite o nome do estabelecimento.', 'error'); return; }
+  if (!city) { showOnbMsg('Digite a cidade.', 'error'); return; }
   hideOnbMsg();
   document.getElementById('step-1').style.display = 'none';
   document.getElementById('step-2').style.display = 'block';
@@ -323,7 +323,7 @@ function addServiceRow(nome, preco, duracao) {
       <input type="number" class="svc-price" placeholder="R$" min="0" step="1" value="${preco || ''}">
     </div>
     <div class="field" style="margin:0;">
-      <label style="font-size:9px;">MIN</label>
+      <label style="font-size:9px;">DURAÇÃO (min)</label>
       <input type="number" class="svc-duration" placeholder="30" min="5" step="5" value="${duracao || ''}">
     </div>
     <button type="button" onclick="document.getElementById('svc-${id}').remove()" style="

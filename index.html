@@ -415,7 +415,7 @@ async function loginBarbeiro() {
   const senha = document.getElementById('barb-senha-login').value;
   const btn = document.getElementById('btn-barb-login');
 
-  if (phone.length < 10) { showBarbMsg('Informe um telefone válido com DDD.', 'error'); return; }
+  if (phone.length < 10) { showBarbMsg('Digite um telefone válido com DDD.', 'error'); return; }
   if (senha.length < 6) { showBarbMsg('Senha deve ter pelo menos 6 caracteres.', 'error'); return; }
 
   setLoading(btn, true);
@@ -445,7 +445,7 @@ async function signupBarbeiro() {
   const senha = document.getElementById('barb-senha-signup').value;
   const btn = document.getElementById('btn-barb-signup');
 
-  if (phone.length < 10) { showBarbMsg('Informe um telefone válido com DDD.', 'error'); return; }
+  if (phone.length < 10) { showBarbMsg('Digite um telefone válido com DDD.', 'error'); return; }
   if (senha.length < 6) { showBarbMsg('Senha deve ter pelo menos 6 caracteres.', 'error'); return; }
 
   // Verificar se o telefone foi cadastrado pelo dono

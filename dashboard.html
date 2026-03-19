@@ -162,6 +162,8 @@
       background:var(--cinza-escuro); border-top:1px solid var(--borda);
       display:flex; justify-content:center; gap:0; padding:8px 0;
       padding-bottom:max(8px, env(safe-area-inset-bottom));
+      padding-left:max(0px, env(safe-area-inset-left));
+      padding-right:max(0px, env(safe-area-inset-right));
     }
     .nav-item {
       flex:1; max-width:65px; display:flex; flex-direction:column;
@@ -207,8 +209,8 @@
     .modal-overlay.show { display:flex; }
     .modal {
       background:var(--cinza-escuro); border:1px solid var(--borda);
-      border-radius:12px; width:100%; max-width:460px; max-height:90vh;
-      overflow-y:auto; padding:24px 20px; animation:fadeUp 0.3s ease;
+      border-radius:12px; width:100%; max-width:460px; max-height:85vh;
+      overflow-y:auto; padding:24px 20px 32px; animation:fadeUp 0.3s ease;
     }
     .modal-title {
       display:flex; justify-content:space-between; align-items:center;
@@ -262,6 +264,19 @@
     .pay-method-btn .pay-icon { font-size:18px; display:block; margin-bottom:4px; }
 
     body { padding-bottom:70px; }
+
+    /* Toast auto-confirm */
+    .toast-auto {
+      position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+      background:rgba(212,168,83,0.95); color:#000; font-size:12px; font-weight:700;
+      padding:10px 20px; border-radius:10px; z-index:9999;
+      animation:toastIn .3s ease;
+      box-shadow:0 4px 16px rgba(0,0,0,0.3);
+    }
+    @keyframes toastIn {
+      from { opacity:0; transform:translateX(-50%) translateY(10px); }
+      to { opacity:1; transform:translateX(-50%) translateY(0); }
+    }
   </style>
 </head>
 <body>
@@ -523,6 +538,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'index.html'; return; }
 
+  // Limpar admin_viewing_shop se não é admin
+  if (!ADMIN_EMAILS.includes(session.user.email)) {
+    sessionStorage.removeItem('admin_viewing_shop');
+  }
+
   if (ADMIN_EMAILS.includes(session.user.email) && !isAdminViewing) {
     window.location.href = 'admin.html';
     return;
@@ -661,6 +681,13 @@ async function autoConfirmar() {
 
     // Atualizar local
     pendentes.forEach(a => a.status = 'confirmed');
+
+    // Toast visual
+    const toast = document.createElement('div');
+    toast.className = 'toast-auto';
+    toast.textContent = pendentes.length + ' agendamento' + (pendentes.length > 1 ? 's' : '') + ' confirmado' + (pendentes.length > 1 ? 's' : '') + ' automaticamente';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
   }
 }
 
@@ -1023,7 +1050,7 @@ async function salvarEdicao() {
   const phone = document.getElementById('edit-phone').value.trim();
   const opening = document.getElementById('edit-open').value;
   const closing = document.getElementById('edit-close').value;
-  if (!name) { showEditMsg('Informe o nome.', 'error'); return; }
+  if (!name) { showEditMsg('Digite o nome do estabelecimento.', 'error'); return; }
 
   btn.disabled = true;
   btn.querySelector('.btn-label').style.display = 'none';
