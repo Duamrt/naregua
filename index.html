@@ -430,10 +430,17 @@ async function loginBarbeiro() {
   }
 
   // Verificar se realmente e barbeiro
-  const { data: barber } = await sb.from('barbers').select('id').eq('user_id', data.user.id).eq('active', true).maybeSingle();
+  const { data: barber } = await sb.from('barbers').select('id, is_owner').eq('user_id', data.user.id).eq('active', true).maybeSingle();
   if (!barber) {
     await sb.auth.signOut();
     showBarbMsg('Sua conta não está vinculada a nenhuma barbearia.', 'error');
+    return;
+  }
+
+  // Barbeiro-dono deve usar login por email
+  if (barber.is_owner) {
+    await sb.auth.signOut();
+    showBarbMsg('Você é o dono! Use seu email e senha na tela principal pra acessar o painel completo.', 'error');
     return;
   }
 

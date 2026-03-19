@@ -239,10 +239,16 @@ async function doLogin() {
 
   if (error) { showMsg('Telefone ou senha incorretos.', 'error'); return; }
 
-  const { data: barber } = await sb.from('barbers').select('id').eq('user_id', data.user.id).eq('active', true).maybeSingle();
+  const { data: barber } = await sb.from('barbers').select('id, is_owner').eq('user_id', data.user.id).eq('active', true).maybeSingle();
   if (!barber) {
     await sb.auth.signOut();
     showMsg('Sua conta não está vinculada a nenhuma barbearia. Fale com o dono.', 'error');
+    return;
+  }
+
+  if (barber.is_owner) {
+    await sb.auth.signOut();
+    showMsg('Você é o dono! Use seu email e senha na tela principal pra acessar o painel completo.', 'error');
     return;
   }
 
