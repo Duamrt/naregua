@@ -468,7 +468,7 @@ function renderShops() {
       </div>
       <div class="shop-meta">${s.city || '—'}${s.phone ? ' · ' + s.phone : ''} · ${s.opening_time || '08:00'}-${s.closing_time || '19:00'}${s.paid_until ? ' · Pago ate ' + s.paid_until.split('-').reverse().join('/') : ''}</div>
       <div class="shop-meta" style="margin-top:2px;">Login: <strong>${s._owner_email || '—'}</strong> · Senha: <strong>${s.owner_password_hint ? esc(s.owner_password_hint) : '—'}</strong> <button class="shop-action-btn" style="padding:2px 8px;font-size:9px;margin-left:4px;" onclick="definirSenha('${esc(s.id)}','${esc(s.owner_id)}','${esc(s._owner_email)}')">DEFINIR SENHA</button></div>
-      ${shopBarbers.filter(b => b.phone).map(b => {
+      ${shopBarbers.filter(b => b.phone).sort((a, b) => (b.is_owner ? 1 : 0) - (a.is_owner ? 1 : 0)).map(b => {
         const isDono = b.is_owner;
         const vinc = b.user_id ? 'vinculado' : 'aguardando';
         const donoBadge = isDono ? ' <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:6px;background:rgba(212,168,83,0.15);color:#d4a853;">DONO</span>' : '';
