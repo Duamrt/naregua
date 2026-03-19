@@ -983,10 +983,9 @@ function enviarLinkBarbeiroZap() {
 function compartilharWhatsApp() {
   const link = document.getElementById('share-link').textContent;
   const msg = 'Fala! Aqui é da *' + shop.name + '* ✂️\n\n'
-    + 'Agora dá pra agendar seu horário direto pelo celular, sem precisar ligar ou mandar mensagem.\n\n'
-    + 'É só clicar no link, escolher o serviço e o horário que fica melhor pra você:\n\n'
+    + 'Agora você pode escolher seu horário direto pelo celular, na hora que quiser.\n\n'
+    + 'É só clicar aqui e agendar:\n\n'
     + '👉 ' + link + '\n\n'
-    + 'Rápido, prático e disponível 24h.\n'
     + 'Te esperamos! 💈';
   window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
 }
