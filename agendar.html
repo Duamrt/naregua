@@ -71,7 +71,7 @@
       background:var(--cinza-claro); transition:all .3s;
     }
     .step-dot.active { background:var(--verde-acao); width:24px; border-radius:4px; }
-    .step-dot.done { background:var(--verde-medio); }
+    .step-dot.done { background:var(--accent-avatar); }
 
     .option-grid { display:flex; flex-direction:column; gap:8px; }
 
@@ -186,7 +186,7 @@
         <h3 style="margin-bottom:12px;">Escolha o profissional</h3>
         <div class="option-grid" id="barbers-list"></div>
         <div style="display:flex;gap:10px;margin-top:16px;">
-          <button class="btn btn-outline" onclick="agBack(1)" style="flex:0.4;">VOLTAR</button>
+          <button class="btn btn-outline" onclick="agBack(1)" style="flex:0.4;padding:10px 16px;font-size:14px;">VOLTAR</button>
           <button class="btn btn-primary" onclick="agNext(3)" style="flex:0.6;">CONTINUAR</button>
         </div>
       </div>
@@ -199,7 +199,7 @@
         <div style="font-size:11px;color:var(--texto-muted);margin-bottom:8px;" id="time-label"></div>
         <div class="time-grid" id="times-list"></div>
         <div style="display:flex;gap:10px;margin-top:16px;">
-          <button class="btn btn-outline" onclick="agBack(2)" style="flex:0.4;">VOLTAR</button>
+          <button class="btn btn-outline" onclick="agBack(2)" style="flex:0.4;padding:10px 16px;font-size:14px;">VOLTAR</button>
           <button class="btn btn-primary" onclick="agNext(4)" style="flex:0.6;">CONTINUAR</button>
         </div>
       </div>
@@ -225,7 +225,7 @@
         <div id="ag-msg" class="msg"></div>
 
         <div style="display:flex;gap:10px;">
-          <button class="btn btn-outline" onclick="agBack(3)" style="flex:0.4;">VOLTAR</button>
+          <button class="btn btn-outline" onclick="agBack(3)" style="flex:0.4;padding:10px 16px;font-size:14px;">VOLTAR</button>
           <button class="btn btn-primary" onclick="confirmarAgendamento()" id="btn-confirm" style="flex:0.6;">
             <span class="btn-label">CONFIRMAR</span>
             <div class="spinner" style="display:none;"></div>
@@ -997,8 +997,10 @@ async function confirmarAgendamento() {
 
     // Sucesso dia inteiro
     const dateFormatted = selectedDate.split('-').reverse().join('/');
-    document.getElementById('success-msg').textContent =
-      `${selectedService.name}\n${dateFormatted} — Dia inteiro`;
+    document.getElementById('success-msg').innerHTML =
+      'Voce agendou:<br><strong>' + esc(selectedService.name) + '</strong>' +
+      '<br>' + dateFormatted + ' — Dia inteiro' +
+      '<br>' + formatMoney(selectedService.price);
 
     const shopPhone = (shop.phone || '').replace(/\D/g, '');
     const hora = new Date().getHours();
@@ -1014,10 +1016,10 @@ async function confirmarAgendamento() {
     const waLink = document.getElementById('whatsapp-link');
     if (shopPhone) {
       waLink.href = `https://wa.me/55${shopPhone}?text=${encodeURIComponent(waText)}`;
-      waLink.style.display = 'flex';
     } else {
-      waLink.style.display = 'none';
+      waLink.href = `https://wa.me/?text=${encodeURIComponent(waText)}`;
     }
+    waLink.style.display = 'flex';
 
     showStep(5);
     return;
@@ -1199,8 +1201,10 @@ async function confirmarAgendamento() {
 
   // Sucesso
   const dateFormatted = selectedDate.split('-').reverse().join('/');
-  document.getElementById('success-msg').textContent =
-    `${selectedService.name} com ${selectedBarber.name}\n${dateFormatted} às ${selectedTime}`;
+  document.getElementById('success-msg').innerHTML =
+    'Voce agendou:<br><strong>' + esc(selectedService.name) + '</strong> com ' + esc(selectedBarber.name) +
+    '<br>' + dateFormatted + ' as ' + selectedTime +
+    '<br>' + formatMoney(selectedService.price);
 
   // Link WhatsApp: prioridade barbeiro selecionado, senao dono da barbearia
   const barberPhone = (selectedBarber.phone || '').replace(/\D/g, '');
@@ -1219,10 +1223,10 @@ async function confirmarAgendamento() {
   const waLink = document.getElementById('whatsapp-link');
   if (destPhone) {
     waLink.href = 'https://wa.me/55' + destPhone + '?text=' + waMsg;
-    waLink.style.display = 'flex';
   } else {
-    waLink.style.display = 'none';
+    waLink.href = 'https://wa.me/?text=' + waMsg;
   }
+  waLink.style.display = 'flex';
 
   showStep(5);
 }

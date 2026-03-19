@@ -23,8 +23,11 @@
   /* Aliases pra compatibilidade */
   --verde-acao: var(--accent);
   --verde-hover: var(--accent-hover);
-  --verde-medio: #b8923e;
-  --verde-edr: #8a6d2e;
+  --accent-avatar: #b8923e;
+  --accent-dark: #8a6d2e;
+  /* Aliases antigos (compatibilidade) */
+  --verde-medio: var(--accent-avatar);
+  --verde-edr: var(--accent-dark);
 }
 
 /* Reset */

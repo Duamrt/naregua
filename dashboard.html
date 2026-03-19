@@ -87,7 +87,7 @@
       font-weight:700; font-family:inherit; cursor:pointer; transition:all .2s;
       letter-spacing:0.5px;
     }
-    .appt-btn:hover { opacity:0.85; }
+    .appt-btn:hover { border-color:var(--borda-hover); transform:translateY(-1px); }
     .btn-confirm-appt { background:rgba(212,168,83,0.15); color:#d4a853; }
     .btn-done-appt { background:rgba(212,168,83,0.15); color:#d4a853; }
     .btn-cancel-appt { background:rgba(231,76,60,0.1); color:#e74c3c; }
@@ -104,6 +104,9 @@
     .barbers-grid {
       display:grid; gap:16px;
     }
+    @media (max-width: 480px) {
+      .barbers-grid { grid-template-columns: 1fr !important; }
+    }
     @media (min-width: 600px) {
       .barbers-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
       .dash-container { max-width:900px; }
@@ -118,7 +121,7 @@
     }
     .barber-avatar {
       width:32px; height:32px; border-radius:50%;
-      background:var(--verde-medio); display:flex; align-items:center;
+      background:var(--accent-avatar); display:flex; align-items:center;
       justify-content:center; font-size:14px; font-weight:800; color:#fff;
     }
     .barber-name { font-size:14px; font-weight:700; }
@@ -935,7 +938,9 @@ function abrirWhatsApp(apptId) {
     + 'Se precisar remarcar, avisa com pelo menos 2h de antecedência pra gente encaixar outro cliente.\n\n'
     + 'Te esperamos!';
 
-  window.open('https://wa.me/55' + phone + '?text=' + encodeURIComponent(msg), '_blank');
+  if (confirm('Mensagem que sera enviada:\n\n' + msg + '\n\nAbrir WhatsApp?')) {
+    window.open('https://wa.me/55' + phone + '?text=' + encodeURIComponent(msg), '_blank');
+  }
 }
 
 // ── Compartilhar ──────────────────────────────────────────────

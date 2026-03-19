@@ -440,6 +440,12 @@ async function finishOnboarding() {
     // BUG 11 ALTO FIX: limpar draft ao finalizar
     localStorage.removeItem('naregua_onboarding_draft');
 
+    // Mostrar link de agendamento antes de redirecionar
+    const baseUrl = window.location.origin + window.location.pathname.replace('onboarding.html', '');
+    const linkAgendamento = baseUrl + 'agendar.html?slug=' + slug;
+    alert('Tudo pronto! Compartilhe esse link com seus clientes:\n\n' + linkAgendamento);
+    navigator.clipboard.writeText(linkAgendamento).catch(() => {});
+
     // Redirecionar pro dashboard
     window.location.href = 'dashboard.html';
 
