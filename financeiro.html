@@ -259,6 +259,8 @@
   <a href="clientes.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4CB; Clientes</a>
   <a href="estoque.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4E6; Estoque</a>
   <a href="relatorio.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4CA; Relatório</a>
+  <a href="resumo.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4CA; Resumo</a>
+  <a href="comandas.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4DD; Comandas</a>
 </div>
 <script>
 function toggleMore(){var m=document.getElementById('more-menu');m.style.display=m.style.display==='none'?'block':'none';}
@@ -510,7 +512,7 @@ async function renderPeriod() {
       const hora = new Date(a.scheduled_at);
       const timeStr = hora.toLocaleDateString('pt-BR') + ' ' + hora.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
       const valor = a.price_paid != null ? Number(a.price_paid) : (svc ? Number(svc.price) : 0);
-      const metodoLabels = { pix:'PIX', dinheiro:'Dinheiro', cartao:'Cartão' };
+      const metodoLabels = { pix:'PIX', dinheiro:'Dinheiro', debito:'Débito', credito:'Crédito', cartao:'Cartão' };
       const metodo = a.payment_method ? metodoLabels[a.payment_method] || a.payment_method : '';
       return `<div class="fin-item">
         <div class="fin-item-left">
