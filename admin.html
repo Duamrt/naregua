@@ -464,7 +464,7 @@ function renderShops() {
         </div>
       </div>
       <div class="shop-meta">${s.city || '—'}${s.phone ? ' · ' + s.phone : ''} · ${s.opening_time || '08:00'}-${s.closing_time || '19:00'}${s.paid_until ? ' · Pago ate ' + s.paid_until.split('-').reverse().join('/') : ''}</div>
-      <div class="shop-meta" style="margin-top:2px;">Login dono: <strong>${s._owner_email || '—'}</strong> <button class="shop-action-btn" style="padding:2px 8px;font-size:9px;margin-left:4px;" onclick="definirSenha('${esc(s.owner_id)}','${esc(s._owner_email)}')">DEFINIR SENHA</button></div>
+      <div class="shop-meta" style="margin-top:2px;">Login: <strong>${s._owner_email || '—'}</strong> · Senha: <strong>${s.owner_password_hint ? esc(s.owner_password_hint) : '—'}</strong> <button class="shop-action-btn" style="padding:2px 8px;font-size:9px;margin-left:4px;" onclick="definirSenha('${esc(s.id)}','${esc(s.owner_id)}','${esc(s._owner_email)}')">DEFINIR SENHA</button></div>
       <div class="shop-stats">
         <span>Profissionais: <strong>${shopBarbers.length}</strong></span>
         <span>Serviços: <strong>${shopSvcs.length}</strong></span>
@@ -488,7 +488,7 @@ function entrarComo(shopId) {
   window.location.href = 'dashboard.html?shop=' + shopId;
 }
 
-async function definirSenha(userId, email) {
+async function definirSenha(shopId, userId, email) {
   const novaSenha = prompt('Nova senha pra ' + email + '\n(minimo 6 caracteres):');
   if (!novaSenha || novaSenha.length < 6) {
     if (novaSenha !== null) alert('Senha deve ter pelo menos 6 caracteres.');
@@ -498,7 +498,10 @@ async function definirSenha(userId, email) {
   const { data, error } = await sb.rpc('admin_set_password', { p_user_id: userId, p_password: novaSenha });
 
   if (!error && data && data.success) {
+    // Salvar hint da senha no barbershop pra referência
+    await sb.from('barbershops').update({ owner_password_hint: novaSenha }).eq('id', shopId);
     alert('Senha alterada com sucesso!');
+    await loadAll();
   } else {
     alert('Erro ao alterar senha: ' + (error?.message || data?.error || 'desconhecido'));
   }
