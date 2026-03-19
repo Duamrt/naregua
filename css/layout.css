@@ -193,11 +193,9 @@
   /* ============================================
      MAIN CONTENT — push right for sidebar
      ============================================ */
-  body {
+  /* Quando sidebar está ativa, empurra conteúdo pra direita */
+  body.nr-has-sidebar {
     padding-bottom: 0 !important;
-  }
-
-  .nr-main-content {
     margin-left: 240px;
   }
 
@@ -241,7 +239,7 @@
     font-size: 18px;
   }
 
-  .nr-main-content {
+  body.nr-has-sidebar {
     margin-left: 200px;
   }
 }
@@ -265,7 +263,7 @@
     display: none !important;
   }
 
-  .nr-main-content {
+  body.nr-has-sidebar {
     margin-left: 0 !important;
   }
 }
