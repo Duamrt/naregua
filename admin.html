@@ -742,6 +742,11 @@ async function salvarAdmin() {
       }
     }
 
+    // Validar telefones duplicados
+    const phones = editShopBarbers.filter(b => b.phone).map(b => b.phone);
+    const dupes = phones.filter((p, i) => phones.indexOf(p) !== i);
+    if (dupes.length) { throw new Error('Telefone duplicado: ' + dupes[0]); }
+
     // Atualizar e criar
     for (const b of editShopBarbers) {
       if (!b.name.trim()) continue;

@@ -340,9 +340,11 @@ async function marcarAtendido(id, btn) {
   }
   btn.textContent = '...';
   btn.disabled = true;
-  const appt = (await sb.from('appointments').select('*, services(price)').eq('id', id).single()).data;
-  const price = appt ? (Number(appt.price_paid) || Number(appt.services?.price) || 0) : 0;
-  await sb.from('appointments').update({ status: 'done', price_paid: price }).eq('id', id);
+  try {
+    const appt = (await sb.from('appointments').select('*, services(price)').eq('id', id).single()).data;
+    const price = appt ? (Number(appt.price_paid) || Number(appt.services?.price) || 0) : 0;
+    await sb.from('appointments').update({ status: 'done', price_paid: price }).eq('id', id);
+  } catch (e) { console.error('Erro ao marcar atendido:', e); }
   renderDay();
 }
 
@@ -355,7 +357,9 @@ async function marcarFalta(id, btn) {
   }
   btn.textContent = '...';
   btn.disabled = true;
-  await sb.from('appointments').update({ status: 'no_show' }).eq('id', id);
+  try {
+    await sb.from('appointments').update({ status: 'no_show' }).eq('id', id);
+  } catch (e) { console.error('Erro ao marcar falta:', e); }
   renderDay();
 }
 

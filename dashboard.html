@@ -839,11 +839,15 @@ async function updateStatus(id, status, btnEl) {
   btnEl.textContent = '...';
   btnEl.disabled = true;
 
-  const appt = dayAppointments.find(a => a.id === id);
-  if (appt && appt.group_id) {
-    await restUpdate('appointments', 'group_id=eq.' + appt.group_id, { status });
-  } else {
-    await restUpdate('appointments', 'id=eq.' + id, { status });
+  try {
+    const appt = dayAppointments.find(a => a.id === id);
+    if (appt && appt.group_id) {
+      await restUpdate('appointments', 'group_id=eq.' + appt.group_id, { status });
+    } else {
+      await restUpdate('appointments', 'id=eq.' + id, { status });
+    }
+  } catch (e) {
+    console.error('Erro ao atualizar status:', e);
   }
   renderDay();
 }
@@ -941,6 +945,7 @@ let editDays = [];
 let editBarbersList = [];
 
 function abrirEdicao() {
+  if (isAdminViewing) { alert('Use o painel Admin pra editar.'); return; }
   document.getElementById('edit-name').value = shop.name || '';
   document.getElementById('edit-city').value = shop.city || '';
   document.getElementById('edit-phone').value = shop.phone || '';

@@ -257,8 +257,10 @@ async function doSignup() {
   if (senha.length < 6) { showMsg('Senha deve ter pelo menos 6 caracteres.', 'error'); return; }
 
   // Verificar se telefone foi cadastrado pelo dono
-  const { data: barberData } = await sb.rpc('check_barber_phone', { p_phone: phone });
-  const pendentes = barberData && barberData.id && !barberData.user_id ? [barberData] : [];
+  const { data: barberData, error: rpcErr } = await sb.rpc('check_barber_phone', { p_phone: phone });
+  if (rpcErr) { showMsg('Erro ao verificar. Tente novamente.', 'error'); return; }
+  if (barberData && barberData.user_id) { showMsg('Esse telefone ja tem acesso. Use a aba ENTRAR.', 'error'); return; }
+  const pendentes = barberData && barberData.id ? [barberData] : [];
 
   if (!pendentes.length) {
     showMsg('Telefone nao encontrado. O dono da barbearia precisa cadastrar seu numero primeiro na aba Equipe.', 'error');
