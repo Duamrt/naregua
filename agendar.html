@@ -235,6 +235,64 @@
       border-radius:6px; margin:2px 4px 2px 0; font-weight:600; color:var(--texto-secundario);
     }
 
+    /* ── Smart suggestions ── */
+    .smart-suggestions {
+      display:none; margin-bottom:16px;
+    }
+    .smart-suggestions.visible { display:block; }
+    .smart-suggestions h4 {
+      font-size:11px; font-weight:700; letter-spacing:1px; color:var(--verde-acao);
+      text-transform:uppercase; margin-bottom:8px;
+    }
+    .suggestions-scroll {
+      display:flex; gap:8px; overflow-x:auto; padding-bottom:6px;
+      scrollbar-width:none; -ms-overflow-style:none;
+    }
+    .suggestions-scroll::-webkit-scrollbar { display:none; }
+    .suggestion-card {
+      min-width:120px; padding:10px 14px; border:1.5px solid var(--verde-acao);
+      border-radius:10px; background:rgba(212,168,83,0.06); cursor:pointer;
+      transition:all .2s; flex-shrink:0; text-align:center;
+    }
+    .suggestion-card:hover { background:rgba(212,168,83,0.14); }
+    .suggestion-card .sug-time { font-size:18px; font-weight:800; color:var(--verde-acao); }
+    .suggestion-card .sug-label { font-size:10px; color:var(--texto-muted); margin-top:2px; font-weight:600; }
+
+    /* ── Popularity badges on time slots ── */
+    .time-slot { position:relative; }
+    .time-slot .slot-badge {
+      display:block; font-size:8px; font-weight:700; margin-top:2px;
+      letter-spacing:0.5px; text-transform:uppercase;
+    }
+    .time-slot .slot-badge.popular { color:#f59e0b; }
+    .time-slot .slot-badge.tranquilo { color:#22c55e; }
+
+    /* ── Returning client bar ── */
+    .returning-bar {
+      display:none; margin-bottom:14px; padding:12px 14px;
+      background:rgba(212,168,83,0.06); border:1.5px solid rgba(212,168,83,0.25);
+      border-radius:10px;
+    }
+    .returning-bar.visible { display:block; }
+    .returning-bar .ret-title { font-size:12px; color:var(--texto-muted); margin-bottom:6px; }
+    .returning-bar .ret-info { font-size:13px; font-weight:600; margin-bottom:8px; }
+    .returning-bar .ret-btn {
+      padding:8px 16px; border-radius:8px; font-size:12px; font-weight:700;
+      background:rgba(212,168,83,0.15); border:1.5px solid rgba(212,168,83,0.3);
+      color:var(--verde-acao); cursor:pointer; font-family:inherit; transition:all .2s;
+    }
+    .returning-bar .ret-btn:hover { background:rgba(212,168,83,0.25); }
+
+    /* ── Wait time estimate ── */
+    .wait-estimate {
+      display:none; margin-top:10px; padding:10px 14px;
+      border-radius:8px; font-size:12px; line-height:1.5;
+      background:rgba(255,255,255,0.04); border:1px solid var(--borda);
+      color:var(--texto-secundario);
+    }
+    .wait-estimate.visible { display:block; }
+    .wait-estimate .wait-icon { margin-right:4px; }
+
     @media (max-width: 400px) {
       .time-grid { grid-template-columns:repeat(3, 1fr); }
     }
@@ -322,11 +380,28 @@
 
       <!-- Step 3: Data e horário -->
       <div id="ag-step-3" style="display:none;">
+        <!-- Returning client bar -->
+        <div class="returning-bar" id="returning-bar">
+          <div class="ret-title">Bem-vindo de volta!</div>
+          <div class="ret-info" id="returning-info"></div>
+          <button class="ret-btn" id="returning-btn" onclick="repeatLastAppointment()">REPETIR HORÁRIO</button>
+        </div>
+
         <h3 style="margin-bottom:12px;">Escolha o dia</h3>
         <div class="date-scroll" id="dates-list"></div>
+
+        <!-- Smart suggestions (above time grid) -->
+        <div class="smart-suggestions" id="smart-suggestions">
+          <h4>Horários sugeridos</h4>
+          <div class="suggestions-scroll" id="suggestions-list"></div>
+        </div>
+
         <h3 style="margin-top:16px;margin-bottom:4px;">Horário disponível</h3>
         <div style="font-size:11px;color:var(--texto-muted);margin-bottom:8px;" id="time-label"></div>
         <div class="time-grid" id="times-list"></div>
+
+        <!-- Wait time estimate -->
+        <div class="wait-estimate" id="wait-estimate"></div>
 
         <!-- Recorrencia semanal -->
         <div class="recurrence-section" id="recurrence-section" style="display:none;">
@@ -432,6 +507,9 @@ let selectedCombo = null;
 let appliedCoupon = null;
 let discountAmount = 0;
 let recurrenceEnabled = false;
+
+// ── Smart scheduling ──
+let lastAppointment = null; // ultimo agendamento do cliente (returning)
 
 const DIAS_SEMANA = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
 const MESES = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
@@ -547,6 +625,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   socialEl.innerHTML = socialHtml;
 
+  // ── Buscar ultimo agendamento do cliente (returning client) ──
+  const prefillPhoneParam = params.get('phone');
+  if (prefillPhoneParam) {
+    try {
+      const phoneClean = decodeURIComponent(prefillPhoneParam).replace(/\D/g, '');
+      if (phoneClean.length >= 10) {
+        // Buscar com like %digitos% pois phone pode estar salvo formatado ou limpo
+        const { data: lastAppt } = await sb
+          .from('appointments')
+          .select('scheduled_at,barber_id,service_id,client_name')
+          .eq('barbershop_id', shop.id)
+          .or('client_phone.eq.' + phoneClean + ',client_phone.like.%' + phoneClean.slice(-8) + '%')
+          .in('status', ['confirmed', 'completed'])
+          .order('scheduled_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (lastAppt) lastAppointment = lastAppt;
+      }
+    } catch (e) { console.log('Erro ao buscar ultimo agendamento:', e); }
+  }
+
   renderStepDots();
   renderCatFilters();
   renderServices();
@@ -604,6 +703,7 @@ function agNext(step) {
     return;
   }
   if (step === 3 && !selectedBarber) { return; }
+  if (step === 3) renderReturningBar();
   if (step === 4 && !selectedDate) { return; }
   if (step === 4 && !selectedService.blocks_all_day && !selectedTime) { return; }
   if (step === 4) renderResumo();
@@ -872,6 +972,10 @@ async function renderTimes() {
   }
 
   try {
+  // Esconder sugestões e espera por default
+  document.getElementById('smart-suggestions').classList.remove('visible');
+  document.getElementById('wait-estimate').classList.remove('visible');
+
   // ── Dia inteiro: sem grade de horário ──
   if (selectedService.blocks_all_day) {
     label.textContent = `Disponibilidade para ${selectedDate.split('-').reverse().join('/')}`;
@@ -954,6 +1058,7 @@ async function renderTimes() {
 
   let html = '';
   let hasSlots = false;
+  const allAvailableSlots = [];
 
   for (let h = openH, m = openM; h < closeH || (h === closeH && m < closeM); ) {
     const timeStr = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
@@ -1005,10 +1110,40 @@ async function renderTimes() {
     const disabled = isPast || isOccupied || isOnBreak;
     const sel = selectedTime === timeStr && !disabled;
 
-    html += `<div class="time-slot ${sel ? 'selected' : ''} ${disabled ? 'disabled' : ''}"
-                  onclick="${disabled ? '' : `selectTime('${timeStr}')`}">${timeStr}</div>`;
+    // ── Popularity badge ──
+    let badge = '';
+    if (!disabled) {
+      const isAdjacentBusy = appointments.some(a => {
+        const _aD = new Date(a.scheduled_at);
+        const aMin = _aD.getHours() * 60 + _aD.getMinutes();
+        const aSvc = services.find(s => s.id === a.service_id);
+        const aDur = aSvc ? aSvc.duration_min : 30;
+        // Within 30min before or after
+        return (Math.abs(slotMin - aMin) <= 30 || Math.abs(slotMin - (aMin + aDur)) <= 30)
+          && !(slotMin >= aMin && slotMin < aMin + aDur); // not the occupied slot itself
+      });
+      const hasNearby = appointments.some(a => {
+        const _aD = new Date(a.scheduled_at);
+        const aMin = _aD.getHours() * 60 + _aD.getMinutes();
+        const aSvc = services.find(s => s.id === a.service_id);
+        const aDur = aSvc ? aSvc.duration_min : 30;
+        return Math.abs(slotMin - aMin) <= 60 || Math.abs(slotMin - (aMin + aDur)) <= 60;
+      });
+      if (isAdjacentBusy) {
+        badge = '<span class="slot-badge popular">Popular</span>';
+      } else if (!hasNearby && appointments.length > 0) {
+        badge = '<span class="slot-badge tranquilo">Tranquilo</span>';
+      }
+    }
 
-    if (!disabled) hasSlots = true;
+    html += `<div class="time-slot ${sel ? 'selected' : ''} ${disabled ? 'disabled' : ''}"
+                  onclick="${disabled ? '' : `selectTime('${timeStr}')`}">${timeStr}${badge}</div>`;
+
+    // Track available slots for suggestions
+    if (!disabled) {
+      allAvailableSlots.push({ time: timeStr, min: slotMin });
+      hasSlots = true;
+    }
 
     // Incrementar
     m += interval;
@@ -1020,6 +1155,9 @@ async function renderTimes() {
   }
 
   el.innerHTML = html;
+
+  // ── Smart suggestions ──
+  renderSmartSuggestions(allAvailableSlots, appointments);
   } catch (err) {
     console.error('Erro ao carregar horarios:', err);
     el.innerHTML = '<div style="font-size:12px;color:#e74c3c;grid-column:1/-1;text-align:center;padding:20px 0;">Erro ao carregar horários. Verifique sua conexão.</div>';
@@ -1029,10 +1167,256 @@ async function renderTimes() {
 function selectTime(t) {
   selectedTime = t;
   renderTimes();
+  renderWaitEstimate();
   // Mostrar recorrencia se não é dia inteiro
   if (selectedService && !selectedService.blocks_all_day && selectedDate && selectedTime) {
     document.getElementById('recurrence-section').style.display = 'block';
     if (recurrenceEnabled) renderRecurrenceDates();
+  }
+}
+
+// ── Smart suggestions ──────────────────────────────────────────
+function renderSmartSuggestions(availableSlots, appts) {
+  const container = document.getElementById('smart-suggestions');
+  const list = document.getElementById('suggestions-list');
+
+  if (!availableSlots.length || availableSlots.length <= 3) {
+    container.classList.remove('visible');
+    return;
+  }
+
+  const suggestions = [];
+
+  // 1. "Mais cedo" — first available
+  const first = availableSlots[0];
+  suggestions.push({ time: first.time, label: 'Mais cedo', icon: '☀️' });
+
+  // 2. "Melhor horário" — slot with most free time around it (least adjacent bookings)
+  let bestSlot = null;
+  let bestScore = -1;
+  for (const slot of availableSlots) {
+    let minDist = 999;
+    for (const a of appts) {
+      const aDate = new Date(a.scheduled_at);
+      const aMin = aDate.getHours() * 60 + aDate.getMinutes();
+      const aSvc = services.find(s => s.id === a.service_id);
+      const aDur = aSvc ? aSvc.duration_min : 30;
+      const distBefore = Math.abs(slot.min - (aMin + aDur));
+      const distAfter = Math.abs(aMin - slot.min);
+      minDist = Math.min(minDist, distBefore, distAfter);
+    }
+    // If no appointments, all equally good — pick middle
+    if (appts.length === 0) minDist = 999;
+    if (minDist > bestScore) {
+      bestScore = minDist;
+      bestSlot = slot;
+    }
+  }
+  if (bestSlot && bestSlot.time !== first.time && bestSlot.time !== availableSlots[availableSlots.length - 1].time) {
+    suggestions.push({ time: bestSlot.time, label: 'Melhor horário', icon: '⭐' });
+  } else if (availableSlots.length > 2) {
+    // Fallback: pick middle slot
+    const mid = availableSlots[Math.floor(availableSlots.length / 2)];
+    if (mid.time !== first.time) {
+      suggestions.push({ time: mid.time, label: 'Melhor horário', icon: '⭐' });
+    }
+  }
+
+  // 3. "Mais tarde" — last available
+  const last = availableSlots[availableSlots.length - 1];
+  if (last.time !== first.time) {
+    suggestions.push({ time: last.time, label: 'Mais tarde', icon: '🌙' });
+  }
+
+  if (suggestions.length < 2) {
+    container.classList.remove('visible');
+    return;
+  }
+
+  list.innerHTML = suggestions.map(s =>
+    `<div class="suggestion-card" onclick="selectTimeSuggestion('${s.time}')">
+      <div class="sug-time">${s.icon} ${s.time}</div>
+      <div class="sug-label">${s.label}</div>
+    </div>`
+  ).join('');
+
+  container.classList.add('visible');
+}
+
+function selectTimeSuggestion(t) {
+  selectedTime = t;
+  renderTimes();
+  renderWaitEstimate();
+  // Auto-show recurrence
+  if (selectedService && !selectedService.blocks_all_day && selectedDate && selectedTime) {
+    document.getElementById('recurrence-section').style.display = 'block';
+    if (recurrenceEnabled) renderRecurrenceDates();
+  }
+}
+
+// ── Wait time estimate ─────────────────────────────────────────
+function renderWaitEstimate() {
+  const el = document.getElementById('wait-estimate');
+  if (!selectedTime || !selectedDate || !selectedService || selectedService.blocks_all_day) {
+    el.classList.remove('visible');
+    return;
+  }
+
+  try {
+    const [slotH, slotM] = selectedTime.split(':').map(Number);
+    const slotMin = slotH * 60 + slotM;
+
+    // Find the appointment that ends closest before selected time
+    let prevEnd = null;
+    let prevEndMin = 0;
+    for (const a of appointments) {
+      const aDate = new Date(a.scheduled_at);
+      const aStartMin = aDate.getHours() * 60 + aDate.getMinutes();
+      const aSvc = services.find(s => s.id === a.service_id);
+      const aDur = aSvc ? aSvc.duration_min : 30;
+      const aEndMin = aStartMin + aDur;
+
+      if (aEndMin <= slotMin && aEndMin > prevEndMin) {
+        prevEndMin = aEndMin;
+        prevEnd = aEndMin;
+      }
+    }
+
+    if (prevEnd !== null) {
+      const gap = slotMin - prevEnd;
+      const prevEndH = String(Math.floor(prevEnd / 60)).padStart(2, '0');
+      const prevEndM = String(prevEnd % 60).padStart(2, '0');
+      const prevEndStr = prevEndH + ':' + prevEndM;
+
+      if (gap === 0) {
+        el.innerHTML = '<span class="wait-icon">⏱️</span> Horário logo após outro cliente (termina às ' + prevEndStr + '). Pode haver pequeno atraso.';
+      } else if (gap <= 15) {
+        el.innerHTML = '<span class="wait-icon">⏱️</span> Atendimento anterior termina às ' + prevEndStr + '. Intervalo curto de ' + gap + ' min.';
+      } else {
+        el.innerHTML = '<span class="wait-icon">✅</span> Atendimento anterior termina às ' + prevEndStr + '. Você será atendido pontualmente às ' + selectedTime + '.';
+      }
+      el.classList.add('visible');
+    } else {
+      // Check if there's a next appointment
+      let nextStart = null;
+      for (const a of appointments) {
+        const aDate = new Date(a.scheduled_at);
+        const aStartMin = aDate.getHours() * 60 + aDate.getMinutes();
+        if (aStartMin > slotMin && (nextStart === null || aStartMin < nextStart)) {
+          nextStart = aStartMin;
+        }
+      }
+
+      if (nextStart !== null) {
+        const duration = selectedService.duration_min || 30;
+        const serviceEnd = slotMin + duration;
+        const gap = nextStart - serviceEnd;
+        if (gap >= 0 && gap <= 15) {
+          el.innerHTML = '<span class="wait-icon">✅</span> Primeiro horário do período. Atendimento pontual às ' + selectedTime + '.';
+        } else {
+          el.innerHTML = '<span class="wait-icon">✅</span> Horário tranquilo. Atendimento pontual às ' + selectedTime + '.';
+        }
+        el.classList.add('visible');
+      } else {
+        el.innerHTML = '<span class="wait-icon">✅</span> Agenda livre. Atendimento pontual às ' + selectedTime + '.';
+        el.classList.add('visible');
+      }
+    }
+  } catch (e) {
+    console.log('Erro ao calcular espera:', e);
+    el.classList.remove('visible');
+  }
+}
+
+// ── Returning client ───────────────────────────────────────────
+function renderReturningBar() {
+  const bar = document.getElementById('returning-bar');
+  if (!lastAppointment || !shop) { bar.classList.remove('visible'); return; }
+
+  try {
+    const la = lastAppointment;
+    const lastDate = new Date(la.scheduled_at);
+    const lastBarber = barbers.find(b => b.id === la.barber_id);
+    const lastService = services.find(s => s.id === la.service_id);
+
+    if (!lastBarber || !lastService) { bar.classList.remove('visible'); return; }
+
+    const diasSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+    const dayName = diasSemana[lastDate.getDay()];
+    const timeStr = String(lastDate.getHours()).padStart(2, '0') + ':' + String(lastDate.getMinutes()).padStart(2, '0');
+
+    document.getElementById('returning-info').innerHTML =
+      'Seu último horário: <strong>' + dayName + ' ' + timeStr + '</strong> com <strong>' + esc(lastBarber.name) + '</strong>' +
+      '<br><span style="font-size:11px;color:var(--texto-muted);">' + esc(lastService.name) + '</span>';
+
+    // Store for use in repeatLastAppointment
+    bar.dataset.barberId = la.barber_id;
+    bar.dataset.serviceId = la.service_id;
+    bar.dataset.dayOfWeek = lastDate.getDay();
+    bar.dataset.time = timeStr;
+
+    bar.classList.add('visible');
+  } catch (e) {
+    console.log('Erro ao montar returning bar:', e);
+    bar.classList.remove('visible');
+  }
+}
+
+async function repeatLastAppointment() {
+  const bar = document.getElementById('returning-bar');
+  const barberId = bar.dataset.barberId;
+  const serviceId = bar.dataset.serviceId;
+  const targetDow = parseInt(bar.dataset.dayOfWeek);
+  const targetTime = bar.dataset.time;
+
+  // Select service
+  const svc = services.find(s => s.id === serviceId);
+  if (svc) {
+    selectedService = svc;
+    selectedCombo = null;
+    renderServices();
+    renderCombos();
+  }
+
+  // Select barber
+  const barber = barbers.find(b => b.id === barberId);
+  if (barber) {
+    selectedBarber = barber;
+    renderBarbers();
+  }
+
+  // Find next occurrence of that day of week
+  const today = new Date();
+  for (let i = 0; i < 14; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() + i);
+    if (d.getDay() === targetDow) {
+      const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      selectedDate = key;
+      renderDates();
+      await renderTimes();
+
+      // Try to select the time
+      const timeSlots = document.querySelectorAll('.time-slot:not(.disabled)');
+      let found = false;
+      for (const slot of timeSlots) {
+        if (slot.textContent.trim().startsWith(targetTime)) {
+          selectedTime = targetTime;
+          found = true;
+          break;
+        }
+      }
+
+      if (found) {
+        selectedTime = targetTime;
+        renderTimes();
+        renderWaitEstimate();
+        bar.innerHTML = '<div style="text-align:center;font-size:12px;color:#22c55e;font-weight:600;">✅ Horário selecionado! Confira e avance.</div>';
+      } else {
+        bar.innerHTML = '<div style="text-align:center;font-size:12px;color:#f59e0b;font-weight:600;">⚠️ Horário ' + targetTime + ' indisponível. Escolha outro abaixo.</div>';
+      }
+      break;
+    }
   }
 }
 
@@ -1729,6 +2113,9 @@ function resetar() {
   recurrenceEnabled = false;
   document.getElementById('rec-switch').classList.remove('on');
   document.getElementById('recurrence-dates').classList.remove('open');
+  document.getElementById('smart-suggestions').classList.remove('visible');
+  document.getElementById('wait-estimate').classList.remove('visible');
+  document.getElementById('returning-bar').classList.remove('visible');
   removerCupom();
   renderServices();
   renderCombos();
