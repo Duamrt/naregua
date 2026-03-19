@@ -183,6 +183,18 @@
     <div id="admin-edit-msg" class="msg"></div>
 
     <input type="hidden" id="adm-edit-id">
+    <div class="modal-section" style="margin-top:0;padding-top:0;border-top:none;">Login do dono</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="field">
+        <label>EMAIL DO DONO *</label>
+        <input type="email" id="adm-owner-email" placeholder="email@exemplo.com">
+      </div>
+      <div class="field">
+        <label>SENHA DO DONO *</label>
+        <input type="text" id="adm-owner-password" placeholder="Mínimo 6 caracteres">
+      </div>
+    </div>
+
     <div class="field">
       <label>TIPO</label>
       <select id="adm-type" onchange="onAdmTypeChange()" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;">
@@ -573,7 +585,10 @@ function editarShop(id) {
   editDays = [...(s.days_open || [1,2,3,4,5,6])];
   renderAdmDays();
 
-  editShopBarbers = allBarbers.filter(b => b.barbershop_id === id).map(b => ({ id: b.id, name: b.name, phone: b.phone || '', user_id: b.user_id, active: b.active }));
+  document.getElementById('adm-owner-email').value = s._owner_email || '';
+  document.getElementById('adm-owner-password').value = s.owner_password_hint || '';
+
+  editShopBarbers = allBarbers.filter(b => b.barbershop_id === id).map(b => ({ id: b.id, name: b.name, phone: b.phone || '', user_id: b.user_id, active: b.active, is_owner: b.is_owner }));
   renderAdmBarbers();
 
   editShopServices = allServices.filter(sv => sv.barbershop_id === id).map(sv => ({ id: sv.id, name: sv.name, price: sv.price, duration_min: sv.duration_min }));
@@ -586,6 +601,8 @@ function editarShop(id) {
 function abrirNovaShop() {
   document.getElementById('modal-admin-title').textContent = 'Novo Cliente';
   document.getElementById('adm-edit-id').value = '';
+  document.getElementById('adm-owner-email').value = '';
+  document.getElementById('adm-owner-password').value = '';
   document.getElementById('adm-type').value = 'barbearia';
   document.getElementById('adm-name').value = '';
   document.getElementById('adm-city').value = '';
@@ -697,7 +714,12 @@ async function salvarAdmin() {
   const closing = document.getElementById('adm-close').value;
   let slug = gerarSlug(name);
 
+  const ownerEmail = document.getElementById('adm-owner-email').value.trim().toLowerCase();
+  const ownerPassword = document.getElementById('adm-owner-password').value.trim();
+
   if (!name) { showAdmMsg('Digite o nome do estabelecimento.', 'error'); return; }
+  if (!editId && (!ownerEmail || !ownerPassword)) { showAdmMsg('Preencha email e senha do dono.', 'error'); return; }
+  if (ownerPassword && ownerPassword.length < 6) { showAdmMsg('Senha deve ter pelo menos 6 caracteres.', 'error'); return; }
 
   // Avisar se slug vai mudar (quebra links antigos)
   if (editId) {
@@ -723,22 +745,50 @@ async function salvarAdmin() {
     let shopId = editId;
 
     if (editId) {
-      // Atualizar
+      // Atualizar barbearia
       const { error } = await sb.from('barbershops').update({
         name, slug, city, phone, address, instagram, payment_methods: editPayments,
         business_type: businessType, plan, paid_until: paidUntil, opening_time: opening, closing_time: closing, days_open: editDays
       }).eq('id', editId);
       if (error) throw error;
+
+      // Atualizar senha do dono se preenchida
+      if (ownerPassword) {
+        const shop = allShops.find(s => s.id === editId);
+        if (shop && shop.owner_id) {
+          await sb.rpc('admin_set_password', { p_user_id: shop.owner_id, p_password: ownerPassword });
+          await sb.from('barbershops').update({ owner_password_hint: ownerPassword }).eq('id', editId);
+        }
+      }
     } else {
-      // Criar nova — pegar o owner_id do admin logado
-      const { data: { session } } = await sb.auth.getSession();
+      // Criar nova — criar user do dono primeiro
+      const { data: signupData, error: signupErr } = await sb.auth.signUp({
+        email: ownerEmail,
+        password: ownerPassword,
+        options: { data: { nome: name } }
+      });
+      if (signupErr) {
+        if (signupErr.message.includes('already registered')) {
+          throw new Error('Esse email já está cadastrado. Use outro.');
+        }
+        throw signupErr;
+      }
+      if (!signupData.user) throw new Error('Erro ao criar conta do dono.');
+
+      const ownerId = signupData.user.id;
       const { data, error } = await sb.from('barbershops').insert({
-        owner_id: session.user.id, name, slug, city, phone, address, instagram,
+        owner_id: ownerId, name, slug, city, phone, address, instagram,
         payment_methods: editPayments, business_type: businessType, plan, paid_until: paidUntil,
-        opening_time: opening, closing_time: closing, days_open: editDays
+        opening_time: opening, closing_time: closing, days_open: editDays,
+        owner_password_hint: ownerPassword
       }).select().single();
       if (error) throw error;
       shopId = data.id;
+
+      // Criar barbeiro-dono automaticamente (primeiro da lista com is_owner)
+      if (editShopBarbers.length > 0) {
+        editShopBarbers[0].is_owner = true;
+      }
     }
 
     // Gerenciar serviços
@@ -785,7 +835,8 @@ async function salvarAdmin() {
         await sb.from('barbers').update({ name: b.name.trim(), phone: b.phone || null }).eq('id', b.id);
       } else {
         await sb.from('barbers').insert({
-          barbershop_id: shopId, name: b.name.trim(), phone: b.phone || null, commission_pct: 0, active: true
+          barbershop_id: shopId, name: b.name.trim(), phone: b.phone || null, commission_pct: 0, active: true,
+          is_owner: b.is_owner || false
         });
       }
     }
