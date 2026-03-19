@@ -545,7 +545,7 @@ const db = sb;
 
 document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await sb.auth.getSession();
-  if (!session) { window.location.href = 'index.html'; return; }
+  if (!session) { window.location.href = 'app.html'; return; }
 
   // Limpar admin_viewing_shop se não é admin
   if (!ADMIN_EMAILS.includes(session.user.email)) {
@@ -1453,7 +1453,7 @@ async function salvarEncaixe() {
 
 async function logout() {
   await sb.auth.signOut();
-  window.location.href = 'index.html';
+  window.location.href = 'app.html';
 }
 </script>
 <script src="js/ajuda.js"></script>

@@ -1,8 +1,9 @@
 // NaRegua — Service Worker (cache-first para assets, network-first para API)
-const CACHE_NAME = 'naregua-v8';
+const CACHE_NAME = 'naregua-v9';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
+  '/app.html',
   '/dashboard.html',
   '/barbeiro.html',
   '/cliente.html',
@@ -72,7 +73,7 @@ self.addEventListener('fetch', e => {
         return resp;
       }).catch(() => caches.match(e.request).then(cached => {
         if (cached) return cached;
-        if (e.request.mode === 'navigate') return caches.match('/index.html');
+        if (e.request.mode === 'navigate') return caches.match('/app.html');
       }))
     );
     return;

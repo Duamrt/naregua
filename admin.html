@@ -358,7 +358,7 @@ function onAdmTypeChange() {
 document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await sb.auth.getSession();
   if (!session || !ADMIN_EMAILS.includes(session.user.email)) {
-    window.location.href = 'index.html';
+    window.location.href = 'app.html';
     return;
   }
 
@@ -940,7 +940,7 @@ async function confirmarExclusao() {
 // ── Logout ────────────────────────────────────────────────────
 async function logout() {
   await sb.auth.signOut();
-  window.location.href = 'index.html';
+  window.location.href = 'app.html';
 }
 </script>
 <script src="js/ajuda.js"></script>

@@ -337,7 +337,7 @@ async function restGet(table, filterStr) {
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await sb.auth.getSession();
-  if (!session) { alert('Sua sessão expirou. Entre de novo.'); window.location.href = 'index.html'; return; }
+  if (!session) { alert('Sua sessão expirou. Entre de novo.'); window.location.href = 'app.html'; return; }
 
   if (!ADMIN_EMAILS.includes(session.user.email)) {
     sessionStorage.removeItem('admin_viewing_shop');
