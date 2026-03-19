@@ -469,9 +469,13 @@ function renderShops() {
       <div class="shop-meta">${s.city || '—'}${s.phone ? ' · ' + s.phone : ''} · ${s.opening_time || '08:00'}-${s.closing_time || '19:00'}${s.paid_until ? ' · Pago ate ' + s.paid_until.split('-').reverse().join('/') : ''}</div>
       <div class="shop-meta" style="margin-top:2px;">Login: <strong>${s._owner_email || '—'}</strong> · Senha: <strong>${s.owner_password_hint ? esc(s.owner_password_hint) : '—'}</strong> <button class="shop-action-btn" style="padding:2px 8px;font-size:9px;margin-left:4px;" onclick="definirSenha('${esc(s.id)}','${esc(s.owner_id)}','${esc(s._owner_email)}')">DEFINIR SENHA</button></div>
       ${shopBarbers.filter(b => b.phone).map(b => {
-        const login = b.phone + '@naregua.app';
+        const isDono = b.is_owner;
         const vinc = b.user_id ? 'vinculado' : 'aguardando';
-        return '<div class="shop-meta" style="margin-top:1px;font-size:11px;">&#x1F4F1; ' + esc(b.name) + ' · ' + esc(b.phone) + ' · <span style="color:' + (b.user_id ? '#22c55e' : '#f59e0b') + '">' + vinc + '</span>' + (b.password_hint ? ' · Senha: <strong>' + esc(b.password_hint) + '</strong>' : '') + (b.user_id ? ' <button class="shop-action-btn" style="padding:1px 6px;font-size:8px;margin-left:2px;" onclick="definirSenhaBarbeiro(\'' + esc(b.id) + '\',\'' + esc(b.user_id) + '\',\'' + esc(b.name) + '\')">SENHA</button>' : '') + '</div>';
+        const donoBadge = isDono ? ' <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:6px;background:rgba(212,168,83,0.15);color:#d4a853;">DONO</span>' : '';
+        const donoNote = isDono ? ' · <span style="color:#d4a853;font-size:9px;">usa login email acima</span>' : '';
+        const senhaBtn = !isDono && b.user_id ? ' <button class="shop-action-btn" style="padding:1px 6px;font-size:8px;margin-left:2px;" onclick="definirSenhaBarbeiro(\'' + esc(b.id) + '\',\'' + esc(b.user_id) + '\',\'' + esc(b.name) + '\')">SENHA</button>' : '';
+        const senhaHint = !isDono && b.password_hint ? ' · Senha: <strong>' + esc(b.password_hint) + '</strong>' : '';
+        return '<div class="shop-meta" style="margin-top:1px;font-size:11px;">&#x1F4F1; ' + esc(b.name) + donoBadge + ' · ' + esc(b.phone) + ' · <span style="color:' + (b.user_id ? '#22c55e' : '#f59e0b') + '">' + vinc + '</span>' + donoNote + senhaHint + senhaBtn + '</div>';
       }).join('')}
       <div class="shop-stats">
         <span>Profissionais: <strong>${shopBarbers.length}</strong></span>
