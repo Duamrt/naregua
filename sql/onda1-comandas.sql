@@ -1,7 +1,6 @@
--- ONDA 1: Tabelas para Comandas
--- Rodar no Supabase SQL Editor
+-- ONDA 1: Tabelas para Comandas (v2 — com DROP IF EXISTS)
 
--- Comandas (registro de consumo durante atendimento)
+-- Tabelas
 CREATE TABLE IF NOT EXISTS comandas (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   barbershop_id uuid REFERENCES barbershops(id) NOT NULL,
@@ -16,7 +15,6 @@ CREATE TABLE IF NOT EXISTS comandas (
   created_at timestamptz DEFAULT now()
 );
 
--- Itens da comanda (servicos + produtos)
 CREATE TABLE IF NOT EXISTS comanda_items (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   comanda_id uuid REFERENCES comandas(id) ON DELETE CASCADE NOT NULL,
@@ -28,57 +26,63 @@ CREATE TABLE IF NOT EXISTS comanda_items (
   created_at timestamptz DEFAULT now()
 );
 
--- RLS para comandas
+-- RLS
 ALTER TABLE comandas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE comanda_items ENABLE ROW LEVEL SECURITY;
 
--- Policy: usuarios autenticados podem ver/editar comandas da sua barbearia
+-- Limpar policies existentes
+DROP POLICY IF EXISTS "comandas_select" ON comandas;
+DROP POLICY IF EXISTS "comandas_insert" ON comandas;
+DROP POLICY IF EXISTS "comandas_update" ON comandas;
+DROP POLICY IF EXISTS "comandas_delete" ON comandas;
+DROP POLICY IF EXISTS "comandas_admin" ON comandas;
+DROP POLICY IF EXISTS "comandas_admin_select" ON comandas;
+DROP POLICY IF EXISTS "comandas_admin_all" ON comandas;
+DROP POLICY IF EXISTS "comandas_barber" ON comandas;
+DROP POLICY IF EXISTS "comandas_barber_select" ON comandas;
+DROP POLICY IF EXISTS "comanda_items_select" ON comanda_items;
+DROP POLICY IF EXISTS "comanda_items_insert" ON comanda_items;
+DROP POLICY IF EXISTS "comanda_items_update" ON comanda_items;
+DROP POLICY IF EXISTS "comanda_items_delete" ON comanda_items;
+DROP POLICY IF EXISTS "comanda_items_admin" ON comanda_items;
+DROP POLICY IF EXISTS "comanda_items_admin_select" ON comanda_items;
+DROP POLICY IF EXISTS "comanda_items_admin_all" ON comanda_items;
+DROP POLICY IF EXISTS "comanda_items_barber" ON comanda_items;
+DROP POLICY IF EXISTS "comanda_items_barber_select" ON comanda_items;
+
+-- Dono vê/edita comandas da barbearia dele
 CREATE POLICY "comandas_select" ON comandas FOR SELECT TO authenticated
   USING (barbershop_id IN (SELECT id FROM barbershops WHERE owner_id = auth.uid()));
-
 CREATE POLICY "comandas_insert" ON comandas FOR INSERT TO authenticated
   WITH CHECK (barbershop_id IN (SELECT id FROM barbershops WHERE owner_id = auth.uid()));
-
 CREATE POLICY "comandas_update" ON comandas FOR UPDATE TO authenticated
   USING (barbershop_id IN (SELECT id FROM barbershops WHERE owner_id = auth.uid()));
-
 CREATE POLICY "comandas_delete" ON comandas FOR DELETE TO authenticated
   USING (barbershop_id IN (SELECT id FROM barbershops WHERE owner_id = auth.uid()));
 
--- Policy: itens seguem a comanda
+-- Itens seguem a comanda
 CREATE POLICY "comanda_items_select" ON comanda_items FOR SELECT TO authenticated
   USING (comanda_id IN (SELECT id FROM comandas WHERE barbershop_id IN (SELECT id FROM barbershops WHERE owner_id = auth.uid())));
-
 CREATE POLICY "comanda_items_insert" ON comanda_items FOR INSERT TO authenticated
   WITH CHECK (comanda_id IN (SELECT id FROM comandas WHERE barbershop_id IN (SELECT id FROM barbershops WHERE owner_id = auth.uid())));
-
 CREATE POLICY "comanda_items_update" ON comanda_items FOR UPDATE TO authenticated
   USING (comanda_id IN (SELECT id FROM comandas WHERE barbershop_id IN (SELECT id FROM barbershops WHERE owner_id = auth.uid())));
-
 CREATE POLICY "comanda_items_delete" ON comanda_items FOR DELETE TO authenticated
   USING (comanda_id IN (SELECT id FROM comandas WHERE barbershop_id IN (SELECT id FROM barbershops WHERE owner_id = auth.uid())));
 
--- Policies para admin (Duam) ver tudo
-CREATE POLICY "comandas_admin_select" ON comandas FOR SELECT TO authenticated
+-- Admin (Duam) vê tudo
+CREATE POLICY "comandas_admin" ON comandas FOR ALL TO authenticated
   USING (auth.jwt() ->> 'email' = 'duam-rt@hotmail.com');
-
-CREATE POLICY "comandas_admin_all" ON comandas FOR ALL TO authenticated
-  USING (auth.jwt() ->> 'email' = 'duam-rt@hotmail.com');
-
-CREATE POLICY "comanda_items_admin_select" ON comanda_items FOR SELECT TO authenticated
+CREATE POLICY "comanda_items_admin" ON comanda_items FOR ALL TO authenticated
   USING (EXISTS (SELECT 1 FROM comandas c WHERE c.id = comanda_id AND auth.jwt() ->> 'email' = 'duam-rt@hotmail.com'));
 
-CREATE POLICY "comanda_items_admin_all" ON comanda_items FOR ALL TO authenticated
-  USING (EXISTS (SELECT 1 FROM comandas c WHERE c.id = comanda_id AND auth.jwt() ->> 'email' = 'duam-rt@hotmail.com'));
-
--- Barbeiros podem ver comandas da barbearia deles
-CREATE POLICY "comandas_barber_select" ON comandas FOR SELECT TO authenticated
+-- Barbeiros veem comandas da barbearia
+CREATE POLICY "comandas_barber" ON comandas FOR SELECT TO authenticated
   USING (barbershop_id IN (SELECT barbershop_id FROM barbers WHERE user_id = auth.uid()));
-
-CREATE POLICY "comanda_items_barber_select" ON comanda_items FOR SELECT TO authenticated
+CREATE POLICY "comanda_items_barber" ON comanda_items FOR SELECT TO authenticated
   USING (comanda_id IN (SELECT id FROM comandas WHERE barbershop_id IN (SELECT barbershop_id FROM barbers WHERE user_id = auth.uid())));
 
--- Indice pra performance
+-- Indices
 CREATE INDEX IF NOT EXISTS idx_comandas_shop_status ON comandas(barbershop_id, status);
 CREATE INDEX IF NOT EXISTS idx_comandas_shop_date ON comandas(barbershop_id, opened_at);
 CREATE INDEX IF NOT EXISTS idx_comanda_items_comanda ON comanda_items(comanda_id);

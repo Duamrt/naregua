@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NaRegua — Histórico do Cliente</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="NaRegua">
+  <link rel="apple-touch-icon" href="img/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .hc-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
+
+    .hc-header {
+      display:flex; align-items:center; gap:8px;
+      padding:12px 0 16px; border-bottom:1px solid var(--borda); margin-bottom:16px;
+    }
+    .btn-back {
+      background:none; border:none; color:var(--texto-secundario); font-size:20px;
+      cursor:pointer; padding:4px 8px 4px 0; font-family:inherit; transition:all .2s;
+    }
+    .btn-back:hover { color:var(--verde-acao); }
+
+    /* Client profile */
+    .profile-card {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:14px;
+      padding:20px; margin-bottom:16px;
+    }
+    .profile-top { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
+    .profile-avatar {
+      width:52px; height:52px; border-radius:50%;
+      background:var(--accent-avatar); display:flex; align-items:center;
+      justify-content:center; font-size:24px; font-weight:800; color:#fff; flex-shrink:0;
+    }
+    .profile-name { font-size:20px; font-weight:800; color:var(--texto-principal); }
+    .profile-phone { font-size:13px; color:var(--texto-muted); margin-top:2px; display:flex; align-items:center; gap:8px; }
+    .profile-phone a {
+      color:#25d366; text-decoration:none; font-weight:700; font-size:11px;
+      border:1px solid rgba(37,211,102,0.3); padding:3px 10px; border-radius:6px;
+      transition:all .2s;
+    }
+    .profile-phone a:hover { background:rgba(37,211,102,0.1); }
+
+    .profile-meta { font-size:12px; color:var(--texto-muted); margin-top:10px; display:flex; flex-direction:column; gap:4px; }
+    .profile-meta strong { color:var(--texto-secundario); }
+
+    .profile-tags { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+    .tag {
+      padding:3px 10px; border-radius:20px; font-size:10px; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.5px;
+    }
+    .tag-vip { background:rgba(212,168,83,0.15); color:#d4a853; border:1px solid rgba(212,168,83,0.3); }
+    .tag-novo { background:rgba(37,211,102,0.12); color:#25d366; border:1px solid rgba(37,211,102,0.3); }
+    .tag-sumido { background:rgba(255,77,77,0.12); color:#ff4d4d; border:1px solid rgba(255,77,77,0.3); }
+
+    /* Birthday + Notes */
+    .profile-field { margin-top:10px; }
+    .profile-field label { font-size:11px; font-weight:600; color:var(--texto-muted); text-transform:uppercase; letter-spacing:0.5px; }
+    .profile-field-row { display:flex; align-items:center; gap:8px; margin-top:4px; }
+    .profile-field-row span { font-size:13px; color:var(--texto-secundario); }
+    .profile-field-row button {
+      background:none; border:1px solid var(--borda); color:var(--texto-muted); font-size:10px;
+      font-weight:700; padding:3px 8px; border-radius:6px; cursor:pointer; font-family:inherit;
+      transition:all .2s;
+    }
+    .profile-field-row button:hover { border-color:var(--verde-acao); color:var(--verde-acao); }
+    .notes-textarea {
+      width:100%; margin-top:4px; padding:8px 10px; background:var(--fundo); border:1px solid var(--borda);
+      border-radius:8px; color:var(--texto-secundario); font-size:12px; font-family:inherit;
+      resize:vertical; min-height:50px; box-sizing:border-box;
+    }
+    .notes-textarea:focus { border-color:var(--verde-acao); outline:none; }
+    .notes-save {
+      margin-top:6px; padding:6px 14px; background:var(--verde-acao); color:#000; border:none;
+      border-radius:8px; font-size:11px; font-weight:700; font-family:inherit; cursor:pointer;
+      transition:all .2s; display:none;
+    }
+    .notes-save:hover { opacity:0.85; }
+
+    /* KPI cards */
+    .kpi-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:20px; }
+    .kpi-card {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:12px;
+      padding:14px; text-align:center;
+    }
+    .kpi-value { font-size:20px; font-weight:800; color:var(--verde-acao); }
+    .kpi-label { font-size:10px; font-weight:600; color:var(--texto-muted); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
+
+    /* Sections */
+    .section { margin-bottom:20px; }
+    .section-title {
+      font-size:13px; font-weight:700; color:var(--texto-principal); text-transform:uppercase;
+      letter-spacing:0.5px; padding-bottom:8px; border-bottom:1px solid var(--borda); margin-bottom:10px;
+    }
+
+    .visit-row {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:10px;
+      padding:12px; margin-bottom:6px;
+    }
+    .visit-top { display:flex; justify-content:space-between; align-items:center; }
+    .visit-date { font-size:12px; font-weight:600; color:var(--texto-secundario); }
+    .visit-price { font-size:13px; font-weight:700; color:var(--verde-acao); }
+    .visit-detail { font-size:11px; color:var(--texto-muted); margin-top:4px; }
+
+    .pkg-row, .sub-row, .rating-row, .coupon-row {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:10px;
+      padding:12px; margin-bottom:6px;
+    }
+    .pkg-name { font-size:13px; font-weight:700; color:var(--texto-secundario); }
+    .pkg-progress { width:100%; height:6px; background:var(--fundo); border-radius:3px; margin-top:6px; overflow:hidden; }
+    .pkg-bar { height:100%; background:var(--verde-acao); border-radius:3px; transition:width .3s; }
+    .pkg-detail { font-size:11px; color:var(--texto-muted); margin-top:4px; }
+
+    .rating-stars { color:#d4a853; font-size:14px; }
+    .rating-comment { font-size:12px; color:var(--texto-secundario); margin-top:4px; font-style:italic; }
+    .rating-meta { font-size:11px; color:var(--texto-muted); margin-top:4px; }
+
+    .empty-section { text-align:center; padding:20px; color:var(--texto-muted); font-size:12px; }
+
+    .load-more-btn {
+      width:100%; padding:10px; background:var(--cinza-escuro); border:1px solid var(--borda);
+      border-radius:10px; color:var(--texto-muted); font-size:12px; font-weight:600;
+      font-family:inherit; cursor:pointer; transition:all .2s; margin-bottom:6px;
+    }
+    .load-more-btn:hover { border-color:var(--verde-acao); color:var(--verde-acao); }
+
+    /* Action buttons */
+    .action-bar { display:flex; gap:8px; margin-bottom:20px; }
+    .action-btn {
+      flex:1; padding:12px; border-radius:10px; font-size:13px; font-weight:700;
+      font-family:inherit; cursor:pointer; text-align:center; text-decoration:none;
+      display:flex; align-items:center; justify-content:center; gap:6px; transition:all .2s;
+    }
+    .action-btn.primary { background:var(--verde-acao); color:#000; border:none; }
+    .action-btn.primary:hover { opacity:0.85; }
+    .action-btn.whatsapp { background:transparent; border:1px solid rgba(37,211,102,0.4); color:#25d366; }
+    .action-btn.whatsapp:hover { background:rgba(37,211,102,0.1); }
+
+    .bottom-nav {
+      position:fixed; bottom:0; left:0; right:0;
+      background:var(--cinza-escuro); border-top:1px solid var(--borda);
+      display:flex; justify-content:center; gap:0; padding:8px 0;
+      padding-bottom:max(8px, env(safe-area-inset-bottom));
+      padding-left:max(0px, env(safe-area-inset-left));
+      padding-right:max(0px, env(safe-area-inset-right));
+    }
+    .nav-item {
+      flex:1; max-width:65px; display:flex; flex-direction:column;
+      align-items:center; gap:2px; padding:6px 0;
+      color:var(--texto-muted); font-size:8px; font-weight:600;
+      text-decoration:none; font-family:inherit; transition:all .2s;
+    }
+    .nav-item.active { color:var(--verde-acao); }
+    .nav-item .nav-icon { font-size:16px; }
+
+    body { padding-bottom:70px; }
+
+    /* Modal birthday */
+    .modal-overlay {
+      display:none; position:fixed; top:0; left:0; right:0; bottom:0;
+      background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;
+    }
+    .modal-overlay.show { display:flex; }
+    .modal-box {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:14px;
+      padding:24px; width:90%; max-width:360px;
+    }
+    .modal-box h3 { font-size:15px; font-weight:700; margin-bottom:14px; }
+    .modal-box input {
+      width:100%; padding:10px 12px; background:var(--fundo); border:1px solid var(--borda);
+      border-radius:8px; color:var(--texto-principal); font-size:14px; font-family:inherit;
+      box-sizing:border-box;
+    }
+    .modal-box input:focus { border-color:var(--verde-acao); outline:none; }
+    .modal-actions { display:flex; gap:8px; margin-top:14px; }
+    .modal-actions button {
+      flex:1; padding:10px; border-radius:8px; font-size:12px; font-weight:700;
+      font-family:inherit; cursor:pointer; transition:all .2s;
+    }
+    .modal-actions .btn-cancel { background:transparent; border:1px solid var(--borda); color:var(--texto-muted); }
+    .modal-actions .btn-save { background:var(--verde-acao); border:none; color:#000; }
+
+    @keyframes spin { to { transform:rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="hc-container">
+
+  <div id="loading" style="text-align:center;padding:60px 0;">
+    <div class="spinner" style="margin:0 auto 12px;width:24px;height:24px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--verde-acao);border-radius:50%;animation:spin .6s linear infinite;"></div>
+    <div style="font-size:13px;color:var(--texto-muted);">Carregando histórico...</div>
+  </div>
+
+  <div id="content" style="display:none;">
+
+    <div class="hc-header">
+      <button class="btn-back" onclick="history.back()" title="Voltar">&#x2190;</button>
+      <h1 style="font-size:18px;font-weight:700;">Histórico do Cliente</h1>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="profile-card">
+      <div class="profile-top">
+        <div class="profile-avatar" id="avatar"></div>
+        <div>
+          <div class="profile-name" id="cli-name"></div>
+          <div class="profile-phone">
+            <span id="cli-phone"></span>
+            <a id="cli-whatsapp" href="#" target="_blank">ZAP</a>
+          </div>
+        </div>
+      </div>
+      <div class="profile-meta">
+        <div>Cliente desde: <strong id="cli-since">—</strong></div>
+      </div>
+      <div class="profile-tags" id="cli-tags"></div>
+
+      <div class="profile-field">
+        <label>Aniversário</label>
+        <div class="profile-field-row">
+          <span id="cli-birthday">—</span>
+          <button onclick="openBirthdayModal()">EDITAR</button>
+        </div>
+      </div>
+
+      <div class="profile-field">
+        <label>Observações</label>
+        <textarea class="notes-textarea" id="cli-notes" placeholder="Preferências, corte favorito..." oninput="showNotesSave()"></textarea>
+        <button class="notes-save" id="btn-save-notes" onclick="saveNotes()">SALVAR</button>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-visits">0</div>
+        <div class="kpi-label">Total visitas</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-total">R$ 0</div>
+        <div class="kpi-label">Total gasto</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-ticket">R$ 0</div>
+        <div class="kpi-label">Ticket médio</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-last">—</div>
+        <div class="kpi-label" id="kpi-last-label">Última visita</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-bar">
+      <a class="action-btn primary" id="btn-agendar" href="#">&#x1F4C5; AGENDAR</a>
+      <a class="action-btn whatsapp" id="btn-zap" href="#" target="_blank">&#x1F4AC; ZAP</a>
+    </div>
+
+    <!-- Visitas -->
+    <div class="section">
+      <div class="section-title">&#x1F4CB; Histórico de Visitas</div>
+      <div id="visits-list"></div>
+      <button class="load-more-btn" id="btn-load-more" style="display:none;" onclick="loadMoreVisits()">Carregar mais</button>
+    </div>
+
+    <!-- Pacotes -->
+    <div class="section" id="sec-pacotes" style="display:none;">
+      <div class="section-title">&#x1F4E6; Pacotes</div>
+      <div id="pacotes-list"></div>
+    </div>
+
+    <!-- Assinaturas -->
+    <div class="section" id="sec-assinaturas" style="display:none;">
+      <div class="section-title">&#x1F451; Assinaturas</div>
+      <div id="assinaturas-list"></div>
+    </div>
+
+    <!-- Avaliações -->
+    <div class="section" id="sec-avaliacoes" style="display:none;">
+      <div class="section-title">&#x2B50; Avaliações</div>
+      <div id="avaliacoes-list"></div>
+    </div>
+
+    <!-- Cupons -->
+    <div class="section" id="sec-cupons" style="display:none;">
+      <div class="section-title">&#x1F3AB; Cupons Usados</div>
+      <div id="cupons-list"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Birthday Modal -->
+<div class="modal-overlay" id="birthday-modal">
+  <div class="modal-box">
+    <h3>Aniversário do cliente</h3>
+    <input type="date" id="input-birthday">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeBirthdayModal()">CANCELAR</button>
+      <button class="btn-save" onclick="saveBirthday()">SALVAR</button>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <a class="nav-item" href="dashboard.html"><span class="nav-icon">&#x1F4C5;</span>AGENDA</a>
+  <a class="nav-item" href="equipe.html"><span class="nav-icon">&#x1F465;</span>EQUIPE</a>
+  <a class="nav-item" href="financeiro.html"><span class="nav-icon">&#x1F4B0;</span>CAIXA</a>
+  <button class="nav-item" onclick="toggleMore()" id="btn-more"><span class="nav-icon">&#x2630;</span>MAIS</button>
+</div>
+<div id="more-menu" style="display:none;position:fixed;bottom:56px;right:8px;background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:12px;padding:8px;z-index:999;min-width:160px;">
+  <a href="servicos.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x2702;&#xFE0F; Serviços</a>
+  <a href="clientes.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4CB; Clientes</a>
+  <a href="estoque.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4E6; Estoque</a>
+  <a href="relatorio.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4CA; Relatório</a>
+  <a href="resumo.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4CA; Resumo</a>
+  <a href="comandas.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4DD; Comandas</a>
+  <a href="pacotes.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4E6; Pacotes</a>
+  <a href="assinaturas.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F451; Assinaturas</a>
+  <a href="cupons.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F3AB; Cupons</a>
+  <a href="retencao.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F504; Retenção</a>
+  <a href="satisfacao.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x2B50; Satisfação</a>
+  <a href="agenda-semana.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F5D3; Agenda Semanal</a>
+  <a href="configuracoes.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x2699; Configurações</a>
+  <a href="lista-espera.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x23F3; Lista de Espera</a>
+  <a href="comissoes.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4B5; Comissões</a>
+  <a href="combos.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F500; Combos</a>
+</div>
+<script>
+function toggleMore(){var m=document.getElementById('more-menu');m.style.display=m.style.display==='none'?'block':'none';}
+document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js?v=3"></script>
+<script src="js/utils.js?v=3"></script>
+<script>
+let shop = null;
+let clientPhone = '';
+let clientRecord = null;
+let allVisits = [];
+let visitsShown = 0;
+const VISITS_PER_PAGE = 20;
+let barbersMap = {};
+let servicesMap = {};
+
+const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
+const _params = new URLSearchParams(window.location.search);
+const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_viewing_shop');
+if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
+const isAdminViewing = !!adminViewingShop;
+const db = sb;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'app.html'; return; }
+
+  if (!ADMIN_EMAILS.includes(session.user.email)) {
+    sessionStorage.removeItem('admin_viewing_shop');
+  }
+
+  if (ADMIN_EMAILS.includes(session.user.email) && !isAdminViewing) {
+    window.location.href = 'admin.html';
+    return;
+  }
+
+  let shopData;
+  if (isAdminViewing) {
+    const { data } = await db.from('barbershops').select('*').eq('id', adminViewingShop).single();
+    shopData = data;
+  } else {
+    const { data } = await db.from('barbershops').select('*').eq('owner_id', session.user.id).maybeSingle();
+    shopData = data;
+  }
+
+  if (!shopData) { window.location.href = 'onboarding.html'; return; }
+  shop = shopData;
+
+  // Get client identifier from URL
+  const phoneParam = _params.get('phone');
+  const nameParam = _params.get('name');
+
+  if (!phoneParam && !nameParam) {
+    document.getElementById('loading').innerHTML = '<div style="text-align:center;padding:60px 0;color:var(--texto-muted);font-size:13px;">Nenhum cliente especificado.</div>';
+    return;
+  }
+
+  // Load barbers and services maps
+  const [barbersRes, servicesRes] = await Promise.all([
+    db.from('barbers').select('id,name').eq('barbershop_id', shop.id),
+    db.from('services').select('id,name,price').eq('barbershop_id', shop.id)
+  ]);
+  for (const b of (barbersRes.data || [])) barbersMap[b.id] = b.name;
+  for (const s of (servicesRes.data || [])) servicesMap[s.id] = s;
+
+  // Find client appointments
+  let query = db.from('appointments')
+    .select('*')
+    .eq('barbershop_id', shop.id)
+    .eq('status', 'done')
+    .order('scheduled_at', { ascending: false });
+
+  if (phoneParam) {
+    clientPhone = phoneParam.replace(/\D/g, '');
+    query = query.eq('client_phone', phoneParam);
+  }
+
+  const { data: appts } = await query;
+  let appointments = appts || [];
+
+  // If searching by name (no phone), filter client-side
+  if (!phoneParam && nameParam) {
+    const nameLower = nameParam.toLowerCase();
+    appointments = appointments.filter(a => (a.client_name || '').toLowerCase().includes(nameLower));
+    // Get phone from first match
+    if (appointments.length > 0) {
+      clientPhone = (appointments[0].client_phone || '').replace(/\D/g, '');
+      // Re-filter by phone for consistency
+      if (clientPhone) {
+        const { data: appts2 } = await db.from('appointments')
+          .select('*')
+          .eq('barbershop_id', shop.id)
+          .eq('status', 'done')
+          .eq('client_phone', appointments[0].client_phone)
+          .order('scheduled_at', { ascending: false });
+        appointments = appts2 || [];
+      }
+    }
+  }
+
+  // Also fetch all-status appointments for "client since" date
+  let allStatusQuery = db.from('appointments')
+    .select('scheduled_at')
+    .eq('barbershop_id', shop.id)
+    .order('scheduled_at', { ascending: true })
+    .limit(1);
+
+  if (clientPhone) {
+    allStatusQuery = allStatusQuery.eq('client_phone', phoneParam || appointments[0]?.client_phone);
+  }
+  const { data: firstAppt } = await allStatusQuery;
+
+  allVisits = appointments;
+  const clientName = appointments.length > 0 ? appointments[0].client_name : (nameParam || '—');
+  const rawPhone = appointments.length > 0 ? appointments[0].client_phone : phoneParam;
+  const phoneClean = (rawPhone || '').replace(/\D/g, '');
+
+  // Try to load client record from clients table
+  try {
+    if (phoneClean) {
+      const { data: cliData } = await db.from('clients')
+        .select('*')
+        .eq('barbershop_id', shop.id)
+        .eq('phone', rawPhone)
+        .maybeSingle();
+      clientRecord = cliData;
+    }
+  } catch (e) { /* clients table may not exist */ }
+
+  // Render profile
+  document.getElementById('avatar').textContent = (clientName || '?').charAt(0).toUpperCase();
+  document.getElementById('cli-name').textContent = clientName;
+  document.getElementById('cli-phone').textContent = rawPhone || phoneClean;
+  document.getElementById('cli-whatsapp').href = 'https://wa.me/55' + phoneClean;
+
+  const sinceDate = firstAppt && firstAppt.length > 0 ? firstAppt[0].scheduled_at : (appointments.length > 0 ? appointments[appointments.length - 1].scheduled_at : null);
+  document.getElementById('cli-since').textContent = sinceDate ? formatDate(sinceDate) : '—';
+
+  // Birthday
+  if (clientRecord && clientRecord.birthday) {
+    document.getElementById('cli-birthday').textContent = formatDate(clientRecord.birthday + 'T12:00:00');
+    document.getElementById('input-birthday').value = clientRecord.birthday;
+  }
+
+  // Notes
+  if (clientRecord && clientRecord.notes) {
+    document.getElementById('cli-notes').value = clientRecord.notes;
+  }
+
+  // Tags
+  const totalVisits = appointments.length;
+  const lastVisitDate = appointments.length > 0 ? new Date(appointments[0].scheduled_at) : null;
+  const daysSinceLast = lastVisitDate ? Math.floor((Date.now() - lastVisitDate.getTime()) / 86400000) : 999;
+
+  let tagsHtml = '';
+  if (totalVisits >= 20) tagsHtml += '<span class="tag tag-vip">VIP</span>';
+  if (totalVisits < 3) tagsHtml += '<span class="tag tag-novo">Novo</span>';
+  if (daysSinceLast > 30) tagsHtml += '<span class="tag tag-sumido">Sumido</span>';
+  document.getElementById('cli-tags').innerHTML = tagsHtml;
+
+  // KPIs
+  const totalSpent = appointments.reduce((s, a) => s + Number(a.price_paid || 0), 0);
+  const avgTicket = totalVisits > 0 ? totalSpent / totalVisits : 0;
+
+  document.getElementById('kpi-visits').textContent = totalVisits;
+  document.getElementById('kpi-total').textContent = formatMoney(totalSpent);
+  document.getElementById('kpi-ticket').textContent = formatMoney(avgTicket);
+
+  if (lastVisitDate) {
+    document.getElementById('kpi-last').textContent = formatDate(appointments[0].scheduled_at);
+    document.getElementById('kpi-last-label').textContent = daysSinceLast === 0 ? 'Hoje' : daysSinceLast + ' dia' + (daysSinceLast !== 1 ? 's' : '') + ' atrás';
+  }
+
+  // Action buttons
+  const agendarUrl = 'agendar.html?client_name=' + encodeURIComponent(clientName) + '&client_phone=' + encodeURIComponent(rawPhone || phoneClean);
+  document.getElementById('btn-agendar').href = agendarUrl;
+  document.getElementById('btn-zap').href = 'https://wa.me/55' + phoneClean;
+
+  // Render visits
+  renderVisits();
+
+  // Load optional sections in parallel
+  await Promise.all([
+    loadPacotes(rawPhone),
+    loadAssinaturas(rawPhone),
+    loadAvaliacoes(rawPhone, phoneClean),
+    loadCupons(rawPhone, phoneClean)
+  ]);
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
+});
+
+function renderVisits() {
+  const el = document.getElementById('visits-list');
+  if (allVisits.length === 0) {
+    el.innerHTML = '<div class="empty-section">Nenhuma visita registrada.</div>';
+    return;
+  }
+
+  const end = Math.min(visitsShown + VISITS_PER_PAGE, allVisits.length);
+  let html = el.innerHTML.replace(/<div class="empty-section">.*?<\/div>/, '');
+
+  for (let i = visitsShown; i < end; i++) {
+    const v = allVisits[i];
+    const svc = servicesMap[v.service_id];
+    const svcName = svc ? esc(svc.name) : '—';
+    const barberName = barbersMap[v.barber_id] || '—';
+    const payMethod = v.payment_method ? esc(v.payment_method) : '';
+
+    html += '<div class="visit-row">' +
+      '<div class="visit-top">' +
+        '<div class="visit-date">' + formatDate(v.scheduled_at) + ' ' + formatTime(v.scheduled_at) + '</div>' +
+        '<div class="visit-price">' + formatMoney(v.price_paid) + '</div>' +
+      '</div>' +
+      '<div class="visit-detail">' + svcName + ' · ' + esc(barberName) + (payMethod ? ' · ' + payMethod : '') + '</div>' +
+    '</div>';
+  }
+
+  visitsShown = end;
+  el.innerHTML = html;
+
+  document.getElementById('btn-load-more').style.display = visitsShown < allVisits.length ? 'block' : 'none';
+}
+
+function loadMoreVisits() {
+  renderVisits();
+}
+
+// Pacotes
+async function loadPacotes(phone) {
+  try {
+    const { data, error } = await db.from('pacote_vendas')
+      .select('*')
+      .eq('barbershop_id', shop.id)
+      .eq('client_phone', phone);
+    if (error) throw error;
+    if (!data || data.length === 0) return;
+
+    document.getElementById('sec-pacotes').style.display = 'block';
+    document.getElementById('pacotes-list').innerHTML = data.map(p => {
+      const used = (p.uses_total || 0) - (p.uses_remaining || 0);
+      const pct = p.uses_total > 0 ? Math.round((used / p.uses_total) * 100) : 0;
+      const statusLabel = p.status === 'active' ? 'Ativo' : (p.status === 'expired' ? 'Expirado' : (p.status || '—'));
+      return '<div class="pkg-row">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+          '<div class="pkg-name">' + esc(p.package_name || 'Pacote') + '</div>' +
+          '<span style="font-size:11px;color:var(--texto-muted);">' + esc(statusLabel) + '</span>' +
+        '</div>' +
+        '<div class="pkg-progress"><div class="pkg-bar" style="width:' + pct + '%"></div></div>' +
+        '<div class="pkg-detail">' + used + '/' + (p.uses_total || 0) + ' usos</div>' +
+      '</div>';
+    }).join('');
+  } catch (e) { /* table may not exist */ }
+}
+
+// Assinaturas
+async function loadAssinaturas(phone) {
+  try {
+    const { data, error } = await db.from('assinatura_clientes')
+      .select('*')
+      .eq('barbershop_id', shop.id)
+      .eq('client_phone', phone);
+    if (error) throw error;
+    if (!data || data.length === 0) return;
+
+    document.getElementById('sec-assinaturas').style.display = 'block';
+    document.getElementById('assinaturas-list').innerHTML = data.map(s => {
+      const statusLabel = s.status === 'active' ? 'Ativa' : (s.status || '—');
+      return '<div class="sub-row">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+          '<div class="pkg-name">' + esc(s.plan_name || 'Assinatura') + '</div>' +
+          '<span style="font-size:11px;color:var(--texto-muted);">' + esc(statusLabel) + '</span>' +
+        '</div>' +
+        '<div class="pkg-detail">' +
+          'Usos este mês: <strong style="color:var(--verde-acao);">' + (s.uses_this_month || 0) + '</strong>' +
+          (s.next_payment ? ' · Próximo pagamento: ' + formatDate(s.next_payment) : '') +
+        '</div>' +
+      '</div>';
+    }).join('');
+  } catch (e) { /* table may not exist */ }
+}
+
+// Avaliações
+async function loadAvaliacoes(phone, phoneClean) {
+  try {
+    const { data, error } = await db.from('respostas_satisfacao')
+      .select('*')
+      .eq('barbershop_id', shop.id)
+      .eq('client_phone', phone)
+      .order('responded_at', { ascending: false });
+    if (error) throw error;
+    if (!data || data.length === 0) return;
+
+    document.getElementById('sec-avaliacoes').style.display = 'block';
+    document.getElementById('avaliacoes-list').innerHTML = data.map(r => {
+      const stars = '&#x2605;'.repeat(r.rating || 0) + '&#x2606;'.repeat(5 - (r.rating || 0));
+      const barberName = barbersMap[r.barber_id] || '';
+      return '<div class="rating-row">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+          '<div class="rating-stars">' + stars + '</div>' +
+          '<span style="font-size:11px;color:var(--texto-muted);">' + formatDate(r.responded_at) + '</span>' +
+        '</div>' +
+        (r.comment ? '<div class="rating-comment">"' + esc(r.comment) + '"</div>' : '') +
+        (barberName ? '<div class="rating-meta">Barbeiro: ' + esc(barberName) + '</div>' : '') +
+      '</div>';
+    }).join('');
+  } catch (e) { /* table may not exist */ }
+}
+
+// Cupons
+async function loadCupons(phone, phoneClean) {
+  try {
+    const { data, error } = await db.from('cupom_usos')
+      .select('*')
+      .eq('barbershop_id', shop.id)
+      .eq('client_phone', phone)
+      .order('used_at', { ascending: false });
+    if (error) throw error;
+    if (!data || data.length === 0) return;
+
+    document.getElementById('sec-cupons').style.display = 'block';
+    document.getElementById('cupons-list').innerHTML = data.map(c => {
+      return '<div class="coupon-row">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+          '<div style="font-size:13px;font-weight:700;color:var(--texto-secundario);">' + esc(c.coupon_code || c.cupom_code || 'Cupom') + '</div>' +
+          '<span style="font-size:11px;color:var(--texto-muted);">' + formatDate(c.used_at) + '</span>' +
+        '</div>' +
+        '<div class="pkg-detail">Desconto: <strong style="color:var(--verde-acao);">' + formatMoney(c.discount_applied) + '</strong></div>' +
+      '</div>';
+    }).join('');
+  } catch (e) { /* table may not exist */ }
+}
+
+// Notes
+function showNotesSave() {
+  document.getElementById('btn-save-notes').style.display = 'inline-block';
+}
+
+async function saveNotes() {
+  const notes = document.getElementById('cli-notes').value.trim();
+  const btn = document.getElementById('btn-save-notes');
+  btn.textContent = 'SALVANDO...';
+
+  try {
+    if (clientRecord && clientRecord.id) {
+      await db.from('clients').update({ notes: notes }).eq('id', clientRecord.id);
+    } else {
+      // Upsert client
+      const rawPhone = allVisits.length > 0 ? allVisits[0].client_phone : clientPhone;
+      const name = allVisits.length > 0 ? allVisits[0].client_name : '';
+      const { data } = await db.from('clients').insert({
+        barbershop_id: shop.id,
+        phone: rawPhone,
+        name: name,
+        notes: notes
+      }).select().single();
+      clientRecord = data;
+    }
+    btn.textContent = 'SALVO!';
+    setTimeout(() => { btn.style.display = 'none'; btn.textContent = 'SALVAR'; }, 1500);
+  } catch (e) {
+    btn.textContent = 'ERRO';
+    setTimeout(() => { btn.textContent = 'SALVAR'; }, 2000);
+  }
+}
+
+// Birthday modal
+function openBirthdayModal() {
+  document.getElementById('birthday-modal').classList.add('show');
+}
+
+function closeBirthdayModal() {
+  document.getElementById('birthday-modal').classList.remove('show');
+}
+
+async function saveBirthday() {
+  const val = document.getElementById('input-birthday').value;
+  if (!val) return;
+
+  const btn = document.querySelector('#birthday-modal .btn-save');
+  btn.textContent = 'SALVANDO...';
+
+  try {
+    if (clientRecord && clientRecord.id) {
+      await db.from('clients').update({ birthday: val }).eq('id', clientRecord.id);
+      clientRecord.birthday = val;
+    } else {
+      const rawPhone = allVisits.length > 0 ? allVisits[0].client_phone : clientPhone;
+      const name = allVisits.length > 0 ? allVisits[0].client_name : '';
+      const { data } = await db.from('clients').insert({
+        barbershop_id: shop.id,
+        phone: rawPhone,
+        name: name,
+        birthday: val
+      }).select().single();
+      clientRecord = data;
+    }
+
+    document.getElementById('cli-birthday').textContent = formatDate(val + 'T12:00:00');
+    closeBirthdayModal();
+    btn.textContent = 'SALVAR';
+  } catch (e) {
+    btn.textContent = 'ERRO';
+    setTimeout(() => { btn.textContent = 'SALVAR'; }, 2000);
+  }
+}
+
+// Close modal on overlay click
+document.getElementById('birthday-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeBirthdayModal();
+});
+</script>
+<script src="js/ajuda.js"></script>
+<script src="js/sw-update.js"></script>
+</body>
+</html>
