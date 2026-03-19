@@ -801,16 +801,16 @@ async function salvarAdmin() {
       }
     }
 
-    for (const sv of editShopServices) {
-      if (!sv.name.trim()) continue;
-      if (sv.id) {
-        await sb.from('services').update({ name: sv.name.trim(), price: sv.price, duration_min: sv.duration_min }).eq('id', sv.id);
-      } else {
-        await sb.from('services').insert({
-          barbershop_id: shopId, name: sv.name.trim(), price: sv.price || 0, duration_min: sv.duration_min || 30, active: true
-        });
-      }
-    }
+    // Batch: separar updates e inserts
+    const svcUpdates = editShopServices.filter(sv => sv.name.trim() && sv.id);
+    const svcInserts = editShopServices.filter(sv => sv.name.trim() && !sv.id);
+
+    await Promise.all([
+      ...svcUpdates.map(sv => sb.from('services').update({ name: sv.name.trim(), price: sv.price, duration_min: sv.duration_min }).eq('id', sv.id)),
+      svcInserts.length ? sb.from('services').insert(svcInserts.map(sv => ({
+        barbershop_id: shopId, name: sv.name.trim(), price: sv.price || 0, duration_min: sv.duration_min || 30, active: true
+      }))) : Promise.resolve()
+    ]);
 
     // Gerenciar barbeiros
     const existingBarbers = allBarbers.filter(b => b.barbershop_id === shopId);
@@ -828,18 +828,17 @@ async function salvarAdmin() {
     const dupes = phones.filter((p, i) => phones.indexOf(p) !== i);
     if (dupes.length) { throw new Error('Telefone duplicado: ' + dupes[0]); }
 
-    // Atualizar e criar
-    for (const b of editShopBarbers) {
-      if (!b.name.trim()) continue;
-      if (b.id) {
-        await sb.from('barbers').update({ name: b.name.trim(), phone: b.phone || null }).eq('id', b.id);
-      } else {
-        await sb.from('barbers').insert({
-          barbershop_id: shopId, name: b.name.trim(), phone: b.phone || null, commission_pct: 0, active: true,
-          is_owner: b.is_owner || false
-        });
-      }
-    }
+    // Batch: separar updates e inserts
+    const barbUpdates = editShopBarbers.filter(b => b.name.trim() && b.id);
+    const barbInserts = editShopBarbers.filter(b => b.name.trim() && !b.id);
+
+    await Promise.all([
+      ...barbUpdates.map(b => sb.from('barbers').update({ name: b.name.trim(), phone: b.phone || null }).eq('id', b.id)),
+      barbInserts.length ? sb.from('barbers').insert(barbInserts.map(b => ({
+        barbershop_id: shopId, name: b.name.trim(), phone: b.phone || null, commission_pct: 0, active: true,
+        is_owner: b.is_owner || false
+      }))) : Promise.resolve()
+    ]);
 
     fecharModalAdmin();
     await loadAll();
