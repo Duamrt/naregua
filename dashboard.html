@@ -307,13 +307,17 @@
 
   <!-- Acoes rapidas -->
   <div id="share-bar" style="display:none;">
-    <div style="display:flex;gap:8px;margin-bottom:8px;">
-      <button onclick="copiarLink()" id="btn-copy" style="flex:1;padding:12px 14px;border-radius:10px;border:none;background:var(--verde-acao);color:#000;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">&#x1F4CB; COPIAR LINK DE AGENDAMENTO</button>
-      <button onclick="compartilharWhatsApp()" style="padding:12px 14px;border-radius:10px;border:none;background:rgba(37,211,102,0.15);color:#25d366;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;">&#x1F4F1; ZAP</button>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button onclick="compartilharWhatsApp()" style="flex:1;padding:10px 8px;border-radius:12px;border:none;background:rgba(37,211,102,0.12);color:#25d366;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;line-height:1.3;">
+        <span style="font-size:18px;">&#x1F4C5;</span>ENVIAR LINK DE<br>AGENDAMENTO
+      </button>
+      <button onclick="enviarLinkBarbeiroZap()" style="flex:1;padding:10px 8px;border-radius:12px;border:none;background:rgba(212,168,83,0.1);color:var(--verde-acao);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;line-height:1.3;">
+        <span style="font-size:18px;">&#x1F4AA;</span>CADASTRAR<br>BARBEIRO
+      </button>
     </div>
     <div style="display:flex;gap:8px;">
-      <button onclick="copiarLinkBarbeiro()" id="btn-copy-barb" style="flex:1;padding:6px 10px;border-radius:6px;border:1px solid var(--borda);background:transparent;color:var(--texto-muted);font-size:9px;font-weight:600;font-family:inherit;cursor:pointer;">copiar link barbeiro</button>
-      <button onclick="enviarLinkBarbeiroZap()" style="flex:1;padding:6px 10px;border-radius:6px;border:1px solid var(--borda);background:transparent;color:var(--texto-muted);font-size:9px;font-weight:600;font-family:inherit;cursor:pointer;">cadastrar barbeiro via zap</button>
+      <button onclick="copiarLink()" id="btn-copy" style="flex:1;padding:10px 14px;border-radius:6px;border:1px solid var(--borda);background:transparent;color:var(--texto-muted);font-size:9px;font-weight:600;font-family:inherit;cursor:pointer;">copiar link agendamento</button>
+      <button onclick="copiarLinkBarbeiro()" id="btn-copy-barb" style="flex:1;padding:10px 14px;border-radius:6px;border:1px solid var(--borda);background:transparent;color:var(--texto-muted);font-size:9px;font-weight:600;font-family:inherit;cursor:pointer;">copiar link barbeiro</button>
     </div>
     <div style="font-size:10px;color:var(--texto-muted);word-break:break-all;margin-top:6px;display:none;" id="share-link"></div>
   </div>
@@ -950,8 +954,8 @@ function copiarLink() {
   const link = document.getElementById('share-link').textContent;
   navigator.clipboard.writeText(link).then(() => {
     const btn = document.getElementById('btn-copy');
-    btn.innerHTML = '&#x2705; COPIADO!';
-    setTimeout(() => btn.innerHTML = '&#x1F4CB; COPIAR LINK DE AGENDAMENTO', 2000);
+    btn.textContent = 'COPIADO!';
+    setTimeout(() => btn.textContent = 'copiar link agendamento', 2000);
   });
 }
 
