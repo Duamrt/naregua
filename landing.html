@@ -470,17 +470,14 @@
 
   .nichos-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
     margin-top: 48px;
     max-width: 900px;
   }
 
-  @media (max-width: 900px) {
-    .nichos-grid { grid-template-columns: repeat(3, 1fr); }
-  }
   @media (max-width: 560px) {
-    .nichos-grid { grid-template-columns: repeat(2, 1fr); }
+    .nichos-grid { grid-template-columns: 1fr 1fr !important; }
   }
 
   .nicho-card {
@@ -943,7 +940,7 @@
       <h2>Feito para <span>barbeiros.</span></h2>
       <p class="section-sub">Do autônomo à barbearia com equipe — qualquer tamanho, qualquer cidade.</p>
     </div>
-    <div class="nichos-grid" style="grid-template-columns: repeat(3, 1fr); max-width: 540px;">
+    <div class="nichos-grid" style="max-width: 540px;">
       <div class="nicho-card reveal">
         <span class="nicho-emoji">✂️</span>
         <div class="nicho-name">Barbearia solo</div>
