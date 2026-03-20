@@ -497,7 +497,7 @@ async function exportClientes(btn) {
       const totalVisits = clientAppts.length;
       const totalSpent = clientAppts.reduce((s, a) => {
         const svc = allServices.find(sv => sv.id === a.service_id);
-        return s + (Number(a.price_paid) || (svc ? Number(svc.price) : 0));
+        return s + ((a.price_paid != null ? Number(a.price_paid) : (svc ? Number(svc.price) : 0)));
       }, 0);
       const lastVisit = clientAppts.length > 0
         ? clientAppts.sort((a, b) => new Date(b.scheduled_at) - new Date(a.scheduled_at))[0].scheduled_at
@@ -544,7 +544,7 @@ async function exportAgendamentos(btn) {
       const svc = allServices.find(sv => sv.id === a.service_id);
       const barber = allBarbers.find(b => b.id === a.barber_id);
       const dt = a.scheduled_at ? new Date(a.scheduled_at) : null;
-      const valor = Number(a.price_paid) || (svc ? Number(svc.price) : 0);
+      const valor = (a.price_paid != null ? Number(a.price_paid) : (svc ? Number(svc.price) : 0));
 
       return [
         dt ? dt.toLocaleDateString('pt-BR') : '',
@@ -603,7 +603,7 @@ async function exportFinanceiro(btn) {
 
     entradas.forEach(a => {
       const svc = allServices.find(sv => sv.id === a.service_id);
-      const valor = Number(a.price_paid) || (svc ? Number(svc.price) : 0);
+      const valor = (a.price_paid != null ? Number(a.price_paid) : (svc ? Number(svc.price) : 0));
       const dt = a.scheduled_at ? new Date(a.scheduled_at) : null;
       rows.push([
         dt ? dt.toLocaleDateString('pt-BR') : '',

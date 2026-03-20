@@ -179,7 +179,7 @@
     .coupon-row { display:flex; gap:8px; }
     .coupon-row input {
       flex:1; padding:8px 12px; border-radius:8px; font-size:13px;
-      background:var(--cinza-medio); border:1.5px solid var(--borda); color:var(--texto-primario);
+      background:var(--cinza-medio); border:1.5px solid var(--borda); color:var(--texto-principal);
       font-family:inherit; text-transform:uppercase; letter-spacing:1px;
     }
     .coupon-row input:focus { border-color:var(--verde-acao); outline:none; }
@@ -621,7 +621,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     socialHtml += `<a href="https://wa.me/55${phone}" target="_blank" class="social-btn social-whatsapp">📱 WhatsApp</a>`;
   }
   if (shop.instagram) {
-    const ig = shop.instagram.replace('@','');
+    const ig = esc(shop.instagram.replace('@',''));
     socialHtml += `<a href="https://instagram.com/${ig}" target="_blank" class="social-btn social-instagram">📸 @${ig}</a>`;
   }
   socialEl.innerHTML = socialHtml;

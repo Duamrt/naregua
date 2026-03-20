@@ -414,7 +414,7 @@ async function fetchAppointments(start, end) {
       const schedTime = a.scheduled_at ? formatTime(a.scheduled_at) : '';
 
       if (a.status === 'done') {
-        const valor = Number(a.price_paid) || (svc ? Number(svc.price) : 0);
+        const valor = (a.price_paid != null ? Number(a.price_paid) : (svc ? Number(svc.price) : 0));
         const metodo = a.payment_method ? (METODO_LABELS[a.payment_method] || a.payment_method) : '';
         items.push({
           type: 'agendamento',

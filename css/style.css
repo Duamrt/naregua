@@ -147,7 +147,7 @@ a { color: var(--verde-acao); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 /* Tipografia */
-.logo { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--prata-claro); }
+.logo { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--texto-principal); }
 .logo span { color: var(--accent); }
 .logo-img { height: 48px; display: block; margin: 0 auto; }
 

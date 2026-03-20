@@ -625,7 +625,7 @@ async function renderPeriod() {
   // Calcular totais
   // BUG 7 FIX: price_paid como fonte primária, service.price como fallback
   const totalReceita = entradas.reduce((s, a) => {
-    const valor = Number(a.price_paid) || (() => { const svc = services.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })();
+    const valor = (a.price_paid != null ? Number(a.price_paid) : (() => { const svc = services.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })());
     return s + valor;
   }, 0);
   const totalDespesa = saidas.reduce((s, e) => s + Number(e.amount || 0), 0);
@@ -636,7 +636,7 @@ async function renderPeriod() {
   entradas.forEach(a => {
     const barber = barbersList.find(b => b.id === a.barber_id);
     if (!barber || !barber.commission_pct) return;
-    const valor = Number(a.price_paid) || (() => { const svc = services.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })();
+    const valor = (a.price_paid != null ? Number(a.price_paid) : (() => { const svc = services.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })());
     const comissao = valor * (barber.commission_pct / 100);
     totalComissao += comissao;
     if (!comissaoPorBarbeiro[barber.id]) comissaoPorBarbeiro[barber.id] = { name: barber.name, pct: barber.commission_pct, total: 0 };
@@ -900,7 +900,7 @@ async function abrirModalFechar() {
 
   const totalReceita = entradas.reduce((s, a) => {
     const svc = services.find(sv => sv.id === a.service_id);
-    return s + (Number(a.price_paid) || (svc ? Number(svc.price) : 0));
+    return s + (a.price_paid != null ? Number(a.price_paid) : (svc ? Number(svc.price) : 0));
   }, 0);
   const totalDespesa = saidas.reduce((s, e) => s + Number(e.amount || 0), 0);
 
@@ -908,7 +908,7 @@ async function abrirModalFechar() {
   entradas.forEach(a => {
     const barber = barbersList.find(b => b.id === a.barber_id);
     if (!barber || !barber.commission_pct) return;
-    const valor = Number(a.price_paid) || (() => { const svc = services.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })();
+    const valor = (a.price_paid != null ? Number(a.price_paid) : (() => { const svc = services.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })());
     totalComissao += valor * (barber.commission_pct / 100);
   });
 
@@ -917,7 +917,7 @@ async function abrirModalFechar() {
   entradas.forEach(a => {
     const met = a.payment_method || 'outro';
     const svc = services.find(sv => sv.id === a.service_id);
-    const val = Number(a.price_paid) || (svc ? Number(svc.price) : 0);
+    const val = a.price_paid != null ? Number(a.price_paid) : (svc ? Number(svc.price) : 0);
     if (!formas[met]) formas[met] = 0;
     formas[met] += val;
   });

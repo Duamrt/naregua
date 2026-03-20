@@ -452,7 +452,7 @@ async function renderDay() {
   const ativos = list.filter(a => !['cancelled','no_show'].includes(a.status));
   const done = list.filter(a => a.status === 'done');
   const faturamento = done.reduce((s, a) => {
-    const v = Number(a.price_paid) || (() => { const svc = services.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })();
+    const v = (a.price_paid != null ? Number(a.price_paid) : (() => { const svc = services.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })());
     return s + v;
   }, 0);
 

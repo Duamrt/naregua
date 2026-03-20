@@ -414,7 +414,7 @@ function renderGlobalStats() {
   const totalNoShow = allAppointments.filter(a => a.status === 'no_show').length;
   // BUG 7 FIX: price_paid como fonte primária
   const revenue = allAppointments.filter(a => a.status === 'done').reduce((s, a) => {
-    const valor = Number(a.price_paid) || (() => { const svc = allServices.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })();
+    const valor = (a.price_paid != null ? Number(a.price_paid) : (() => { const svc = allServices.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })());
     return s + valor;
   }, 0);
 
@@ -444,7 +444,7 @@ function renderShops() {
     const shopDone = shopAppts.filter(a => a.status === 'done');
     // BUG 7 FIX: price_paid como fonte primária
     const shopRevenue = shopDone.reduce((sum, a) => {
-      const valor = Number(a.price_paid) || (() => { const svc = allServices.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })();
+      const valor = (a.price_paid != null ? Number(a.price_paid) : (() => { const svc = allServices.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })());
       return sum + valor;
     }, 0);
 
