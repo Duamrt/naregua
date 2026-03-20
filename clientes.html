@@ -39,9 +39,9 @@
 
     .client-card {
       background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:12px;
-      padding:14px; margin-bottom:8px; transition:all .2s;
+      padding:14px; margin-bottom:8px; transition:all .2s; cursor:pointer;
     }
-    .client-card:hover { border-color:var(--borda-hover); }
+    .client-card:hover { border-color:var(--verde-acao); transform:translateY(-1px); }
     .client-top { display:flex; justify-content:space-between; align-items:center; }
     .client-name { font-size:14px; font-weight:700; }
     .client-phone { font-size:12px; color:var(--texto-muted); margin-top:2px; }
@@ -267,7 +267,8 @@ function renderClients(list) {
     const ultima = c.lastVisit ? formatDate(c.lastVisit) : '—';
     const primeira = c.firstVisit ? formatDate(c.firstVisit) : '—';
 
-    return '<div class="client-card">' +
+    const histUrl = 'historico-cliente.html?phone=' + encodeURIComponent(c.phone);
+    return '<div class="client-card" onclick="if(!event.target.closest(\'.client-actions\'))window.location.href=\'' + histUrl + '\'">' +
       '<div class="client-top">' +
         '<div style="display:flex;align-items:center;gap:12px;">' +
           '<div class="client-avatar">' + inicial + '</div>' +
@@ -283,6 +284,7 @@ function renderClients(list) {
         ' · Cliente desde: ' + primeira +
       '</div>' +
       '<div class="client-actions">' +
+        '<a href="' + histUrl + '" class="client-btn" style="color:var(--verde-acao);border-color:var(--accent-border);">VER FICHA</a>' +
         '<a href="https://wa.me/55' + c.phoneClean + '" target="_blank" class="client-btn whatsapp">ZAP</a>' +
         '<button class="client-btn" onclick="copiarTelefone(\'' + esc(c.phoneClean) + '\',this)">COPIAR TEL</button>' +
       '</div>' +
