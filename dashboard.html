@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03201104">
-  <link rel="stylesheet" href="css/layout.css?v=03201104">
-  <script src="js/theme.js?v=03201104"></script>
+  <link rel="stylesheet" href="css/style.css?v=03201109">
+  <link rel="stylesheet" href="css/layout.css?v=03201109">
+  <script src="js/theme.js?v=03201109"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -499,6 +499,11 @@
       <select id="enc-service" style="width:100%;padding:10px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;"></select>
     </div>
     <div class="field">
+      <label>HORARIO</label>
+      <input type="time" id="enc-time" style="width:100%;padding:10px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;box-sizing:border-box;">
+      <div style="font-size:11px;color:var(--texto-muted);margin-top:4px;">Deixe vazio para encaixar agora</div>
+    </div>
+    <div class="field">
       <label>NOME DO CLIENTE</label>
       <input type="text" id="enc-name" autocomplete="name" placeholder="Opcional" style="width:100%;padding:10px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;box-sizing:border-box;">
     </div>
@@ -557,10 +562,10 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03201104"></script>
-<script src="js/supabase.js?v=03201104"></script>
-<script src="js/utils.js?v=03201104"></script>
-<script src="js/push.js?v=03201104"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03201109"></script>
+<script src="js/supabase.js?v=03201109"></script>
+<script src="js/utils.js?v=03201109"></script>
+<script src="js/push.js?v=03201109"></script>
 <script>
 console.log('Dashboard v3 carregado');
 // ── Estado ────────────────────────────────────────────────────
@@ -1858,6 +1863,7 @@ function abrirEncaixe() {
     '<option value="' + s.id + '">' + esc(s.name) + ' (' + formatMoney(s.price) + ')</option>'
   ).join('');
 
+  document.getElementById('enc-time').value = '';
   document.getElementById('enc-name').value = '';
   document.getElementById('enc-phone').value = '';
   document.getElementById('encaixe-msg').className = 'msg';
@@ -1890,11 +1896,17 @@ async function salvarEncaixe() {
   const svc = services.find(s => s.id === serviceId);
   const duration = svc ? (svc.duration_min || 30) : 30;
 
-  // Horario = agora arredondado pra proximos 15min
+  // Horario: usa o campo se preenchido, senão agora arredondado
+  const encTime = document.getElementById('enc-time').value;
   const agora = new Date();
-  const minNow = agora.getMinutes();
-  const rounded = Math.ceil(minNow / 15) * 15;
-  agora.setMinutes(rounded, 0, 0);
+  if (encTime) {
+    const [hh, mm] = encTime.split(':').map(Number);
+    agora.setHours(hh, mm, 0, 0);
+  } else {
+    const minNow = agora.getMinutes();
+    const rounded = Math.ceil(minNow / 15) * 15;
+    agora.setMinutes(rounded, 0, 0);
+  }
 
   // Buscar agendamentos do profissional hoje pra validar conflito
   const diaStr = agora.getFullYear() + '-' + String(agora.getMonth()+1).padStart(2,'0') + '-' + String(agora.getDate()).padStart(2,'0');
@@ -1920,7 +1932,19 @@ async function salvarEncaixe() {
     });
   }
 
-  // Se horario atual conflita, avanca de 15 em 15 min ate achar livre (max 4h)
+  // Se horario conflita
+  if (encTime && temConflito(agora)) {
+    // Barbeiro escolheu horario especifico — avisa que ta ocupado
+    btn.disabled = false;
+    btn.querySelector('.btn-label').style.display = 'inline';
+    btn.querySelector('.spinner').style.display = 'none';
+    const el = document.getElementById('encaixe-msg');
+    el.textContent = 'Horario ' + encTime + ' ja esta ocupado para esse profissional.';
+    el.className = 'msg msg-error show';
+    return;
+  }
+
+  // Se nao escolheu horario (encaixe agora), avanca ate achar livre
   let tentativas = 0;
   while (temConflito(agora) && tentativas < 16) {
     agora.setMinutes(agora.getMinutes() + 15);
@@ -2042,9 +2066,9 @@ function updateBell(count) {
 // Run bell check after shop loads (inside DOMContentLoaded, after renderDay)
 setTimeout(() => { if (shop) checkBellCount(); }, 2000);
 </script>
-<script src="js/ajuda.js?v=03201104"></script>
-<script src="js/tour.js?v=03201104"></script>
-<script src="js/sw-update.js?v=03201104"></script>
-<script src="js/sidebar.js?v=03201104"></script>
+<script src="js/ajuda.js?v=03201109"></script>
+<script src="js/tour.js?v=03201109"></script>
+<script src="js/sw-update.js?v=03201109"></script>
+<script src="js/sidebar.js?v=03201109"></script>
 </body>
 </html>
