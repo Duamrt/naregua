@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03201117">
-  <link rel="stylesheet" href="css/layout.css?v=03201117">
-  <script src="js/theme.js?v=03201117"></script>
+  <link rel="stylesheet" href="css/style.css?v=03201128">
+  <link rel="stylesheet" href="css/layout.css?v=03201128">
+  <script src="js/theme.js?v=03201128"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -562,10 +562,10 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03201117"></script>
-<script src="js/supabase.js?v=03201117"></script>
-<script src="js/utils.js?v=03201117"></script>
-<script src="js/push.js?v=03201117"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03201128"></script>
+<script src="js/supabase.js?v=03201128"></script>
+<script src="js/utils.js?v=03201128"></script>
+<script src="js/push.js?v=03201128"></script>
 <script>
 console.log('Dashboard v3 carregado');
 // ── Estado ────────────────────────────────────────────────────
@@ -1399,12 +1399,15 @@ async function confirmarPagamento() {
     window._pagComandaId = null;
   }
 
+  // Salvar dados do agendamento ANTES de fechar (pra sugestão de volta)
+  const apptParaRebook = a ? { barber_id: a.barber_id, service_id: a.service_id, client_name: a.client_name, client_phone: a.client_phone, scheduled_at: a.scheduled_at } : null;
+
   fecharModalPag();
   sessionStorage.removeItem(BELL_CACHE_KEY);
   await renderDay();
 
-  // Sugerir próximo agendamento
-  if (a) sugerirProximoAgendamento(a);
+  // Sugerir próximo agendamento (usa cópia salva, não referência que pode ter sido limpa)
+  if (apptParaRebook) sugerirProximoAgendamento(apptParaRebook);
 }
 
 // ── Re-agendamento pós-atendimento ──────────────────────────
@@ -1610,11 +1613,11 @@ function renderConsumoLista() {
 
 async function confirmarConsumoRapido(apptId, itemId, itemName, price, tipo) {
   const comandaId = await getOrCreateComanda(apptId);
-  if (!comandaId) { alert('Erro ao criar comanda.'); return; }
+  if (!comandaId) { alert('Erro ao abrir comanda. Tente novamente.'); return; }
 
   try {
     // Adicionar item na comanda
-    await sb.from('comanda_items').insert({
+    const { error: itemErr } = await sb.from('comanda_items').insert({
       comanda_id: comandaId,
       type: tipo || 'produto',
       reference_id: itemId,
@@ -1622,6 +1625,7 @@ async function confirmarConsumoRapido(apptId, itemId, itemName, price, tipo) {
       price: price,
       quantity: 1
     });
+    if (itemErr) throw itemErr;
 
     // Baixa no estoque (só pra produtos)
     if (tipo === 'produto') {
@@ -1696,7 +1700,11 @@ async function loadConsumoNoModal(apptId) {
       .limit(1);
 
     if (comandas && comandas.length > 0 && comandas[0].comanda_items) {
+      // Filtrar o servico principal pra nao contar 2x (ja esta no svcPrice)
+      const a = dayAppointments.find(x => x.id === apptId);
+      const svcId = a ? a.service_id : null;
       _pagExtras = comandas[0].comanda_items
+        .filter(i => !(i.type === 'servico' && i.reference_id === svcId))
         .map(i => ({ product_id: i.reference_id, name: i.name, price: i.price, qty: i.quantity, type: i.type }));
       window._pagComandaId = comandas[0].id;
       renderExtras();
@@ -2091,9 +2099,9 @@ function updateBell(count) {
 // Run bell check after shop loads (inside DOMContentLoaded, after renderDay)
 setTimeout(() => { if (shop) checkBellCount(); }, 2000);
 </script>
-<script src="js/ajuda.js?v=03201117"></script>
-<script src="js/tour.js?v=03201117"></script>
-<script src="js/sw-update.js?v=03201117"></script>
-<script src="js/sidebar.js?v=03201117"></script>
+<script src="js/ajuda.js?v=03201128"></script>
+<script src="js/tour.js?v=03201128"></script>
+<script src="js/sw-update.js?v=03201128"></script>
+<script src="js/sidebar.js?v=03201128"></script>
 </body>
 </html>
