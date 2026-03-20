@@ -736,8 +736,8 @@ function renderVendaMetodos() {
   var metodos = [
     { key: 'pix', icon: '\uD83D\uDCF1', label: 'PIX' },
     { key: 'dinheiro', icon: '\uD83D\uDCB5', label: 'Dinheiro' },
-    { key: 'debito', icon: '\uD83D\uDCB3', label: 'Debito' },
-    { key: 'credito', icon: '\uD83D\uDCB3', label: 'Credito' }
+    { key: 'debito', icon: '\uD83D\uDCB3', label: 'Débito' },
+    { key: 'credito', icon: '\uD83D\uDCB3', label: 'Crédito' }
   ];
   document.getElementById('venda-metodos').innerHTML = metodos.map(function(m) {
     return '<button class="pay-method-btn ' + (_vendaMethod === m.key ? 'active' : '') + '" onclick="setVendaMethod(\'' + m.key + '\')">'

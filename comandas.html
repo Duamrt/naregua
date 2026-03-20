@@ -585,7 +585,7 @@ function renderList() {
     const total = items.reduce((s, i) => s + (Number(i.price) * (i.quantity || 1)), 0);
     const openTime = formatTime(c.opened_at);
     const statusLabel = c.status === 'aberta' ? 'Aberta' : c.status === 'fechada' ? 'Fechada' : 'Cancelada';
-    const metodoLabels = { pix:'PIX', dinheiro:'Dinheiro', debito:'Debito', credito:'Credito' };
+    const metodoLabels = { pix:'PIX', dinheiro:'Dinheiro', debito:'Débito', credito:'Crédito' };
 
     let comissaoHtml = '';
     if (c.status === 'fechada' && barber && barber.commission_pct) {

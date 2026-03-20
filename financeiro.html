@@ -935,7 +935,7 @@ async function abrirModalFechar() {
   document.getElementById('fech-inicial').textContent = formatMoney(valorInicial);
   document.getElementById('fech-esperado').textContent = formatMoney(esperadoCaixa);
 
-  const metLabels = { pix: 'PIX', dinheiro: 'Dinheiro', debito: 'Debito', credito: 'Credito', cartao: 'Cartao' };
+  const metLabels = { pix: 'PIX', dinheiro: 'Dinheiro', debito: 'Débito', credito: 'Crédito', cartao: 'Cartão' };
   const formasEl = document.getElementById('fech-formas');
   if (Object.keys(formas).length) {
     formasEl.innerHTML = Object.entries(formas).map(([k, v]) =>

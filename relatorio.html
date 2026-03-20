@@ -491,7 +491,7 @@ const CAT_LABELS = {
   produtos:'Produtos', manutencao:'Manutencao', equipamento:'Equipamento',
   comissao:'Comissao', imposto:'Imposto', outros:'Outros'
 };
-const PAY_LABELS = { pix:'PIX', dinheiro:'Dinheiro', cartao:'Cartao' };
+const PAY_LABELS = { pix:'PIX', dinheiro:'Dinheiro', cartao:'Cartão' };
 const PAY_COLORS = { pix:'pay-pix', dinheiro:'pay-dinheiro', cartao:'pay-cartao' };
 
 const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
@@ -881,9 +881,9 @@ function renderDonutPayment(done) {
   const PAY_DONUT = {
     pix:      { label: 'PIX',      color: '#00b4d8' },
     dinheiro: { label: 'Dinheiro', color: '#2d6a4f' },
-    debito:   { label: 'Debito',   color: '#e76f51' },
-    credito:  { label: 'Credito',  color: '#9b59b6' },
-    cartao:   { label: 'Cartao',   color: '#6c5ce7' }
+    debito:   { label: 'Débito',   color: '#e76f51' },
+    credito:  { label: 'Crédito',  color: '#9b59b6' },
+    cartao:   { label: 'Cartão',   color: '#6c5ce7' }
   };
 
   const totals = {};
