@@ -471,7 +471,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const nameParam = _params.get('name');
 
   if (!phoneParam && !nameParam) {
-    document.getElementById('loading').innerHTML = '<div style="text-align:center;padding:60px 0;color:var(--texto-muted);font-size:13px;">Nenhum cliente especificado.</div>';
+    document.getElementById('loading').innerHTML = '<div style="text-align:center;padding:60px 0;color:var(--texto-muted);font-size:13px;">Nenhum cliente selecionado.<br><a href="clientes.html" style="color:var(--verde-acao);font-weight:700;margin-top:12px;display:inline-block;">Voltar para Clientes</a></div>';
     return;
   }
 

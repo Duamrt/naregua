@@ -1474,7 +1474,7 @@ async function salvarEncaixe() {
     barber_id: barberId,
     service_id: serviceId,
     client_name: nome,
-    client_phone: phone,
+    client_phone: phone.replace(/\D/g, ''),
     scheduled_at: scheduledAt,
     status: 'confirmed'
   });
