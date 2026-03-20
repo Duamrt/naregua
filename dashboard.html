@@ -455,7 +455,21 @@
     <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--texto-muted);margin-bottom:12px;">REGISTRAR PAGAMENTO</div>
     <div id="pag-cliente" style="font-size:15px;font-weight:700;margin-bottom:4px;"></div>
     <div id="pag-servico" style="font-size:12px;color:var(--texto-muted);margin-bottom:4px;"></div>
+    <div id="pag-valor-servico" style="font-size:13px;color:var(--texto-secundario);margin-bottom:8px;"></div>
+
+    <!-- Consumo extra -->
+    <div id="pag-extras" style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--texto-muted);">CONSUMO EXTRA</div>
+        <button onclick="toggleProdutosList()" id="btn-add-prod" style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;border:1px solid var(--accent-border);background:transparent;color:var(--verde-acao);cursor:pointer;font-family:inherit;">+ PRODUTO</button>
+      </div>
+      <div id="pag-produtos-list" style="display:none;max-height:120px;overflow-y:auto;margin-bottom:8px;"></div>
+      <div id="pag-extras-items"></div>
+    </div>
+
+    <!-- Total -->
     <div id="pag-valor" style="font-size:24px;font-weight:800;color:var(--verde-acao);margin-bottom:16px;"></div>
+
     <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--texto-muted);margin-bottom:8px;">FORMA DE PAGAMENTO</div>
     <div style="display:flex;gap:8px;margin-bottom:16px;" id="pag-metodos"></div>
     <div style="display:flex;gap:10px;">
@@ -623,13 +637,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelector('.dash-container').insertBefore(banner, document.querySelector('.dash-header'));
   }
 
-  // Buscar serviços e barbeiros
-  const [svcRes, barbRes] = await Promise.all([
+  // Buscar serviços, barbeiros e produtos
+  const [svcRes, barbRes, prodRes] = await Promise.all([
     db.from('services').select('*').eq('barbershop_id', shop.id),
-    db.from('barbers').select('*').eq('barbershop_id', shop.id)
+    db.from('barbers').select('*').eq('barbershop_id', shop.id),
+    db.from('products').select('id,name,price,quantity').eq('barbershop_id', shop.id).gt('quantity', 0).order('name')
   ]);
   services = svcRes.data || [];
   barbers = barbRes.data || [];
+  window._products = prodRes.data || [];
 
   // Link público
   const baseUrl = window.location.origin + window.location.pathname.replace('dashboard.html', '');
@@ -1208,6 +1224,7 @@ function showEditMsg(text, type) {
 // ── Modal pagamento ───────────────────────────────────────────
 let _pagApptId = null;
 let _pagMethod = 'pix';
+let _pagExtras = []; // { product_id, name, price, qty }
 
 function abrirModalPagamento(apptId) {
   const a = dayAppointments.find(x => x.id === apptId);
@@ -1215,10 +1232,14 @@ function abrirModalPagamento(apptId) {
   const svc = services.find(s => s.id === a.service_id);
   _pagApptId = apptId;
   _pagMethod = 'pix';
+  _pagExtras = [];
 
   document.getElementById('pag-cliente').textContent = a.client_name;
   document.getElementById('pag-servico').textContent = svc ? svc.name : '—';
-  document.getElementById('pag-valor').textContent = formatMoney(svc ? svc.price : 0);
+  document.getElementById('pag-valor-servico').textContent = 'Serviço: ' + formatMoney(svc ? svc.price : 0);
+  document.getElementById('pag-extras-items').innerHTML = '';
+  document.getElementById('pag-produtos-list').style.display = 'none';
+  updatePagTotal();
   renderPayMethods();
   document.getElementById('modal-pagamento').classList.add('show');
 }
@@ -1226,6 +1247,65 @@ function abrirModalPagamento(apptId) {
 function fecharModalPag() {
   document.getElementById('modal-pagamento').classList.remove('show');
   _pagApptId = null;
+  _pagExtras = [];
+}
+
+function toggleProdutosList() {
+  const el = document.getElementById('pag-produtos-list');
+  if (el.style.display !== 'none') { el.style.display = 'none'; return; }
+  const produtos = window._products || [];
+  if (!produtos.length) {
+    el.innerHTML = '<div style="padding:8px;font-size:11px;color:var(--texto-muted);text-align:center;">Nenhum produto em estoque.</div>';
+    el.style.display = 'block';
+    return;
+  }
+  el.innerHTML = produtos.map(p =>
+    '<button onclick="addExtra(\'' + p.id + '\',\'' + esc(p.name) + '\',' + p.price + ')" style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:8px 10px;border:none;border-bottom:1px solid var(--borda);background:transparent;color:var(--texto-secundario);font-size:12px;font-family:inherit;cursor:pointer;transition:all .1s;text-align:left;">' +
+      '<span>' + esc(p.name) + '</span>' +
+      '<span style="color:var(--verde-acao);font-weight:700;">' + formatMoney(p.price) + '</span>' +
+    '</button>'
+  ).join('');
+  el.style.display = 'block';
+}
+
+function addExtra(productId, name, price) {
+  const existing = _pagExtras.find(e => e.product_id === productId);
+  if (existing) {
+    existing.qty++;
+  } else {
+    _pagExtras.push({ product_id: productId, name, price: Number(price), qty: 1 });
+  }
+  document.getElementById('pag-produtos-list').style.display = 'none';
+  renderExtras();
+  updatePagTotal();
+}
+
+function removeExtra(idx) {
+  _pagExtras.splice(idx, 1);
+  renderExtras();
+  updatePagTotal();
+}
+
+function renderExtras() {
+  const el = document.getElementById('pag-extras-items');
+  if (!_pagExtras.length) { el.innerHTML = ''; return; }
+  el.innerHTML = _pagExtras.map((e, i) =>
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--borda);font-size:12px;">' +
+      '<span>' + esc(e.name) + (e.qty > 1 ? ' x' + e.qty : '') + '</span>' +
+      '<div style="display:flex;align-items:center;gap:8px;">' +
+        '<span style="font-weight:700;color:var(--verde-acao);">' + formatMoney(e.price * e.qty) + '</span>' +
+        '<button onclick="removeExtra(' + i + ')" style="background:none;border:none;color:var(--vermelho,#ef4444);font-size:14px;cursor:pointer;padding:2px 4px;">×</button>' +
+      '</div>' +
+    '</div>'
+  ).join('');
+}
+
+function updatePagTotal() {
+  const a = dayAppointments.find(x => x.id === _pagApptId);
+  const svc = a ? services.find(s => s.id === a.service_id) : null;
+  const svcPrice = svc ? Number(svc.price) : 0;
+  const extrasTotal = _pagExtras.reduce((s, e) => s + e.price * e.qty, 0);
+  document.getElementById('pag-valor').textContent = formatMoney(svcPrice + extrasTotal);
 }
 
 function renderPayMethods() {
@@ -1256,10 +1336,12 @@ async function confirmarPagamento() {
 
   const a = dayAppointments.find(x => x.id === _pagApptId);
   const svc = a ? services.find(s => s.id === a.service_id) : null;
-  const price = svc ? Number(svc.price) : 0;
+  const svcPrice = svc ? Number(svc.price) : 0;
+  const extrasTotal = _pagExtras.reduce((s, e) => s + e.price * e.qty, 0);
+  const totalPrice = svcPrice + extrasTotal;
 
   // Se tem group_id, atualiza todo o grupo
-  const updateData = { status: 'done', price_paid: price, payment_method: _pagMethod };
+  const updateData = { status: 'done', price_paid: totalPrice, payment_method: _pagMethod };
   let result;
   if (a && a.group_id) {
     result = await restUpdate('appointments', 'group_id=eq.' + a.group_id, updateData);
@@ -1276,8 +1358,28 @@ async function confirmarPagamento() {
     return;
   }
 
+  // Dar baixa no estoque dos produtos consumidos
+  for (const extra of _pagExtras) {
+    try {
+      await sb.from('stock_movements').insert({
+        barbershop_id: shop.id,
+        product_id: extra.product_id,
+        type: 'saida',
+        quantity: extra.qty,
+        notes: 'Venda - ' + (a ? a.client_name : 'Cliente')
+      });
+      // Atualizar quantidade no produto
+      const prod = (window._products || []).find(p => p.id === extra.product_id);
+      if (prod) {
+        const newQty = Math.max(0, prod.quantity - extra.qty);
+        await sb.from('products').update({ quantity: newQty }).eq('id', extra.product_id);
+        prod.quantity = newQty;
+      }
+    } catch (e) { console.warn('Erro ao dar baixa estoque:', e); }
+  }
+
   fecharModalPag();
-  sessionStorage.removeItem(BELL_CACHE_KEY); // Invalidar bell cache
+  sessionStorage.removeItem(BELL_CACHE_KEY);
   await renderDay();
 }
 
