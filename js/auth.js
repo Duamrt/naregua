@@ -75,9 +75,9 @@ async function handleLogin(e) {
     return;
   }
 
-  // BUG 8 ALTO FIX: validar senha mínima no login também
-  if (senha.length < 8 || !/\d/.test(senha)) {
-    showMsg('A senha deve ter pelo menos 8 caracteres e incluir um número.', 'error');
+  // Login aceita qualquer senha (validação forte só no signup)
+  if (senha.length < 4) {
+    showMsg('Digite sua senha.', 'error');
     return;
   }
 
