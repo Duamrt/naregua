@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03201109">
-  <link rel="stylesheet" href="css/layout.css?v=03201109">
-  <script src="js/theme.js?v=03201109"></script>
+  <link rel="stylesheet" href="css/style.css?v=03201117">
+  <link rel="stylesheet" href="css/layout.css?v=03201117">
+  <script src="js/theme.js?v=03201117"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -562,10 +562,10 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03201109"></script>
-<script src="js/supabase.js?v=03201109"></script>
-<script src="js/utils.js?v=03201109"></script>
-<script src="js/push.js?v=03201109"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03201117"></script>
+<script src="js/supabase.js?v=03201117"></script>
+<script src="js/utils.js?v=03201117"></script>
+<script src="js/push.js?v=03201117"></script>
 <script>
 console.log('Dashboard v3 carregado');
 // ── Estado ────────────────────────────────────────────────────
@@ -1965,7 +1965,7 @@ async function salvarEncaixe() {
   const timeStr = String(agora.getHours()).padStart(2,'0') + ':' + String(agora.getMinutes()).padStart(2,'0');
   const scheduledAt = dateStr + 'T' + timeStr + ':00-03:00';
 
-  const { error } = await sb.from('appointments').insert({
+  const { data: apptData, error } = await sb.from('appointments').insert({
     barbershop_id: shop.id,
     barber_id: barberId,
     service_id: serviceId,
@@ -1973,18 +1973,43 @@ async function salvarEncaixe() {
     client_phone: phone.replace(/\D/g, ''),
     scheduled_at: scheduledAt,
     status: 'confirmed'
-  });
-
-  btn.disabled = false;
-  btn.querySelector('.btn-label').style.display = 'inline';
-  btn.querySelector('.spinner').style.display = 'none';
+  }).select('id').single();
 
   if (error) {
+    btn.disabled = false;
+    btn.querySelector('.btn-label').style.display = 'inline';
+    btn.querySelector('.spinner').style.display = 'none';
     const el = document.getElementById('encaixe-msg');
     el.textContent = 'Erro ao encaixar. Tente novamente.';
     el.className = 'msg msg-error show';
     return;
   }
+
+  // Criar comanda aberta vinculada ao agendamento
+  const { data: comandaData } = await sb.from('comandas').insert({
+    barbershop_id: shop.id,
+    barber_id: barberId,
+    client_name: nome,
+    client_phone: phone.replace(/\D/g, ''),
+    appointment_id: apptData.id,
+    status: 'aberta'
+  }).select('id').single();
+
+  // Adicionar o servico como primeiro item da comanda
+  if (comandaData && svc) {
+    await sb.from('comanda_items').insert({
+      comanda_id: comandaData.id,
+      type: 'servico',
+      reference_id: serviceId,
+      name: svc.name,
+      price: svc.price,
+      quantity: 1
+    });
+  }
+
+  btn.disabled = false;
+  btn.querySelector('.btn-label').style.display = 'inline';
+  btn.querySelector('.spinner').style.display = 'none';
 
   fecharEncaixe();
   renderDay();
@@ -2066,9 +2091,9 @@ function updateBell(count) {
 // Run bell check after shop loads (inside DOMContentLoaded, after renderDay)
 setTimeout(() => { if (shop) checkBellCount(); }, 2000);
 </script>
-<script src="js/ajuda.js?v=03201109"></script>
-<script src="js/tour.js?v=03201109"></script>
-<script src="js/sw-update.js?v=03201109"></script>
-<script src="js/sidebar.js?v=03201109"></script>
+<script src="js/ajuda.js?v=03201117"></script>
+<script src="js/tour.js?v=03201117"></script>
+<script src="js/sw-update.js?v=03201117"></script>
+<script src="js/sidebar.js?v=03201117"></script>
 </body>
 </html>
