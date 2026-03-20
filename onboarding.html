@@ -148,13 +148,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Já tem barbearia? Vai pro dashboard
-  const { data: shop, error: shopErr } = await sb
+  const { data: shops } = await sb
     .from('barbershops')
     .select('id')
     .eq('owner_id', currentUser.id)
-    .maybeSingle();
-  console.log('onboarding shop:', shop, 'err:', shopErr);
-  if (shop) { window.location.href = 'dashboard.html'; return; }
+    .limit(1);
+  if (shops && shops.length > 0) { window.location.href = 'dashboard.html'; return; }
 
   // Preencher nome do user se tiver
   const nome = currentUser.user_metadata?.nome || '';

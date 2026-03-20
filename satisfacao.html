@@ -417,7 +417,7 @@ const RATING_LABELS = {
     const { data } = await sb.from('barbershops').select('*').eq('id', isAdminViewing).single();
     shopData = data;
   } else {
-    const { data } = await sb.from('barbershops').select('*').eq('owner_id', session.user.id).maybeSingle();
+    const { data } = await sb.from('barbershops').select('*').eq('owner_id', session.user.id).order('created_at', { ascending: true }).limit(1).maybeSingle();
     shopData = data;
   }
 

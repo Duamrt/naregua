@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data } = await db.from('barbershops').select('*').eq('id', adminViewingShop).single();
     shopData = data;
   } else {
-    const { data } = await db.from('barbershops').select('*').eq('owner_id', session.user.id).maybeSingle();
+    const { data } = await db.from('barbershops').select('*').eq('owner_id', session.user.id).order('created_at', { ascending: true }).limit(1).maybeSingle();
     shopData = data;
   }
 
