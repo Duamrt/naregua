@@ -363,7 +363,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 
   if (!shopData) {
-    var res2 = await sb.from('barbershops').select('*').eq('owner_id', session.user.id).order('created_at', { ascending: true }).limit(1).maybeSingle();
+    var res2 = await sb.from('barbershops').select('*').eq('owner_id', session.user.id).order('created_at', { ascending: true }).limit(1);
     shopData = res2.data;
   }
 

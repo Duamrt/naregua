@@ -369,8 +369,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data } = await db.from('barbershops').select('*').eq('id', adminViewingShop).single();
     shopData = data;
   } else {
-    const { data } = await db.from('barbershops').select('*').eq('owner_id', session.user.id).order('created_at', { ascending: true }).limit(1).maybeSingle();
-    shopData = data;
+    const { data } = await db.from('barbershops').select('*').eq('owner_id', session.user.id).order('created_at', { ascending: true }).limit(1);
+    shopData = data && data[0] ? data[0] : null;
   }
 
   if (!shopData) { window.location.href = isAdminViewing ? 'admin.html' : 'onboarding.html'; return; }
