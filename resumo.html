@@ -74,6 +74,10 @@
     .kpi-brown { background:linear-gradient(135deg,#6e4b3a,#a0522d); }
     .kpi-profit-pos { background:linear-gradient(135deg,#1e8449,#2ecc71); }
     .kpi-profit-neg { background:linear-gradient(135deg,#922b21,#e74c3c); }
+    .kpi-cyan { background:linear-gradient(135deg,#0e6655,#1abc9c); }
+    .kpi-pink { background:linear-gradient(135deg,#922b5e,#e91e8c); }
+    .kpi-teal { background:linear-gradient(135deg,#1a5276,#2e86c1); }
+    .kpi-amber { background:linear-gradient(135deg,#b7950b,#f1c40f); }
 
     /* Updated label */
     .updated-at {
@@ -235,6 +239,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   const sid = shop.id;
 
   // Fetch all data in parallel
+  // 7 dias a frente (pra assinaturas vencendo)
+  const d7ahead = new Date(now);
+  d7ahead.setDate(now.getDate() + 7);
+  const d7aheadStr = d7ahead.toISOString().slice(0, 10);
+
+  // 60 dias atras
+  const d60ago = new Date(now);
+  d60ago.setDate(now.getDate() - 60);
+  const d60agoStr = d60ago.toISOString().slice(0, 10) + 'T00:00:00';
+
   const [
     rTodayAppts,
     rTodayDone,
@@ -243,7 +257,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     rAllAppts,
     rProducts,
     rBarbers,
-    rExpenses
+    rExpenses,
+    rClients,
+    rCaixaAberto,
+    rAssinVencendo
   ] = await Promise.all([
     // 1. Agendamentos hoje (nao cancelados)
     db.from('appointments').select('id', { count: 'exact', head: true })
@@ -281,7 +298,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 10. Despesas do mes
     db.from('expenses').select('amount')
       .eq('barbershop_id', sid)
-      .gte('date', todayStr.slice(0, 7) + '-01').lte('date', todayStr)
+      .gte('date', todayStr.slice(0, 7) + '-01').lte('date', todayStr),
+
+    // 11. Clientes cadastrados (pra calcular sem cadastro)
+    db.from('clients').select('phone')
+      .eq('barbershop_id', sid),
+
+    // 12. Caixa aberto (fechamento pendente)
+    db.from('fechamentos_caixa').select('id', { count: 'exact', head: true })
+      .eq('barbershop_id', sid).eq('status', 'aberto'),
+
+    // 13. Assinaturas vencendo em 7 dias
+    db.from('assinatura_clientes').select('id, next_payment, status')
+      .eq('barbershop_id', sid).eq('status', 'ativa')
   ]);
 
   // ── Calculos ──────────────────────────────────────────────
@@ -353,6 +382,51 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 11. Lucro do mes
   const lucroMes = fatMes - despesasMes - comissoesMes;
 
+  // 12. Clientes sem cadastro (telefone nos agendamentos mas não na tabela clients)
+  const clientPhones = new Set((rClients.data || []).map(c => (c.phone || '').replace(/\D/g, '')));
+  const apptPhones = new Set();
+  for (const a of allAppts) {
+    if (a.client_phone) apptPhones.add((a.client_phone || '').replace(/\D/g, ''));
+  }
+  let semCadastro = 0;
+  for (const p of apptPhones) {
+    if (p && !clientPhones.has(p)) semCadastro++;
+  }
+
+  // 13. Retorno previsto (clientes com frequência calculada que devem voltar esta semana)
+  const visitsByPhone = {};
+  for (const a of allAppts) {
+    if (!a.client_phone) continue;
+    const ph = (a.client_phone || '').replace(/\D/g, '');
+    if (!visitsByPhone[ph]) visitsByPhone[ph] = [];
+    visitsByPhone[ph].push(a.scheduled_at);
+  }
+  let retornoPrevisto = 0;
+  for (const ph in visitsByPhone) {
+    const visits = visitsByPhone[ph].sort();
+    if (visits.length < 2) continue;
+    // Calcular intervalo médio entre visitas
+    let totalDias = 0;
+    for (let i = 1; i < visits.length; i++) {
+      totalDias += (new Date(visits[i]) - new Date(visits[i - 1])) / (1000 * 60 * 60 * 24);
+    }
+    const intervaloMedio = totalDias / (visits.length - 1);
+    // Próximo retorno previsto = última visita + intervalo médio
+    const ultimaVisita = new Date(visits[visits.length - 1]);
+    const proximoRetorno = new Date(ultimaVisita);
+    proximoRetorno.setDate(proximoRetorno.getDate() + Math.round(intervaloMedio));
+    // Se o retorno previsto é entre hoje e 7 dias à frente
+    if (proximoRetorno >= now && proximoRetorno <= d7ahead) retornoPrevisto++;
+  }
+
+  // 14. Caixa aberto
+  const caixaAberto = rCaixaAberto.count || 0;
+
+  // 15. Assinaturas vencendo em 7 dias
+  const assinVencendo = (rAssinVencendo.data || []).filter(s =>
+    s.next_payment && s.next_payment >= todayStr && s.next_payment <= d7aheadStr
+  ).length;
+
   // ── Render Cards ──────────────────────────────────────────
   const cards = [
     { num: agendHoje, label: 'Agendamentos hoje', color: 'kpi-blue', link: 'dashboard.html' },
@@ -360,8 +434,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     { num: formatMoney(fatHoje), label: 'Faturamento hoje', color: 'kpi-gold', link: 'financeiro.html' },
     { num: formatMoney(fatMes), label: 'Faturamento do mês', color: 'kpi-darkgreen', link: 'financeiro.html' },
     { num: comandasAbertas, label: 'Comandas abertas', color: 'kpi-orange', link: 'financeiro.html' },
-    { num: semRetorno, label: 'Sem retorno +30 dias', color: 'kpi-red', link: 'clientes.html' },
+    { num: semCadastro, label: 'Clientes sem cadastro', color: 'kpi-amber', link: 'importar-clientes.html' },
+    { num: retornoPrevisto, label: 'Retorno previsto (7 dias)', color: 'kpi-cyan', link: 'clientes.html' },
+    { num: semRetorno, label: 'Sem retorno +30 dias', color: 'kpi-red', link: 'retencao.html' },
     { num: novosClientes, label: 'Novos clientes (semana)', color: 'kpi-green', link: 'clientes.html' },
+    { num: caixaAberto, label: 'Caixa aberto', color: caixaAberto > 0 ? 'kpi-orange' : 'kpi-green', link: 'financeiro.html' },
+    { num: assinVencendo, label: 'Assinaturas vencendo', color: assinVencendo > 0 ? 'kpi-pink' : 'kpi-green', link: 'assinaturas.html' },
     { num: estoqueBaixo, label: 'Estoque baixo', color: 'kpi-purple', link: 'estoque.html' },
     { num: formatMoney(comissoesMes), label: 'Comissões do mês', color: 'kpi-brown', link: 'equipe.html' },
     { num: formatMoney(despesasMes), label: 'Despesas do mês', color: 'kpi-red', link: 'financeiro.html' },
