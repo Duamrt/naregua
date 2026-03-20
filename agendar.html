@@ -512,6 +512,59 @@ let recurrenceEnabled = false;
 // ── Smart scheduling ──
 let lastAppointment = null; // ultimo agendamento do cliente (returning)
 
+// ── Tracking de agendamentos abandonados ──
+let _trackSessionId = crypto.randomUUID();
+let _trackId = null;
+let _trackMaxStep = 0;
+
+async function trackStep(step) {
+  if (!shop) return;
+  _trackMaxStep = Math.max(_trackMaxStep, step);
+  const payload = {
+    barbershop_id: shop.id,
+    session_id: _trackSessionId,
+    step_reached: _trackMaxStep,
+    service_name: selectedService ? selectedService.name : null,
+    barber_name: selectedBarber ? selectedBarber.name : null,
+    selected_date: selectedDate || null,
+    selected_time: selectedTime || null,
+    client_name: document.getElementById('client-name')?.value?.trim() || null,
+    client_phone: document.getElementById('client-phone')?.value?.replace(/\D/g, '') || null,
+    updated_at: new Date().toISOString()
+  };
+  try {
+    if (_trackId) {
+      await sb.from('booking_attempts').update(payload).eq('id', _trackId);
+    } else {
+      payload.completed = false;
+      const { data } = await sb.from('booking_attempts').insert(payload).select('id').single();
+      if (data) _trackId = data.id;
+    }
+  } catch (e) { /* tabela pode não existir ainda */ }
+}
+
+function trackCompleted() {
+  if (_trackId) {
+    sb.from('booking_attempts').update({ completed: true, step_reached: 5, updated_at: new Date().toISOString() }).eq('id', _trackId).then(() => {});
+  }
+}
+
+// Rastrear saída da página (abandono)
+window.addEventListener('beforeunload', () => {
+  if (_trackId && _trackMaxStep >= 2 && _trackMaxStep < 5) {
+    const payload = JSON.stringify({
+      step_reached: _trackMaxStep,
+      client_name: document.getElementById('client-name')?.value?.trim() || null,
+      client_phone: document.getElementById('client-phone')?.value?.replace(/\D/g, '') || null,
+      updated_at: new Date().toISOString()
+    });
+    navigator.sendBeacon && navigator.sendBeacon(
+      'https://jsydprrcyrjjxdmzrqpz.supabase.co/rest/v1/booking_attempts?id=eq.' + _trackId,
+      new Blob([payload], { type: 'application/json' })
+    );
+  }
+});
+
 const DIAS_SEMANA = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
 const MESES = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
 
@@ -692,6 +745,8 @@ function showStep(n) {
   }
   currentStep = n;
   renderStepDots();
+  // Tracking de abandono
+  if (n >= 2) trackStep(n);
 }
 
 function agNext(step) {
@@ -1654,6 +1709,7 @@ async function confirmarAgendamento() {
     }
     waLink.style.display = 'flex';
 
+    trackCompleted();
     showStep(5);
     return;
   }
@@ -1911,6 +1967,7 @@ async function confirmarAgendamento() {
   }
   waLink.style.display = 'flex';
 
+  trackCompleted();
   showStep(5);
 }
 

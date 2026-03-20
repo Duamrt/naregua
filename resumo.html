@@ -246,6 +246,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const d7aheadStr = d7ahead.toISOString().slice(0, 10);
 
   // 60 dias atras
+  const d7ago = new Date(now);
+  d7ago.setDate(now.getDate() - 7);
+  const d7agoStr = d7ago.toISOString();
+
   const d60ago = new Date(now);
   d60ago.setDate(now.getDate() - 60);
   const d60agoStr = d60ago.toISOString().slice(0, 10) + 'T00:00:00';
@@ -261,7 +265,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     rExpenses,
     rClients,
     rCaixaAberto,
-    rAssinVencendo
+    rAssinVencendo,
+    rAbandonos
   ] = await Promise.all([
     // 1. Agendamentos hoje (nao cancelados)
     db.from('appointments').select('id', { count: 'exact', head: true })
@@ -311,7 +316,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 13. Assinaturas vencendo em 7 dias
     db.from('assinatura_clientes').select('id, next_payment, status')
-      .eq('barbershop_id', sid).eq('status', 'ativa')
+      .eq('barbershop_id', sid).eq('status', 'ativa'),
+
+    // 14. Agendamentos abandonados (últimos 7 dias)
+    db.from('booking_attempts').select('id', { count: 'exact', head: true })
+      .eq('barbershop_id', sid).eq('completed', false).gte('step_reached', 3)
+      .gte('created_at', d7agoStr)
   ]);
 
   // ── Calculos ──────────────────────────────────────────────
@@ -428,6 +438,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     s.next_payment && s.next_payment >= todayStr && s.next_payment <= d7aheadStr
   ).length;
 
+  // 16. Agendamentos abandonados (7 dias)
+  const abandonos = rAbandonos ? (rAbandonos.count || 0) : 0;
+
   // ── Render Cards ──────────────────────────────────────────
   const cards = [
     { num: agendHoje, label: 'Agendamentos hoje', color: 'kpi-blue', link: 'dashboard.html' },
@@ -439,6 +452,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     { num: retornoPrevisto, label: 'Retorno previsto (7 dias)', color: 'kpi-cyan', link: 'clientes.html' },
     { num: semRetorno, label: 'Sem retorno +30 dias', color: 'kpi-red', link: 'retencao.html' },
     { num: novosClientes, label: 'Novos clientes (semana)', color: 'kpi-green', link: 'clientes.html' },
+    { num: abandonos, label: 'Abandonos (7 dias)', color: abandonos > 0 ? 'kpi-red' : 'kpi-green', link: 'lembretes.html' },
     { num: caixaAberto, label: 'Caixa aberto', color: caixaAberto > 0 ? 'kpi-orange' : 'kpi-green', link: 'financeiro.html' },
     { num: assinVencendo, label: 'Assinaturas vencendo', color: assinVencendo > 0 ? 'kpi-pink' : 'kpi-green', link: 'assinaturas.html' },
     { num: estoqueBaixo, label: 'Estoque baixo', color: 'kpi-purple', link: 'estoque.html' },
