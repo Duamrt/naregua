@@ -609,6 +609,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (!shopData) { window.location.href = 'onboarding.html'; return; }
   shop = shopData;
+  if (typeof syncThemeFromSettings === 'function') syncThemeFromSettings(shop.settings);
 
   document.getElementById('shop-name').textContent = shop.name;
   document.getElementById('shop-city').textContent = shop.city + (shop.phone ? ' · ' + shop.phone : '');

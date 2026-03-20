@@ -56,6 +56,82 @@
   color: #1a1a1a;
 }
 
+/* ── Temas por Segmento ─────────────────────────── */
+
+/* Estética — Rosa + Clean */
+[data-segment="estetica"] {
+  --accent: #e91e8c;
+  --accent-hover: #d11a7d;
+  --accent-soft: rgba(233,30,140,0.10);
+  --accent-border: rgba(233,30,140,0.20);
+  --accent-avatar: #c4186e;
+  --accent-dark: #9e1359;
+}
+[data-segment="estetica"][data-theme="light"] {
+  --accent: #d11a7d;
+  --accent-hover: #b8166d;
+  --accent-soft: rgba(209,26,125,0.10);
+  --accent-border: rgba(209,26,125,0.20);
+  --accent-avatar: #9e1359;
+}
+
+/* Sobrancelha — Marrom quente / Nude */
+[data-segment="sobrancelha"] {
+  --accent: #c4956a;
+  --accent-hover: #b07f55;
+  --accent-soft: rgba(196,149,106,0.10);
+  --accent-border: rgba(196,149,106,0.20);
+  --accent-avatar: #a07040;
+  --accent-dark: #8a5e30;
+}
+[data-segment="sobrancelha"][data-theme="light"] {
+  --accent: #a07040;
+  --accent-hover: #8a5e30;
+  --accent-soft: rgba(160,112,64,0.10);
+  --accent-border: rgba(160,112,64,0.20);
+  --accent-avatar: #8a5e30;
+}
+
+/* Unha — Lilás / Rosa vibrante */
+[data-segment="unha"] {
+  --accent: #a855f7;
+  --accent-hover: #9333ea;
+  --accent-soft: rgba(168,85,247,0.10);
+  --accent-border: rgba(168,85,247,0.20);
+  --accent-avatar: #7e22ce;
+  --accent-dark: #6b21a8;
+}
+[data-segment="unha"][data-theme="light"] {
+  --accent: #9333ea;
+  --accent-hover: #7e22ce;
+  --accent-soft: rgba(147,51,234,0.10);
+  --accent-border: rgba(147,51,234,0.20);
+  --accent-avatar: #6b21a8;
+}
+
+/* Salão — Rose Gold elegante */
+[data-segment="salao"] {
+  --accent: #b76e79;
+  --accent-hover: #a35d68;
+  --accent-soft: rgba(183,110,121,0.10);
+  --accent-border: rgba(183,110,121,0.20);
+  --accent-avatar: #8e4a55;
+  --accent-dark: #753d48;
+}
+[data-segment="salao"][data-theme="light"] {
+  --accent: #a35d68;
+  --accent-hover: #8e4a55;
+  --accent-soft: rgba(163,93,104,0.10);
+  --accent-border: rgba(163,93,104,0.20);
+  --accent-avatar: #753d48;
+}
+
+/* Cor personalizada via CSS variable inline */
+[style*="--custom-accent"] {
+  --accent: var(--custom-accent);
+  --verde-acao: var(--custom-accent);
+}
+
 /* Reset */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 

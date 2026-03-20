@@ -380,6 +380,36 @@
       </div>
       <div class="cfg-section-body">
 
+        <!-- Segmento do negócio -->
+        <div class="cfg-param">
+          <div class="cfg-param-info">
+            <div class="cfg-param-label">Segmento</div>
+            <div class="cfg-param-desc">Define o visual e os formulários (anamnese, lembretes) do sistema</div>
+          </div>
+          <div class="cfg-colors" id="cfg-segment" style="margin-top:8px;">
+            <div class="cfg-color-wrap">
+              <div class="cfg-color" data-segment="barbearia" style="background:#d4a853;" onclick="selectSegment(this)"></div>
+              <div class="cfg-color-label">Barbearia</div>
+            </div>
+            <div class="cfg-color-wrap">
+              <div class="cfg-color" data-segment="estetica" style="background:#e91e8c;" onclick="selectSegment(this)"></div>
+              <div class="cfg-color-label">Estética</div>
+            </div>
+            <div class="cfg-color-wrap">
+              <div class="cfg-color" data-segment="sobrancelha" style="background:#c4956a;" onclick="selectSegment(this)"></div>
+              <div class="cfg-color-label">Sobrancelha</div>
+            </div>
+            <div class="cfg-color-wrap">
+              <div class="cfg-color" data-segment="unha" style="background:#a855f7;" onclick="selectSegment(this)"></div>
+              <div class="cfg-color-label">Unha</div>
+            </div>
+            <div class="cfg-color-wrap">
+              <div class="cfg-color" data-segment="salao" style="background:#b76e79;" onclick="selectSegment(this)"></div>
+              <div class="cfg-color-label">Salão</div>
+            </div>
+          </div>
+        </div>
+
         <!-- Tema claro/escuro -->
         <div class="cfg-param">
           <div class="cfg-param-top">
@@ -408,6 +438,22 @@
               <div class="cfg-color-label">Gold</div>
             </div>
             <div class="cfg-color-wrap">
+              <div class="cfg-color" data-color="#e91e8c" style="background:#e91e8c;" onclick="selectColor(this)"></div>
+              <div class="cfg-color-label">Pink</div>
+            </div>
+            <div class="cfg-color-wrap">
+              <div class="cfg-color" data-color="#c4956a" style="background:#c4956a;" onclick="selectColor(this)"></div>
+              <div class="cfg-color-label">Nude</div>
+            </div>
+            <div class="cfg-color-wrap">
+              <div class="cfg-color" data-color="#b76e79" style="background:#b76e79;" onclick="selectColor(this)"></div>
+              <div class="cfg-color-label">Rosé</div>
+            </div>
+            <div class="cfg-color-wrap">
+              <div class="cfg-color" data-color="#a855f7" style="background:#a855f7;" onclick="selectColor(this)"></div>
+              <div class="cfg-color-label">Lilás</div>
+            </div>
+            <div class="cfg-color-wrap">
               <div class="cfg-color" data-color="#22c55e" style="background:#22c55e;" onclick="selectColor(this)"></div>
               <div class="cfg-color-label">Green</div>
             </div>
@@ -418,10 +464,6 @@
             <div class="cfg-color-wrap">
               <div class="cfg-color" data-color="#ef4444" style="background:#ef4444;" onclick="selectColor(this)"></div>
               <div class="cfg-color-label">Red</div>
-            </div>
-            <div class="cfg-color-wrap">
-              <div class="cfg-color" data-color="#a855f7" style="background:#a855f7;" onclick="selectColor(this)"></div>
-              <div class="cfg-color-label">Purple</div>
             </div>
           </div>
         </div>
@@ -566,11 +608,20 @@ function loadSettings() {
     el.querySelector('input').checked = isOn;
   });
 
+  // Segmento
+  const seg = s.segmento || 'barbearia';
+  document.querySelectorAll('#cfg-segment .cfg-color').forEach(el => {
+    el.classList.toggle('active', el.dataset.segment === seg);
+  });
+
   // Accent color
   const color = s.accent_color || DEFAULTS.accent_color;
   document.querySelectorAll('#cfg-accent-color .cfg-color').forEach(el => {
     el.classList.toggle('active', el.dataset.color === color);
   });
+
+  // Sync theme
+  if (typeof syncThemeFromSettings === 'function') syncThemeFromSettings(s);
 
   isDirty = false;
   document.getElementById('unsaved-badge').classList.remove('show');
@@ -586,6 +637,10 @@ function collectSettings() {
   const activeColor = document.querySelector('#cfg-accent-color .cfg-color.active');
   if (activeColor) accentColor = activeColor.dataset.color;
 
+  let segmento = 'barbearia';
+  const activeSeg = document.querySelector('#cfg-segment .cfg-color.active');
+  if (activeSeg) segmento = activeSeg.dataset.segment;
+
   return {
     slot_interval: parseInt(document.getElementById('cfg-slot-interval').value) || DEFAULTS.slot_interval,
     booking_limit_days: parseInt(document.getElementById('cfg-booking-limit').value) || DEFAULTS.booking_limit_days,
@@ -597,7 +652,8 @@ function collectSettings() {
     send_confirmation: document.getElementById('cfg-send-confirmation').checked,
     default_commission: parseInt(document.getElementById('cfg-default-commission').value) || 0,
     payment_methods: methods.length ? methods : DEFAULTS.payment_methods,
-    accent_color: accentColor
+    accent_color: accentColor,
+    segmento: segmento
   };
 }
 
@@ -625,6 +681,8 @@ async function salvar() {
       shop.settings = settings;
       isDirty = false;
       document.getElementById('unsaved-badge').classList.remove('show');
+      // Sync tema em todas as páginas
+      if (typeof syncThemeFromSettings === 'function') syncThemeFromSettings(settings);
       showToast('Configurações salvas!');
     }
   } catch (e) {
@@ -660,6 +718,16 @@ function toggleCheck(el) {
 function selectColor(el) {
   document.querySelectorAll('#cfg-accent-color .cfg-color').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
+  // Preview cor em tempo real
+  if (typeof setAccentColor === 'function') setAccentColor(el.dataset.color);
+  markDirty();
+}
+
+function selectSegment(el) {
+  document.querySelectorAll('#cfg-segment .cfg-color').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  // Preview segmento em tempo real
+  if (typeof setSegment === 'function') setSegment(el.dataset.segment);
   markDirty();
 }
 
