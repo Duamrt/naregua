@@ -1532,6 +1532,27 @@ async function confirmarAgendamento() {
     }
   }
 
+  // ── Limite de agendamentos em aberto por cliente ──
+  const maxPending = (shop.settings && shop.settings.max_pending_bookings) || 0;
+  if (maxPending > 0) {
+    const phoneBusca = phone.replace(/\D/g, '');
+    const { data: abertos } = await sb
+      .from('appointments')
+      .select('id')
+      .eq('barbershop_id', shop.id)
+      .or('client_phone.eq.' + phoneBusca + ',client_phone.like.%' + phoneBusca.slice(-8) + '%')
+      .gte('scheduled_at', new Date().toISOString())
+      .in('status', ['pending', 'confirmed']);
+
+    if ((abertos || []).length >= maxPending) {
+      btn.disabled = false;
+      btn.querySelector('.btn-label').style.display = 'inline';
+      btn.querySelector('.spinner').style.display = 'none';
+      showAgMsg(`Você já tem ${(abertos || []).length} agendamento(s) em aberto. O máximo permitido é ${maxPending}. Cancele um antes de agendar outro.`, 'error');
+      return;
+    }
+  }
+
   // Enviar com timezone de Brasilia (-03:00) pra Supabase salvar correto
   const scheduledAtStr = selectedDate + 'T' + selectedTime + ':00-03:00';
   const isDiaInteiro = selectedService.blocks_all_day;

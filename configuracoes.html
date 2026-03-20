@@ -219,7 +219,21 @@
           </div>
         </div>
 
-        <!-- 3. Limite de cancelamento -->
+        <!-- 3. Máximo de agendamentos em aberto -->
+        <div class="cfg-param">
+          <div class="cfg-param-top">
+            <div class="cfg-param-info">
+              <div class="cfg-param-label">Máximo de agendamentos em aberto</div>
+              <div class="cfg-param-desc">Quantos agendamentos futuros o mesmo cliente pode ter ao mesmo tempo (0 = sem limite)</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <input type="number" class="cfg-number" id="cfg-max-pending" min="0" max="10" onchange="markDirty()" oninput="markDirty()">
+              <span style="font-size:11px;color:var(--texto-muted);">máx</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Limite de cancelamento -->
         <div class="cfg-param">
           <div class="cfg-param-top">
             <div class="cfg-param-info">
@@ -477,6 +491,7 @@ let isDirty = false;
 const DEFAULTS = {
   slot_interval: 30,
   booking_limit_days: 30,
+  max_pending_bookings: 2,
   cancel_limit_hours: 2,
   allow_overlap: false,
   auto_confirm: true,
@@ -534,6 +549,7 @@ function loadSettings() {
 
   document.getElementById('cfg-slot-interval').value = s.slot_interval;
   document.getElementById('cfg-booking-limit').value = s.booking_limit_days;
+  document.getElementById('cfg-max-pending').value = s.max_pending_bookings;
   document.getElementById('cfg-cancel-limit').value = s.cancel_limit_hours;
   document.getElementById('cfg-allow-overlap').checked = s.allow_overlap;
   document.getElementById('cfg-auto-confirm').checked = s.auto_confirm;
@@ -573,6 +589,7 @@ function collectSettings() {
   return {
     slot_interval: parseInt(document.getElementById('cfg-slot-interval').value) || DEFAULTS.slot_interval,
     booking_limit_days: parseInt(document.getElementById('cfg-booking-limit').value) || DEFAULTS.booking_limit_days,
+    max_pending_bookings: parseInt(document.getElementById('cfg-max-pending').value) || 0,
     cancel_limit_hours: parseInt(document.getElementById('cfg-cancel-limit').value) || 0,
     allow_overlap: document.getElementById('cfg-allow-overlap').checked,
     auto_confirm: document.getElementById('cfg-auto-confirm').checked,
