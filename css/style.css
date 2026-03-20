@@ -13,11 +13,17 @@
   --texto-muted: #737373;
   --vermelho: #ef4444;
   --amarelo: #f59e0b;
+  --verde-status: #22c55e;
+  --azul-status: #3b82f6;
+  --roxo-status: #a855f7;
   --borda: rgba(255,255,255,0.05);
   --borda-hover: rgba(255,255,255,0.12);
   --radius: 12px;
   --radius-sm: 8px;
+  --radius-pill: 20px;
   --shadow: 0 4px 24px rgba(0,0,0,0.5);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+  --focus-ring: 0 0 0 3px var(--accent-soft);
   --transition: all 0.2s ease;
 
   /* Aliases pra compatibilidade */
@@ -260,7 +266,7 @@ h3 { font-size: 15px; font-weight: 600; }
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--accent-hover), #b08a38);
+  background: linear-gradient(135deg, var(--accent-hover), var(--accent-dark));
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(212,168,83,0.25);
 }
