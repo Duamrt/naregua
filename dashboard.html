@@ -720,6 +720,9 @@ async function renderDay() {
 
   dayAppointments = appts || [];
 
+  // Carregar contagem de consumo das comandas
+  await loadConsumoCount();
+
   // Verificar novos agendamentos e notificar
   if (isToday(currentDate)) {
     checkNewAppointments(dayAppointments);
@@ -901,14 +904,17 @@ function renderApptCard(a, isNext) {
       ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${esc(a.id)}')">ZAP</button>` : ''}
     `;
   } else if (a.status === 'confirmed') {
+    const btnConsumo = `<button class="appt-btn" onclick="addConsumoRapido('${esc(a.id)}')" style="background:rgba(168,85,247,0.15);color:#a855f7;border-color:rgba(168,85,247,0.3);" title="Adicionar consumo">+ CONSUMO</button>`;
     if (jaPassou) {
       actions = `
         <button class="appt-btn btn-done-appt" onclick="abrirModalPagamento('${esc(a.id)}')">ATENDIDO</button>
+        ${btnConsumo}
         <button class="appt-btn btn-noshow" onclick="updateStatus('${esc(a.id)}','no_show',this)">FALTOU</button>
       `;
     } else {
       actions = `
         <button class="appt-btn btn-done-appt" onclick="abrirModalPagamento('${esc(a.id)}')">CONCLUIR</button>
+        ${btnConsumo}
         <button class="appt-btn btn-cancel-appt" onclick="cancelarComVaga('${esc(a.id)}',this)">CANCELAR</button>
         ${phone ? `<button class="appt-btn btn-whatsapp" onclick="abrirWhatsApp('${esc(a.id)}')">ZAP</button>` : ''}
       `;
@@ -924,7 +930,7 @@ function renderApptCard(a, isNext) {
       <div style="display:flex;align-items:center;gap:6px;">${isNext ? '<span style="font-size:8px;font-weight:800;letter-spacing:1px;padding:2px 6px;border-radius:4px;background:rgba(212,168,83,0.2);color:var(--verde-acao);">PROXIMO</span>' : ''}<span class="appt-status ${st.cls}">${st.label}</span></div>
     </div>
     <div class="barber-appt-client">${esc(a.client_name)}</div>
-    <div class="barber-appt-svc">${svcName} · ${svcPrice}${isDiaInteiro ? ' · <span style="color:#9b59b6;font-weight:700;">DIA INTEIRO</span>' : ''}</div>
+    <div class="barber-appt-svc">${svcName} · ${svcPrice}${isDiaInteiro ? ' · <span style="color:#9b59b6;font-weight:700;">DIA INTEIRO</span>' : ''}${a._consumoCount ? ' · <span style="color:#a855f7;font-weight:700;">+' + a._consumoCount + ' item' + (a._consumoCount > 1 ? 's' : '') + '</span>' : ''}</div>
     ${a.client_phone ? `<div class="barber-appt-svc">📱 ${esc(a.client_phone)}</div>` : ''}
     ${actions ? `<div class="barber-appt-actions">${actions}</div>` : ''}
   </div>`;
@@ -1242,6 +1248,8 @@ function abrirModalPagamento(apptId) {
   updatePagTotal();
   renderPayMethods();
   document.getElementById('modal-pagamento').classList.add('show');
+  // Puxar consumo da comanda existente
+  loadConsumoNoModal(apptId);
 }
 
 function fecharModalPag() {
@@ -1378,9 +1386,155 @@ async function confirmarPagamento() {
     } catch (e) { console.warn('Erro ao dar baixa estoque:', e); }
   }
 
+  // Fechar comanda vinculada (se existir)
+  if (window._pagComandaId) {
+    try {
+      await sb.from('comandas').update({ status: 'fechada', payment_method: _pagMethod, total: totalPrice }).eq('id', window._pagComandaId);
+    } catch (e) { console.warn('Erro ao fechar comanda:', e); }
+    window._pagComandaId = null;
+  }
+
   fecharModalPag();
   sessionStorage.removeItem(BELL_CACHE_KEY);
   await renderDay();
+}
+
+// ── Comanda automática + consumo rápido ──────────────────────
+async function getOrCreateComanda(apptId) {
+  const a = dayAppointments.find(x => x.id === apptId);
+  if (!a) return null;
+
+  // Buscar comanda existente vinculada ao agendamento
+  const { data: existing } = await sb.from('comandas')
+    .select('id')
+    .eq('barbershop_id', shop.id)
+    .eq('appointment_id', apptId)
+    .eq('status', 'aberta')
+    .limit(1);
+
+  if (existing && existing.length > 0) return existing[0].id;
+
+  // Criar comanda automaticamente
+  const { data: nova } = await sb.from('comandas').insert({
+    barbershop_id: shop.id,
+    barber_id: a.barber_id,
+    client_name: a.client_name,
+    client_phone: a.client_phone,
+    appointment_id: apptId,
+    status: 'aberta'
+  }).select('id').single();
+
+  return nova ? nova.id : null;
+}
+
+async function addConsumoRapido(apptId) {
+  const produtos = window._products || [];
+  if (!produtos.length) {
+    alert('Nenhum produto em estoque.');
+    return;
+  }
+
+  // Mostrar lista de produtos pra seleção rápida
+  const el = document.createElement('div');
+  el.id = 'consumo-rapido-overlay';
+  el.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
+  el.onclick = function(e) { if (e.target === el) el.remove(); };
+
+  let html = '<div style="background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:14px;padding:20px;width:100%;max-width:360px;max-height:80vh;overflow-y:auto;">';
+  html += '<div style="font-size:14px;font-weight:700;margin-bottom:12px;">Adicionar consumo</div>';
+  html += produtos.map(p =>
+    '<button onclick="confirmarConsumoRapido(\'' + apptId + '\',\'' + p.id + '\',\'' + esc(p.name) + '\',' + p.price + ')" style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:12px;border:1px solid var(--borda);border-radius:10px;background:transparent;color:var(--texto-secundario);font-size:13px;font-family:inherit;cursor:pointer;margin-bottom:6px;transition:all .1s;">' +
+      '<span>' + esc(p.name) + '</span>' +
+      '<span style="color:var(--verde-acao);font-weight:700;">' + formatMoney(p.price) + '</span>' +
+    '</button>'
+  ).join('');
+  html += '<button onclick="document.getElementById(\'consumo-rapido-overlay\').remove()" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--borda);background:transparent;color:var(--texto-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px;">FECHAR</button>';
+  html += '</div>';
+  el.innerHTML = html;
+  document.body.appendChild(el);
+}
+
+async function confirmarConsumoRapido(apptId, productId, productName, price) {
+  const comandaId = await getOrCreateComanda(apptId);
+  if (!comandaId) { alert('Erro ao criar comanda.'); return; }
+
+  try {
+    // Adicionar item na comanda
+    await sb.from('comanda_items').insert({
+      comanda_id: comandaId,
+      type: 'produto',
+      reference_id: productId,
+      name: productName,
+      price: price,
+      quantity: 1
+    });
+
+    // Baixa no estoque
+    const prod = (window._products || []).find(p => p.id === productId);
+    if (prod) {
+      await sb.from('stock_movements').insert({
+        barbershop_id: shop.id,
+        product_id: productId,
+        type: 'saida',
+        quantity: 1,
+        notes: 'Consumo durante atendimento'
+      });
+      const newQty = Math.max(0, prod.quantity - 1);
+      await sb.from('products').update({ quantity: newQty }).eq('id', productId);
+      prod.quantity = newQty;
+    }
+
+    // Fechar overlay e atualizar
+    const overlay = document.getElementById('consumo-rapido-overlay');
+    if (overlay) overlay.remove();
+
+    // Atualizar contagem de consumo no card
+    await loadConsumoCount();
+    await renderDay();
+
+  } catch (e) {
+    console.warn('Erro ao adicionar consumo:', e);
+    alert('Erro ao adicionar produto.');
+  }
+}
+
+async function loadConsumoCount() {
+  // Buscar comandas abertas do dia com contagem de itens
+  try {
+    const { data: comandas } = await sb.from('comandas')
+      .select('appointment_id, comanda_items(id)')
+      .eq('barbershop_id', shop.id)
+      .eq('status', 'aberta')
+      .not('appointment_id', 'is', null);
+
+    if (comandas) {
+      for (const c of comandas) {
+        const a = dayAppointments.find(x => x.id === c.appointment_id);
+        if (a) a._consumoCount = (c.comanda_items || []).length;
+      }
+    }
+  } catch (e) { /* tabela pode não ter appointment_id */ }
+}
+
+async function loadConsumoNoModal(apptId) {
+  // Puxar itens da comanda existente pro modal de pagamento
+  try {
+    const { data: comandas } = await sb.from('comandas')
+      .select('id, comanda_items(id, name, price, quantity, reference_id, type)')
+      .eq('barbershop_id', shop.id)
+      .eq('appointment_id', apptId)
+      .eq('status', 'aberta')
+      .limit(1);
+
+    if (comandas && comandas.length > 0 && comandas[0].comanda_items) {
+      _pagExtras = comandas[0].comanda_items
+        .filter(i => i.type === 'produto')
+        .map(i => ({ product_id: i.reference_id, name: i.name, price: i.price, qty: i.quantity }));
+      window._pagComandaId = comandas[0].id;
+      renderExtras();
+      updatePagTotal();
+    }
+  } catch (e) { /* tabela pode não ter appointment_id */ }
 }
 
 // ── Remarketing de vaga ───────────────────────────────────────
