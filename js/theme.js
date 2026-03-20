@@ -1,4 +1,14 @@
 /* NaRegua — Theme Toggle (dark/light) + Segment Themes + Custom Accent */
+
+// Cores padrão de cada segmento (deve bater com style.css)
+var SEGMENT_DEFAULTS = {
+  barbearia: '#d4a853',
+  estetica: '#e91e8c',
+  sobrancelha: '#c4956a',
+  unha: '#a855f7',
+  salao: '#b76e79'
+};
+
 (function() {
   // Tema claro/escuro
   var saved = localStorage.getItem('naregua_theme');
@@ -10,21 +20,33 @@
   }
 
   // Segmento (barbearia, estetica, sobrancelha, unha, salao)
-  var seg = localStorage.getItem('naregua_segment');
+  var seg = localStorage.getItem('naregua_segment') || 'barbearia';
   if (seg && seg !== 'barbearia') {
     document.documentElement.setAttribute('data-segment', seg);
   }
 
-  // Cor personalizada (se definida e diferente do padrão do segmento)
+  // Cor personalizada — só aplica inline se for diferente do padrão do segmento
   var customColor = localStorage.getItem('naregua_accent');
-  if (customColor) {
-    document.documentElement.style.setProperty('--accent', customColor);
-    document.documentElement.style.setProperty('--verde-acao', customColor);
-    // Gerar hover (10% mais escuro)
-    document.documentElement.style.setProperty('--accent-hover', darkenColor(customColor, 15));
-    document.documentElement.style.setProperty('--accent-avatar', darkenColor(customColor, 25));
+  var segDefault = SEGMENT_DEFAULTS[seg] || SEGMENT_DEFAULTS.barbearia;
+  if (customColor && customColor.toLowerCase() !== segDefault.toLowerCase()) {
+    applyInlineAccent(customColor);
   }
 })();
+
+function applyInlineAccent(color) {
+  document.documentElement.style.setProperty('--accent', color);
+  document.documentElement.style.setProperty('--verde-acao', color);
+  document.documentElement.style.setProperty('--accent-hover', darkenColor(color, 15));
+  document.documentElement.style.setProperty('--accent-avatar', darkenColor(color, 25));
+  document.documentElement.style.setProperty('--accent-soft', hexToRgba(color, 0.10));
+  document.documentElement.style.setProperty('--accent-border', hexToRgba(color, 0.20));
+}
+
+function clearInlineAccent() {
+  ['--accent', '--verde-acao', '--accent-hover', '--accent-avatar', '--accent-soft', '--accent-border'].forEach(function(p) {
+    document.documentElement.style.removeProperty(p);
+  });
+}
 
 function toggleTheme() {
   var current = document.documentElement.getAttribute('data-theme');
@@ -45,27 +67,33 @@ function getTheme() {
 }
 
 function setSegment(seg) {
-  localStorage.setItem('naregua_segment', seg);
+  localStorage.setItem('naregua_segment', seg || 'barbearia');
   if (seg && seg !== 'barbearia') {
     document.documentElement.setAttribute('data-segment', seg);
   } else {
     document.documentElement.removeAttribute('data-segment');
   }
+  // Limpar inline accent pra deixar o CSS do segmento resolver
+  clearInlineAccent();
+  // Atualizar localStorage accent pro padrão do segmento
+  var segDefault = SEGMENT_DEFAULTS[seg] || SEGMENT_DEFAULTS.barbearia;
+  localStorage.setItem('naregua_accent', segDefault);
 }
 
 function setAccentColor(color) {
-  if (color) {
-    localStorage.setItem('naregua_accent', color);
-    document.documentElement.style.setProperty('--accent', color);
-    document.documentElement.style.setProperty('--verde-acao', color);
-    document.documentElement.style.setProperty('--accent-hover', darkenColor(color, 15));
-    document.documentElement.style.setProperty('--accent-avatar', darkenColor(color, 25));
-  } else {
+  if (!color) {
     localStorage.removeItem('naregua_accent');
-    document.documentElement.style.removeProperty('--accent');
-    document.documentElement.style.removeProperty('--verde-acao');
-    document.documentElement.style.removeProperty('--accent-hover');
-    document.documentElement.style.removeProperty('--accent-avatar');
+    clearInlineAccent();
+    return;
+  }
+  localStorage.setItem('naregua_accent', color);
+  // Só aplica inline se for diferente do padrão do segmento atual
+  var seg = localStorage.getItem('naregua_segment') || 'barbearia';
+  var segDefault = SEGMENT_DEFAULTS[seg] || SEGMENT_DEFAULTS.barbearia;
+  if (color.toLowerCase() !== segDefault.toLowerCase()) {
+    applyInlineAccent(color);
+  } else {
+    clearInlineAccent();
   }
 }
 
@@ -86,4 +114,13 @@ function darkenColor(hex, pct) {
   g = Math.max(0, Math.floor(g * (1 - pct / 100)));
   b = Math.max(0, Math.floor(b * (1 - pct / 100)));
   return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+// Hex pra rgba
+function hexToRgba(hex, alpha) {
+  hex = hex.replace('#', '');
+  var r = parseInt(hex.substring(0, 2), 16);
+  var g = parseInt(hex.substring(2, 4), 16);
+  var b = parseInt(hex.substring(4, 6), 16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
 }

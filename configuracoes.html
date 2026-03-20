@@ -727,7 +727,14 @@ function selectSegment(el) {
   document.querySelectorAll('#cfg-segment .cfg-color').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
   // Preview segmento em tempo real
-  if (typeof setSegment === 'function') setSegment(el.dataset.segment);
+  var seg = el.dataset.segment;
+  if (typeof setSegment === 'function') setSegment(seg);
+  // Auto-selecionar cor padrão do segmento
+  var segDefaults = { barbearia:'#d4a853', estetica:'#e91e8c', sobrancelha:'#c4956a', unha:'#a855f7', salao:'#b76e79' };
+  var defaultColor = segDefaults[seg] || '#d4a853';
+  document.querySelectorAll('#cfg-accent-color .cfg-color').forEach(c => {
+    c.classList.toggle('active', c.dataset.color === defaultColor);
+  });
   markDirty();
 }
 
