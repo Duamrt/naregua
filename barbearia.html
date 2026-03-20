@@ -6,7 +6,7 @@
   <title>NaRegua</title>
   <meta property="og:type" content="website">
   <meta property="og:title" content="NaRegua">
-  <meta property="og:description" content="Agende seu horario online. Rapido e sem complicacao.">
+  <meta property="og:description" content="Agende seu horário online. Rápido e sem complicação.">
   <meta property="og:image" content="https://usenaregua.com.br/img/og-preview.png">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -366,7 +366,7 @@
   <section class="section" id="sobreSection" style="display:none;">
     <div class="section-title">Sobre</div>
     <div class="sobre-text" id="sobreText"></div>
-    <div class="section-title" style="margin-top:16px;">Horario de Funcionamento</div>
+    <div class="section-title" style="margin-top:16px;">Horário de Funcionamento</div>
     <div class="horario-grid" id="horarioGrid"></div>
   </section>
 
@@ -459,7 +459,7 @@ const DIAS_ABREV = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
     // Update page title + OG
     document.title = esc(shop.name) + ' — NaRegua';
     document.querySelector('meta[property="og:title"]').content = shop.name + ' — Agende online';
-    document.querySelector('meta[property="og:description"]').content = 'Agende seu horario na ' + shop.name + '. Rapido e sem complicacao.';
+    document.querySelector('meta[property="og:description"]').content = 'Agende seu horário na ' + shop.name + '. Rápido e sem complicação.';
 
     // Load all data in parallel
     const [barbers, services, combos, fotos, reviews] = await Promise.all([

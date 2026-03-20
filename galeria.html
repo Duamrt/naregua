@@ -805,7 +805,7 @@ async function salvarFoto() {
         console.warn('Storage upload falhou:', upError.message);
         // Fallback: try converting to base64 URL or show error
         if (upError.message.includes('bucket') || upError.message.includes('not found') || upError.message.includes('Bucket')) {
-          showUploadMsg('Bucket "galeria" nao existe no Supabase Storage. Use o campo URL como alternativa.', 'error');
+          showUploadMsg('Upload não disponível. Cole a URL da imagem no campo abaixo.', 'error');
           btn.disabled = false;
           btn.querySelector('.btn-label').style.display = 'inline';
           btn.querySelector('.spinner').style.display = 'none';
@@ -842,7 +842,7 @@ async function salvarFoto() {
 
     if (error) {
       if (error.message.includes('relation') || error.message.includes('does not exist')) {
-        showUploadMsg('Tabela "galeria" nao existe no banco. Execute o SQL de criacao.', 'error');
+        showUploadMsg('Galeria não está configurada. Entre em contato com o suporte.', 'error');
       } else {
         showUploadMsg('Erro ao salvar: ' + error.message, 'error');
       }
