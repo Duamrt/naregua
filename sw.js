@@ -1,5 +1,6 @@
-// NaRegua — Service Worker (cache-first para assets, network-first para API)
-const CACHE_NAME = 'naregua-v11';
+// NaRegua — Service Worker (network-first para HTML/JS/CSS, cache-first para imagens)
+// DEPLOY_VERSION é atualizado automaticamente pelo deploy.sh
+const CACHE_NAME = 'naregua-v20260320103130';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -104,8 +105,8 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // HTMLs e JS — network-first (sempre pega atualizado, cache como fallback)
-  if (url.endsWith('.html') || url.endsWith('.js') || e.request.mode === 'navigate') {
+  // HTMLs, JS e CSS — network-first (sempre pega atualizado, cache como fallback)
+  if (url.endsWith('.html') || url.endsWith('.js') || url.endsWith('.css') || e.request.mode === 'navigate') {
     e.respondWith(
       fetch(e.request).then(resp => {
         if (resp.ok && e.request.method === 'GET') {
