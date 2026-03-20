@@ -302,7 +302,7 @@
       <label style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--texto-muted);margin-bottom:6px;display:block;">SERVICOS INCLUIDOS</label>
       <div class="toggle-all-row" onclick="toggleAllServices()">
         <input type="checkbox" id="plano-all-svcs" onclick="event.stopPropagation();toggleAllServices()">
-        <label for="plano-all-svcs">Todos os servicos</label>
+        <label for="plano-all-svcs">Todos os serviços</label>
       </div>
       <div class="svc-check-list" id="plano-svcs-list"></div>
     </div>
@@ -356,7 +356,7 @@
   <button class="nav-item active" onclick="toggleMore()" id="btn-more"><span class="nav-icon">&#x2630;</span>MAIS</button>
 </div>
 <div id="more-menu" style="display:none;position:fixed;bottom:56px;right:8px;background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:12px;padding:8px;z-index:999;min-width:160px;">
-  <a href="servicos.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x2702;&#xFE0F; Servicos</a>
+  <a href="serviços.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x2702;&#xFE0F; Servicos</a>
   <a href="clientes.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4CB; Clientes</a>
   <a href="estoque.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4E6; Estoque</a>
   <a href="relatorio.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4CA; Relatorio</a>
@@ -515,7 +515,7 @@ function renderPlanos() {
     // Services
     let svcsHtml = '';
     if (!p.services || p.services.length === 0) {
-      svcsHtml = '<span class="svc-tag">Todos os servicos</span>';
+      svcsHtml = '<span class="svc-tag">Todos os serviços</span>';
     } else {
       svcsHtml = p.services.map(sid => {
         const svc = servicesList.find(s => s.id === sid);
@@ -661,7 +661,7 @@ function renderSvcCheckboxes(selectedIds) {
   el.style.display = 'block';
 
   if (!servicesList.length) {
-    el.innerHTML = '<div style="padding:10px;font-size:11px;color:var(--texto-muted);">Nenhum servico cadastrado.</div>';
+    el.innerHTML = '<div style="padding:10px;font-size:11px;color:var(--texto-muted);">Nenhum serviço cadastrado.</div>';
     return;
   }
 
@@ -700,7 +700,7 @@ async function salvarPlano() {
   if (!allSvcs) {
     const checks = document.querySelectorAll('#plano-svcs-list input[type="checkbox"]:checked');
     services = Array.from(checks).map(c => c.value);
-    if (services.length === 0) { showMsg('plano-msg', 'Selecione pelo menos um servico ou marque "Todos".', 'error'); return; }
+    if (services.length === 0) { showMsg('plano-msg', 'Selecione pelo menos um serviço ou marque "Todos".', 'error'); return; }
   }
 
   btn.disabled = true;

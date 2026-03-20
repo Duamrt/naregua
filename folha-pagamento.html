@@ -798,7 +798,7 @@ async function saveSalary(barberId) {
 
   if (res.error) {
     // Column might not exist — inform user
-    alert('Nao foi possivel salvar o salario. A coluna "salary" pode nao existir na tabela barbers. Execute: ALTER TABLE barbers ADD COLUMN salary numeric DEFAULT 0;');
+    alert('Não foi possível salvar o salário. A coluna "salary" pode não existir na tabela barbers. Execute: ALTER TABLE barbers ADD COLUMN salary numeric DEFAULT 0;');
     return;
   }
 
