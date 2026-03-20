@@ -8,10 +8,18 @@
 }
 
 /* ============================================
-   BOTTOM NAV — Mobile global overrides
+   MOBILE — Global overrides
    ============================================ */
 .nav-item {
   font-size: 10px !important;
+}
+
+/* Touch targets mínimo 44px em mobile */
+@media (max-width: 767px) {
+  .btn-back, .icon-btn, .date-nav-btn, .week-nav-btn, .month-btn, .period-btn {
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
 }
 
 @media (min-width: 768px) {

@@ -416,7 +416,7 @@ function renderBarbers() {
   const el = document.getElementById('eq-list');
 
   if (!barbers.length) {
-    el.innerHTML = '<div class="empty-eq"><div style="font-size:40px;margin-bottom:12px;">👥</div><div>Nenhum profissional cadastrado.</div></div>';
+    el.innerHTML = '<div class="empty-eq"><div style="font-size:40px;margin-bottom:12px;">👥</div><div>Nenhum profissional cadastrado.<br><span style="font-size:11px;color:var(--texto-muted);margin-top:8px;display:block;">Clique em "+ PROFISSIONAL" pra adicionar.</span></div></div>';
     return;
   }
 

@@ -169,10 +169,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (draft.name) document.getElementById('shop-name').value = draft.name;
   if (draft.city) document.getElementById('shop-city').value = draft.city;
   if (draft.phone) document.getElementById('shop-phone').value = draft.phone;
+  if (draft.days) selectedDays = draft.days;
 
   // Preencher selects de horário
-  populateTimeSelect('shop-open', '08:00');
-  populateTimeSelect('shop-close', '19:00');
+  populateTimeSelect('shop-open', draft.openTime || '08:00');
+  populateTimeSelect('shop-close', draft.closeTime || '19:00');
 
   // Dias da semana
   renderDays();
@@ -194,6 +195,7 @@ function goStep2() {
   if (!name) { showOnbMsg('Digite o nome do estabelecimento.', 'error'); return; }
   if (!city) { showOnbMsg('Digite a cidade.', 'error'); return; }
   hideOnbMsg();
+  saveDraft();
   document.getElementById('step-1').style.display = 'none';
   document.getElementById('step-2').style.display = 'block';
 }
@@ -205,6 +207,7 @@ function backStep1() {
 
 function goStep3() {
   hideOnbMsg();
+  saveDraft();
   document.getElementById('step-2').style.display = 'none';
   document.getElementById('step-3').style.display = 'block';
 }
@@ -301,6 +304,9 @@ function saveDraft() {
     name: document.getElementById('shop-name').value,
     city: document.getElementById('shop-city').value,
     phone: document.getElementById('shop-phone').value,
+    openTime: document.getElementById('shop-open')?.value || '08:00',
+    closeTime: document.getElementById('shop-close')?.value || '19:00',
+    days: selectedDays
   };
   localStorage.setItem('naregua_onboarding_draft', JSON.stringify(draft));
 }
