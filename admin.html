@@ -890,7 +890,7 @@ async function confirmarExclusao() {
   const typedName = document.getElementById('delete-confirm-input').value.trim();
   const shop = allShops.find(x => x.id === _deleteShopId);
   if (!shop || typedName.toLowerCase() !== shop.name.toLowerCase()) {
-    errEl.textContent = 'Nome nao confere. Digite "' + (shop ? shop.name : '') + '" pra confirmar.';
+    errEl.textContent = 'Nome não confere. Digite "' + (shop ? shop.name : '') + '" pra confirmar.';
     errEl.style.display = 'block';
     return;
   }

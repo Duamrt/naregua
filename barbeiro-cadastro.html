@@ -285,7 +285,7 @@ async function doSignup() {
   if (error) {
     setLoading(btn, false);
     if (error.message.includes('already registered')) {
-      showMsg('Esse telefone ja tem conta. Use a aba ENTRAR.', 'error');
+      showMsg('Esse telefone já tem conta. Use a aba ENTRAR.', 'error');
     } else {
       showMsg('Erro ao criar conta. Tente novamente.', 'error');
     }

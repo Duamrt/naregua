@@ -272,13 +272,13 @@
         <input type="number" id="pacote-qty" min="1" step="1" placeholder="5" value="5">
       </div>
       <div class="field">
-        <label>PRECO (R$)</label>
+        <label>PREÇO (R$)</label>
         <input type="number" id="pacote-preco" min="0" step="0.01" placeholder="100,00">
       </div>
     </div>
     <div class="field">
-      <label>DESCRICAO (OPCIONAL)</label>
-      <input type="text" id="pacote-desc" placeholder="Descricao do pacote">
+      <label>DESCRIÇÃO (OPCIONAL)</label>
+      <input type="text" id="pacote-desc" placeholder="Descrição do pacote">
     </div>
     <button class="btn btn-primary" onclick="salvarPacote()" id="btn-pacote-save" style="margin-top:8px;">
       <span class="btn-label">CRIAR PACOTE</span>
@@ -632,7 +632,7 @@ async function salvarPacote() {
 
   if (!nome) { showMsg('pacote-msg', 'Digite o nome do pacote.', 'error'); return; }
   if (qty <= 0) { showMsg('pacote-msg', 'Quantidade deve ser maior que zero.', 'error'); return; }
-  if (preco <= 0) { showMsg('pacote-msg', 'Preco deve ser maior que zero.', 'error'); return; }
+  if (preco <= 0) { showMsg('pacote-msg', 'Preço deve ser maior que zero.', 'error'); return; }
 
   btn.disabled = true;
   btn.querySelector('.btn-label').style.display = 'none';

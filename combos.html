@@ -218,18 +218,18 @@
       <div class="svc-selector-label">SERVICOS INCLUIDOS * (minimo 2)</div>
       <div class="svc-check-list" id="svc-check-list"></div>
       <div class="svc-sum-row">
-        <span>Preco individual:</span>
+        <span>Preço individual:</span>
         <span class="svc-sum-value" id="svc-sum-value">R$ 0,00</span>
       </div>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
       <div class="field">
-        <label>PRECO DO COMBO (R$) *</label>
+        <label>PREÇO DO COMBO (R$) *</label>
         <input type="number" id="combo-preco" min="0" step="1" placeholder="40" oninput="calcSavings()">
       </div>
       <div class="field">
-        <label>DURACAO (MIN) *</label>
+        <label>DURAÇÃO (MIN) *</label>
         <input type="number" id="combo-duracao" min="5" step="5" placeholder="45">
       </div>
     </div>
@@ -549,7 +549,7 @@ function calcSavings() {
     el.textContent = 'Economia: ' + formatMoney(savings) + ' (' + pct + '%)';
     el.style.display = 'block';
   } else if (comboPrice > 0 && sumIndiv > 0 && comboPrice >= sumIndiv) {
-    el.textContent = 'Preco deve ser menor que ' + formatMoney(sumIndiv);
+    el.textContent = 'Preço deve ser menor que ' + formatMoney(sumIndiv);
     el.style.display = 'block';
     el.style.color = '#ef4444';
     el.style.background = 'rgba(239,68,68,0.08)';
@@ -577,12 +577,12 @@ async function salvarCombo() {
   // Validations
   if (!nome) { showMsg('Digite o nome do combo.', 'error'); return; }
   if (selected.length < 2) { showMsg('Selecione pelo menos 2 servicos.', 'error'); return; }
-  if (isNaN(preco) || preco <= 0) { showMsg('Digite um preco valido.', 'error'); return; }
+  if (isNaN(preco) || preco <= 0) { showMsg('Digite um preço válido.', 'error'); return; }
 
   var sumIndiv = selected.reduce(function(s, svc) { return s + svc.price; }, 0);
   if (preco >= sumIndiv) { showMsg('Preco do combo deve ser menor que ' + formatMoney(sumIndiv) + '.', 'error'); return; }
 
-  if (isNaN(duracao) || duracao < 5) { showMsg('Duracao minima: 5 min.', 'error'); return; }
+  if (isNaN(duracao) || duracao < 5) { showMsg('Duração mínima: 5 min.', 'error'); return; }
 
   btn.disabled = true;
   btn.querySelector('.btn-label').style.display = 'none';

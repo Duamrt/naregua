@@ -364,7 +364,7 @@
   <a href="qrcode.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4F1; QR Code</a>
   <a href="notificacoes.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F514; Notificacoes</a>
   <a href="galeria.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4F7; Galeria</a>
-  <a href="politicas.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4DC; Politicas</a>
+  <a href="politicas.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4DC; Políticas</a>
   <a href="importar-clientes.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--verde-acao);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4E5; Importar Clientes</a>
   <a href="recibo-barbeiro.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F9FE; Recibo Comissão</a>
   <a href="backup.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4BE; Backup</a>
@@ -731,7 +731,7 @@ async function adicionarManual() {
   const birthday = document.getElementById('m-birthday').value;
 
   if (!name) { toast('Informe o nome.', true); return; }
-  if (!phone || phone.length < 10 || phone.length > 11) { toast('Telefone invalido (10-11 digitos).', true); return; }
+  if (!phone || phone.length < 10 || phone.length > 11) { toast('Telefone inválido (10-11 dígitos).', true); return; }
 
   const obj = {
     barbershop_id: shop.id,

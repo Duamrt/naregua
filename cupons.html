@@ -475,7 +475,7 @@ function renderCupons() {
           + '<button class="cup-btn share" onclick="toggleShare(\'' + c.id + '\',event)" style="width:100%;">COMPARTILHAR</button>'
           + '<div class="share-menu" id="share-' + c.id + '">'
             + '<button class="share-option" onclick="shareWhatsApp(\'' + c.id + '\')">&#x1F4F2; Enviar por WhatsApp</button>'
-            + '<button class="share-option" onclick="copiarCodigo(\'' + c.id + '\')">&#x1F4CB; Copiar codigo</button>'
+            + '<button class="share-option" onclick="copiarCodigo(\'' + c.id + '\')">&#x1F4CB; Copiar código</button>'
           + '</div>'
         + '</div>'
         + '<button class="cup-btn" onclick="toggleAtivo(\'' + c.id + '\',' + (c.active ? 'false' : 'true') + ')">' + (c.active ? 'DESATIVAR' : 'ATIVAR') + '</button>'
@@ -528,10 +528,10 @@ async function salvarCupom() {
   const validFrom = document.getElementById('cupom-from').value || null;
   const validUntil = document.getElementById('cupom-until').value || null;
 
-  if (!code) { showMsg('Digite o codigo do cupom.', 'error'); return; }
-  if (!code.match(/^[A-Z0-9_-]+$/)) { showMsg('Codigo so pode ter letras, numeros, - e _', 'error'); return; }
+  if (!code) { showMsg('Digite o código do cupom.', 'error'); return; }
+  if (!code.match(/^[A-Z0-9_-]+$/)) { showMsg('Código só pode ter letras, números, - e _', 'error'); return; }
   if (!valor || valor <= 0) { showMsg('Digite o valor do desconto.', 'error'); return; }
-  if (discountType === 'percentual' && valor > 100) { showMsg('Percentual maximo e 100%.', 'error'); return; }
+  if (discountType === 'percentual' && valor > 100) { showMsg('Percentual máximo é 100%.', 'error'); return; }
 
   const payload = {
     code,
@@ -558,7 +558,7 @@ async function salvarCupom() {
       const { error } = await sb.from('cupons').insert(payload);
       if (error) {
         if (error.message && error.message.includes('unique')) {
-          showMsg('Ja existe um cupom com esse codigo.', 'error');
+          showMsg('Já existe um cupom com esse código.', 'error');
         } else {
           showMsg('Erro ao salvar: ' + error.message, 'error');
         }
@@ -572,7 +572,7 @@ async function salvarCupom() {
     await loadCupons();
   } catch (e) {
     if (e.message && e.message.includes('unique')) {
-      showMsg('Ja existe um cupom com esse codigo.', 'error');
+      showMsg('Já existe um cupom com esse código.', 'error');
     } else {
       showMsg('Erro ao salvar.', 'error');
     }
