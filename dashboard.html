@@ -1397,6 +1397,97 @@ async function confirmarPagamento() {
   fecharModalPag();
   sessionStorage.removeItem(BELL_CACHE_KEY);
   await renderDay();
+
+  // Sugerir próximo agendamento
+  if (a) sugerirProximoAgendamento(a);
+}
+
+// ── Re-agendamento pós-atendimento ──────────────────────────
+function sugerirProximoAgendamento(appt) {
+  const svc = services.find(s => s.id === appt.service_id);
+  if (!svc) return;
+
+  // Calcular ciclo baseado nas configurações de lembrete ou padrão 21 dias
+  const intervals = (shop.settings && shop.settings.reminder_intervals) || {};
+  const svcName = (svc.name || '').toLowerCase();
+  let ciclo = (shop.settings && shop.settings.reminder_default_days) || 21;
+  for (const key in intervals) {
+    if (svcName.includes(key)) { ciclo = intervals[key]; break; }
+  }
+
+  // Calcular data sugerida (mesmo dia da semana + ciclo)
+  const hoje = new Date();
+  const sugerida = new Date(hoje);
+  sugerida.setDate(sugerida.getDate() + ciclo);
+
+  // Mesmo horário do agendamento atual
+  const horaOriginal = new Date(appt.scheduled_at);
+  const horaStr = String(horaOriginal.getHours()).padStart(2, '0') + ':' + String(horaOriginal.getMinutes()).padStart(2, '0');
+
+  const DIAS_SEMANA = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+  const diaSemana = DIAS_SEMANA[sugerida.getDay()];
+  const dataStr = sugerida.toLocaleDateString('pt-BR');
+  const dataISO = sugerida.getFullYear() + '-' + String(sugerida.getMonth() + 1).padStart(2, '0') + '-' + String(sugerida.getDate()).padStart(2, '0');
+
+  const el = document.createElement('div');
+  el.id = 'rebook-overlay';
+  el.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
+  el.onclick = function(e) { if (e.target === el) el.remove(); };
+
+  el.innerHTML = '<div style="background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:16px;padding:28px 24px;width:100%;max-width:360px;text-align:center;">' +
+    '<div style="font-size:40px;margin-bottom:12px;">📅</div>' +
+    '<div style="font-size:16px;font-weight:800;margin-bottom:6px;">Já quer deixar o próximo marcado?</div>' +
+    '<div style="font-size:12px;color:var(--texto-muted);margin-bottom:20px;">Baseado no ciclo de ' + ciclo + ' dias do serviço</div>' +
+    // Sugestão principal
+    '<div style="background:rgba(212,168,83,0.08);border:1px solid rgba(212,168,83,0.2);border-radius:12px;padding:16px;margin-bottom:16px;">' +
+      '<div style="font-size:11px;color:var(--texto-muted);font-weight:600;letter-spacing:0.5px;margin-bottom:6px;">SUGESTÃO</div>' +
+      '<div style="font-size:18px;font-weight:800;color:var(--verde-acao);">' + diaSemana + ', ' + dataStr + '</div>' +
+      '<div style="font-size:13px;color:var(--texto-secundario);margin-top:4px;">às ' + horaStr + ' · ' + esc(svc.name) + '</div>' +
+    '</div>' +
+    // Botões
+    '<div style="display:flex;gap:8px;">' +
+      '<button onclick="document.getElementById(\'rebook-overlay\').remove()" style="flex:0.4;padding:12px;border-radius:10px;border:1px solid var(--borda);background:transparent;color:var(--texto-muted);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Não, obrigado</button>' +
+      '<button onclick="confirmarRebook(\'' + esc(appt.barber_id || '') + '\',\'' + esc(appt.service_id) + '\',\'' + esc(appt.client_name) + '\',\'' + esc(appt.client_phone) + '\',\'' + dataISO + '\',\'' + horaStr + '\')" style="flex:0.6;padding:12px;border-radius:10px;border:none;background:var(--verde-acao);color:#000;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">AGENDAR</button>' +
+    '</div>' +
+  '</div>';
+
+  document.body.appendChild(el);
+}
+
+async function confirmarRebook(barberId, serviceId, clientName, clientPhone, dateISO, timeStr) {
+  const btn = event.target;
+  btn.textContent = '...';
+  btn.disabled = true;
+
+  const scheduledAt = dateISO + 'T' + timeStr + ':00-03:00';
+
+  try {
+    const { error } = await sb.from('appointments').insert({
+      barbershop_id: shop.id,
+      barber_id: barberId || null,
+      service_id: serviceId,
+      client_name: clientName,
+      client_phone: clientPhone.replace(/\D/g, ''),
+      scheduled_at: scheduledAt,
+      status: 'confirmed'
+    });
+
+    if (error) throw error;
+
+    // Feedback
+    const overlay = document.getElementById('rebook-overlay');
+    if (overlay) {
+      overlay.querySelector('div > div').innerHTML =
+        '<div style="font-size:48px;margin-bottom:12px;">✅</div>' +
+        '<div style="font-size:16px;font-weight:800;margin-bottom:8px;">Agendado!</div>' +
+        '<div style="font-size:13px;color:var(--texto-muted);">' + esc(clientName.split(' ')[0]) + ' volta em ' + dateISO.split('-').reverse().join('/') + ' às ' + timeStr + '</div>';
+      setTimeout(() => overlay.remove(), 2000);
+    }
+  } catch (e) {
+    console.warn('Erro ao re-agendar:', e);
+    btn.textContent = 'ERRO';
+    setTimeout(() => { btn.textContent = 'AGENDAR'; btn.disabled = false; }, 2000);
+  }
 }
 
 // ── Comanda automática + consumo rápido ──────────────────────
