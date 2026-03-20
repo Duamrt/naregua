@@ -222,7 +222,7 @@
     .modal {
       background:var(--cinza-escuro); border:1px solid var(--borda);
       border-radius:12px; width:100%; max-width:460px; max-height:85vh;
-      overflow-y:auto; padding:24px 20px 32px; animation:fadeUp 0.3s ease;
+      overflow-y:auto; padding:24px 20px 32px; padding-bottom:40px; animation:fadeUp 0.3s ease;
     }
     .modal-title {
       display:flex; justify-content:space-between; align-items:center;
@@ -1153,7 +1153,12 @@ async function salvarEdicao() {
     const editIds = editBarbersList.filter(b => b.id).map(b => b.id);
     const toRemove = barbers.filter(b => !editIds.includes(b.id));
     for (const b of toRemove) {
-      await db.from('barbers').delete().eq('id', b.id);
+      // Verificar agendamentos pendentes antes de deletar
+      const { data: pendAppts } = await sb.from('appointments').select('id', { count: 'exact', head: true }).eq('barber_id', b.id).in('status', ['pending','confirmed']);
+      if ((pendAppts) && pendAppts > 0) {
+        await sb.from('appointments').update({ status: 'cancelled' }).eq('barber_id', b.id).in('status', ['pending','confirmed']);
+      }
+      await db.from('barbers').update({ active: false }).eq('id', b.id);
     }
 
     // Atualizar existentes e criar novos
@@ -1272,6 +1277,7 @@ async function confirmarPagamento() {
   }
 
   fecharModalPag();
+  sessionStorage.removeItem(BELL_CACHE_KEY); // Invalidar bell cache
   await renderDay();
 }
 
@@ -1309,6 +1315,7 @@ async function cancelarComVaga(apptId, btnEl) {
     new Date(a.scheduled_at) > horaCancelada
   ).sort((a, b) => new Date(a.scheduled_at) - new Date(b.scheduled_at));
 
+  sessionStorage.removeItem(BELL_CACHE_KEY); // Invalidar bell cache
   await renderDay();
 
   // Se tem clientes posteriores, mostrar modal

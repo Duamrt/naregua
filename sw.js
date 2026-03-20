@@ -1,5 +1,5 @@
 // NaRegua — Service Worker (cache-first para assets, network-first para API)
-const CACHE_NAME = 'naregua-v10';
+const CACHE_NAME = 'naregua-v11';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -61,7 +61,8 @@ const STATIC_ASSETS = [
   '/js/sw-update.js',
   '/img/icon-192.png',
   '/img/icon-512.png',
-  '/manifest.json'
+  '/manifest.json',
+  '/offline.html'
 ];
 
 // Instala e pré-cacheia assets estáticos
@@ -114,7 +115,7 @@ self.addEventListener('fetch', e => {
         return resp;
       }).catch(() => caches.match(e.request).then(cached => {
         if (cached) return cached;
-        if (e.request.mode === 'navigate') return caches.match('/app.html');
+        if (e.request.mode === 'navigate') return caches.match('/offline.html');
       }))
     );
     return;

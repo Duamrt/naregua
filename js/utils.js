@@ -1,5 +1,10 @@
 // NaRegua — Helpers
 
+// Silenciar console.log em produção (manter console.warn e console.error)
+if (location.hostname === 'usenaregua.com.br') {
+  console.log = function() {};
+}
+
 function formatMoney(v) {
   return 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 }
