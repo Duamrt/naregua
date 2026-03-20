@@ -459,14 +459,11 @@ async function finishOnboarding() {
     // BUG 11 ALTO FIX: limpar draft ao finalizar
     localStorage.removeItem('naregua_onboarding_draft');
 
-    // Mostrar link de agendamento antes de redirecionar
+    // Mostrar modal de sucesso com link de agendamento
     const baseUrl = window.location.origin + window.location.pathname.replace('onboarding.html', '');
     const linkAgendamento = baseUrl + 'agendar.html?slug=' + slug;
-    alert('Tudo pronto! Compartilhe esse link com seus clientes:\n\n' + linkAgendamento);
     navigator.clipboard.writeText(linkAgendamento).catch(() => {});
-
-    // Redirecionar pro dashboard
-    window.location.href = 'dashboard.html';
+    showSuccessModal(linkAgendamento);
 
   } catch (e) {
     console.error(e);
@@ -488,6 +485,34 @@ function showOnbMsg(text, type) {
 }
 function hideOnbMsg() {
   document.getElementById('onboarding-msg').className = 'msg';
+}
+</script>
+<!-- Modal Sucesso -->
+<div id="success-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:var(--cinza-escuro,#0a0a0a);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px 24px;width:90%;max-width:400px;text-align:center;">
+    <div style="font-size:48px;margin-bottom:12px;">&#x1F389;</div>
+    <h2 style="font-size:20px;font-weight:800;margin-bottom:8px;">Tudo pronto!</h2>
+    <p style="font-size:13px;color:#a3a3a3;margin-bottom:20px;">Seu estabelecimento foi criado. Compartilhe o link abaixo com seus clientes:</p>
+    <div id="success-link" style="background:#141414;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px;font-size:12px;font-weight:600;color:var(--accent,#d4a853);word-break:break-all;margin-bottom:16px;cursor:pointer;" onclick="copyLink()"></div>
+    <div id="copy-feedback" style="font-size:11px;color:#22c55e;margin-bottom:16px;display:none;">Link copiado!</div>
+    <div style="display:flex;gap:8px;">
+      <a id="btn-test-link" href="#" target="_blank" style="flex:1;padding:12px;border-radius:10px;background:var(--accent,#d4a853);color:#000;font-size:13px;font-weight:700;text-decoration:none;text-align:center;font-family:Inter,sans-serif;">Testar agendamento</a>
+      <button onclick="window.location.href='dashboard.html'" style="flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#fafafa;font-size:13px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">Ir pro painel</button>
+    </div>
+  </div>
+</div>
+<script>
+function showSuccessModal(link) {
+  document.getElementById('success-link').textContent = link;
+  document.getElementById('btn-test-link').href = link;
+  document.getElementById('success-modal').style.display = 'flex';
+}
+function copyLink() {
+  const link = document.getElementById('success-link').textContent;
+  navigator.clipboard.writeText(link).then(() => {
+    document.getElementById('copy-feedback').style.display = 'block';
+    setTimeout(() => document.getElementById('copy-feedback').style.display = 'none', 3000);
+  });
 }
 </script>
 <script src="js/ajuda.js"></script>

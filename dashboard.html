@@ -812,7 +812,7 @@ function renderAppointments() {
   // Agendamentos sem barbeiro definido
   const semBarbeiro = list.filter(a => !a.barber_id || !barbers.find(b => b.id === a.barber_id));
   if (semBarbeiro.length) {
-    columns.push({ barber: { id: null, name: 'Sem barbeiro' }, appts: semBarbeiro });
+    columns.push({ barber: { id: null, name: 'Sem profissional' }, appts: semBarbeiro });
   }
 
   // Identificar proximo agendamento (confirmado, futuro, mais proximo de agora)
