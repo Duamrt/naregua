@@ -206,10 +206,15 @@
     .anam-field input[type="text"],
     .anam-field textarea,
     .anam-field select {
-      width:100%; padding:8px 10px; background:var(--fundo); border:1px solid var(--borda);
-      border-radius:8px; color:var(--texto-principal); font-size:12px; font-family:inherit;
+      width:100%; padding:8px 10px; background:#1a1a1a; border:1px solid var(--borda);
+      border-radius:8px; color:#fafafa; font-size:12px; font-family:inherit;
       box-sizing:border-box;
     }
+    .anam-field select option {
+      background:#1a1a1a; color:#fafafa;
+    }
+    [data-theme="light"] .anam-field select { background:#fff; color:#1a1a1a; }
+    [data-theme="light"] .anam-field select option { background:#fff; color:#1a1a1a; }
     .anam-field textarea { min-height:50px; resize:vertical; }
     .anam-field input:focus, .anam-field textarea:focus, .anam-field select:focus {
       border-color:var(--verde-acao); outline:none;
