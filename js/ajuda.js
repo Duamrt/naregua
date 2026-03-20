@@ -125,6 +125,17 @@ const AJUDA = {
       'Acompanhe quantos foram usados e por quem'
     ]
   },
+  'lembretes': {
+    titulo: 'Lembretes',
+    itens: [
+      'Lista inteligente de clientes que precisam de lembrete',
+      'Intervalo configurável por serviço (ex: corte 21 dias, barba 7 dias)',
+      'Botão WhatsApp com mensagem pronta — 1 toque pra enviar',
+      'Filtros por serviço, pendentes e já enviados',
+      'Marque como enviado pra não repetir no mesmo dia',
+      'Clique na engrenagem pra personalizar os intervalos'
+    ]
+  },
   'retencao': {
     titulo: 'Retenção',
     itens: [

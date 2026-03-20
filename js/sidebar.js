@@ -29,6 +29,7 @@
       { icon: '📣', label: 'Promoções', href: 'promocoes.html' }
     ]},
     { group: 'CLIENTES', open: false, items: [
+      { icon: '🔔', label: 'Lembretes', href: 'lembretes.html' },
       { icon: '🔄', label: 'Retenção', href: 'retencao.html' },
       { icon: '⭐', label: 'Satisfação', href: 'satisfacao.html' },
       { icon: '⏳', label: 'Lista de Espera', href: 'lista-espera.html' },
