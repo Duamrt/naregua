@@ -1299,7 +1299,7 @@ function renderExtras() {
   if (!_pagExtras.length) { el.innerHTML = ''; return; }
   el.innerHTML = _pagExtras.map((e, i) =>
     '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--borda);font-size:12px;">' +
-      '<span>' + esc(e.name) + (e.qty > 1 ? ' x' + e.qty : '') + '</span>' +
+      '<span>' + (e.type === 'servico' ? '✂️ ' : '📦 ') + esc(e.name) + (e.qty > 1 ? ' x' + e.qty : '') + '</span>' +
       '<div style="display:flex;align-items:center;gap:8px;">' +
         '<span style="font-weight:700;color:var(--verde-acao);">' + formatMoney(e.price * e.qty) + '</span>' +
         '<button onclick="removeExtra(' + i + ')" style="background:none;border:none;color:var(--vermelho,#ef4444);font-size:14px;cursor:pointer;padding:2px 4px;">×</button>' +
@@ -1427,34 +1427,92 @@ async function getOrCreateComanda(apptId) {
   return nova ? nova.id : null;
 }
 
-async function addConsumoRapido(apptId) {
-  const produtos = window._products || [];
-  if (!produtos.length) {
-    alert('Nenhum produto em estoque.');
-    return;
-  }
+let _consumoTab = 'produtos';
+let _consumoApptId = null;
 
-  // Mostrar lista de produtos pra seleção rápida
+async function addConsumoRapido(apptId) {
+  _consumoApptId = apptId;
+  _consumoTab = 'produtos';
+
   const el = document.createElement('div');
   el.id = 'consumo-rapido-overlay';
   el.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
   el.onclick = function(e) { if (e.target === el) el.remove(); };
 
-  let html = '<div style="background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:14px;padding:20px;width:100%;max-width:360px;max-height:80vh;overflow-y:auto;">';
-  html += '<div style="font-size:14px;font-weight:700;margin-bottom:12px;">Adicionar consumo</div>';
-  html += produtos.map(p =>
-    '<button onclick="confirmarConsumoRapido(\'' + apptId + '\',\'' + p.id + '\',\'' + esc(p.name) + '\',' + p.price + ')" style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:12px;border:1px solid var(--borda);border-radius:10px;background:transparent;color:var(--texto-secundario);font-size:13px;font-family:inherit;cursor:pointer;margin-bottom:6px;transition:all .1s;">' +
-      '<span>' + esc(p.name) + '</span>' +
-      '<span style="color:var(--verde-acao);font-weight:700;">' + formatMoney(p.price) + '</span>' +
-    '</button>'
-  ).join('');
-  html += '<button onclick="document.getElementById(\'consumo-rapido-overlay\').remove()" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--borda);background:transparent;color:var(--texto-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px;">FECHAR</button>';
-  html += '</div>';
-  el.innerHTML = html;
+  el.innerHTML = '<div style="background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:14px;padding:20px;width:100%;max-width:380px;max-height:85vh;display:flex;flex-direction:column;">' +
+    '<div style="font-size:14px;font-weight:700;margin-bottom:12px;">Adicionar consumo</div>' +
+    // Abas
+    '<div style="display:flex;gap:6px;margin-bottom:10px;" id="consumo-tabs"></div>' +
+    // Busca
+    '<input type="text" id="consumo-busca" placeholder="Buscar..." oninput="renderConsumoLista()" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--borda);background:var(--cinza-medio,#141414);color:var(--texto-principal);font-size:13px;font-family:inherit;margin-bottom:10px;box-sizing:border-box;">' +
+    // Lista
+    '<div id="consumo-lista" style="flex:1;overflow-y:auto;min-height:100px;max-height:50vh;"></div>' +
+    // Fechar
+    '<button onclick="document.getElementById(\'consumo-rapido-overlay\').remove()" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--borda);background:transparent;color:var(--texto-muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px;flex-shrink:0;">FECHAR</button>' +
+  '</div>';
+
   document.body.appendChild(el);
+  renderConsumoTabs();
+  renderConsumoLista();
+  document.getElementById('consumo-busca').focus();
 }
 
-async function confirmarConsumoRapido(apptId, productId, productName, price) {
+function renderConsumoTabs() {
+  const tabs = [
+    { key: 'produtos', icon: '📦', label: 'Produtos' },
+    { key: 'servicos', icon: '✂️', label: 'Serviços' }
+  ];
+  document.getElementById('consumo-tabs').innerHTML = tabs.map(t =>
+    '<button onclick="setConsumoTab(\'' + t.key + '\')" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s;border:1px solid ' +
+    (_consumoTab === t.key ? 'var(--verde-acao)' : 'var(--borda)') + ';background:' +
+    (_consumoTab === t.key ? 'rgba(212,168,83,0.15)' : 'transparent') + ';color:' +
+    (_consumoTab === t.key ? 'var(--verde-acao)' : 'var(--texto-muted)') + ';">' + t.icon + ' ' + t.label + '</button>'
+  ).join('');
+}
+
+function setConsumoTab(tab) {
+  _consumoTab = tab;
+  document.getElementById('consumo-busca').value = '';
+  renderConsumoTabs();
+  renderConsumoLista();
+}
+
+function renderConsumoLista() {
+  const busca = (document.getElementById('consumo-busca')?.value || '').toLowerCase();
+  const el = document.getElementById('consumo-lista');
+
+  if (_consumoTab === 'produtos') {
+    let items = (window._products || []).filter(p => p.quantity > 0);
+    if (busca) items = items.filter(p => p.name.toLowerCase().includes(busca));
+
+    if (!items.length) {
+      el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--texto-muted);font-size:12px;">' + (busca ? 'Nenhum produto encontrado.' : 'Nenhum produto em estoque.') + '</div>';
+      return;
+    }
+    el.innerHTML = items.map(p =>
+      '<button onclick="confirmarConsumoRapido(\'' + _consumoApptId + '\',\'' + p.id + '\',\'' + esc(p.name) + '\',' + p.price + ',\'produto\')" style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:12px;border:1px solid var(--borda);border-radius:10px;background:transparent;color:var(--texto-secundario);font-size:13px;font-family:inherit;cursor:pointer;margin-bottom:6px;">' +
+        '<div style="text-align:left;"><div>' + esc(p.name) + '</div><div style="font-size:10px;color:var(--texto-muted);">Estoque: ' + p.quantity + '</div></div>' +
+        '<span style="color:var(--verde-acao);font-weight:700;">' + formatMoney(p.price) + '</span>' +
+      '</button>'
+    ).join('');
+  } else {
+    let items = services.filter(s => s.active !== false);
+    if (busca) items = items.filter(s => s.name.toLowerCase().includes(busca));
+
+    if (!items.length) {
+      el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--texto-muted);font-size:12px;">Nenhum serviço encontrado.</div>';
+      return;
+    }
+    el.innerHTML = items.map(s =>
+      '<button onclick="confirmarConsumoRapido(\'' + _consumoApptId + '\',\'' + s.id + '\',\'' + esc(s.name) + '\',' + s.price + ',\'servico\')" style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:12px;border:1px solid var(--borda);border-radius:10px;background:transparent;color:var(--texto-secundario);font-size:13px;font-family:inherit;cursor:pointer;margin-bottom:6px;">' +
+        '<div style="text-align:left;"><div>' + esc(s.name) + '</div><div style="font-size:10px;color:var(--texto-muted);">' + s.duration_min + ' min</div></div>' +
+        '<span style="color:var(--verde-acao);font-weight:700;">' + formatMoney(s.price) + '</span>' +
+      '</button>'
+    ).join('');
+  }
+}
+
+async function confirmarConsumoRapido(apptId, itemId, itemName, price, tipo) {
   const comandaId = await getOrCreateComanda(apptId);
   if (!comandaId) { alert('Erro ao criar comanda.'); return; }
 
@@ -1462,39 +1520,53 @@ async function confirmarConsumoRapido(apptId, productId, productName, price) {
     // Adicionar item na comanda
     await sb.from('comanda_items').insert({
       comanda_id: comandaId,
-      type: 'produto',
-      reference_id: productId,
-      name: productName,
+      type: tipo || 'produto',
+      reference_id: itemId,
+      name: itemName,
       price: price,
       quantity: 1
     });
 
-    // Baixa no estoque
-    const prod = (window._products || []).find(p => p.id === productId);
-    if (prod) {
-      await sb.from('stock_movements').insert({
-        barbershop_id: shop.id,
-        product_id: productId,
-        type: 'saida',
-        quantity: 1,
-        notes: 'Consumo durante atendimento'
-      });
-      const newQty = Math.max(0, prod.quantity - 1);
-      await sb.from('products').update({ quantity: newQty }).eq('id', productId);
-      prod.quantity = newQty;
+    // Baixa no estoque (só pra produtos)
+    if (tipo === 'produto') {
+      const prod = (window._products || []).find(p => p.id === itemId);
+      if (prod) {
+        await sb.from('stock_movements').insert({
+          barbershop_id: shop.id,
+          product_id: itemId,
+          type: 'saida',
+          quantity: 1,
+          notes: 'Consumo durante atendimento'
+        });
+        const newQty = Math.max(0, prod.quantity - 1);
+        await sb.from('products').update({ quantity: newQty }).eq('id', itemId);
+        prod.quantity = newQty;
+      }
     }
 
-    // Fechar overlay e atualizar
-    const overlay = document.getElementById('consumo-rapido-overlay');
-    if (overlay) overlay.remove();
+    // Feedback visual sem fechar overlay (pra adicionar mais)
+    const feedback = document.createElement('div');
+    feedback.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:10px;background:var(--verde-acao,#d4a853);color:#000;font-size:13px;font-weight:700;z-index:99999;';
+    feedback.textContent = '✓ ' + itemName + ' adicionado';
+    document.body.appendChild(feedback);
+    setTimeout(() => feedback.remove(), 1500);
+
+    // Atualizar lista (estoque pode ter mudado)
+    renderConsumoLista();
 
     // Atualizar contagem de consumo no card
     await loadConsumoCount();
-    await renderDay();
+    // Re-render só os cards sem fechar overlay
+    const dateStr = currentDate.getFullYear() + '-' + String(currentDate.getMonth()+1).padStart(2,'0') + '-' + String(currentDate.getDate()).padStart(2,'0');
+    const dayStart = dateStr + 'T00:00:00-03:00';
+    const dayEnd = dateStr + 'T23:59:59-03:00';
+    const { data: appts } = await sb.from('appointments').select('*').eq('barbershop_id', shop.id).gte('scheduled_at', dayStart).lte('scheduled_at', dayEnd).order('scheduled_at', { ascending: true });
+    dayAppointments = appts || [];
+    await loadConsumoCount();
 
   } catch (e) {
     console.warn('Erro ao adicionar consumo:', e);
-    alert('Erro ao adicionar produto.');
+    alert('Erro ao adicionar item.');
   }
 }
 
@@ -1528,8 +1600,7 @@ async function loadConsumoNoModal(apptId) {
 
     if (comandas && comandas.length > 0 && comandas[0].comanda_items) {
       _pagExtras = comandas[0].comanda_items
-        .filter(i => i.type === 'produto')
-        .map(i => ({ product_id: i.reference_id, name: i.name, price: i.price, qty: i.quantity }));
+        .map(i => ({ product_id: i.reference_id, name: i.name, price: i.price, qty: i.quantity, type: i.type }));
       window._pagComandaId = comandas[0].id;
       renderExtras();
       updatePagTotal();
