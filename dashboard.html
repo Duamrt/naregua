@@ -35,7 +35,7 @@
       display:none; /* hidden until count > 0 */
     }
     .icon-btn {
-      width:36px; height:36px; border-radius:8px; border:1px solid var(--borda);
+      width:44px; height:44px; border-radius:8px; border:1px solid var(--borda);
       background:transparent; color:var(--texto-secundario); font-size:16px;
       cursor:pointer; display:flex; align-items:center; justify-content:center;
       transition:all .2s;
@@ -57,7 +57,7 @@
       margin-bottom:16px;
     }
     .date-nav-btn {
-      width:36px; height:36px; border-radius:8px; border:1px solid var(--borda);
+      width:44px; height:44px; border-radius:8px; border:1px solid var(--borda);
       background:transparent; color:var(--texto-secundario); font-size:16px;
       cursor:pointer; display:flex; align-items:center; justify-content:center;
       transition:all .2s; font-family:inherit;
@@ -1512,7 +1512,7 @@ async function checkBellCount() {
       const { ts, count } = JSON.parse(raw);
       if (Date.now() - ts < BELL_CACHE_TTL) { updateBell(count); return; }
     }
-  } catch {}
+  } catch (e) { console.warn('Bell cache error:', e); }
 
   let total = 0;
   const today = new Date().toISOString().slice(0, 10);
@@ -1550,7 +1550,7 @@ async function checkBellCount() {
   try {
     const read = JSON.parse(localStorage.getItem('naregua_read_notifs') || '[]');
     total = Math.max(0, total - Math.min(read.length, total));
-  } catch {}
+  } catch (e) { console.warn('Bell read error:', e); }
 
   sessionStorage.setItem(BELL_CACHE_KEY, JSON.stringify({ ts: Date.now(), count: total }));
   updateBell(total);

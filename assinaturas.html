@@ -766,7 +766,7 @@ async function excluirPlano(id, btnEl) {
   // Check if has active subscribers
   const hasSubs = assinantes.some(s => s.assinatura_id === id && s.status === 'ativa');
   if (hasSubs) {
-    alert('Este plano tem assinantes ativos. Cancele as assinaturas primeiro.');
+    showAlert('Este plano tem assinantes ativos. Cancele as assinaturas primeiro.', true);
     btnEl.disabled = false;
     btnEl.textContent = 'Excluir';
     return;
@@ -781,7 +781,7 @@ async function excluirPlano(id, btnEl) {
 function abrirModalAssinante() {
   const activePlans = planos.filter(p => p.active);
   if (!activePlans.length) {
-    alert('Crie um plano ativo primeiro.');
+    showAlert('Crie um plano ativo primeiro.', true);
     return;
   }
 
@@ -875,13 +875,13 @@ async function registrarUso(id) {
 
   const plano = planos.find(p => p.id === sub.assinatura_id);
   if (plano && plano.max_uses && (sub.uses_this_month || 0) >= plano.max_uses) {
-    alert('Limite de usos atingido para este mes.');
+    showAlert('Limite de usos atingido para este mês.', true);
     return;
   }
 
   const newUses = (sub.uses_this_month || 0) + 1;
   const { error } = await db.from('assinatura_clientes').update({ uses_this_month: newUses }).eq('id', id);
-  if (error) { console.error(error); alert('Erro ao registrar uso.'); return; }
+  if (error) { console.error(error); showAlert('Erro ao registrar uso.', true); return; }
 
   sub.uses_this_month = newUses;
   renderAssinantes();
@@ -901,7 +901,7 @@ async function renovarAssinatura(id) {
     next_payment: nextPay.toISOString().split('T')[0]
   }).eq('id', id);
 
-  if (error) { console.error(error); alert('Erro ao renovar.'); return; }
+  if (error) { console.error(error); showAlert('Erro ao renovar.', true); return; }
 
   sub.uses_this_month = 0;
   sub.status = 'ativa';
@@ -911,7 +911,7 @@ async function renovarAssinatura(id) {
 }
 
 function abrirZap(phone) {
-  if (!phone) { alert('Telefone nao cadastrado.'); return; }
+  if (!phone) { showAlert('Telefone não cadastrado.', true); return; }
   const num = phone.replace(/\D/g, '');
   const full = num.length <= 11 ? '55' + num : num;
   window.open('https://wa.me/' + full, '_blank');
@@ -930,7 +930,7 @@ async function cancelarAssinatura(id, btnEl) {
   delete btnEl.dataset.confirming;
 
   const { error } = await db.from('assinatura_clientes').update({ status: 'cancelada' }).eq('id', id);
-  if (error) { console.error(error); alert('Erro ao cancelar.'); return; }
+  if (error) { console.error(error); showAlert('Erro ao cancelar.', true); return; }
 
   await loadAll();
 }
@@ -940,6 +940,14 @@ function showMsg(id, text, type) {
   const el = document.getElementById(id);
   el.textContent = text;
   el.className = `msg msg-${type} show`;
+}
+
+function showAlert(text, isError) {
+  const t = document.createElement('div');
+  t.textContent = text;
+  t.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:10px;font-size:13px;font-weight:600;font-family:Inter,sans-serif;z-index:9999;animation:fadeIn .3s;max-width:90%;text-align:center;' + (isError ? 'background:#ef4444;color:#fff;' : 'background:var(--verde-acao);color:#000;');
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
 }
 </script>
 <script src="js/ajuda.js"></script>
