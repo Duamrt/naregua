@@ -1886,11 +1886,57 @@ async function salvarEncaixe() {
   btn.querySelector('.btn-label').style.display = 'none';
   btn.querySelector('.spinner').style.display = 'inline-block';
 
+  // Duracao do servico selecionado
+  const svc = services.find(s => s.id === serviceId);
+  const duration = svc ? (svc.duration_min || 30) : 30;
+
   // Horario = agora arredondado pra proximos 15min
   const agora = new Date();
-  const min = agora.getMinutes();
-  const rounded = Math.ceil(min / 15) * 15;
+  const minNow = agora.getMinutes();
+  const rounded = Math.ceil(minNow / 15) * 15;
   agora.setMinutes(rounded, 0, 0);
+
+  // Buscar agendamentos do profissional hoje pra validar conflito
+  const diaStr = agora.getFullYear() + '-' + String(agora.getMonth()+1).padStart(2,'0') + '-' + String(agora.getDate()).padStart(2,'0');
+  const { data: existing } = await sb.from('appointments')
+    .select('scheduled_at, service_id')
+    .eq('barber_id', barberId)
+    .eq('barbershop_id', shop.id)
+    .gte('scheduled_at', diaStr + 'T00:00:00')
+    .lt('scheduled_at', diaStr + 'T23:59:59')
+    .in('status', ['pending', 'confirmed']);
+
+  // Funcao pra checar se horario conflita com agendamentos existentes
+  function temConflito(slot) {
+    const slotStart = slot.getHours() * 60 + slot.getMinutes();
+    const slotEnd = slotStart + duration;
+    return (existing || []).some(a => {
+      const aDate = new Date(a.scheduled_at);
+      const aStart = aDate.getHours() * 60 + aDate.getMinutes();
+      const aSvc = services.find(s => s.id === a.service_id);
+      const aDur = aSvc ? (aSvc.duration_min || 30) : 30;
+      const aEnd = aStart + aDur;
+      return slotStart < aEnd && slotEnd > aStart;
+    });
+  }
+
+  // Se horario atual conflita, avanca de 15 em 15 min ate achar livre (max 4h)
+  let tentativas = 0;
+  while (temConflito(agora) && tentativas < 16) {
+    agora.setMinutes(agora.getMinutes() + 15);
+    tentativas++;
+  }
+
+  if (tentativas >= 16) {
+    btn.disabled = false;
+    btn.querySelector('.btn-label').style.display = 'inline';
+    btn.querySelector('.spinner').style.display = 'none';
+    const el = document.getElementById('encaixe-msg');
+    el.textContent = 'Sem horario livre nas proximas 4h para esse profissional.';
+    el.className = 'msg msg-error show';
+    return;
+  }
+
   const dateStr = agora.getFullYear() + '-' + String(agora.getMonth()+1).padStart(2,'0') + '-' + String(agora.getDate()).padStart(2,'0');
   const timeStr = String(agora.getHours()).padStart(2,'0') + ':' + String(agora.getMinutes()).padStart(2,'0');
   const scheduledAt = dateStr + 'T' + timeStr + ':00-03:00';
