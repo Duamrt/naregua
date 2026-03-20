@@ -189,6 +189,58 @@
     .modal-actions .btn-save { background:var(--verde-acao); border:none; color:#000; }
 
     @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* Anamnese */
+    .anam-field {
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:10px;
+      padding:12px; margin-bottom:6px;
+    }
+    .anam-field label {
+      font-size:11px; font-weight:700; color:var(--texto-muted); text-transform:uppercase;
+      letter-spacing:0.3px; display:block; margin-bottom:6px;
+    }
+    .anam-field .anam-value {
+      font-size:13px; color:var(--texto-secundario); font-weight:600;
+    }
+    .anam-field .anam-value.alerta { color:#ef4444; }
+    .anam-field input[type="text"],
+    .anam-field textarea,
+    .anam-field select {
+      width:100%; padding:8px 10px; background:var(--fundo); border:1px solid var(--borda);
+      border-radius:8px; color:var(--texto-principal); font-size:12px; font-family:inherit;
+      box-sizing:border-box;
+    }
+    .anam-field textarea { min-height:50px; resize:vertical; }
+    .anam-field input:focus, .anam-field textarea:focus, .anam-field select:focus {
+      border-color:var(--verde-acao); outline:none;
+    }
+    .anam-toggle-row {
+      display:flex; align-items:center; justify-content:space-between;
+      background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:10px;
+      padding:12px; margin-bottom:6px;
+    }
+    .anam-toggle-row label {
+      font-size:12px; font-weight:600; color:var(--texto-secundario);
+    }
+    .anam-toggle-row .toggle-switch {
+      width:40px; height:22px; background:var(--borda); border-radius:11px;
+      position:relative; cursor:pointer; transition:background .2s; border:none;
+    }
+    .anam-toggle-row .toggle-switch.on { background:var(--verde-acao); }
+    .anam-toggle-row .toggle-switch::after {
+      content:''; position:absolute; top:2px; left:2px; width:18px; height:18px;
+      background:#fff; border-radius:50%; transition:transform .2s;
+    }
+    .anam-toggle-row .toggle-switch.on::after { transform:translateX(18px); }
+    .anam-actions {
+      display:flex; gap:8px; margin-top:10px;
+    }
+    .anam-actions button {
+      flex:1; padding:10px; border-radius:8px; font-size:12px; font-weight:700;
+      font-family:inherit; cursor:pointer; transition:all .2s;
+    }
+    .anam-btn-save { background:var(--verde-acao); color:#000; border:none; }
+    .anam-btn-cancel { background:transparent; border:1px solid var(--borda); color:var(--texto-muted); }
   </style>
 </head>
 <body>
@@ -294,6 +346,16 @@
     <div class="section" id="sec-cupons" style="display:none;">
       <div class="section-title">&#x1F3AB; Cupons Usados</div>
       <div id="cupons-list"></div>
+    </div>
+
+    <!-- Anamnese -->
+    <div class="section" id="sec-anamnese">
+      <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>&#x1F4CB; Anamnese / Ficha de Avaliação</span>
+        <button onclick="toggleAnamnese()" id="btn-toggle-anamnese" style="background:none;border:1px solid var(--borda);color:var(--texto-muted);font-size:10px;font-weight:700;padding:3px 10px;border-radius:6px;cursor:pointer;font-family:inherit;">PREENCHER</button>
+      </div>
+      <div id="anamnese-view"></div>
+      <div id="anamnese-form" style="display:none;"></div>
     </div>
 
   </div>
@@ -540,6 +602,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadCupons(rawPhone, phoneClean)
   ]);
 
+  // Render anamnese view
+  renderAnamneseView();
+  if (clientRecord && clientRecord.anamnese && Object.keys(clientRecord.anamnese).length > 0) {
+    document.getElementById('btn-toggle-anamnese').textContent = 'EDITAR';
+  }
+
   document.getElementById('loading').style.display = 'none';
   document.getElementById('content').style.display = 'block';
 });
@@ -763,6 +831,200 @@ async function saveBirthday() {
 document.getElementById('birthday-modal').addEventListener('click', function(e) {
   if (e.target === this) closeBirthdayModal();
 });
+
+// ── Anamnese ──────────────────────────────────────────────────
+const ANAMNESE_TEMPLATES = {
+  barbearia: [
+    { key: 'tipo_cabelo', label: 'Tipo de cabelo', type: 'select', options: ['Liso', 'Ondulado', 'Cacheado', 'Crespo'] },
+    { key: 'sensibilidade_couro', label: 'Couro cabeludo sensível', type: 'toggle' },
+    { key: 'alergia_produto', label: 'Alergia a algum produto', type: 'toggle' },
+    { key: 'queda_capilar', label: 'Queda capilar', type: 'toggle' },
+    { key: 'caspa', label: 'Caspa / oleosidade', type: 'toggle' },
+    { key: 'progressiva', label: 'Já fez progressiva/química', type: 'toggle' },
+    { key: 'corte_preferido', label: 'Corte preferido', type: 'text' },
+    { key: 'obs', label: 'Observações', type: 'textarea' }
+  ],
+  estetica: [
+    { key: 'tipo_pele', label: 'Tipo de pele', type: 'select', options: ['Seca', 'Oleosa', 'Mista', 'Normal', 'Sensível'] },
+    { key: 'alergia_acido', label: 'Alergia a ácido', type: 'toggle' },
+    { key: 'alergia_cosmetico', label: 'Alergia a cosméticos', type: 'toggle' },
+    { key: 'usa_retinol', label: 'Usa ácido/retinol', type: 'toggle' },
+    { key: 'gravida', label: 'Gestante', type: 'toggle' },
+    { key: 'tratamento_anterior', label: 'Tratamentos anteriores', type: 'text' },
+    { key: 'medicamento', label: 'Usa medicamento contínuo', type: 'text' },
+    { key: 'obs', label: 'Observações', type: 'textarea' }
+  ],
+  sobrancelha: [
+    { key: 'tipo_pele', label: 'Tipo de pele', type: 'select', options: ['Seca', 'Oleosa', 'Mista', 'Normal', 'Sensível'] },
+    { key: 'alergia_henna', label: 'Alergia a henna', type: 'toggle' },
+    { key: 'alergia_tinta', label: 'Alergia a tinta', type: 'toggle' },
+    { key: 'micropigmentacao', label: 'Já fez micropigmentação', type: 'toggle' },
+    { key: 'usa_retinol', label: 'Usa ácido/retinol', type: 'toggle' },
+    { key: 'gravida', label: 'Gestante', type: 'toggle' },
+    { key: 'cicatrizacao', label: 'Problema de cicatrização', type: 'toggle' },
+    { key: 'formato_preferido', label: 'Formato preferido', type: 'text' },
+    { key: 'obs', label: 'Observações', type: 'textarea' }
+  ],
+  unha: [
+    { key: 'alergia_esmalte', label: 'Alergia a esmalte/acetona', type: 'toggle' },
+    { key: 'diabetes', label: 'Diabetes', type: 'toggle' },
+    { key: 'micose', label: 'Micose/fungo', type: 'toggle' },
+    { key: 'anticoagulante', label: 'Usa anticoagulante', type: 'toggle' },
+    { key: 'unha_gel', label: 'Já fez unha em gel/fibra', type: 'toggle' },
+    { key: 'formato_preferido', label: 'Formato preferido', type: 'select', options: ['Quadrada', 'Redonda', 'Oval', 'Amêndoa', 'Bailarina', 'Stiletto'] },
+    { key: 'cor_preferida', label: 'Cores preferidas', type: 'text' },
+    { key: 'obs', label: 'Observações', type: 'textarea' }
+  ],
+  salao: [
+    { key: 'tipo_cabelo', label: 'Tipo de cabelo', type: 'select', options: ['Liso', 'Ondulado', 'Cacheado', 'Crespo'] },
+    { key: 'tipo_pele', label: 'Tipo de pele', type: 'select', options: ['Seca', 'Oleosa', 'Mista', 'Normal', 'Sensível'] },
+    { key: 'alergia_quimica', label: 'Alergia a química capilar', type: 'toggle' },
+    { key: 'alergia_tinta', label: 'Alergia a tintura', type: 'toggle' },
+    { key: 'gravida', label: 'Gestante', type: 'toggle' },
+    { key: 'progressiva', label: 'Já fez progressiva', type: 'toggle' },
+    { key: 'coloracao_atual', label: 'Coloração atual', type: 'text' },
+    { key: 'tratamento_anterior', label: 'Tratamentos anteriores', type: 'text' },
+    { key: 'obs', label: 'Observações', type: 'textarea' }
+  ]
+};
+
+function getAnamneseTemplate() {
+  const seg = (shop.settings && shop.settings.segmento) || 'barbearia';
+  const custom = (shop.settings && shop.settings.anamnese_template);
+  if (custom && Array.isArray(custom) && custom.length > 0) return custom;
+  return ANAMNESE_TEMPLATES[seg] || ANAMNESE_TEMPLATES.barbearia;
+}
+
+function renderAnamneseView() {
+  const data = (clientRecord && clientRecord.anamnese) || {};
+  const template = getAnamneseTemplate();
+  const viewEl = document.getElementById('anamnese-view');
+
+  const filled = template.filter(f => data[f.key] !== undefined && data[f.key] !== '' && data[f.key] !== false);
+
+  if (filled.length === 0) {
+    viewEl.innerHTML = '<div class="empty-section">Nenhuma anamnese preenchida. Clique em PREENCHER.</div>';
+    return;
+  }
+
+  viewEl.innerHTML = filled.map(f => {
+    let val = data[f.key];
+    let cls = '';
+    if (f.type === 'toggle') {
+      val = val ? 'Sim' : 'Não';
+      if (data[f.key]) cls = ' alerta';
+    }
+    return '<div class="anam-field"><label>' + esc(f.label) + '</label><div class="anam-value' + cls + '">' + esc(String(val)) + '</div></div>';
+  }).join('');
+}
+
+let anamneseFormOpen = false;
+
+function toggleAnamnese() {
+  anamneseFormOpen = !anamneseFormOpen;
+  const formEl = document.getElementById('anamnese-form');
+  const viewEl = document.getElementById('anamnese-view');
+  const btn = document.getElementById('btn-toggle-anamnese');
+
+  if (anamneseFormOpen) {
+    btn.textContent = 'CANCELAR';
+    viewEl.style.display = 'none';
+    formEl.style.display = 'block';
+    renderAnamneseForm();
+  } else {
+    btn.textContent = 'PREENCHER';
+    viewEl.style.display = 'block';
+    formEl.style.display = 'none';
+    renderAnamneseView();
+  }
+}
+
+function renderAnamneseForm() {
+  const data = (clientRecord && clientRecord.anamnese) || {};
+  const template = getAnamneseTemplate();
+  const formEl = document.getElementById('anamnese-form');
+
+  let html = template.map(f => {
+    const val = data[f.key] !== undefined ? data[f.key] : (f.type === 'toggle' ? false : '');
+
+    if (f.type === 'toggle') {
+      return '<div class="anam-toggle-row">' +
+        '<label>' + esc(f.label) + '</label>' +
+        '<button type="button" class="toggle-switch ' + (val ? 'on' : '') + '" data-key="' + esc(f.key) + '" onclick="toggleAnamField(this)"></button>' +
+      '</div>';
+    }
+    if (f.type === 'select') {
+      const opts = (f.options || []).map(o => '<option value="' + esc(o) + '"' + (val === o ? ' selected' : '') + '>' + esc(o) + '</option>').join('');
+      return '<div class="anam-field"><label>' + esc(f.label) + '</label>' +
+        '<select data-key="' + esc(f.key) + '"><option value="">— Selecione —</option>' + opts + '</select></div>';
+    }
+    if (f.type === 'textarea') {
+      return '<div class="anam-field"><label>' + esc(f.label) + '</label>' +
+        '<textarea data-key="' + esc(f.key) + '">' + esc(String(val)) + '</textarea></div>';
+    }
+    return '<div class="anam-field"><label>' + esc(f.label) + '</label>' +
+      '<input type="text" data-key="' + esc(f.key) + '" value="' + esc(String(val)) + '"></div>';
+  }).join('');
+
+  html += '<div class="anam-actions">' +
+    '<button class="anam-btn-cancel" onclick="toggleAnamnese()">CANCELAR</button>' +
+    '<button class="anam-btn-save" onclick="saveAnamnese()">SALVAR ANAMNESE</button>' +
+  '</div>';
+
+  formEl.innerHTML = html;
+}
+
+function toggleAnamField(el) {
+  el.classList.toggle('on');
+}
+
+async function saveAnamnese() {
+  const template = getAnamneseTemplate();
+  const anamnese = {};
+
+  for (const f of template) {
+    if (f.type === 'toggle') {
+      const el = document.querySelector('.toggle-switch[data-key="' + f.key + '"]');
+      anamnese[f.key] = el ? el.classList.contains('on') : false;
+    } else {
+      const el = document.querySelector('[data-key="' + f.key + '"]');
+      anamnese[f.key] = el ? el.value.trim() : '';
+    }
+  }
+
+  const btn = document.querySelector('.anam-btn-save');
+  btn.textContent = 'SALVANDO...';
+
+  try {
+    if (clientRecord && clientRecord.id) {
+      await db.from('clients').update({ anamnese }).eq('id', clientRecord.id);
+      clientRecord.anamnese = anamnese;
+    } else {
+      const rawPhone = allVisits.length > 0 ? allVisits[0].client_phone : clientPhone;
+      const name = allVisits.length > 0 ? allVisits[0].client_name : '';
+      const { data } = await db.from('clients').insert({
+        barbershop_id: shop.id,
+        phone: rawPhone,
+        name: name,
+        anamnese: anamnese
+      }).select().single();
+      clientRecord = data;
+    }
+
+    btn.textContent = 'SALVO!';
+    setTimeout(() => {
+      anamneseFormOpen = false;
+      document.getElementById('btn-toggle-anamnese').textContent = 'EDITAR';
+      document.getElementById('anamnese-form').style.display = 'none';
+      document.getElementById('anamnese-view').style.display = 'block';
+      renderAnamneseView();
+    }, 800);
+  } catch (e) {
+    console.error('Erro ao salvar anamnese:', e);
+    btn.textContent = 'ERRO — tente novamente';
+    setTimeout(() => { btn.textContent = 'SALVAR ANAMNESE'; }, 2000);
+  }
+}
 </script>
 <script src="js/ajuda.js"></script>
 <script src="js/sw-update.js"></script>
