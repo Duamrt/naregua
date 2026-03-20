@@ -11,16 +11,18 @@ const AJUDA = {
       'Use +ENCAIXE pra clientes sem hora marcada',
       'Navegue entre dias com as setas',
       'O próximo cliente aparece destacado com borda dourada',
-      'A agenda atualiza automaticamente a cada 30 segundos'
+      'A agenda atualiza automaticamente a cada 30 segundos',
+      'O sino mostra notificações pendentes (novos agendamentos)'
     ]
   },
   'agenda-semana': {
     titulo: 'Agenda Semanal',
     itens: [
-      'Visão completa da semana por barbeiro',
+      'Visão completa da semana por profissional',
       'Dias fechados e folgas são destacados em cinza',
       'Clique num card pra ir direto pro dia na agenda',
-      'Use as setas pra navegar entre semanas'
+      'Use as setas pra navegar entre semanas',
+      'Alterne entre "TODOS" e por profissional individual'
     ]
   },
   'financeiro': {
@@ -30,7 +32,8 @@ const AJUDA = {
       'Registre despesas com + DESPESA',
       'Alterne entre DIA e MÊS nos filtros',
       'A margem mostra quanto sobra após custos e comissões',
-      'A receita vem dos atendimentos concluídos no dashboard'
+      'Abra e feche o caixa por turno (manhã/tarde/noite)',
+      'Confira valores esperados vs recebidos no fechamento'
     ]
   },
   'equipe': {
@@ -38,17 +41,19 @@ const AJUDA = {
     itens: [
       'Gerencie seus profissionais e seus horários',
       'Configure horário por dia, pausa e modo de agendamento',
-      'Defina a comissão (%) de cada barbeiro',
+      'Defina a comissão (%) de cada profissional',
       'Desativar mantém o histórico, excluir apaga tudo',
-      'O telefone é necessário pro barbeiro criar acesso no app'
+      'O telefone é necessário pro profissional criar acesso no app',
+      'Compartilhe o link de cadastro via WhatsApp'
     ]
   },
   'servicos': {
     titulo: 'Serviços',
     itens: [
-      'Cadastre os serviços que você oferece',
+      'Cadastre os serviços/procedimentos que você oferece',
       'Defina nome, preço e duração em minutos',
-      'Desativar um serviço esconde do agendamento mas mantém histórico',
+      'Serviço "dia inteiro" bloqueia toda a agenda do dia',
+      'Desativar esconde do agendamento mas mantém histórico',
       'Preço e duração podem ser editados sem afetar agendamentos já feitos'
     ]
   },
@@ -56,8 +61,9 @@ const AJUDA = {
     titulo: 'Clientes',
     itens: [
       'Lista de todos os clientes que já agendaram',
-      'Clique no nome pra ver o histórico completo',
+      'Clique no card pra ver ficha completa, histórico e anamnese',
       'Use a busca pra encontrar por nome ou telefone',
+      'VER FICHA abre o histórico detalhado do cliente',
       'ZAP abre conversa no WhatsApp direto com o cliente'
     ]
   },
@@ -73,7 +79,7 @@ const AJUDA = {
   'relatorio': {
     titulo: 'Relatório',
     itens: [
-      'Análise completa: ranking de barbeiros, comparativo mensal',
+      'Análise completa: ranking de profissionais, comparativo mensal',
       'Formas de pagamento mais usadas e despesas por categoria',
       'Gráfico de faturamento diário e horários de pico',
       'Use as setas pra navegar entre meses',
@@ -83,16 +89,17 @@ const AJUDA = {
   'resumo': {
     titulo: 'Resumo',
     itens: [
-      'Visão geral do negócio em cards coloridos',
-      'Cada card mostra um KPI importante',
-      'Faturamento, atendimentos, ticket médio e mais',
-      'Acompanhe a evolução mês a mês'
+      'Visão geral do negócio em 16 KPIs coloridos',
+      'Faturamento, atendimentos, ticket médio, lucro',
+      'Clientes sem cadastro, retorno previsto, abandonos',
+      'Caixa aberto, assinaturas vencendo, estoque baixo',
+      'Clique em qualquer card pra ir direto pra página relacionada'
     ]
   },
   'comandas': {
     titulo: 'Comandas',
     itens: [
-      'Abra uma comanda quando o cliente sentar na cadeira',
+      'Abra uma comanda quando o cliente chegar',
       'Adicione serviços e produtos à comanda',
       'Feche com a forma de pagamento quando terminar',
       'O valor é somado automaticamente no financeiro'
@@ -141,7 +148,7 @@ const AJUDA = {
     itens: [
       'Veja clientes que sumiram há mais de 30 dias',
       'Aniversariantes do mês pra mandar parabéns',
-      'Nota de satisfação média da barbearia',
+      'Nota de satisfação média do estabelecimento',
       'Chame clientes de volta pelo WhatsApp com um toque'
     ]
   },
@@ -157,11 +164,14 @@ const AJUDA = {
   'configuracoes': {
     titulo: 'Configurações',
     itens: [
-      'Ajuste o intervalo entre horários de agendamento',
-      'Limite de antecedência pra agendar',
-      'Comissão padrão aplicada a novos barbeiros',
-      'Formas de pagamento aceitas',
-      'Tema visual (claro/escuro) da barbearia'
+      'Segmento: escolha entre barbearia, estética, sobrancelha, unha ou salão',
+      'Intervalo entre horários de agendamento (15, 30, 45 ou 60 min)',
+      'Limite de agendamento futuro (quantos dias à frente)',
+      'Máximo de agendamentos em aberto por cliente',
+      'Limite de cancelamento (horas mínimas de antecedência)',
+      'Comissão padrão aplicada a novos profissionais',
+      'Formas de pagamento aceitas (PIX, Dinheiro, Débito, Crédito)',
+      'Tema visual: claro/escuro + cor de destaque + segmento'
     ]
   },
   'lista-espera': {
@@ -176,19 +186,22 @@ const AJUDA = {
   'comissoes': {
     titulo: 'Comissões',
     itens: [
-      'Quanto cada barbeiro faturou no período',
+      'Quanto cada profissional faturou no período',
       'Valor da comissão calculado automaticamente',
       'Edite a % de comissão direto nesta tela',
       'Filtre por mês pra fechar o pagamento'
     ]
   },
   'historico-cliente': {
-    titulo: 'Histórico do Cliente',
+    titulo: 'Ficha do Cliente',
     itens: [
-      'Todas as visitas deste cliente com data e serviço',
-      'Total gasto e frequência de visitas',
-      'Pacotes e assinaturas vinculados',
-      'Avaliações de satisfação que ele deixou'
+      'Todas as visitas com data, serviço e valor',
+      'Total gasto, ticket médio e frequência de visitas',
+      'Tags automáticas: VIP (20+ visitas), Novo, Sumido',
+      'Aniversário editável + observações livres',
+      'Anamnese / Ficha de Avaliação: preencha dados de saúde e preferências',
+      'Pacotes, assinaturas e avaliações vinculados',
+      'Botão AGENDAR e ZAP direto na ficha'
     ]
   },
   'combos': {
@@ -214,26 +227,27 @@ const AJUDA = {
     itens: [
       'Veja seu plano atual e recursos disponíveis',
       'Dias restantes do período de teste (trial)',
-      'Compare os planos e faça upgrade',
-      'Histórico de pagamentos e faturas'
+      'Compare Básico (1 profissional), Profissional (até 3) e Premium (ilimitado)',
+      'Contrate via WhatsApp direto com o suporte'
     ]
   },
   'busca': {
     titulo: 'Busca',
     itens: [
       'Encontre qualquer coisa: clientes, agendamentos, serviços',
-      'Pesquise também produtos, barbeiros e comandas',
+      'Pesquise também produtos, profissionais e comandas',
       'Digite e veja os resultados em tempo real',
-      'Clique no resultado pra ir direto pra página'
+      'Atalho: Ctrl+K abre a busca de qualquer página'
     ]
   },
   'qrcode': {
-    titulo: 'QR Code',
+    titulo: 'QR Code & Cartão Digital',
     itens: [
-      'QR Code da sua barbearia pra imprimir',
+      'QR Code do seu estabelecimento pra imprimir',
       'Coloque no balcão, espelho ou cartão de visita',
-      'Cada barbeiro tem seu QR Code individual',
-      'O cliente escaneia e agenda direto pelo celular'
+      'Cada profissional tem seu QR Code individual',
+      'O cliente escaneia e agenda direto pelo celular',
+      'Cartão digital compartilhável via WhatsApp'
     ]
   },
   'notificacoes': {
@@ -249,9 +263,9 @@ const AJUDA = {
     titulo: 'Galeria',
     itens: [
       'Portfólio de fotos dos trabalhos realizados',
-      'Upload de imagens organizadas por barbeiro',
-      'Categorize por tipo: cabelo, barba, sobrancelha',
-      'As fotos aparecem no perfil público da barbearia'
+      'Upload de imagens ou cole URL direto',
+      'Categorize por tipo de trabalho',
+      'As fotos aparecem no perfil público do estabelecimento'
     ]
   },
   'politicas': {
@@ -266,16 +280,16 @@ const AJUDA = {
   'importar-clientes': {
     titulo: 'Importar Clientes',
     itens: [
-      'Importe clientes de uma planilha CSV',
-      'Ou cole direto do Excel (nome e telefone)',
+      'Importe clientes de uma planilha CSV ou Excel',
+      'Cole direto do Excel (nome e telefone)',
       'Clientes duplicados são identificados pelo telefone',
       'Revise antes de confirmar a importação'
     ]
   },
   'recibo-barbeiro': {
-    titulo: 'Recibo',
+    titulo: 'Recibo de Comissão',
     itens: [
-      'Recibo de comissão do barbeiro',
+      'Recibo detalhado do profissional',
       'Detalhamento de atendimentos e valores',
       'Imprimível direto do navegador',
       'Compartilhável via WhatsApp'
@@ -284,8 +298,8 @@ const AJUDA = {
   'backup': {
     titulo: 'Backup',
     itens: [
-      'Exporte todos os seus dados da barbearia',
-      'Formatos disponíveis: CSV e JSON',
+      'Exporte todos os seus dados do estabelecimento',
+      'Agendamentos em CSV, tudo em JSON',
       'Seus dados são seus, leve quando quiser',
       'Recomendamos fazer backup mensalmente'
     ]
@@ -293,7 +307,7 @@ const AJUDA = {
   'atividades': {
     titulo: 'Atividades',
     itens: [
-      'Log de tudo que aconteceu na barbearia',
+      'Log de tudo que aconteceu no estabelecimento',
       'Agendamentos, despesas, estoque e comandas',
       'Filtre por período e tipo de atividade',
       'Acompanhe quem fez o quê e quando'
@@ -312,7 +326,7 @@ const AJUDA = {
     titulo: 'Folha de Pagamento',
     itens: [
       'Salário fixo + comissão - deduções = líquido a pagar',
-      'Detalhamento completo por barbeiro',
+      'Detalhamento completo por profissional',
       'Imprimível pra assinatura do profissional',
       'Filtre por mês e exporte se precisar'
     ]
@@ -329,9 +343,9 @@ const AJUDA = {
   'admin': {
     titulo: 'Painel Admin',
     itens: [
-      'Gerenciamento de todas as barbearias do NaRegua',
-      'Crie, edite e acesse qualquer barbearia',
-      'Veja stats globais: barbeiros, agendamentos, faturamento',
+      'Gerenciamento de todos os estabelecimentos do NaRegua',
+      'Crie, edite e acesse qualquer estabelecimento',
+      'Veja stats globais: profissionais, agendamentos, faturamento',
       '"Entrar como" acessa o dashboard como se fosse o dono'
     ]
   },
@@ -347,19 +361,21 @@ const AJUDA = {
   'agendar': {
     titulo: 'Agendar',
     itens: [
-      'Escolha o barbeiro e o serviço desejado',
+      'Escolha o profissional e o serviço desejado',
       'Selecione o dia e horário disponível',
       'Confirme com seu nome e telefone',
-      'Você receberá confirmação pelo WhatsApp'
+      'Aplique cupom de desconto se tiver',
+      'Combos disponíveis com preço especial'
     ]
   },
   'barbearia': {
-    titulo: 'Minha Barbearia',
+    titulo: 'Perfil Público',
     itens: [
-      'Perfil público da sua barbearia',
+      'Perfil público do seu estabelecimento',
       'Informações que o cliente vê antes de agendar',
       'Endereço, horário de funcionamento e contato',
-      'Galeria de fotos e serviços oferecidos'
+      'Galeria de fotos e serviços oferecidos',
+      'Botão AGENDAR AGORA leva direto pro agendamento'
     ]
   },
   'cliente': {
@@ -383,18 +399,18 @@ const AJUDA = {
   'onboarding': {
     titulo: 'Configuração Inicial',
     itens: [
-      'Preencha os dados da sua barbearia passo a passo',
-      'Configure horários, serviços e barbeiros',
-      'Ao final, sua barbearia estará pronta pra receber agendamentos',
+      'Preencha os dados do seu estabelecimento passo a passo',
+      'Configure horários, serviços e profissionais',
+      'Ao final, seu estabelecimento estará pronto pra receber agendamentos',
       'Você pode ajustar tudo depois nas Configurações'
     ]
   },
   'barbeiro-cadastro': {
-    titulo: 'Cadastro do Barbeiro',
+    titulo: 'Cadastro do Profissional',
     itens: [
       'Crie seu acesso como profissional',
-      'Use o telefone cadastrado pelo dono da barbearia',
-      'Defina sua senha de acesso',
+      'Use o telefone cadastrado pelo dono do estabelecimento',
+      'Defina sua senha de acesso (mínimo 8 caracteres + 1 número)',
       'Após o cadastro, acesse sua agenda pessoal'
     ]
   }
