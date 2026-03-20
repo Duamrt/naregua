@@ -27,3 +27,18 @@ function esc(str) {
   d.textContent = str || '';
   return d.innerHTML;
 }
+
+// ── Google Analytics 4 ──────────────────────────────────────
+(function() {
+  var GA_ID = 'G-XXXXXXXXXX'; // TODO: substituir pelo GA ID real do NaRegua
+  if (GA_ID === 'G-XXXXXXXXXX') return; // Não carrega se não configurado
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+  document.head.appendChild(s);
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  window.gtag = gtag;
+  gtag('js', new Date());
+  gtag('config', GA_ID, { send_page_view: true });
+})();

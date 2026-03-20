@@ -80,8 +80,9 @@
     NAV.forEach(function (group) {
       var g = document.createElement('div');
       g.className = 'nr-sidebar-group';
+      var isFirstVisit = Object.keys(state).length === 0;
       var saved = state[group.group];
-      if (saved !== undefined ? saved : !group.open) g.classList.add('collapsed');
+      if (saved !== undefined ? saved : (isFirstVisit ? false : !group.open)) g.classList.add('collapsed');
 
       var header = document.createElement('div');
       header.className = 'nr-sidebar-group-header';
