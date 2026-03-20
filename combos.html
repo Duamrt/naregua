@@ -490,7 +490,7 @@ function fecharModal() {
 function renderServiceSelector(selectedIds) {
   const el = document.getElementById('svc-check-list');
   if (!allServices.length) {
-    el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--texto-muted);font-size:12px;">Nenhum servico ativo. Crie servicos primeiro.</div>';
+    el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--texto-muted);font-size:12px;">Nenhum serviço ativo. Crie serviços primeiro.</div>';
     updateSum();
     return;
   }
@@ -580,7 +580,7 @@ async function salvarCombo() {
   if (isNaN(preco) || preco <= 0) { showMsg('Digite um preço válido.', 'error'); return; }
 
   var sumIndiv = selected.reduce(function(s, svc) { return s + svc.price; }, 0);
-  if (preco >= sumIndiv) { showMsg('Preco do combo deve ser menor que ' + formatMoney(sumIndiv) + '.', 'error'); return; }
+  if (preco >= sumIndiv) { showMsg('Preço do combo deve ser menor que ' + formatMoney(sumIndiv) + '.', 'error'); return; }
 
   if (isNaN(duracao) || duracao < 5) { showMsg('Duração mínima: 5 min.', 'error'); return; }
 
