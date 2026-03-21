@@ -464,6 +464,17 @@ async function finishOnboarding() {
     // BUG 11 ALTO FIX: limpar draft ao finalizar
     localStorage.removeItem('naregua_onboarding_draft');
 
+    // Notificar no Telegram
+    fetch('https://api.telegram.org/bot8644194982:AAH6-26NFAbYYtq4TM45hOapqqMguid9qpI/sendMessage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: '-5132930435',
+        text: '💈 <b>Novo cliente NaRegua!</b>\n\n👤 ' + name + '\n📍 ' + (city || 'N/I') + '\n📞 ' + (phone || 'N/I') + '\n📧 ' + currentUser.email + '\n📅 ' + new Date().toLocaleString('pt-BR'),
+        parse_mode: 'HTML'
+      })
+    }).catch(() => {});
+
     // Mostrar modal de sucesso com link de agendamento
     const baseUrl = window.location.origin + window.location.pathname.replace('onboarding.html', '');
     const linkAgendamento = baseUrl + 'agendar.html?slug=' + slug;
