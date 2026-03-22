@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03201640">
-  <link rel="stylesheet" href="css/layout.css?v=03201640">
-  <script src="js/theme.js?v=03201640"></script>
+  <link rel="stylesheet" href="css/style.css?v=03221550">
+  <link rel="stylesheet" href="css/layout.css?v=03221550">
+  <script src="js/theme.js?v=03221550"></script>
   <style>
     .le-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -256,7 +256,7 @@
       <input type="tel" id="le-phone" placeholder="(00) 00000-0000" inputmode="numeric" autocomplete="tel">
     </div>
     <div class="field">
-      <label>BARBEIRO PREFERIDO</label>
+      <label id="lbl-profissional">PROFISSIONAL PREFERIDO</label>
       <select id="le-barber"><option value="">Qualquer</option></select>
     </div>
     <div class="field">
@@ -318,9 +318,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03201640"></script>
-<script src="js/supabase.js?v=03201640"></script>
-<script src="js/utils.js?v=03201640"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221550"></script>
+<script src="js/supabase.js?v=03221550"></script>
+<script src="js/utils.js?v=03221550"></script>
 <script>
 console.log('Lista de Espera v1 carregado');
 
@@ -385,6 +385,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelector('.le-container').insertBefore(banner, document.querySelector('.le-header'));
   }
 
+  // Ajustar labels conforme tipo de negócio
+  const termos = { barbearia: 'BARBEIRO PREFERIDO', manicure: 'MANICURE PREFERIDA', salao: 'PROFISSIONAL PREFERIDO', outro: 'PROFISSIONAL PREFERIDO' };
+  const lbl = document.getElementById('lbl-profissional');
+  if (lbl) lbl.textContent = termos[shop.business_type] || 'PROFISSIONAL PREFERIDO';
+
   // Carregar dados auxiliares
   await Promise.all([loadBarbers(), loadServices()]);
   populateSelects();
@@ -402,7 +407,7 @@ async function loadBarbers() {
 }
 
 async function loadServices() {
-  const { data } = await db.from('services').select('id,name,price,duration').eq('barbershop_id', shop.id).order('name');
+  const { data } = await db.from('services').select('id,name,price,duration_min').eq('barbershop_id', shop.id).eq('active', true).order('name');
   services = data || [];
 }
 
@@ -499,7 +504,7 @@ function renderFila() {
 
   const now = new Date();
   el.innerHTML = filtered.map((item, idx) => {
-    const barberName = item.barber_id ? (barbers.find(b => b.id === item.barber_id)?.name || 'Barbeiro') : 'Qualquer';
+    const barberName = item.barber_id ? (barbers.find(b => b.id === item.barber_id)?.name || 'Profissional') : 'Qualquer';
     const serviceName = item.service_id ? (services.find(s => s.id === item.service_id)?.name || 'Servico') : '\u2014';
     const phone = item.client_phone || '';
     const phoneFormatted = phone ? formatPhone(phone) : '';
@@ -746,8 +751,8 @@ function showModalMsg(text, type) {
   el.className = 'msg msg-' + type + ' show';
 }
 </script>
-<script src="js/ajuda.js?v=03201640"></script>
-<script src="js/sw-update.js?v=03201640"></script>
-<script src="js/sidebar.js?v=03201640"></script>
+<script src="js/ajuda.js?v=03221550"></script>
+<script src="js/sw-update.js?v=03221550"></script>
+<script src="js/sidebar.js?v=03221550"></script>
 </body>
 </html>

@@ -13,8 +13,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03201640">
-  <script src="js/theme.js?v=03201640"></script>
+  <link rel="stylesheet" href="css/style.css?v=03221550">
+  <script src="js/theme.js?v=03221550"></script>
 </head>
 <body>
 
@@ -23,6 +23,7 @@
     <div class="card-header">
       <img src="img/logo.png" alt="NaRegua" class="logo-img" style="height:48px;margin-bottom:8px;">
       <p>Vamos configurar seu negócio</p>
+      <button onclick="sairConta()" style="background:none;border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:6px 14px;font-size:11px;color:#a3a3a3;cursor:pointer;font-family:inherit;margin-top:8px;">Nao e voce? Trocar conta</button>
     </div>
 
     <div id="onboarding-msg" class="msg"></div>
@@ -113,9 +114,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03201640"></script>
-<script src="js/supabase.js?v=03201640"></script>
-<script src="js/utils.js?v=03201640"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221550"></script>
+<script src="js/supabase.js?v=03221550"></script>
+<script src="js/utils.js?v=03221550"></script>
 <script>
 // ── Verificar sessão ──────────────────────────────────────────
 let currentUser = null;
@@ -494,6 +495,12 @@ async function finishOnboarding() {
 }
 
 // ── Feedback ──────────────────────────────────────────────────
+async function sairConta() {
+  localStorage.removeItem('naregua_onboarding_draft');
+  await sb.auth.signOut();
+  window.location.href = 'app.html';
+}
+
 function showOnbMsg(text, type) {
   const el = document.getElementById('onboarding-msg');
   el.textContent = text;
@@ -531,7 +538,7 @@ function copyLink() {
   });
 }
 </script>
-<script src="js/ajuda.js?v=03201640"></script>
-<script src="js/sw-update.js?v=03201640"></script>
+<script src="js/ajuda.js?v=03221550"></script>
+<script src="js/sw-update.js?v=03221550"></script>
 </body>
 </html>

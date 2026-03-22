@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NaRegua — Acesso do Barbeiro</title>
+  <title>NaRegua — Acesso do Profissional</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,8 +13,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03201640">
-  <script src="js/theme.js?v=03201640"></script>
+  <link rel="stylesheet" href="css/style.css?v=03221550">
+  <script src="js/theme.js?v=03221550"></script>
   <style>
     body { background:#000; overflow-x:hidden; }
 
@@ -114,7 +114,7 @@
   </div>
 
   <div class="card">
-    <div class="card-title">Area do Barbeiro</div>
+    <div class="card-title">Area do Profissional</div>
     <div class="card-sub">Use seu número de telefone pra entrar ou criar seu acesso</div>
 
     <div class="tabs">
@@ -146,7 +146,7 @@
     <!-- PRIMEIRO ACESSO -->
     <div id="form-signup" style="display:none;">
       <div class="help" style="margin-top:0;margin-bottom:16px;text-align:left;">
-        O dono da barbearia já cadastrou seu telefone. Digite o <strong>mesmo número</strong> e crie uma senha pra acessar sua agenda.
+        O responsável pelo estabelecimento já cadastrou seu telefone. Digite o <strong>mesmo número</strong> e crie uma senha pra acessar sua agenda.
       </div>
       <div class="field">
         <label class="label">SEU TELEFONE</label>
@@ -166,16 +166,16 @@
     </div>
 
     <div class="help">
-      Nao tem acesso? Peca ao <strong>dono da barbearia</strong> cadastrar seu telefone na equipe.
+      Nao tem acesso? Peca ao <strong>responsável do estabelecimento</strong> cadastrar seu telefone na equipe.
     </div>
   </div>
 
   <div class="footer">NaRegua &copy; 2026</div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03201640"></script>
-<script src="js/supabase.js?v=03201640"></script>
-<script src="js/utils.js?v=03201640"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221550"></script>
+<script src="js/supabase.js?v=03221550"></script>
+<script src="js/utils.js?v=03221550"></script>
 <script>
 // Se ja logado como barbeiro, redireciona
 (async () => {
@@ -243,13 +243,13 @@ async function doLogin() {
   const { data: barber } = await sb.from('barbers').select('id, is_owner').eq('user_id', data.user.id).eq('active', true).maybeSingle();
   if (!barber) {
     await sb.auth.signOut();
-    showMsg('Sua conta não está vinculada a nenhuma barbearia. Fale com o dono.', 'error');
+    showMsg('Sua conta não está vinculada a nenhum estabelecimento. Fale com o responsável.', 'error');
     return;
   }
 
   if (barber.is_owner) {
     await sb.auth.signOut();
-    showMsg('Você é o dono! Use seu email e senha na tela principal pra acessar o painel completo.', 'error');
+    showMsg('Você é o responsável! Use seu email e senha na tela principal pra acessar o painel completo.', 'error');
     return;
   }
 
@@ -271,7 +271,7 @@ async function doSignup() {
   const pendentes = barberData && barberData.id ? [barberData] : [];
 
   if (!pendentes.length) {
-    showMsg('Telefone não encontrado. O dono da barbearia precisa cadastrar seu número primeiro na aba Equipe.', 'error');
+    showMsg('Telefone não encontrado. O responsável pelo estabelecimento precisa cadastrar seu número na aba Equipe.', 'error');
     return;
   }
 
@@ -309,7 +309,7 @@ async function doSignup() {
   }
 }
 </script>
-<script src="js/ajuda.js?v=03201640"></script>
-<script src="js/sw-update.js?v=03201640"></script>
+<script src="js/ajuda.js?v=03221550"></script>
+<script src="js/sw-update.js?v=03221550"></script>
 </body>
 </html>

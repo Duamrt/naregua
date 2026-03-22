@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03201640">
-  <link rel="stylesheet" href="css/layout.css?v=03201640">
-  <script src="js/theme.js?v=03201640"></script>
+  <link rel="stylesheet" href="css/style.css?v=03221550">
+  <link rel="stylesheet" href="css/layout.css?v=03221550">
+  <script src="js/theme.js?v=03221550"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -327,7 +327,7 @@
         <span style="font-size:18px;">&#x1F4C5;</span>ENVIAR LINK DE<br>AGENDAMENTO
       </button>
       <button onclick="enviarLinkBarbeiroZap()" style="flex:1;padding:10px 8px;border-radius:12px;border:none;background:rgba(212,168,83,0.1);color:var(--verde-acao);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;line-height:1.3;">
-        <span style="font-size:18px;">&#x1F4AA;</span>CADASTRAR<br>BARBEIRO
+        <span style="font-size:18px;">&#x1F4AA;</span>CADASTRAR<br><span id="lbl-cadastrar-prof">PROFISSIONAL</span>
       </button>
     </div>
     <div style="display:flex;gap:8px;">
@@ -354,6 +354,20 @@
     <div class="stat-card">
       <div class="stat-num" id="stat-revenue" style="color:var(--verde-acao);">0</div>
       <div class="stat-label">FATURADO</div>
+    </div>
+  </div>
+
+  <!-- Banner Lista de Espera -->
+  <div id="le-banner" style="display:none;background:rgba(212,168,83,0.08);border:1px solid rgba(212,168,83,0.2);border-radius:10px;padding:12px 14px;margin-bottom:16px;cursor:pointer;" onclick="location.href='lista-espera.html'">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:16px;">&#x23F3;</span>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#d4a853;" id="le-banner-text">0 na lista de espera</div>
+          <div style="font-size:10px;color:var(--texto-muted);">Toque pra gerenciar</div>
+        </div>
+      </div>
+      <span style="font-size:14px;color:#d4a853;">&#x276F;</span>
     </div>
   </div>
 
@@ -562,10 +576,10 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03201640"></script>
-<script src="js/supabase.js?v=03201640"></script>
-<script src="js/utils.js?v=03201640"></script>
-<script src="js/push.js?v=03201640"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221550"></script>
+<script src="js/supabase.js?v=03221550"></script>
+<script src="js/utils.js?v=03221550"></script>
+<script src="js/push.js?v=03221550"></script>
 <script>
 console.log('Dashboard v3 carregado');
 // ── Estado ────────────────────────────────────────────────────
@@ -669,11 +683,38 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('filters').style.display = 'flex';
   document.getElementById('appt-list').style.display = 'block';
 
-  renderDay();
+  // Label dinâmico "CADASTRAR PROFISSIONAL" conforme tipo de negócio
+  const termosProf = { barbearia: 'BARBEIRO', manicure: 'MANICURE', salao: 'PROFISSIONAL', outro: 'PROFISSIONAL' };
+  const lblCadProf = document.getElementById('lbl-cadastrar-prof');
+  if (lblCadProf) lblCadProf.textContent = termosProf[shop.business_type] || 'PROFISSIONAL';
 
-  // Atualizar automaticamente a cada 30s (pega novos agendamentos)
-  setInterval(() => renderDay(), 30000);
+  renderDay();
+  checkListaEspera();
+
+  // Atualizar automaticamente a cada 30s (pega novos agendamentos + lista de espera)
+  setInterval(() => { renderDay(); checkListaEspera(); }, 30000);
 });
+
+// ── Lista de espera no dashboard ──────────────────────────────
+async function checkListaEspera() {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const { data, error } = await db.from('lista_espera')
+      .select('id,status')
+      .eq('barbershop_id', shop.id)
+      .gte('created_at', today + 'T00:00:00')
+      .lte('created_at', today + 'T23:59:59')
+      .in('status', ['aguardando', 'chamado']);
+    const count = (data || []).length;
+    const banner = document.getElementById('le-banner');
+    if (count > 0) {
+      banner.style.display = 'block';
+      document.getElementById('le-banner-text').textContent = count + ' na lista de espera';
+    } else {
+      banner.style.display = 'none';
+    }
+  } catch (e) { console.error('checkListaEspera:', e); }
+}
 
 // ── Navegação de dias ─────────────────────────────────────────
 function changeDay(delta) {
@@ -2099,9 +2140,9 @@ function updateBell(count) {
 // Run bell check after shop loads (inside DOMContentLoaded, after renderDay)
 setTimeout(() => { if (shop) checkBellCount(); }, 2000);
 </script>
-<script src="js/ajuda.js?v=03201640"></script>
-<script src="js/tour.js?v=03201640"></script>
-<script src="js/sw-update.js?v=03201640"></script>
-<script src="js/sidebar.js?v=03201640"></script>
+<script src="js/ajuda.js?v=03221550"></script>
+<script src="js/tour.js?v=03221550"></script>
+<script src="js/sw-update.js?v=03221550"></script>
+<script src="js/sidebar.js?v=03221550"></script>
 </body>
 </html>

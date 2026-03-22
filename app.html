@@ -19,8 +19,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03201640">
-  <script src="js/theme.js?v=03201640"></script>
+  <link rel="stylesheet" href="css/style.css?v=03221550">
+  <script src="js/theme.js?v=03221550"></script>
   <style>
     body { background:#000; overflow-x:hidden; }
 
@@ -279,7 +279,7 @@
 <div id="modal-barbeiro" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;padding:16px;">
   <div style="background:#0a0a0a;border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius);padding:28px 24px;width:100%;max-width:380px;max-height:90vh;overflow-y:auto;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-      <div style="font-size:16px;font-weight:700;">Entrar como profissional</div>
+      <div style="font-size:16px;font-weight:700;">Acesso do profissional</div>
       <button onclick="fecharModalBarbeiro()" style="background:none;border:none;color:#525252;font-size:18px;cursor:pointer;">&#x2715;</button>
     </div>
     <div id="barb-msg" class="login-msg" style="margin-bottom:12px;"></div>
@@ -312,7 +312,7 @@
     <!-- Form primeiro acesso -->
     <div id="barb-form-signup" style="display:none;">
       <div style="font-size:12px;color:var(--texto-muted);margin-bottom:16px;line-height:1.5;">
-        O dono da barbearia precisa ter cadastrado seu telefone na equipe. Digite o mesmo número e crie uma senha.
+        O responsável pelo estabelecimento precisa ter cadastrado seu telefone na equipe. Digite o mesmo número e crie uma senha.
       </div>
       <div class="login-field">
         <label class="login-label">TELEFONE</label>
@@ -334,10 +334,10 @@
 </div>
 
 <!-- Supabase CDN -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03201640"></script>
-<script src="js/supabase.js?v=03201640"></script>
-<script src="js/utils.js?v=03201640"></script>
-<script src="js/auth.js?v=03201640"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221550"></script>
+<script src="js/supabase.js?v=03221550"></script>
+<script src="js/utils.js?v=03221550"></script>
+<script src="js/auth.js?v=03221550"></script>
 <script>
 // Override tabs pro novo layout
 document.querySelectorAll('.login-tab').forEach(tab => {
@@ -434,14 +434,14 @@ async function loginBarbeiro() {
   const { data: barber } = await sb.from('barbers').select('id, is_owner').eq('user_id', data.user.id).eq('active', true).maybeSingle();
   if (!barber) {
     await sb.auth.signOut();
-    showBarbMsg('Sua conta não está vinculada a nenhuma barbearia.', 'error');
+    showBarbMsg('Sua conta não está vinculada a nenhum estabelecimento.', 'error');
     return;
   }
 
   // Barbeiro-dono deve usar login por email
   if (barber.is_owner) {
     await sb.auth.signOut();
-    showBarbMsg('Você é o dono! Use seu email e senha na tela principal pra acessar o painel completo.', 'error');
+    showBarbMsg('Você é o responsável! Use seu email e senha na tela principal pra acessar o painel completo.', 'error');
     return;
   }
 
@@ -463,7 +463,7 @@ async function signupBarbeiro() {
   const pendentes = barberData && barberData.id ? [barberData] : [];
 
   if (!pendentes.length) {
-    showBarbMsg('Telefone não encontrado. Peça ao dono da barbearia pra cadastrar seu número na equipe.', 'error');
+    showBarbMsg('Telefone não encontrado. Peça ao responsável pelo estabelecimento pra cadastrar seu número na equipe.', 'error');
     return;
   }
 
@@ -504,6 +504,6 @@ async function signupBarbeiro() {
   }
 }
 </script>
-<script src="js/sw-update.js?v=03201640"></script>
+<script src="js/sw-update.js?v=03221550"></script>
 </body>
 </html>
