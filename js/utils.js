@@ -35,11 +35,15 @@ function esc(str) {
 
 // ── Termos dinâmicos por tipo de negócio ─────────────────────
 function getTermos(tipo) {
+  const _pro = { profissional: 'profissional', Profissional: 'Profissional', PROFISSIONAL: 'PROFISSIONAL', profissionais: 'profissionais', Profissionais: 'Profissionais', do_profissional: 'do profissional' };
   const map = {
-    barbearia: { profissional: 'barbeiro', Profissional: 'Barbeiro', PROFISSIONAL: 'BARBEIRO', profissionais: 'barbeiros', Profissionais: 'Barbeiros', do_profissional: 'do barbeiro', estabelecimento: 'barbearia', Estabelecimento: 'Barbearia', placeholder_combo: 'Ex: Cabelo + Barba Premium', placeholder_pacote: 'Ex: 5 Cortes por R$100' },
-    manicure:  { profissional: 'manicure', Profissional: 'Manicure', PROFISSIONAL: 'MANICURE', profissionais: 'manicures', Profissionais: 'Manicures', do_profissional: 'da manicure', estabelecimento: 'studio', Estabelecimento: 'Studio', placeholder_combo: 'Ex: Mão + Pé Completo', placeholder_pacote: 'Ex: 5 Manicures por R$100' },
-    salao:     { profissional: 'profissional', Profissional: 'Profissional', PROFISSIONAL: 'PROFISSIONAL', profissionais: 'profissionais', Profissionais: 'Profissionais', do_profissional: 'do profissional', estabelecimento: 'salão', Estabelecimento: 'Salão', placeholder_combo: 'Ex: Escova + Hidratação', placeholder_pacote: 'Ex: 5 Escovas por R$120' },
-    outro:     { profissional: 'profissional', Profissional: 'Profissional', PROFISSIONAL: 'PROFISSIONAL', profissionais: 'profissionais', Profissionais: 'Profissionais', do_profissional: 'do profissional', estabelecimento: 'estabelecimento', Estabelecimento: 'Estabelecimento', placeholder_combo: 'Ex: Combo Premium', placeholder_pacote: 'Ex: 5 Sessões por R$100' },
+    barbearia:   { ..._pro, profissional: 'barbeiro', Profissional: 'Barbeiro', PROFISSIONAL: 'BARBEIRO', profissionais: 'barbeiros', Profissionais: 'Barbeiros', do_profissional: 'do barbeiro', estabelecimento: 'barbearia', Estabelecimento: 'Barbearia', placeholder_combo: 'Ex: Cabelo + Barba Premium', placeholder_pacote: 'Ex: 5 Cortes por R$100' },
+    manicure:    { ..._pro, profissional: 'manicure', Profissional: 'Manicure', PROFISSIONAL: 'MANICURE', profissionais: 'manicures', Profissionais: 'Manicures', do_profissional: 'da manicure', estabelecimento: 'studio', Estabelecimento: 'Studio', placeholder_combo: 'Ex: Mão + Pé Completo', placeholder_pacote: 'Ex: 5 Manicures por R$100' },
+    unha:        { ..._pro, profissional: 'nail designer', Profissional: 'Nail Designer', PROFISSIONAL: 'NAIL DESIGNER', profissionais: 'nail designers', Profissionais: 'Nail Designers', do_profissional: 'da nail designer', estabelecimento: 'studio', Estabelecimento: 'Studio', placeholder_combo: 'Ex: Mão + Pé Completo', placeholder_pacote: 'Ex: 5 Manicures por R$100' },
+    sobrancelha: { ..._pro, profissional: 'designer', Profissional: 'Designer', PROFISSIONAL: 'DESIGNER', profissionais: 'designers', Profissionais: 'Designers', do_profissional: 'do designer', estabelecimento: 'studio', Estabelecimento: 'Studio', placeholder_combo: 'Ex: Design + Henna', placeholder_pacote: 'Ex: 5 Designs por R$100' },
+    estetica:    { ..._pro, profissional: 'esteticista', Profissional: 'Esteticista', PROFISSIONAL: 'ESTETICISTA', profissionais: 'esteticistas', Profissionais: 'Esteticistas', do_profissional: 'da esteticista', estabelecimento: 'clínica', Estabelecimento: 'Clínica', placeholder_combo: 'Ex: Limpeza + Hidratação', placeholder_pacote: 'Ex: 5 Sessões por R$200' },
+    salao:       { ..._pro, estabelecimento: 'salão', Estabelecimento: 'Salão', placeholder_combo: 'Ex: Escova + Hidratação', placeholder_pacote: 'Ex: 5 Escovas por R$120' },
+    outro:       { ..._pro, estabelecimento: 'estabelecimento', Estabelecimento: 'Estabelecimento', placeholder_combo: 'Ex: Combo Premium', placeholder_pacote: 'Ex: 5 Sessões por R$100' },
   };
   return map[tipo] || map.outro;
 }

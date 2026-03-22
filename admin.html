@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03221601">
-  <link rel="stylesheet" href="css/layout.css?v=03221601">
-  <script src="js/theme.js?v=03221601"></script>
+  <link rel="stylesheet" href="css/style.css?v=03221608">
+  <link rel="stylesheet" href="css/layout.css?v=03221608">
+  <script src="js/theme.js?v=03221608"></script>
   <style>
     .admin-container { max-width:900px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -202,6 +202,9 @@
       <select id="adm-type" onchange="onAdmTypeChange()" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;">
         <option value="barbearia">Barbearia</option>
         <option value="manicure">Manicure</option>
+        <option value="unha">Nail Designer</option>
+        <option value="sobrancelha">Sobrancelha</option>
+        <option value="estetica">Estética</option>
         <option value="salao">Salão</option>
         <option value="outro">Outro</option>
       </select>
@@ -297,9 +300,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221601"></script>
-<script src="js/supabase.js?v=03221601"></script>
-<script src="js/utils.js?v=03221601"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221608"></script>
+<script src="js/supabase.js?v=03221608"></script>
+<script src="js/utils.js?v=03221608"></script>
 <script>
 // ── Config admin — só seu e-mail tem acesso ───────────────────
 const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
@@ -332,6 +335,30 @@ const DEFAULT_SERVICES = {
     { id: null, name: 'Alongamento', price: 120, duration_min: 120 },
     { id: null, name: 'Francesinha', price: 35, duration_min: 50 },
     { id: null, name: 'Spa dos pés', price: 40, duration_min: 45 },
+  ],
+  unha: [
+    { id: null, name: 'Manicure simples', price: 25, duration_min: 40 },
+    { id: null, name: 'Pedicure', price: 30, duration_min: 50 },
+    { id: null, name: 'Esmaltação em gel', price: 60, duration_min: 60 },
+    { id: null, name: 'Banho de gel', price: 50, duration_min: 60 },
+    { id: null, name: 'Alongamento', price: 120, duration_min: 120 },
+    { id: null, name: 'Nail art (por unha)', price: 15, duration_min: 20 },
+  ],
+  sobrancelha: [
+    { id: null, name: 'Design de sobrancelha', price: 30, duration_min: 30 },
+    { id: null, name: 'Henna', price: 25, duration_min: 20 },
+    { id: null, name: 'Design + Henna', price: 50, duration_min: 45 },
+    { id: null, name: 'Micropigmentação', price: 350, duration_min: 120 },
+    { id: null, name: 'Laminação', price: 80, duration_min: 60 },
+    { id: null, name: 'Extensão de cílios', price: 120, duration_min: 90 },
+  ],
+  estetica: [
+    { id: null, name: 'Limpeza de pele', price: 80, duration_min: 60 },
+    { id: null, name: 'Hidratação facial', price: 60, duration_min: 45 },
+    { id: null, name: 'Peeling', price: 100, duration_min: 50 },
+    { id: null, name: 'Drenagem linfática', price: 80, duration_min: 60 },
+    { id: null, name: 'Massagem relaxante', price: 70, duration_min: 50 },
+    { id: null, name: 'Depilação', price: 40, duration_min: 30 },
   ],
   salao: [
     { id: null, name: 'Corte feminino', price: 40, duration_min: 45 },
@@ -945,8 +972,8 @@ async function logout() {
   window.location.href = 'app.html';
 }
 </script>
-<script src="js/ajuda.js?v=03221601"></script>
-<script src="js/sw-update.js?v=03221601"></script>
-<script src="js/sidebar.js?v=03221601"></script>
+<script src="js/ajuda.js?v=03221608"></script>
+<script src="js/sw-update.js?v=03221608"></script>
+<script src="js/sidebar.js?v=03221608"></script>
 </body>
 </html>

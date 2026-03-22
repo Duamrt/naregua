@@ -13,8 +13,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03221601">
-  <script src="js/theme.js?v=03221601"></script>
+  <link rel="stylesheet" href="css/style.css?v=03221608">
+  <script src="js/theme.js?v=03221608"></script>
 </head>
 <body>
 
@@ -114,9 +114,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221601"></script>
-<script src="js/supabase.js?v=03221601"></script>
-<script src="js/utils.js?v=03221601"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221608"></script>
+<script src="js/supabase.js?v=03221608"></script>
+<script src="js/utils.js?v=03221608"></script>
 <script>
 // ── Verificar sessão ──────────────────────────────────────────
 let currentUser = null;
@@ -247,10 +247,13 @@ function toggleDay(i) {
 
 // ── Tipo de negócio ───────────────────────────────────────────
 const TIPOS = [
-  { key: 'barbearia', label: 'Barbearia', icon: '💈' },
-  { key: 'manicure',  label: 'Manicure',  icon: '💅' },
-  { key: 'salao',     label: 'Salão',     icon: '✂️' },
-  { key: 'outro',     label: 'Outro',     icon: '📋' },
+  { key: 'barbearia',   label: 'Barbearia',   icon: '💈' },
+  { key: 'manicure',    label: 'Manicure',    icon: '💅' },
+  { key: 'unha',        label: 'Nail Designer', icon: '💅' },
+  { key: 'sobrancelha', label: 'Sobrancelha', icon: '🪒' },
+  { key: 'estetica',    label: 'Estética',    icon: '✨' },
+  { key: 'salao',       label: 'Salão',       icon: '✂️' },
+  { key: 'outro',       label: 'Outro',       icon: '📋' },
 ];
 
 let selectedType = 'barbearia';
@@ -270,6 +273,32 @@ const DEFAULT_SERVICES = {
     { name: 'Alongamento', price: 120, duration_min: 120 },
     { name: 'Francesinha', price: 35, duration_min: 50 },
     { name: 'Spa dos pés', price: 40, duration_min: 45 },
+  ],
+  unha: [
+    { name: 'Manicure simples', price: 25, duration_min: 40 },
+    { name: 'Pedicure', price: 30, duration_min: 50 },
+    { name: 'Esmaltação em gel', price: 60, duration_min: 60 },
+    { name: 'Banho de gel', price: 50, duration_min: 60 },
+    { name: 'Alongamento', price: 120, duration_min: 120 },
+    { name: 'Nail art (por unha)', price: 15, duration_min: 20 },
+    { name: 'Francesinha', price: 35, duration_min: 50 },
+    { name: 'Spa dos pés', price: 40, duration_min: 45 },
+  ],
+  sobrancelha: [
+    { name: 'Design de sobrancelha', price: 30, duration_min: 30 },
+    { name: 'Henna', price: 25, duration_min: 20 },
+    { name: 'Design + Henna', price: 50, duration_min: 45 },
+    { name: 'Micropigmentação', price: 350, duration_min: 120 },
+    { name: 'Laminação', price: 80, duration_min: 60 },
+    { name: 'Extensão de cílios', price: 120, duration_min: 90 },
+  ],
+  estetica: [
+    { name: 'Limpeza de pele', price: 80, duration_min: 60 },
+    { name: 'Hidratação facial', price: 60, duration_min: 45 },
+    { name: 'Peeling', price: 100, duration_min: 50 },
+    { name: 'Drenagem linfática', price: 80, duration_min: 60 },
+    { name: 'Massagem relaxante', price: 70, duration_min: 50 },
+    { name: 'Depilação', price: 40, duration_min: 30 },
   ],
   salao: [
     { name: 'Corte feminino', price: 40, duration_min: 45 },
@@ -538,7 +567,7 @@ function copyLink() {
   });
 }
 </script>
-<script src="js/ajuda.js?v=03221601"></script>
-<script src="js/sw-update.js?v=03221601"></script>
+<script src="js/ajuda.js?v=03221608"></script>
+<script src="js/sw-update.js?v=03221608"></script>
 </body>
 </html>

@@ -70,7 +70,7 @@
 
     sidebar = document.createElement('aside');
     sidebar.className = 'nr-sidebar';
-    var segLabels = { barbearia:'Gestão para barbearias', manicure:'Gestão para nail designers', estetica:'Gestão para estética', sobrancelha:'Gestão para sobrancelhas', unha:'Gestão para nail designers', salao:'Gestão para salões', outro:'Gestão para seu negócio' };
+    var segLabels = { barbearia:'Gestão para barbearias', manicure:'Gestão para manicures', unha:'Gestão para nail designers', sobrancelha:'Gestão para designers de sobrancelha', estetica:'Gestão para estética', salao:'Gestão para salões', outro:'Gestão para seu negócio' };
     var segKey = localStorage.getItem('naregua_segment') || 'outro';
     sidebar.innerHTML = '<div class="nr-sidebar-brand"><div class="nr-logo">Na<span>Regua</span></div><div class="nr-logo-sub">' + (segLabels[segKey] || segLabels.outro) + '</div></div>';
 
