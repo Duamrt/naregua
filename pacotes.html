@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03221550">
-  <link rel="stylesheet" href="css/layout.css?v=03221550">
-  <script src="js/theme.js?v=03221550"></script>
+  <link rel="stylesheet" href="css/style.css?v=03221601">
+  <link rel="stylesheet" href="css/layout.css?v=03221601">
+  <script src="js/theme.js?v=03221601"></script>
   <style>
     .pkt-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -260,7 +260,7 @@
     <input type="hidden" id="pacote-edit-id">
     <div class="field">
       <label>NOME *</label>
-      <input type="text" id="pacote-nome" placeholder="Ex: 5 Cortes por R$100">
+      <input type="text" id="pacote-nome" placeholder="Ex: 5 Sessões por R$100">
     </div>
     <div class="field">
       <label>SERVICO</label>
@@ -370,9 +370,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221550"></script>
-<script src="js/supabase.js?v=03221550"></script>
-<script src="js/utils.js?v=03221550"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221601"></script>
+<script src="js/supabase.js?v=03221601"></script>
+<script src="js/utils.js?v=03221601"></script>
 <script>
 // ── Estado ────────────────────────────────────────────────────
 let shop = null;
@@ -413,6 +413,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (!shopData) { window.location.href = isAdminViewing ? 'admin.html' : 'onboarding.html'; return; }
   shop = shopData;
+
+  // Placeholders dinâmicos por tipo de negócio
+  const t = getTermos(shop.business_type);
+  document.getElementById('pacote-nome').placeholder = t.placeholder_pacote;
 
   // Banner admin
   if (isAdminViewing) {
@@ -872,8 +876,8 @@ function formatTime(iso) {
   return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 </script>
-<script src="js/ajuda.js?v=03221550"></script>
-<script src="js/sw-update.js?v=03221550"></script>
-<script src="js/sidebar.js?v=03221550"></script>
+<script src="js/ajuda.js?v=03221601"></script>
+<script src="js/sw-update.js?v=03221601"></script>
+<script src="js/sidebar.js?v=03221601"></script>
 </body>
 </html>

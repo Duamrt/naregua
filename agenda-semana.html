@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03221550">
-  <link rel="stylesheet" href="css/layout.css?v=03221550">
-  <script src="js/theme.js?v=03221550"></script>
+  <link rel="stylesheet" href="css/style.css?v=03221601">
+  <link rel="stylesheet" href="css/layout.css?v=03221601">
+  <script src="js/theme.js?v=03221601"></script>
   <style>
     .ws-container { max-width:1100px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -309,7 +309,7 @@
 
     <!-- Toggle mode -->
     <div class="mode-toggle">
-      <button class="mode-btn active" id="mode-barber" onclick="setMode('barber')">POR BARBEIRO</button>
+      <button class="mode-btn active" id="mode-barber" onclick="setMode('barber')">POR PROFISSIONAL</button>
       <button class="mode-btn" id="mode-todos" onclick="setMode('todos')">TODOS</button>
     </div>
 
@@ -386,9 +386,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221550"></script>
-<script src="js/supabase.js?v=03221550"></script>
-<script src="js/utils.js?v=03221550"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221601"></script>
+<script src="js/supabase.js?v=03221601"></script>
+<script src="js/utils.js?v=03221601"></script>
 <script>
 console.log('Agenda Semanal v1 carregado');
 
@@ -632,7 +632,7 @@ function renderGridBarber() {
   let html = '<div class="week-grid" style="grid-template-rows:auto' + ' auto'.repeat(barbers.length || 1) + ';">';
 
   // Header row
-  html += '<div class="wg-corner">BARBEIRO</div>';
+  html += '<div class="wg-corner">PROFISSIONAL</div>';
   days.forEach((d, i) => {
     const jsDay = getWeekDayJS(i);
     const isToday = isSameDay(d, today);
@@ -644,7 +644,7 @@ function renderGridBarber() {
 
   // Barber rows
   if (barbers.length === 0) {
-    html += '<div class="wg-barber-label"><span class="wg-bname" style="color:var(--texto-muted);">Nenhum barbeiro</span></div>';
+    html += '<div class="wg-barber-label"><span class="wg-bname" style="color:var(--texto-muted);">Nenhum profissional</span></div>';
     days.forEach((d, i) => {
       html += '<div class="wg-cell"><div class="wg-empty">—</div></div>';
     });
@@ -841,7 +841,7 @@ function renderMobile() {
 
       // Appointments without barber
       if (byBarber['_none'] && byBarber['_none'].length > 0) {
-        html += '<div class="mw-barber-section">SEM BARBEIRO</div>';
+        html += '<div class="mw-barber-section">SEM PROFISSIONAL</div>';
         byBarber['_none'].forEach(a => {
           html += '<div class="mw-appt" onclick="goToDay(\'' + dKey + '\')">';
           html += '<div class="mw-appt-time" style="color:' + statusColor(a.status) + ';">' + apptTime(a) + '</div>';
@@ -875,8 +875,8 @@ function goToDay(dateStr) {
   window.location.href = 'dashboard.html?date=' + dateStr;
 }
 </script>
-<script src="js/ajuda.js?v=03221550" defer></script>
-<script src="js/sw-update.js?v=03221550" defer></script>
-<script src="js/sidebar.js?v=03221550"></script>
+<script src="js/ajuda.js?v=03221601" defer></script>
+<script src="js/sw-update.js?v=03221601" defer></script>
+<script src="js/sidebar.js?v=03221601"></script>
 </body>
 </html>

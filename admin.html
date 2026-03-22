@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03221550">
-  <link rel="stylesheet" href="css/layout.css?v=03221550">
-  <script src="js/theme.js?v=03221550"></script>
+  <link rel="stylesheet" href="css/style.css?v=03221601">
+  <link rel="stylesheet" href="css/layout.css?v=03221601">
+  <script src="js/theme.js?v=03221601"></script>
   <style>
     .admin-container { max-width:900px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -267,7 +267,7 @@
 
     <div class="modal-section">Profissionais</div>
     <div id="adm-barbers"></div>
-    <button class="btn btn-outline" onclick="admAddBarber()" style="margin:10px 0 16px;font-size:12px;">+ BARBEIRO</button>
+    <button class="btn btn-outline" onclick="admAddBarber()" style="margin:10px 0 16px;font-size:12px;">+ PROFISSIONAL</button>
 
     <button class="btn btn-primary" onclick="salvarAdmin()" id="btn-adm-save">
       <span class="btn-label">SALVAR</span>
@@ -297,9 +297,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221550"></script>
-<script src="js/supabase.js?v=03221550"></script>
-<script src="js/utils.js?v=03221550"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221601"></script>
+<script src="js/supabase.js?v=03221601"></script>
+<script src="js/utils.js?v=03221601"></script>
 <script>
 // ── Config admin — só seu e-mail tem acesso ───────────────────
 const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
@@ -502,7 +502,7 @@ function renderShops() {
         <button class="shop-action-btn" onclick="editarShop('${esc(s.id)}')">Editar</button>
         <button class="shop-action-btn" onclick="copiarLinkShop('${esc(s.slug)}')">Copiar link</button>
         <button class="shop-action-btn" onclick="window.open('${baseUrl}agendar.html?slug=${esc(s.slug)}','_blank')">Ver pagina</button>
-        <button class="shop-action-btn" onclick="copiarLinkBarbeiro()">Link barbeiro</button>
+        <button class="shop-action-btn" onclick="copiarLinkBarbeiro()">Link profissional</button>
         <button class="shop-action-btn danger" onclick="excluirShop('${esc(s.id)}')">Excluir</button>
       </div>
     </div>`;
@@ -526,7 +526,7 @@ async function definirSenhaBarbeiro(barberId, userId, nome) {
 
   if (!error && data && data.success) {
     await sb.from('barbers').update({ password_hint: novaSenha }).eq('id', barberId);
-    alert('Senha do barbeiro alterada!');
+    alert('Senha do profissional alterada!');
     await loadAll();
   } else {
     alert('Erro ao alterar senha: ' + (error?.message || data?.error || 'desconhecido'));
@@ -555,7 +555,7 @@ async function definirSenha(shopId, userId, email) {
 function copiarLinkBarbeiro() {
   const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
   navigator.clipboard.writeText(baseUrl + 'barbeiro-cadastro.html');
-  alert('Link copiado! Envie pro barbeiro: ' + baseUrl + 'barbeiro-cadastro.html');
+  alert('Link copiado! Envie pro profissional: ' + baseUrl + 'barbeiro-cadastro.html');
 }
 
 function copiarLinkShop(slug) {
@@ -945,8 +945,8 @@ async function logout() {
   window.location.href = 'app.html';
 }
 </script>
-<script src="js/ajuda.js?v=03221550"></script>
-<script src="js/sw-update.js?v=03221550"></script>
-<script src="js/sidebar.js?v=03221550"></script>
+<script src="js/ajuda.js?v=03221601"></script>
+<script src="js/sw-update.js?v=03221601"></script>
+<script src="js/sidebar.js?v=03221601"></script>
 </body>
 </html>

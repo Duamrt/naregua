@@ -33,6 +33,17 @@ function esc(str) {
   return d.innerHTML;
 }
 
+// ── Termos dinâmicos por tipo de negócio ─────────────────────
+function getTermos(tipo) {
+  const map = {
+    barbearia: { profissional: 'barbeiro', Profissional: 'Barbeiro', PROFISSIONAL: 'BARBEIRO', profissionais: 'barbeiros', Profissionais: 'Barbeiros', do_profissional: 'do barbeiro', estabelecimento: 'barbearia', Estabelecimento: 'Barbearia', placeholder_combo: 'Ex: Cabelo + Barba Premium', placeholder_pacote: 'Ex: 5 Cortes por R$100' },
+    manicure:  { profissional: 'manicure', Profissional: 'Manicure', PROFISSIONAL: 'MANICURE', profissionais: 'manicures', Profissionais: 'Manicures', do_profissional: 'da manicure', estabelecimento: 'studio', Estabelecimento: 'Studio', placeholder_combo: 'Ex: Mão + Pé Completo', placeholder_pacote: 'Ex: 5 Manicures por R$100' },
+    salao:     { profissional: 'profissional', Profissional: 'Profissional', PROFISSIONAL: 'PROFISSIONAL', profissionais: 'profissionais', Profissionais: 'Profissionais', do_profissional: 'do profissional', estabelecimento: 'salão', Estabelecimento: 'Salão', placeholder_combo: 'Ex: Escova + Hidratação', placeholder_pacote: 'Ex: 5 Escovas por R$120' },
+    outro:     { profissional: 'profissional', Profissional: 'Profissional', PROFISSIONAL: 'PROFISSIONAL', profissionais: 'profissionais', Profissionais: 'Profissionais', do_profissional: 'do profissional', estabelecimento: 'estabelecimento', Estabelecimento: 'Estabelecimento', placeholder_combo: 'Ex: Combo Premium', placeholder_pacote: 'Ex: 5 Sessões por R$100' },
+  };
+  return map[tipo] || map.outro;
+}
+
 // ── Google Analytics 4 ──────────────────────────────────────
 (function() {
   var GA_ID = 'G-XXXXXXXXXX'; // TODO: substituir pelo GA ID real do NaRegua

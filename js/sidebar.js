@@ -70,9 +70,9 @@
 
     sidebar = document.createElement('aside');
     sidebar.className = 'nr-sidebar';
-    var segLabels = { barbearia:'Gestão para barbearias', estetica:'Gestão para estética', sobrancelha:'Gestão para sobrancelhas', unha:'Gestão para nail designers', salao:'Gestão para salões' };
-    var segKey = localStorage.getItem('naregua_segment') || 'barbearia';
-    sidebar.innerHTML = '<div class="nr-sidebar-brand"><div class="nr-logo">Na<span>Regua</span></div><div class="nr-logo-sub">' + (segLabels[segKey] || segLabels.barbearia) + '</div></div>';
+    var segLabels = { barbearia:'Gestão para barbearias', manicure:'Gestão para nail designers', estetica:'Gestão para estética', sobrancelha:'Gestão para sobrancelhas', unha:'Gestão para nail designers', salao:'Gestão para salões', outro:'Gestão para seu negócio' };
+    var segKey = localStorage.getItem('naregua_segment') || 'outro';
+    sidebar.innerHTML = '<div class="nr-sidebar-brand"><div class="nr-logo">Na<span>Regua</span></div><div class="nr-logo-sub">' + (segLabels[segKey] || segLabels.outro) + '</div></div>';
 
     var nav = document.createElement('nav');
     nav.className = 'nr-sidebar-nav';
@@ -111,7 +111,7 @@
     // Footer
     var footer = document.createElement('div');
     footer.className = 'nr-sidebar-footer';
-    footer.innerHTML = '<div class="nr-sidebar-shop">Minha Barbearia</div><button class="nr-sidebar-logout" onclick="if(typeof logout===\'function\')logout();else{window.location.href=\'app.html\';}">Sair</button>';
+    footer.innerHTML = '<div class="nr-sidebar-shop">Meu Estabelecimento</div><button class="nr-sidebar-logout" onclick="if(typeof logout===\'function\')logout();else{window.location.href=\'app.html\';}">Sair</button>';
     sidebar.appendChild(footer);
 
     // Inserir no body SEM mover nada
