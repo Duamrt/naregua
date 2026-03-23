@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual NaRegua</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --dourado: #c9a84c;
+  --dourado-med: #b8963a;
+  --dourado-claro: #d4b85c;
+  --dourado-acao: #c9a84c;
+  --preto: #0a0a0a;
+  --card: #111111;
+  --card2: #181818;
+  --borda: #222;
+  --off-white: #f5f2eb;
+  --texto: #cccccc;
+  --muted: #666;
+  --alerta: #f39c12;
+  --erro: #e74c3c;
+  --azul: #60a5fa;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--preto);
+  color: var(--texto);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR ─────────────────────────── */
+.sidebar {
+  width: 260px;
+  min-height: 100vh;
+  background: #080808;
+  border-right: 1px solid var(--borda);
+  position: fixed;
+  top: 0; left: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.sidebar-brand {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.brand-shield {
+  width: 48px;
+  height: 48px;
+  background: #1a1a1a;
+  border: 2px solid var(--dourado);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--dourado);
+  letter-spacing: -1px;
+}
+
+.brand-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: white;
+  letter-spacing: 0.5px;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.nav-group {
+  padding: 16px 0 8px;
+}
+
+.nav-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 24px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 24px;
+  cursor: pointer;
+  color: #888;
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+}
+
+.nav-item:hover { color: white; background: #141414; }
+.nav-item.active {
+  color: var(--dourado-acao);
+  background: rgba(201,168,76,0.06);
+  border-left-color: var(--dourado-acao);
+}
+
+.nav-icon {
+  width: 16px;
+  text-align: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.nav-badge {
+  margin-left: auto;
+  background: #1a1a1a;
+  color: var(--dourado);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  border: 1px solid var(--dourado);
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px 24px;
+  border-top: 1px solid var(--borda);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.sidebar-footer a {
+  color: var(--dourado-acao);
+  text-decoration: none;
+}
+
+/* ── MAIN ────────────────────────────── */
+.main {
+  margin-left: 260px;
+  flex: 1;
+  min-height: 100vh;
+}
+
+.section {
+  display: none;
+  padding: 48px 52px;
+  max-width: 880px;
+  animation: fadeIn 0.25s ease;
+}
+
+.section.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── TYPOGRAPHY ──────────────────────── */
+.section-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--dourado-acao);
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  color: white;
+  line-height: 1.1;
+  margin-bottom: 12px;
+}
+
+.section-subtitle {
+  font-size: 15px;
+  color: #888;
+  margin-bottom: 36px;
+  max-width: 580px;
+}
+
+h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: white;
+  margin: 32px 0 12px;
+}
+
+h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dourado-acao);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 20px 0 8px;
+}
+
+p {
+  color: var(--texto);
+  margin-bottom: 12px;
+  line-height: 1.7;
+}
+
+/* ── CARDS ───────────────────────────── */
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  padding: 20px 22px;
+  transition: border-color 0.2s;
+}
+
+.card:hover { border-color: var(--dourado-med); }
+
+.card-icon {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 6px;
+}
+
+.card-text {
+  font-size: 13px;
+  color: #777;
+  line-height: 1.6;
+}
+
+/* ── PROFILE CARDS ───────────────────── */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.profile-card {
+  background: var(--card);
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+
+.profile-card.dono { border-top: 2px solid var(--dourado); }
+.profile-card.profissional { border-top: 2px solid var(--azul); }
+.profile-card.cliente { border-top: 2px solid var(--alerta); }
+.profile-card.admin { border-top: 2px solid var(--erro); }
+
+.profile-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.badge-dono { background: rgba(201,168,76,0.15); color: var(--dourado); }
+.badge-profissional { background: rgba(96,165,250,0.15); color: var(--azul); }
+.badge-cliente { background: rgba(243,156,18,0.15); color: var(--alerta); }
+.badge-admin { background: rgba(231,76,60,0.15); color: var(--erro); }
+
+.profile-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.profile-list {
+  list-style: none;
+  font-size: 12.5px;
+  color: #777;
+  line-height: 2;
+}
+
+.profile-list li::before {
+  content: "→ ";
+  color: var(--dourado-med);
+}
+
+/* ── STEPS ───────────────────────────── */
+.steps {
+  margin: 20px 0;
+  counter-reset: step;
+}
+
+.step {
+  display: flex;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #151515;
+}
+
+.step:last-child { border-bottom: none; }
+
+.step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  border: 1px solid var(--dourado);
+  color: var(--dourado);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.step-content {}
+.step-title { font-size: 14px; font-weight: 600; color: white; margin-bottom: 3px; }
+.step-desc { font-size: 13px; color: #666; }
+
+/* ── TABLE ───────────────────────────── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 13px;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 10px 14px;
+  background: #111;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.data-table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid #151515;
+  color: #aaa;
+  vertical-align: top;
+}
+
+.data-table tr:hover td { background: #111; }
+
+.data-table td:first-child {
+  font-weight: 600;
+  color: white;
+  font-size: 12px;
+}
+
+/* ── TAGS / CHIPS ────────────────────── */
+.tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-right: 4px;
+}
+
+.tag-gold { background: rgba(201,168,76,0.12); color: var(--dourado); }
+.tag-yellow { background: rgba(243,156,18,0.12); color: var(--alerta); }
+.tag-red { background: rgba(231,76,60,0.12); color: var(--erro); }
+.tag-blue { background: rgba(96,165,250,0.12); color: var(--azul); }
+.tag-gray { background: rgba(102,102,102,0.12); color: #888; }
+
+/* ── INFO BOX ────────────────────────── */
+.info-box {
+  background: rgba(201,168,76,0.06);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin: 16px 0;
+  font-size: 13.5px;
+  color: #aaa;
+}
+
+.info-box strong { color: var(--dourado-acao); }
+
+.warn-box {
+  background: rgba(243,156,18,0.06);
+  border: 1px solid rgba(243,156,18,0.2);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin: 16px 0;
+  font-size: 13.5px;
+  color: #aaa;
+}
+
+.warn-box strong { color: var(--alerta); }
+
+/* ── MODULE GRID ─────────────────────── */
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.module-card {
+  background: var(--card);
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.module-card:hover {
+  border-color: var(--dourado-med);
+  transform: translateY(-2px);
+}
+
+.module-card .emoji { font-size: 24px; display: block; margin-bottom: 8px; }
+.module-card .label { font-size: 12px; font-weight: 600; color: #aaa; }
+
+/* ── SEGMENT GRID ────────────────────── */
+.segment-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  margin: 16px 0;
+}
+
+.segment-item {
+  background: var(--card);
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #888;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.segment-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* ── PLAN CARDS ──────────────────────── */
+.plan-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.plan-card {
+  background: var(--card);
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  padding: 24px 20px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.plan-card.destaque {
+  border-color: var(--dourado);
+  position: relative;
+}
+
+.plan-card.destaque::before {
+  content: 'MAIS POPULAR';
+  position: absolute;
+  top: -10px; left: 50%; transform: translateX(-50%);
+  background: var(--dourado);
+  color: #1a1a1a;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 3px 10px;
+  border-radius: 10px;
+}
+
+.plan-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.plan-price {
+  font-family: 'Syne', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--dourado);
+  margin: 12px 0 4px;
+}
+
+.plan-price small {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.plan-features {
+  list-style: none;
+  font-size: 12.5px;
+  color: #777;
+  line-height: 2.2;
+  margin-top: 16px;
+  text-align: left;
+}
+
+.plan-features li::before {
+  content: "✓ ";
+  color: var(--dourado);
+  font-weight: 700;
+}
+
+/* ── DIVIDER ─────────────────────────── */
+.divider {
+  height: 1px;
+  background: var(--borda);
+  margin: 32px 0;
+}
+
+/* ── HERO (capa) ─────────────────────── */
+#home.section {
+  padding: 0;
+  max-width: 100%;
+}
+
+.hero {
+  background: linear-gradient(135deg, #080808 0%, #1a1508 50%, #080808 100%);
+  border-bottom: 1px solid var(--borda);
+  padding: 72px 52px 56px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(201,168,76,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--dourado-acao);
+  background: rgba(201,168,76,0.08);
+  border: 1px solid rgba(201,168,76,0.2);
+  padding: 5px 12px;
+  border-radius: 20px;
+  margin-bottom: 24px;
+}
+
+.hero-dot {
+  width: 6px; height: 6px;
+  background: var(--dourado-acao);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 52px;
+  font-weight: 800;
+  color: white;
+  line-height: 1.0;
+  margin-bottom: 18px;
+}
+
+.hero-title span { color: var(--dourado-acao); }
+
+.hero-desc {
+  font-size: 16px;
+  color: #777;
+  max-width: 520px;
+  margin-bottom: 36px;
+  line-height: 1.7;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 36px;
+}
+
+.hero-stat {}
+.stat-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: white;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.hero-content {
+  padding: 48px 52px;
+  max-width: 880px;
+}
+
+/* ── SHORTCUT ────────────────────────── */
+.shortcut-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--card);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+}
+
+.shortcut-key {
+  background: #222;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border-bottom: 2px solid #333;
+  font-family: monospace;
+  flex-shrink: 0;
+}
+
+.shortcut-desc { font-size: 13px; color: #888; }
+
+/* ── MOBILE TOGGLE ───────────────────── */
+.mob-toggle {
+  display: none;
+  position: fixed;
+  top: 16px; left: 16px;
+  z-index: 200;
+  background: #1a1a1a;
+  border: 1px solid var(--dourado);
+  color: var(--dourado);
+  width: 40px; height: 40px;
+  border-radius: 8px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .mob-toggle { display: flex; align-items: center; justify-content: center; }
+  .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .section { padding: 24px 20px; }
+  .hero { padding: 56px 20px 36px; }
+  .hero-content { padding: 32px 20px; }
+  .hero-title { font-size: 34px; }
+  .card-grid, .profile-grid, .module-grid, .plan-grid { grid-template-columns: 1fr; }
+  .segment-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<button class="mob-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-shield">NR</div>
+    <div class="brand-name">NaRegua</div>
+    <div class="brand-sub">Manual do Sistema · v2026</div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Inicio</div>
+    <div class="nav-item active" data-target="home">
+      <span class="nav-icon">🏠</span> Visao Geral
+    </div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Comecar</div>
+    <div class="nav-item" data-target="primeiros-passos">
+      <span class="nav-icon">🚀</span> Primeiros Passos
+    </div>
+    <div class="nav-item" data-target="dashboard">
+      <span class="nav-icon">📊</span> Dashboard
+    </div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Atendimento</div>
+    <div class="nav-item" data-target="agendamento">
+      <span class="nav-icon">📅</span> Agendamento
+    </div>
+    <div class="nav-item" data-target="equipe">
+      <span class="nav-icon">👥</span> Equipe
+    </div>
+    <div class="nav-item" data-target="clientes">
+      <span class="nav-icon">👤</span> Clientes
+    </div>
+    <div class="nav-item" data-target="servicos">
+      <span class="nav-icon">✂️</span> Servicos
+    </div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Gestao</div>
+    <div class="nav-item" data-target="caixa">
+      <span class="nav-icon">💰</span> Caixa / Financeiro
+    </div>
+    <div class="nav-item" data-target="estoque">
+      <span class="nav-icon">📦</span> Estoque
+    </div>
+    <div class="nav-item" data-target="relatorios">
+      <span class="nav-icon">📈</span> Relatorios
+    </div>
+    <div class="nav-item" data-target="marketing">
+      <span class="nav-icon">📣</span> Marketing
+    </div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Sistema</div>
+    <div class="nav-item" data-target="configuracoes">
+      <span class="nav-icon">⚙️</span> Configuracoes
+    </div>
+    <div class="nav-item" data-target="minisite">
+      <span class="nav-icon">🌐</span> Mini-site Publico
+    </div>
+    <div class="nav-item" data-target="planos">
+      <span class="nav-icon">💎</span> Planos
+      <span class="nav-badge">PRO</span>
+    </div>
+    <div class="nav-item" data-target="suporte">
+      <span class="nav-icon">💬</span> Suporte
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <a href="https://usenaregua.com.br" target="_blank">usenaregua.com.br</a><br>
+    Agendamento inteligente<br>
+    para beleza
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- HOME -->
+  <section class="section active" id="home">
+    <div class="hero">
+      <div class="hero-tag"><span class="hero-dot"></span> Plataforma Ativa</div>
+      <h1 class="hero-title">Na<br><span>Regua</span></h1>
+      <p class="hero-desc">Agendamento inteligente para profissionais de beleza. Gerencie agenda, equipe, financeiro e clientes em um unico lugar. Multi-segmento: funciona para qualquer area da beleza.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="stat-num">7</div>
+          <div class="stat-label">Segmentos</div>
+        </div>
+        <div class="hero-stat">
+          <div class="stat-num">3</div>
+          <div class="stat-label">Planos</div>
+        </div>
+        <div class="hero-stat">
+          <div class="stat-num">14+</div>
+          <div class="stat-label">Modulos</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-content">
+      <div class="section-tag">O que voce encontra aqui</div>
+      <h2 class="section-title" style="font-size:28px">Tudo sobre o NaRegua</h2>
+      <p class="section-subtitle">Navegue pelos modulos no menu lateral. Este manual cobre todas as funcionalidades do sistema.</p>
+
+      <div class="module-grid">
+        <div class="module-card" onclick="navigate('primeiros-passos')"><span class="emoji">🚀</span><span class="label">Primeiros Passos</span></div>
+        <div class="module-card" onclick="navigate('dashboard')"><span class="emoji">📊</span><span class="label">Dashboard</span></div>
+        <div class="module-card" onclick="navigate('agendamento')"><span class="emoji">📅</span><span class="label">Agendamento</span></div>
+        <div class="module-card" onclick="navigate('equipe')"><span class="emoji">👥</span><span class="label">Equipe</span></div>
+        <div class="module-card" onclick="navigate('caixa')"><span class="emoji">💰</span><span class="label">Caixa</span></div>
+        <div class="module-card" onclick="navigate('clientes')"><span class="emoji">👤</span><span class="label">Clientes</span></div>
+        <div class="module-card" onclick="navigate('servicos')"><span class="emoji">✂️</span><span class="label">Servicos</span></div>
+        <div class="module-card" onclick="navigate('estoque')"><span class="emoji">📦</span><span class="label">Estoque</span></div>
+        <div class="module-card" onclick="navigate('relatorios')"><span class="emoji">📈</span><span class="label">Relatorios</span></div>
+        <div class="module-card" onclick="navigate('marketing')"><span class="emoji">📣</span><span class="label">Marketing</span></div>
+        <div class="module-card" onclick="navigate('minisite')"><span class="emoji">🌐</span><span class="label">Mini-site</span></div>
+        <div class="module-card" onclick="navigate('planos')"><span class="emoji">💎</span><span class="label">Planos</span></div>
+      </div>
+
+      <h3>Segmentos disponiveis</h3>
+      <p>O NaRegua se adapta ao seu tipo de negocio. Ao criar sua conta, voce escolhe o segmento e o sistema ajusta os termos automaticamente.</p>
+      <div class="segment-grid">
+        <div class="segment-item"><span class="segment-icon">💈</span> Barbearia</div>
+        <div class="segment-item"><span class="segment-icon">💅</span> Manicure</div>
+        <div class="segment-item"><span class="segment-icon">✨</span> Nail Designer</div>
+        <div class="segment-item"><span class="segment-icon">🔲</span> Sobrancelha</div>
+        <div class="segment-item"><span class="segment-icon">🧖</span> Estetica</div>
+        <div class="segment-item"><span class="segment-icon">💇</span> Salao</div>
+        <div class="segment-item"><span class="segment-icon">📌</span> Outro</div>
+      </div>
+
+      <div class="info-box">
+        <strong>Acesso:</strong> usenaregua.com.br · Funciona em computador, tablet e celular. Instale como aplicativo direto do navegador.
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIMEIROS PASSOS -->
+  <section class="section" id="primeiros-passos">
+    <span class="section-tag">Comecar</span>
+    <h1 class="section-title">Primeiros Passos</h1>
+    <p class="section-subtitle">Como criar sua conta, fazer login e configurar seu estabelecimento.</p>
+
+    <h3>Criar sua conta</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Acesse usenaregua.com.br</div>
+          <div class="step-desc">Clique em "Criar conta gratis" na pagina inicial.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Preencha seus dados</div>
+          <div class="step-desc">Nome do estabelecimento, seu nome, e-mail e senha. Aceite os termos de uso e a politica de privacidade (LGPD).</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Escolha seu segmento</div>
+          <div class="step-desc">Selecione entre 7 opcoes: barbearia, manicure, nail designer, sobrancelha, estetica, salao ou outro. O sistema ajusta a linguagem automaticamente.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Onboarding guiado</div>
+          <div class="step-desc">Um tour mostra as funcionalidades principais. Voce ja pode cadastrar servicos e profissionais durante esse passo.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">Pronto para usar</div>
+          <div class="step-desc">Seu estabelecimento ja esta ativo. Compartilhe o link publico com seus clientes para comecarem a agendar.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Como fazer login</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Abra o navegador</div>
+          <div class="step-desc">Chrome, Edge ou Safari. Acesse: usenaregua.com.br</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Digite seu e-mail e senha</div>
+          <div class="step-desc">Use os dados que cadastrou ao criar a conta.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Sessao salva automaticamente</div>
+          <div class="step-desc">Voce nao precisa fazer login toda vez. A sessao fica ativa por 30 dias.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Perfis de acesso</h3>
+    <p>Cada tipo de usuario ve uma tela diferente no sistema.</p>
+
+    <div class="profile-grid">
+      <div class="profile-card dono">
+        <span class="profile-badge badge-dono">Dono</span>
+        <div class="profile-name">Dono do Estabelecimento</div>
+        <ul class="profile-list">
+          <li>Acesso total ao sistema</li>
+          <li>Gerenciar equipe e comissoes</li>
+          <li>Ver relatorios e financeiro</li>
+          <li>Configurar servicos e precos</li>
+          <li>Criar promocoes e cupons</li>
+        </ul>
+      </div>
+      <div class="profile-card profissional">
+        <span class="profile-badge badge-profissional">Profissional</span>
+        <div class="profile-name">Profissional</div>
+        <ul class="profile-list">
+          <li>Ver sua agenda do dia</li>
+          <li>Confirmar e concluir atendimentos</li>
+          <li>Registrar comandas</li>
+          <li>Ver suas comissoes</li>
+        </ul>
+      </div>
+      <div class="profile-card cliente">
+        <span class="profile-badge badge-cliente">Cliente</span>
+        <div class="profile-name">Cliente</div>
+        <ul class="profile-list">
+          <li>Agendar pelo link publico</li>
+          <li>Escolher profissional e horario</li>
+          <li>Ver historico de agendamentos</li>
+          <li>Avaliar atendimentos</li>
+        </ul>
+      </div>
+      <div class="profile-card admin">
+        <span class="profile-badge badge-admin">Admin</span>
+        <div class="profile-name">Administrador</div>
+        <ul class="profile-list">
+          <li>Gerenciar todos os estabelecimentos</li>
+          <li>Suporte a usuarios</li>
+          <li>Visao da plataforma completa</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section class="section" id="dashboard">
+    <span class="section-tag">Modulo</span>
+    <h1 class="section-title">Dashboard</h1>
+    <p class="section-subtitle">Tela inicial do sistema. Mostra tudo que voce precisa saber ao abrir o NaRegua.</p>
+
+    <h3>O que aparece no Dashboard</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">📅</div>
+        <div class="card-title">Agenda do Dia</div>
+        <div class="card-text">Lista de todos os agendamentos de hoje, com horario, cliente, servico e profissional responsavel.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <div class="card-title">Encaixe Rapido</div>
+        <div class="card-text">Botao para agendar um cliente na hora, sem precisar ir para a tela de agendamento. Ideal para quem chega sem marcar.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔔</div>
+        <div class="card-title">Notificacoes</div>
+        <div class="card-text">Sino no topo com alertas de novos agendamentos, cancelamentos e lembretes importantes.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔍</div>
+        <div class="card-title">Busca Rapida (Ctrl+K)</div>
+        <div class="card-text">Atalho para encontrar clientes, servicos ou agendamentos rapidamente. Funciona de qualquer tela.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">💰</div>
+        <div class="card-title">Resumo Financeiro</div>
+        <div class="card-text">Faturamento do dia, quantidade de atendimentos e ticket medio. Visao rapida do movimento.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <div class="card-title">Lista de Espera</div>
+        <div class="card-text">Banner mostrando quantos clientes estao aguardando vaga. Aparece quando a agenda esta lotada.</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>Dica:</strong> Horarios ja ocupados ficam escondidos automaticamente na agenda, mostrando apenas os disponiveis. Isso facilita o encaixe rapido.
+    </div>
+  </section>
+
+  <!-- AGENDAMENTO -->
+  <section class="section" id="agendamento">
+    <span class="section-tag">Modulo</span>
+    <h1 class="section-title">Agendamento</h1>
+    <p class="section-subtitle">O coracao do NaRegua. Gerencie todos os agendamentos do seu estabelecimento.</p>
+
+    <h3>Link publico de agendamento</h3>
+    <p>Cada estabelecimento tem um link unico que voce compartilha com seus clientes. Eles acessam pelo celular, escolhem o servico, profissional e horario — tudo sem precisar ligar ou mandar mensagem.</p>
+
+    <div class="divider"></div>
+
+    <h3>Como funciona para o cliente</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Acessa o link do estabelecimento</div>
+          <div class="step-desc">O cliente abre o link no celular ou computador.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Escolhe o servico</div>
+          <div class="step-desc">Lista de servicos com preco e duracao. Pode selecionar combos tambem.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Escolhe o profissional</div>
+          <div class="step-desc">Se tiver mais de um profissional, o cliente pode escolher com quem quer ser atendido.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Escolhe data e horario</div>
+          <div class="step-desc">So aparecem horarios disponiveis. Horarios ocupados ficam escondidos automaticamente.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">Confirma o agendamento</div>
+          <div class="step-desc">Informa nome e telefone (ou faz login). Pode aplicar cupom de desconto nesse momento.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Funcionalidades do agendamento</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">🔄</div>
+        <div class="card-title">Recorrencia</div>
+        <div class="card-text">O cliente pode agendar de forma recorrente (semanal, quinzenal, mensal). O sistema cria os proximos automaticamente.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎫</div>
+        <div class="card-title">Cupons de Desconto</div>
+        <div class="card-text">Crie cupons com percentual ou valor fixo. O cliente aplica na hora de agendar.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📦</div>
+        <div class="card-title">Combos</div>
+        <div class="card-text">Agrupe servicos com preco especial. Exemplo: corte + barba com desconto.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">⏰</div>
+        <div class="card-title">Horarios Inteligentes</div>
+        <div class="card-text">O sistema calcula horarios baseado na duracao de cada servico. Nao deixa agendar em horarios que dariam conflito.</div>
+      </div>
+    </div>
+
+    <div class="warn-box">
+      <strong>Importante:</strong> quando um agendamento e cancelado, o horario volta a ficar disponivel automaticamente para outros clientes.
+    </div>
+  </section>
+
+  <!-- EQUIPE -->
+  <section class="section" id="equipe">
+    <span class="section-tag">Modulo</span>
+    <h1 class="section-title">Equipe</h1>
+    <p class="section-subtitle">Cadastre profissionais, defina comissoes e acompanhe a performance de cada um.</p>
+
+    <h3>Cadastrar profissional</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Acesse o menu Equipe</div>
+          <div class="step-desc">Clique em "Novo Profissional".</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Preencha os dados</div>
+          <div class="step-desc">Nome, telefone, e-mail e foto (opcional). Defina os servicos que esse profissional realiza.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Defina a comissao</div>
+          <div class="step-desc">Percentual que o profissional recebe por atendimento. Pode ser diferente por servico.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Ative o acesso</div>
+          <div class="step-desc">O profissional recebe um login proprio para ver sua agenda e comissoes.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Acompanhamento de performance</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">🏆</div>
+        <div class="card-title">Ranking</div>
+        <div class="card-text">Veja quem mais atendeu, quem tem melhor avaliacao e quem faturou mais no periodo.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">💵</div>
+        <div class="card-title">Comissoes</div>
+        <div class="card-text">Calculo automatico das comissoes baseado nos atendimentos concluidos.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <div class="card-title">Performance</div>
+        <div class="card-text">Numero de atendimentos, taxa de cancelamento e nota media de satisfacao.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📅</div>
+        <div class="card-title">Agenda Individual</div>
+        <div class="card-text">Cada profissional ve apenas seus proprios agendamentos e comissoes.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAIXA / FINANCEIRO -->
+  <section class="section" id="caixa">
+    <span class="section-tag">Modulo</span>
+    <h1 class="section-title">Caixa / Financeiro</h1>
+    <p class="section-subtitle">Controle total do dinheiro que entra e sai do seu estabelecimento.</p>
+
+    <h3>Comandas</h3>
+    <p>Cada atendimento gera uma comanda automatica. Nela voce registra:</p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">📝</div>
+        <div class="card-title">Servicos Realizados</div>
+        <div class="card-text">Os servicos do agendamento ja vem preenchidos. Voce pode adicionar mais se o cliente pedir algo extra.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🛒</div>
+        <div class="card-title">Produtos Vendidos</div>
+        <div class="card-text">Adicionou um produto na comanda? O estoque e baixado automaticamente.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">💳</div>
+        <div class="card-title">Forma de Pagamento</div>
+        <div class="card-text">Dinheiro, Pix, cartao de credito, debito ou misto. Registre como o cliente pagou.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎫</div>
+        <div class="card-title">Descontos</div>
+        <div class="card-text">Aplique cupons ou descontos manuais na comanda antes de fechar.</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Fechamento de caixa</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Clique em "Fechar Caixa"</div>
+          <div class="step-desc">No final do dia, acesse o menu Caixa e clique no botao de fechamento.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Confira o resumo</div>
+          <div class="step-desc">O sistema mostra total por forma de pagamento, comissoes dos profissionais e saldo liquido.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Confirme o fechamento</div>
+          <div class="step-desc">Apos confirmar, o dia fica registrado e voce pode consultar depois nos relatorios.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Despesas</h3>
+    <p>Registre gastos do estabelecimento (aluguel, luz, produtos, etc.) para ter o lucro real. Categorize por tipo e acompanhe mes a mes nos relatorios.</p>
+  </section>
+
+  <!-- CLIENTES -->
+  <section class="section" id="clientes">
+    <span class="section-tag">Modulo</span>
+    <h1 class="section-title">Clientes</h1>
+    <p class="section-subtitle">Conheca seus clientes, acompanhe o historico e fidelize com lembretes.</p>
+
+    <h3>Cadastro de clientes</h3>
+    <p>Clientes sao cadastrados automaticamente quando agendam pela primeira vez. Voce tambem pode cadastrar manualmente.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">👤</div>
+        <div class="card-title">Ficha do Cliente</div>
+        <div class="card-text">Nome, telefone, e-mail, data de nascimento e notas pessoais (preferencias, alergias, observacoes).</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📋</div>
+        <div class="card-title">Anamnese / Ficha Tecnica</div>
+        <div class="card-text">Registre informacoes tecnicas sobre o cliente: tipo de pele, cabelo, alergias, produtos usados. Ideal para estetica e saloes.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📅</div>
+        <div class="card-title">Historico Completo</div>
+        <div class="card-text">Todos os agendamentos anteriores, servicos realizados, valores pagos e avaliacoes dadas.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔔</div>
+        <div class="card-title">Lembretes</div>
+        <div class="card-text">O sistema avisa quando um cliente fiel nao aparece ha muito tempo. Voce decide quando notificar.</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>Privacidade:</strong> os dados dos clientes sao protegidos pela LGPD. Apenas o dono do estabelecimento e os profissionais autorizados tem acesso.
+    </div>
+  </section>
+
+  <!-- SERVICOS -->
+  <section class="section" id="servicos">
+    <span class="section-tag">Modulo</span>
+    <h1 class="section-title">Servicos</h1>
+    <p class="section-subtitle">Cadastre tudo que seu estabelecimento oferece — servicos avulsos, combos, pacotes e assinaturas.</p>
+
+    <h3>Cadastrar servico</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Acesse o menu Servicos</div>
+          <div class="step-desc">Clique em "Novo Servico".</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Preencha os dados</div>
+          <div class="step-desc">Nome, preco, duracao estimada e descricao. Escolha quais profissionais realizam esse servico.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Ative para agendamento</div>
+          <div class="step-desc">O servico aparece no link publico para os clientes agendarem.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Tipos de oferta</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">✂️</div>
+        <div class="card-title">Servico Avulso</div>
+        <div class="card-text">Servico individual com preco e duracao definidos. Exemplo: corte, escova, manicure.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📦</div>
+        <div class="card-title">Combo</div>
+        <div class="card-text">Dois ou mais servicos juntos com preco especial. O cliente agenda tudo de uma vez.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎁</div>
+        <div class="card-title">Pacote</div>
+        <div class="card-text">Venda um pacote de sessoes antecipadas. Exemplo: 10 cortes pelo preco de 8. O sistema controla quantos ja foram usados.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔄</div>
+        <div class="card-title">Assinatura</div>
+        <div class="card-text">O cliente paga um valor mensal e tem direito a agendamentos inclusos. Ideal para fidelizacao.</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>Servicos padrao:</strong> ao criar sua conta, o sistema ja sugere servicos comuns para o seu segmento. Voce pode editar ou remover a qualquer momento.
+    </div>
+  </section>
+
+  <!-- ESTOQUE -->
+  <section class="section" id="estoque">
+    <span class="section-tag">Modulo</span>
+    <h1 class="section-title">Estoque</h1>
+    <p class="section-subtitle">Controle de produtos do seu estabelecimento — desde o recebimento ate o consumo durante atendimentos.</p>
+
+    <h3>Gerenciar produtos</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">📦</div>
+        <div class="card-title">Cadastro de Produtos</div>
+        <div class="card-text">Nome, marca, quantidade, preco de compra e preco de venda. Controle o que voce tem disponivel.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📥</div>
+        <div class="card-title">Entrada de Estoque</div>
+        <div class="card-text">Registre a chegada de produtos. Quantidade atualizada automaticamente.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📤</div>
+        <div class="card-title">Saida de Estoque</div>
+        <div class="card-text">Registre vendas, uso interno ou perdas. Baixa automatica quando o produto e vendido na comanda.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔄</div>
+        <div class="card-title">Consumo no Atendimento</div>
+        <div class="card-text">Vincule produtos a servicos. Quando o atendimento e concluido, o estoque e baixado automaticamente.</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Movimentacoes</h3>
+    <p>Todas as entradas e saidas ficam registradas com data, quantidade e motivo. Voce pode filtrar por periodo e exportar o historico.</p>
+
+    <div class="warn-box">
+      <strong>Alerta de estoque baixo:</strong> quando um produto chega a quantidade minima, o sistema avisa para voce repor antes de acabar.
+    </div>
+  </section>
+
+  <!-- RELATORIOS -->
+  <section class="section" id="relatorios">
+    <span class="section-tag">Modulo</span>
+    <h1 class="section-title">Relatorios</h1>
+    <p class="section-subtitle">Numeros que ajudam a tomar decisoes. Veja o que funciona e o que precisa melhorar.</p>
+
+    <h3>Relatorios disponiveis</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <div class="card-title">KPIs Principais</div>
+        <div class="card-text">Faturamento, ticket medio, total de atendimentos e taxa de ocupacao. Tudo por periodo (dia, semana, mes).</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📋</div>
+        <div class="card-title">Resumo Financeiro</div>
+        <div class="card-text">Receitas, despesas e lucro liquido. Compare meses e veja a evolucao do negocio.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">⭐</div>
+        <div class="card-title">Satisfacao</div>
+        <div class="card-text">Nota media das avaliacoes, comentarios dos clientes e evolucao da satisfacao ao longo do tempo.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔁</div>
+        <div class="card-title">Retencao</div>
+        <div class="card-text">Quantos clientes voltam? Frequencia media entre visitas e taxa de retorno por periodo.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏆</div>
+        <div class="card-title">Ranking de Profissionais</div>
+        <div class="card-text">Quem mais atendeu, quem tem melhor nota, quem faturou mais. Compare a performance da equipe.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">✂️</div>
+        <div class="card-title">Servicos Mais Pedidos</div>
+        <div class="card-text">Quais servicos sao mais procurados, qual o faturamento de cada um e tendencias de demanda.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARKETING -->
+  <section class="section" id="marketing">
+    <span class="section-tag">Modulo</span>
+    <h1 class="section-title">Marketing</h1>
+    <p class="section-subtitle">Ferramentas para atrair e fidelizar clientes. Promova seu estabelecimento de forma inteligente.</p>
+
+    <h3>Ferramentas de marketing</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">🎉</div>
+        <div class="card-title">Promocoes</div>
+        <div class="card-text">Crie promocoes com desconto por periodo. Exemplo: "20% off na primeira visita" ou "Black Friday". Aparece no link publico.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎫</div>
+        <div class="card-title">Cupons</div>
+        <div class="card-text">Gere codigos de desconto para compartilhar nas redes sociais, WhatsApp ou parcerias. Controle uso maximo e validade.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📋</div>
+        <div class="card-title">Lista de Espera</div>
+        <div class="card-text">Quando a agenda esta cheia, o cliente pode entrar na lista de espera. Se alguem cancelar, ele e avisado automaticamente.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">⏰</div>
+        <div class="card-title">Horarios Ociosos</div>
+        <div class="card-text">O sistema identifica horarios que costumam ficar vagos e sugere promocoes para preenche-los.</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>Remarketing:</strong> quando um agendamento e cancelado, o sistema pode oferecer automaticamente o horario vago para clientes da lista de espera.
+    </div>
+  </section>
+
+  <!-- CONFIGURACOES -->
+  <section class="section" id="configuracoes">
+    <span class="section-tag">Modulo</span>
+    <h1 class="section-title">Configuracoes</h1>
+    <p class="section-subtitle">Personalize o NaRegua para funcionar do jeito que voce precisa.</p>
+
+    <h3>O que voce pode configurar</h3>
+    <table class="data-table">
+      <thead><tr><th>Item</th><th>Descricao</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Perfil do Estabelecimento</td>
+          <td>Nome, endereco, telefone, logo e descricao que aparece no link publico.</td>
+        </tr>
+        <tr>
+          <td>Horario de Funcionamento</td>
+          <td>Defina os dias e horarios em que o estabelecimento atende. Horarios fora do expediente nao ficam disponiveis para agendamento.</td>
+        </tr>
+        <tr>
+          <td>Tema Visual</td>
+          <td>Alterne entre tema claro e escuro. A preferencia fica salva no seu dispositivo.</td>
+        </tr>
+        <tr>
+          <td>Politica de Cancelamento</td>
+          <td>Defina com quantas horas de antecedencia o cliente pode cancelar sem penalidade.</td>
+        </tr>
+        <tr>
+          <td>Intervalo entre Atendimentos</td>
+          <td>Tempo minimo entre um atendimento e outro (5, 10, 15 ou 30 minutos).</td>
+        </tr>
+        <tr>
+          <td>Galeria de Fotos</td>
+          <td>Fotos do seu trabalho que aparecem no mini-site publico. Portfolio para atrair novos clientes.</td>
+        </tr>
+        <tr>
+          <td>Plano e Assinatura</td>
+          <td>Veja seu plano atual, funcionalidades disponiveis e faca upgrade se precisar.</td>
+        </tr>
+        <tr>
+          <td>Notificacoes Push</td>
+          <td>Ative ou desative avisos no celular sobre novos agendamentos e cancelamentos.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- MINI-SITE PUBLICO -->
+  <section class="section" id="minisite">
+    <span class="section-tag">Modulo</span>
+    <h1 class="section-title">Mini-site Publico</h1>
+    <p class="section-subtitle">Seu estabelecimento com pagina propria na internet, sem precisar criar um site separado.</p>
+
+    <h3>O que aparece no mini-site</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">🏪</div>
+        <div class="card-title">Informacoes do Estabelecimento</div>
+        <div class="card-text">Nome, endereco, telefone, horario de funcionamento e descricao. Tudo editavel nas configuracoes.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">✂️</div>
+        <div class="card-title">Lista de Servicos</div>
+        <div class="card-text">Todos os servicos com preco e duracao. O cliente ja pode clicar e agendar direto.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📸</div>
+        <div class="card-title">Portfolio / Galeria</div>
+        <div class="card-text">Fotos dos seus melhores trabalhos. Atualize pela tela de configuracoes.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">⭐</div>
+        <div class="card-title">Avaliacoes</div>
+        <div class="card-text">Notas e comentarios de clientes que ja foram atendidos. Prova social para atrair novos clientes.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">👥</div>
+        <div class="card-title">Equipe</div>
+        <div class="card-text">Fotos e nomes dos profissionais. O cliente pode escolher com quem quer ser atendido.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📅</div>
+        <div class="card-title">Botao Agendar</div>
+        <div class="card-text">Botao em destaque para o cliente agendar direto pelo mini-site, sem precisar ligar.</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>Compartilhe:</strong> coloque o link do mini-site na bio do Instagram, no WhatsApp e nos cartoes de visita. E a forma mais facil dos clientes te encontrarem.
+    </div>
+  </section>
+
+  <!-- PLANOS -->
+  <section class="section" id="planos">
+    <span class="section-tag">Monetizacao</span>
+    <h1 class="section-title">Planos</h1>
+    <p class="section-subtitle">Escolha o plano que melhor se encaixa no tamanho do seu negocio.</p>
+
+    <div class="plan-grid">
+      <div class="plan-card">
+        <div class="plan-name">Basico</div>
+        <div class="plan-price">R$29<small>,90/mes</small></div>
+        <ul class="plan-features">
+          <li>Agendamento online</li>
+          <li>Link publico</li>
+          <li>1 profissional</li>
+          <li>Caixa basico</li>
+          <li>Notificacoes push</li>
+          <li>Suporte por e-mail</li>
+        </ul>
+      </div>
+      <div class="plan-card destaque">
+        <div class="plan-name">Profissional</div>
+        <div class="plan-price">R$49<small>,90/mes</small></div>
+        <ul class="plan-features">
+          <li>Tudo do Basico</li>
+          <li>Ate 5 profissionais</li>
+          <li>Combos e pacotes</li>
+          <li>Cupons de desconto</li>
+          <li>Relatorios completos</li>
+          <li>Mini-site personalizado</li>
+          <li>Controle de estoque</li>
+          <li>Suporte prioritario</li>
+        </ul>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">Premium</div>
+        <div class="plan-price">R$79<small>,90/mes</small></div>
+        <ul class="plan-features">
+          <li>Tudo do Profissional</li>
+          <li>Profissionais ilimitados</li>
+          <li>Assinaturas de clientes</li>
+          <li>Marketing automatizado</li>
+          <li>Remarketing de vagas</li>
+          <li>Pesquisa de satisfacao</li>
+          <li>Anamnese / fichas tecnicas</li>
+          <li>Suporte via WhatsApp</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Periodo de teste</h3>
+    <p>Todos os planos tem 14 dias de teste gratis com acesso a todas as funcionalidades. Voce so comeca a pagar depois de decidir qual plano escolher.</p>
+
+    <div class="divider"></div>
+
+    <h3>Comparativo de funcionalidades</h3>
+    <table class="data-table">
+      <thead><tr><th>Funcionalidade</th><th>Basico</th><th>Profissional</th><th>Premium</th></tr></thead>
+      <tbody>
+        <tr><td>Agendamento online</td><td><span class="tag tag-gold">Sim</span></td><td><span class="tag tag-gold">Sim</span></td><td><span class="tag tag-gold">Sim</span></td></tr>
+        <tr><td>Link publico</td><td><span class="tag tag-gold">Sim</span></td><td><span class="tag tag-gold">Sim</span></td><td><span class="tag tag-gold">Sim</span></td></tr>
+        <tr><td>Profissionais</td><td><span class="tag tag-gray">1</span></td><td><span class="tag tag-blue">Ate 5</span></td><td><span class="tag tag-gold">Ilimitado</span></td></tr>
+        <tr><td>Combos e pacotes</td><td><span class="tag tag-gray">Nao</span></td><td><span class="tag tag-gold">Sim</span></td><td><span class="tag tag-gold">Sim</span></td></tr>
+        <tr><td>Cupons</td><td><span class="tag tag-gray">Nao</span></td><td><span class="tag tag-gold">Sim</span></td><td><span class="tag tag-gold">Sim</span></td></tr>
+        <tr><td>Relatorios</td><td><span class="tag tag-gray">Basico</span></td><td><span class="tag tag-gold">Completo</span></td><td><span class="tag tag-gold">Completo</span></td></tr>
+        <tr><td>Estoque</td><td><span class="tag tag-gray">Nao</span></td><td><span class="tag tag-gold">Sim</span></td><td><span class="tag tag-gold">Sim</span></td></tr>
+        <tr><td>Assinaturas</td><td><span class="tag tag-gray">Nao</span></td><td><span class="tag tag-gray">Nao</span></td><td><span class="tag tag-gold">Sim</span></td></tr>
+        <tr><td>Marketing</td><td><span class="tag tag-gray">Nao</span></td><td><span class="tag tag-gray">Nao</span></td><td><span class="tag tag-gold">Sim</span></td></tr>
+        <tr><td>Satisfacao</td><td><span class="tag tag-gray">Nao</span></td><td><span class="tag tag-gray">Nao</span></td><td><span class="tag tag-gold">Sim</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- SUPORTE -->
+  <section class="section" id="suporte">
+    <span class="section-tag">Ajuda</span>
+    <h1 class="section-title">Suporte</h1>
+    <p class="section-subtitle">Precisa de ajuda? Estamos aqui para resolver.</p>
+
+    <h3>Canais de atendimento</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">💬</div>
+        <div class="card-title">WhatsApp</div>
+        <div class="card-text">Plano Premium tem suporte direto pelo WhatsApp em horario comercial.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📧</div>
+        <div class="card-title">E-mail</div>
+        <div class="card-text">Todos os planos tem suporte por e-mail. Resposta em ate 24 horas uteis.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">❓</div>
+        <div class="card-title">Ajuda no Sistema</div>
+        <div class="card-text">Cada tela tem um botao de ajuda com explicacoes sobre aquela funcionalidade. Sao 37 paginas de ajuda contextual.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎓</div>
+        <div class="card-title">Tour Guiado</div>
+        <div class="card-text">Na primeira vez que voce acessa o sistema, um tour mostra as funcionalidades principais. Voce pode repetir o tour a qualquer momento.</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Perguntas frequentes</h3>
+    <table class="data-table">
+      <thead><tr><th>Pergunta</th><th>Resposta</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Posso testar antes de pagar?</td>
+          <td>Sim! Todos os planos tem 14 dias de teste gratis com acesso total.</td>
+        </tr>
+        <tr>
+          <td>Funciona no celular?</td>
+          <td>Sim. O NaRegua funciona em qualquer navegador e pode ser instalado como aplicativo no celular.</td>
+        </tr>
+        <tr>
+          <td>Meus dados estao seguros?</td>
+          <td>Sim. Usamos criptografia e seguimos a LGPD. Seus dados ficam em servidores seguros e ninguem mais tem acesso.</td>
+        </tr>
+        <tr>
+          <td>Posso mudar de plano?</td>
+          <td>Sim. Voce pode fazer upgrade ou downgrade a qualquer momento. A diferenca e ajustada automaticamente.</td>
+        </tr>
+        <tr>
+          <td>Como cancelo minha conta?</td>
+          <td>Nas configuracoes, voce pode cancelar a assinatura. Seus dados ficam guardados por 30 dias caso mude de ideia.</td>
+        </tr>
+        <tr>
+          <td>Posso trocar o segmento?</td>
+          <td>Sim. Nas configuracoes voce pode mudar de barbearia para salao, por exemplo. Os termos sao ajustados automaticamente.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="info-box">
+      <strong>Site:</strong> usenaregua.com.br · Agendamento inteligente para profissionais de beleza.
+    </div>
+  </section>
+
+</main>
+
+<script>
+function navigate(target) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const sec = document.getElementById(target);
+  if (sec) { sec.classList.add('active'); sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  document.querySelectorAll('.nav-item[data-target="' + target + '"]').forEach(n => n.classList.add('active'));
+  if (window.innerWidth <= 768) document.querySelector('.sidebar').classList.remove('open');
+}
+
+document.querySelectorAll('.nav-item[data-target]').forEach(item => {
+  item.addEventListener('click', () => navigate(item.dataset.target));
+});
+
+document.querySelectorAll('.module-card[onclick]').forEach(card => {
+  card.style.cursor = 'pointer';
+});
+</script>
+</body>
+</html>
