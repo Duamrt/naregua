@@ -20,7 +20,7 @@ var SEGMENT_DEFAULTS = {
   }
 
   // Segmento (barbearia, estetica, sobrancelha, unha, salao)
-  var seg = localStorage.getItem('naregua_segment') || 'barbearia';
+  var seg = localStorage.getItem('naregua_segment') || 'outro';
   if (seg && seg !== 'barbearia') {
     document.documentElement.setAttribute('data-segment', seg);
   }
@@ -67,7 +67,7 @@ function getTheme() {
 }
 
 function setSegment(seg) {
-  localStorage.setItem('naregua_segment', seg || 'barbearia');
+  localStorage.setItem('naregua_segment', seg || 'outro');
   if (seg && seg !== 'barbearia') {
     document.documentElement.setAttribute('data-segment', seg);
   } else {
@@ -88,7 +88,7 @@ function setAccentColor(color) {
   }
   localStorage.setItem('naregua_accent', color);
   // Só aplica inline se for diferente do padrão do segmento atual
-  var seg = localStorage.getItem('naregua_segment') || 'barbearia';
+  var seg = localStorage.getItem('naregua_segment') || 'outro';
   var segDefault = SEGMENT_DEFAULTS[seg] || SEGMENT_DEFAULTS.barbearia;
   if (color.toLowerCase() !== segDefault.toLowerCase()) {
     applyInlineAccent(color);

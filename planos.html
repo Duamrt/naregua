@@ -13,8 +13,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03221608">
-  <script src="js/theme.js?v=03221608"></script>
+  <link rel="stylesheet" href="css/style.css?v=03230524">
+  <script src="js/theme.js?v=03230524"></script>
   <style>
     .plan-container { max-width:520px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -259,9 +259,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221608"></script>
-<script src="js/supabase.js?v=03221608"></script>
-<script src="js/utils.js?v=03221608"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03230524"></script>
+<script src="js/supabase.js?v=03230524"></script>
+<script src="js/utils.js?v=03230524"></script>
 <script>
 const PLAN_NAMES = {
   trial: 'Trial Gratuito',
@@ -322,7 +322,7 @@ const PLANS = [
 let shop = null;
 let selectedPlan = 'profissional'; // default pra mensagem WhatsApp
 
-const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
+// ADMIN_EMAILS centralizado em utils.js
 const _params = new URLSearchParams(window.location.search);
 const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_viewing_shop');
 if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
@@ -452,7 +452,7 @@ function copiarPix() {
   });
 }
 </script>
-<script src="js/ajuda.js?v=03221608"></script>
-<script src="js/sw-update.js?v=03221608"></script>
+<script src="js/ajuda.js?v=03230524"></script>
+<script src="js/sw-update.js?v=03230524"></script>
 </body>
 </html>

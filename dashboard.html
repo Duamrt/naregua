@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03221608">
-  <link rel="stylesheet" href="css/layout.css?v=03221608">
-  <script src="js/theme.js?v=03221608"></script>
+  <link rel="stylesheet" href="css/style.css?v=03230524">
+  <link rel="stylesheet" href="css/layout.css?v=03230524">
+  <script src="js/theme.js?v=03230524"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -576,10 +576,10 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221608"></script>
-<script src="js/supabase.js?v=03221608"></script>
-<script src="js/utils.js?v=03221608"></script>
-<script src="js/push.js?v=03221608"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03230524"></script>
+<script src="js/supabase.js?v=03230524"></script>
+<script src="js/utils.js?v=03230524"></script>
+<script src="js/push.js?v=03230524"></script>
 <script>
 console.log('Dashboard v3 carregado');
 // ── Estado ────────────────────────────────────────────────────
@@ -595,7 +595,7 @@ const DIAS_SEMANA = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'
 const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 
 // ── Init ──────────────────────────────────────────────────────
-const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
+// ADMIN_EMAILS centralizado em utils.js
 const _params = new URLSearchParams(window.location.search);
 const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_viewing_shop');
 if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
@@ -2143,9 +2143,9 @@ function updateBell(count) {
 // Run bell check after shop loads (inside DOMContentLoaded, after renderDay)
 setTimeout(() => { if (shop) checkBellCount(); }, 2000);
 </script>
-<script src="js/ajuda.js?v=03221608"></script>
-<script src="js/tour.js?v=03221608"></script>
-<script src="js/sw-update.js?v=03221608"></script>
-<script src="js/sidebar.js?v=03221608"></script>
+<script src="js/ajuda.js?v=03230524"></script>
+<script src="js/tour.js?v=03230524"></script>
+<script src="js/sw-update.js?v=03230524"></script>
+<script src="js/sidebar.js?v=03230524"></script>
 </body>
 </html>

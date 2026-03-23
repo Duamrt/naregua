@@ -17,8 +17,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03221608">
-  <script src="js/theme.js?v=03221608"></script>
+  <link rel="stylesheet" href="css/style.css?v=03230524">
+  <script src="js/theme.js?v=03230524"></script>
   <style>
     .shop-header { text-align:center; margin-bottom:24px; }
     .shop-header h1 { font-size:20px; margin-bottom:4px; }
@@ -475,9 +475,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03221608"></script>
-<script src="js/supabase.js?v=03221608"></script>
-<script src="js/utils.js?v=03221608"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03230524"></script>
+<script src="js/supabase.js?v=03230524"></script>
+<script src="js/utils.js?v=03230524"></script>
 <script>
 // ── Mascara telefone ──────────────────────────────────────────
 document.getElementById('client-phone').addEventListener('input', function() {
@@ -1549,22 +1549,26 @@ function renderResumo() {
 
 // ── Confirmar ─────────────────────────────────────────────────
 async function confirmarAgendamento() {
+  const btn = document.getElementById('btn-confirm');
+  if (btn.disabled) return; // debounce: evita duplo-clique
+  btn.disabled = true;
+
   const nome = document.getElementById('client-name').value.trim();
   const phone = document.getElementById('client-phone').value.trim();
-  const btn = document.getElementById('btn-confirm');
   const msgEl = document.getElementById('ag-msg');
 
-  if (!nome || nome.length < 2) { showAgMsg('Digite seu nome (pelo menos 2 letras).', 'error'); return; }
+  if (!nome || nome.length < 2) { showAgMsg('Digite seu nome (pelo menos 2 letras).', 'error'); btn.disabled = false; return; }
   const phoneLimpo = phone.replace(/\D/g, '');
-  if (!phoneLimpo || phoneLimpo.length < 10) { showAgMsg('Digite um WhatsApp válido com DDD.', 'error'); return; }
+  if (!phoneLimpo || phoneLimpo.length < 10) { showAgMsg('Digite um WhatsApp válido com DDD.', 'error'); btn.disabled = false; return; }
 
-  btn.disabled = true;
   btn.querySelector('.btn-label').style.display = 'none';
   btn.querySelector('.spinner').style.display = 'inline-block';
   msgEl.className = 'msg';
 
   // BUG 5 ALTO FIX: verificar se serviço ainda existe
-  const svcCheck = await sb.from('services').select('id').eq('id', selectedService.id).eq('active', true).single();
+  let svcCheck;
+  try { svcCheck = await sb.from('services').select('id').eq('id', selectedService.id).eq('active', true).single(); }
+  catch(e) { showAgMsg('Serviço indisponível. Tente novamente.', 'error'); btn.disabled = false; btn.querySelector('.btn-label').style.display = 'inline'; btn.querySelector('.spinner').style.display = 'none'; return; }
   if (!svcCheck.data) {
     btn.disabled = false;
     btn.querySelector('.btn-label').style.display = 'inline';
@@ -1581,7 +1585,9 @@ async function confirmarAgendamento() {
 
   // BUG 6 ALTO FIX: verificar se barbeiro ainda esta ativo (pula se "any")
   if (selectedBarber && selectedBarber.id !== 'any' && !selectedService.blocks_all_day) {
-    const barberCheck = await sb.from('barbers').select('id').eq('id', selectedBarber.id).eq('active', true).single();
+    let barberCheck;
+    try { barberCheck = await sb.from('barbers').select('id').eq('id', selectedBarber.id).eq('active', true).single(); }
+    catch(e) { showAgMsg('Profissional indisponível. Tente novamente.', 'error'); btn.disabled = false; btn.querySelector('.btn-label').style.display = 'inline'; btn.querySelector('.spinner').style.display = 'none'; return; }
     if (!barberCheck.data) {
       btn.disabled = false;
       btn.querySelector('.btn-label').style.display = 'inline';
@@ -2214,7 +2220,7 @@ function resetar() {
   document.getElementById('client-phone').value = '';
 }
 </script>
-<script src="js/ajuda.js?v=03221608"></script>
-<script src="js/sw-update.js?v=03221608"></script>
+<script src="js/ajuda.js?v=03230524"></script>
+<script src="js/sw-update.js?v=03230524"></script>
 </body>
 </html>

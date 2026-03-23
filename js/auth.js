@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ── Sessão ────────────────────────────────────────────────────
-const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
+// ADMIN_EMAILS centralizado em utils.js
 
 async function checkSession() {
   try {
@@ -137,12 +137,14 @@ async function redirectUser(user) {
   // Tentar vincular por telefone (email fake = telefone@naregua.app)
   const phoneFromEmail = user.email.replace('@naregua.app', '');
   if (user.email.endsWith('@naregua.app') && phoneFromEmail) {
+    // TODO: filtrar por barbershop_id quando disponível (nesse ponto do login não temos o shop)
     const { data: pending } = await sb
       .from('barbers')
       .select('id')
       .eq('phone', phoneFromEmail)
       .is('user_id', null)
       .eq('active', true)
+      .limit(1)
       .maybeSingle();
 
     if (pending) {

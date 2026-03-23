@@ -5,6 +5,9 @@ if (location.hostname === 'usenaregua.com.br') {
   console.log = function() {};
 }
 
+// Emails de admin (centralizado — NÃO redefinir nos HTMLs)
+const ADMIN_EMAILS = ['duam-rt@hotmail.com'];
+
 function formatMoney(v) {
   return 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 }
