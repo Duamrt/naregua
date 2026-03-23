@@ -152,7 +152,9 @@
 
   function init() {
     handleResize();
-    window.addEventListener('resize', handleResize);
+    if(window._sidebarResizeHandler) window.removeEventListener('resize', window._sidebarResizeHandler);
+    window._sidebarResizeHandler = handleResize;
+    window.addEventListener('resize', window._sidebarResizeHandler);
     // Atualizar nome após 3s (tempo pro async carregar)
     setTimeout(function() {
       if (document.querySelector('.nr-sidebar-shop-name, .nr-sidebar-shop')) updateShopName();

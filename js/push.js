@@ -27,7 +27,8 @@ async function initPush(shopId) {
     if (!session) return;
 
     // Upsert: se endpoint ja existe, atualiza
-    await sb.from('push_subscriptions').delete().eq('endpoint', sub.endpoint);
+    const { error: delErr } = await sb.from('push_subscriptions').delete().eq('endpoint', sub.endpoint);
+    if(delErr) console.error('Erro ao limpar subscription antiga:', delErr);
 
     await sb.from('push_subscriptions').insert({
       user_id: session.user.id,

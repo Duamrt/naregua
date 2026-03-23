@@ -27,7 +27,7 @@ var SEGMENT_DEFAULTS = {
 
   // Cor personalizada — só aplica inline se for diferente do padrão do segmento
   var customColor = localStorage.getItem('naregua_accent');
-  var segDefault = SEGMENT_DEFAULTS[seg] || SEGMENT_DEFAULTS.barbearia;
+  var segDefault = SEGMENT_DEFAULTS[seg] || SEGMENT_DEFAULTS.outro;
   if (customColor && customColor.toLowerCase() !== segDefault.toLowerCase()) {
     applyInlineAccent(customColor);
   }
@@ -76,7 +76,7 @@ function setSegment(seg) {
   // Limpar inline accent pra deixar o CSS do segmento resolver
   clearInlineAccent();
   // Atualizar localStorage accent pro padrão do segmento
-  var segDefault = SEGMENT_DEFAULTS[seg] || SEGMENT_DEFAULTS.barbearia;
+  var segDefault = SEGMENT_DEFAULTS[seg] || SEGMENT_DEFAULTS.outro;
   localStorage.setItem('naregua_accent', segDefault);
 }
 
@@ -89,7 +89,7 @@ function setAccentColor(color) {
   localStorage.setItem('naregua_accent', color);
   // Só aplica inline se for diferente do padrão do segmento atual
   var seg = localStorage.getItem('naregua_segment') || 'outro';
-  var segDefault = SEGMENT_DEFAULTS[seg] || SEGMENT_DEFAULTS.barbearia;
+  var segDefault = SEGMENT_DEFAULTS[seg] || SEGMENT_DEFAULTS.outro;
   if (color.toLowerCase() !== segDefault.toLowerCase()) {
     applyInlineAccent(color);
   } else {
