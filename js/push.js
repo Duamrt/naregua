@@ -37,7 +37,7 @@ async function initPush(shopId) {
       auth: keys.auth
     });
 
-    console.log('Push subscription ativa');
+
   } catch (err) {
     console.error('Push init error:', err);
   }

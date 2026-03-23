@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03230524">
-  <link rel="stylesheet" href="css/layout.css?v=03230524">
-  <script src="js/theme.js?v=03230524"></script>
+  <link rel="stylesheet" href="css/style.css?v=03230530">
+  <link rel="stylesheet" href="css/layout.css?v=03230530">
+  <script src="js/theme.js?v=03230530"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -576,10 +576,10 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03230524"></script>
-<script src="js/supabase.js?v=03230524"></script>
-<script src="js/utils.js?v=03230524"></script>
-<script src="js/push.js?v=03230524"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03230530"></script>
+<script src="js/supabase.js?v=03230530"></script>
+<script src="js/utils.js?v=03230530"></script>
+<script src="js/push.js?v=03230530"></script>
 <script>
 console.log('Dashboard v3 carregado');
 // ── Estado ────────────────────────────────────────────────────
@@ -695,7 +695,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   checkListaEspera();
 
   // Atualizar automaticamente a cada 30s (pega novos agendamentos + lista de espera)
-  setInterval(() => { renderDay(); checkListaEspera(); }, 30000);
+  setInterval(async () => {
+    try { await renderDay(); await checkListaEspera(); } catch(e) { console.error('Auto-refresh:', e); }
+  }, 30000);
 });
 
 // ── Lista de espera no dashboard ──────────────────────────────
@@ -987,6 +989,7 @@ function renderApptCard(a, isNext) {
 
 // ── Ações ─────────────────────────────────────────────────────
 async function updateStatus(id, status, btnEl) {
+  if (btnEl.disabled) return;
   const labels = { cancelled:'Cancelar', no_show:'Marcar falta', done:'Concluir', confirmed:'Confirmar' };
   const destructive = ['cancelled','no_show'].includes(status);
 
@@ -1010,11 +1013,16 @@ async function updateStatus(id, status, btnEl) {
     }
   } catch (e) {
     console.error('Erro ao atualizar status:', e);
+    if (typeof toast === 'function') toast('Erro ao processar. Tente novamente.', 'error');
+    btnEl.disabled = false;
+    btnEl.textContent = labels[status] || 'Ação';
+    return;
   }
   renderDay();
 }
 
 async function excluirAgendamento(id, btnEl) {
+  if (btnEl.disabled) return;
   if (!btnEl.dataset.confirming) {
     btnEl.textContent = 'Certeza?';
     btnEl.style.color = '#ef4444';
@@ -1391,19 +1399,28 @@ async function confirmarPagamento() {
   btn.querySelector('.btn-label').style.display = 'none';
   btn.querySelector('.spinner').style.display = 'inline-block';
 
-  const a = dayAppointments.find(x => x.id === _pagApptId);
-  const svc = a ? services.find(s => s.id === a.service_id) : null;
-  const svcPrice = svc ? Number(svc.price) : 0;
-  const extrasTotal = _pagExtras.reduce((s, e) => s + e.price * e.qty, 0);
-  const totalPrice = svcPrice + extrasTotal;
+  let a, totalPrice, result;
+  try {
+    a = dayAppointments.find(x => x.id === _pagApptId);
+    const svc = a ? services.find(s => s.id === a.service_id) : null;
+    const svcPrice = svc ? Number(svc.price) : 0;
+    const extrasTotal = _pagExtras.reduce((s, e) => s + e.price * e.qty, 0);
+    totalPrice = svcPrice + extrasTotal;
 
-  // Se tem group_id, atualiza todo o grupo
-  const updateData = { status: 'done', price_paid: totalPrice, payment_method: _pagMethod };
-  let result;
-  if (a && a.group_id) {
-    result = await restUpdate('appointments', 'group_id=eq.' + a.group_id, updateData);
-  } else {
-    result = await restUpdate('appointments', 'id=eq.' + _pagApptId, updateData);
+    // Se tem group_id, atualiza todo o grupo
+    const updateData = { status: 'done', price_paid: totalPrice, payment_method: _pagMethod };
+    if (a && a.group_id) {
+      result = await restUpdate('appointments', 'group_id=eq.' + a.group_id, updateData);
+    } else {
+      result = await restUpdate('appointments', 'id=eq.' + _pagApptId, updateData);
+    }
+  } catch(e) {
+    console.error('Erro ao concluir:', e);
+    if (typeof toast === 'function') toast('Erro ao processar. Tente novamente.', 'error');
+    btn.disabled = false;
+    btn.querySelector('.btn-label').style.display = 'inline';
+    btn.querySelector('.spinner').style.display = 'none';
+    return;
   }
 
   btn.disabled = false;
@@ -1759,6 +1776,7 @@ async function loadConsumoNoModal(apptId) {
 
 // ── Remarketing de vaga ───────────────────────────────────────
 async function cancelarComVaga(apptId, btnEl) {
+  if (btnEl.disabled) return;
   // Confirmação duplo clique
   if (!btnEl.dataset.confirming) {
     const original = btnEl.textContent;
@@ -1772,14 +1790,23 @@ async function cancelarComVaga(apptId, btnEl) {
   btnEl.disabled = true;
 
   const cancelado = dayAppointments.find(a => a.id === apptId);
-  if (!cancelado) return;
+  if (!cancelado) { btnEl.disabled = false; return; }
 
   // Cancelar o agendamento
-  const appt = dayAppointments.find(a => a.id === apptId);
-  if (appt && appt.group_id) {
-    await restUpdate('appointments', 'group_id=eq.' + appt.group_id, { status: 'cancelled' });
-  } else {
-    await restUpdate('appointments', 'id=eq.' + apptId, { status: 'cancelled' });
+  try {
+    const appt = dayAppointments.find(a => a.id === apptId);
+    if (appt && appt.group_id) {
+      await restUpdate('appointments', 'group_id=eq.' + appt.group_id, { status: 'cancelled' });
+    } else {
+      await restUpdate('appointments', 'id=eq.' + apptId, { status: 'cancelled' });
+    }
+  } catch(e) {
+    console.error('Erro ao cancelar:', e);
+    if (typeof toast === 'function') toast('Erro ao processar. Tente novamente.', 'error');
+    btnEl.disabled = false;
+    btnEl.textContent = 'CANCELAR';
+    delete btnEl.dataset.confirming;
+    return;
   }
 
   // Buscar clientes com horário POSTERIOR no mesmo dia e barbeiro
@@ -2143,9 +2170,9 @@ function updateBell(count) {
 // Run bell check after shop loads (inside DOMContentLoaded, after renderDay)
 setTimeout(() => { if (shop) checkBellCount(); }, 2000);
 </script>
-<script src="js/ajuda.js?v=03230524"></script>
-<script src="js/tour.js?v=03230524"></script>
-<script src="js/sw-update.js?v=03230524"></script>
-<script src="js/sidebar.js?v=03230524"></script>
+<script src="js/ajuda.js?v=03230530"></script>
+<script src="js/tour.js?v=03230530"></script>
+<script src="js/sw-update.js?v=03230530"></script>
+<script src="js/sidebar.js?v=03230530"></script>
 </body>
 </html>

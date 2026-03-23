@@ -111,7 +111,11 @@
     // Footer
     var footer = document.createElement('div');
     footer.className = 'nr-sidebar-footer';
-    footer.innerHTML = '<div class="nr-sidebar-shop">Meu Estabelecimento</div><button class="nr-sidebar-logout" onclick="if(typeof logout===\'function\')logout();else{window.location.href=\'app.html\';}">Sair</button>';
+    var shopLabel = 'Meu Negócio';
+    if (typeof getTermos === 'function' && segKey !== 'outro') {
+      try { var _t = getTermos(segKey); if (_t && _t.Estabelecimento) shopLabel = 'Meu ' + _t.Estabelecimento; } catch(e) {}
+    }
+    footer.innerHTML = '<div class="nr-sidebar-shop">' + shopLabel + '</div><button class="nr-sidebar-logout" onclick="if(typeof logout===\'function\')logout();else{window.location.href=\'app.html\';}">Sair</button>';
     sidebar.appendChild(footer);
 
     // Inserir no body SEM mover nada
@@ -149,9 +153,10 @@
   function init() {
     handleResize();
     window.addEventListener('resize', handleResize);
-    // Atualizar nome da barbearia após 2s (tempo pro async carregar)
-    setTimeout(updateShopName, 2000);
-    setTimeout(updateShopName, 5000);
+    // Atualizar nome após 3s (tempo pro async carregar)
+    setTimeout(function() {
+      if (document.querySelector('.nr-sidebar-shop-name, .nr-sidebar-shop')) updateShopName();
+    }, 3000);
   }
 
   if (document.readyState === 'loading') {
