@@ -53,8 +53,8 @@ function getTermos(tipo) {
 
 // ── Google Analytics 4 ──────────────────────────────────────
 (function() {
-  var GA_ID = 'G-XXXXXXXXXX'; // TODO: substituir pelo GA ID real do NaRegua
-  if (GA_ID === 'G-XXXXXXXXXX') return; // Não carrega se não configurado
+  var GA_ID = 'G-FH9DRF8LBR';
+  if (!GA_ID) return;
   var s = document.createElement('script');
   s.async = true;
   s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
