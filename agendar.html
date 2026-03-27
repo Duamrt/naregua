@@ -17,8 +17,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03271129">
-  <script src="js/theme.js?v=03271129"></script>
+  <link rel="stylesheet" href="css/style.css?v=03271132">
+  <script src="js/theme.js?v=03271132"></script>
   <style>
     .shop-header { text-align:center; margin-bottom:24px; }
     .shop-header h1 { font-size:20px; margin-bottom:4px; }
@@ -475,9 +475,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271129"></script>
-<script src="js/supabase.js?v=03271129"></script>
-<script src="js/utils.js?v=03271129"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271132"></script>
+<script src="js/supabase.js?v=03271132"></script>
+<script src="js/utils.js?v=03271132"></script>
 <script>
 // ── Mascara telefone ──────────────────────────────────────────
 document.getElementById('client-phone').addEventListener('input', function() {
@@ -568,6 +568,7 @@ window.addEventListener('beforeunload', () => {
 const DIAS_SEMANA = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
 const MESES = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
 const replaceApptId = new URLSearchParams(window.location.search).get('replace'); // ID do agendamento a substituir (reagendamento)
+let skipLimitCheck = false; // Flag: pular limite após cancelar inline
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
@@ -1609,7 +1610,7 @@ async function confirmarAgendamento() {
 
   // ── Limite de agendamentos em aberto por cliente (pular se é reagendamento) ──
   const maxPending = (shop.settings && shop.settings.max_pending_bookings) || 0;
-  if (maxPending > 0 && !replaceApptId) {
+  if (maxPending > 0 && !replaceApptId && !skipLimitCheck) {
     const phoneBusca = phone.replace(/\D/g, '');
     const { data: abertos } = await sb
       .from('appointments')
@@ -2041,6 +2042,7 @@ async function cancelarInline(apptId, btn) {
   btn.disabled = true;
   const phone = document.getElementById('client-phone').value.replace(/\D/g, '');
   await sb.rpc('client_cancel_appointment', { p_id: apptId, p_phone: phone });
+  skipLimitCheck = true; // Pular limite na próxima confirmação
   // Visual feedback
   const card = btn.parentElement;
   if (card) {
@@ -2294,7 +2296,7 @@ function resetar() {
   document.getElementById('client-phone').value = '';
 }
 </script>
-<script src="js/ajuda.js?v=03271129"></script>
-<script src="js/sw-update.js?v=03271129"></script>
+<script src="js/ajuda.js?v=03271132"></script>
+<script src="js/sw-update.js?v=03271132"></script>
 </body>
 </html>

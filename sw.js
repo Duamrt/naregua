@@ -1,6 +1,6 @@
 // NaRegua — Service Worker (network-first para HTML/JS/CSS, cache-first para imagens)
 // DEPLOY_VERSION é atualizado automaticamente pelo deploy.sh
-const CACHE_NAME = 'naregua-v20260327112958';
+const CACHE_NAME = 'naregua-v20260327113254';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
