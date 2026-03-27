@@ -13,8 +13,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03271107">
-  <script src="js/theme.js?v=03271107"></script>
+  <link rel="stylesheet" href="css/style.css?v=03271112">
+  <script src="js/theme.js?v=03271112"></script>
   <style>
     body { background:#000; }
     .cli-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
@@ -183,9 +183,9 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271107"></script>
-<script src="js/supabase.js?v=03271107"></script>
-<script src="js/utils.js?v=03271107"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271112"></script>
+<script src="js/supabase.js?v=03271112"></script>
+<script src="js/utils.js?v=03271112"></script>
 <script>
 console.log('Cliente v1');
 
@@ -389,10 +389,6 @@ async function cancelar(id, btn) {
     await sb.rpc('client_cancel_appointment', { p_id: id, p_phone: clientPhone });
   }
 
-  // Marcar card visual como cancelado antes de remover
-  const card = btn.closest('.appt-card');
-  if (card) card.classList.add('cancelled-anim');
-
   // Atualizar local
   allAppts = allAppts.map(a => a.id === id ? { ...a, status: 'cancelled' } : a);
   if (appt && appt.group_id) {
@@ -406,10 +402,41 @@ async function cancelar(id, btn) {
   document.getElementById('stat-proximos').textContent = proximos.length;
   document.getElementById('stat-feitos').textContent = feitos.length;
 
+  // Montar WhatsApp de aviso ao salão
+  const shopPhone = (appt._shop && appt._shop.phone || '').replace(/\D/g, '');
+  const shopName = appt._shop ? appt._shop.name : '';
+  const svcName = appt._service ? appt._service.name : '';
+  const dt = new Date(appt.scheduled_at);
+  const dataFmt = dt.toLocaleDateString('pt-BR');
+  const horaFmt = dt.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+  const clientName = appt.client_name || '';
+  const hora = new Date().getHours();
+  const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
+  const waText = saudacao + ', ' + shopName + '! Preciso cancelar meu agendamento.\n\n'
+    + '*' + svcName.replace(/\*/g, '\u2731') + '*\n'
+    + 'Dia: ' + dataFmt + ' as ' + horaFmt + '\n'
+    + 'Nome: ' + clientName;
+  const waUrl = shopPhone
+    ? 'https://wa.me/55' + shopPhone + '?text=' + encodeURIComponent(waText)
+    : 'https://wa.me/?text=' + encodeURIComponent(waText);
+
+  // Substituir card pelo aviso de sucesso + botão WhatsApp
+  const card = btn.closest('.appt-card');
+  if (card) {
+    card.innerHTML = '<div style="text-align:center;padding:16px 0;">'
+      + '<div style="font-size:28px;margin-bottom:8px;">&#10003;</div>'
+      + '<div style="font-size:14px;font-weight:700;color:#22c55e;margin-bottom:4px;">Cancelado com sucesso!</div>'
+      + '<div style="font-size:12px;color:var(--texto-muted);margin-bottom:14px;">' + esc(svcName) + ' — ' + dataFmt + ' às ' + horaFmt + '</div>'
+      + '<a href="' + waUrl + '" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:#25d366;color:#fff;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;">'
+      + '&#x1F4F1; AVISAR ' + esc(shopName).toUpperCase() + ' PELO WHATSAPP</a>'
+      + '</div>';
+    card.style.border = '1px solid #22c55e';
+  }
+
   showToast('Agendamento cancelado com sucesso!');
 
-  // Espera 1.5s com visual riscado, depois atualiza lista
-  setTimeout(() => renderList(), 1500);
+  // Depois de 8s, atualiza lista normalmente
+  setTimeout(() => renderList(), 8000);
 }
 
 function showToast(msg) {
@@ -420,7 +447,7 @@ function showToast(msg) {
   setTimeout(() => t.remove(), 4000);
 }
 </script>
-<script src="js/ajuda.js?v=03271107"></script>
-<script src="js/sw-update.js?v=03271107"></script>
+<script src="js/ajuda.js?v=03271112"></script>
+<script src="js/sw-update.js?v=03271112"></script>
 </body>
 </html>
