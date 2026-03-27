@@ -315,7 +315,7 @@
     },
     {
       target: '.barber-column',
-      title: 'Colunas por barbeiro',
+      title: 'Colunas por profissional',
       text: 'Cada profissional tem sua coluna. Os agendamentos aparecem organizados por horário.',
       position: 'bottom'
     },
