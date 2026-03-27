@@ -5,7 +5,6 @@
   var NAV = [
     { group: 'PRINCIPAL', open: true, items: [
       { icon: '📅', label: 'Agenda', href: 'dashboard.html' },
-      { icon: '🗓', label: 'Agenda Semanal', href: 'agenda-semana.html' },
       { icon: '📊', label: 'Resumo', href: 'resumo.html' }
     ]},
     { group: 'GESTÃO', open: true, items: [

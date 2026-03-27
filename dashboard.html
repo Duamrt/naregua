@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03270536">
-  <link rel="stylesheet" href="css/layout.css?v=03270536">
-  <script src="js/theme.js?v=03270536"></script>
+  <link rel="stylesheet" href="css/style.css?v=03270539">
+  <link rel="stylesheet" href="css/layout.css?v=03270539">
+  <script src="js/theme.js?v=03270539"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -379,7 +379,6 @@
         <span class="bell-badge" id="bell-badge">0</span>
       </div>
       <button class="mini-cal-toggle" id="btn-cal-toggle" onclick="toggleMiniCal()">CALENDARIO</button>
-      <a href="agenda-semana.html" style="padding:6px 12px;border-radius:8px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;text-decoration:none;display:flex;align-items:center;">SEMANA</a>
       <button style="padding:6px 12px;border-radius:8px;border:none;background:var(--verde-acao);color:#000;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;" onclick="abrirEncaixe()">+ ENCAIXE</button>
       <button class="icon-btn" onclick="abrirEdicao()" title="Editar">&#x270F;&#xFE0F;</button>
       <button class="icon-btn" onclick="logout()" title="Sair">&#x23FB;</button>
@@ -618,7 +617,6 @@
   <button class="nav-item" onclick="toggleMore()" id="btn-more"><span class="nav-icon">&#x2630;</span>MAIS</button>
 </div>
 <div id="more-menu" style="display:none;position:fixed;bottom:56px;right:8px;background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:12px;padding:8px;z-index:999;min-width:160px;">
-  <a href="agenda-semana.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--accent);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4C5; Agenda Semanal</a>
   <a href="servicos.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x2702;&#xFE0F; Serviços</a>
   <a href="clientes.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4CB; Clientes</a>
   <a href="estoque.html" style="display:flex;align-items:center;gap:10px;padding:10px 12px;color:var(--texto-secundario);text-decoration:none;font-size:12px;font-weight:600;border-radius:8px;transition:all .2s;">&#x1F4E6; Estoque</a>
@@ -654,10 +652,10 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03270536"></script>
-<script src="js/supabase.js?v=03270536"></script>
-<script src="js/utils.js?v=03270536"></script>
-<script src="js/push.js?v=03270536"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03270539"></script>
+<script src="js/supabase.js?v=03270539"></script>
+<script src="js/utils.js?v=03270539"></script>
+<script src="js/push.js?v=03270539"></script>
 <script>
 console.log('Dashboard v3 carregado');
 // ── Estado ────────────────────────────────────────────────────
@@ -2412,9 +2410,9 @@ function selectCalDay(dateKey) {
   renderDay();
 }
 </script>
-<script src="js/ajuda.js?v=03270536"></script>
-<script src="js/tour.js?v=03270536"></script>
-<script src="js/sw-update.js?v=03270536"></script>
-<script src="js/sidebar.js?v=03270536"></script>
+<script src="js/ajuda.js?v=03270539"></script>
+<script src="js/tour.js?v=03270539"></script>
+<script src="js/sw-update.js?v=03270539"></script>
+<script src="js/sidebar.js?v=03270539"></script>
 </body>
 </html>
