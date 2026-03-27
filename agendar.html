@@ -17,8 +17,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03271101">
-  <script src="js/theme.js?v=03271101"></script>
+  <link rel="stylesheet" href="css/style.css?v=03271107">
+  <script src="js/theme.js?v=03271107"></script>
   <style>
     .shop-header { text-align:center; margin-bottom:24px; }
     .shop-header h1 { font-size:20px; margin-bottom:4px; }
@@ -475,9 +475,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271101"></script>
-<script src="js/supabase.js?v=03271101"></script>
-<script src="js/utils.js?v=03271101"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271107"></script>
+<script src="js/supabase.js?v=03271107"></script>
+<script src="js/utils.js?v=03271107"></script>
 <script>
 // ── Mascara telefone ──────────────────────────────────────────
 document.getElementById('client-phone').addEventListener('input', function() {
@@ -1618,7 +1618,10 @@ async function confirmarAgendamento() {
       btn.disabled = false;
       btn.querySelector('.btn-label').style.display = 'inline';
       btn.querySelector('.spinner').style.display = 'none';
-      showAgMsg(`Você já tem ${(abertos || []).length} agendamento(s) em aberto. O máximo permitido é ${maxPending}. Cancele um antes de agendar outro.`, 'error');
+      const linkMeus = 'cliente.html?slug=' + encodeURIComponent(shop.slug) + '&phone=' + encodeURIComponent(phoneBusca);
+      const el = document.getElementById('ag-msg');
+      el.innerHTML = `Você já tem ${(abertos || []).length} agendamento(s) em aberto. O máximo permitido é ${maxPending}.<br><br><a href="${linkMeus}" style="display:inline-block;padding:10px 20px;background:var(--verde-acao);color:#000;border-radius:8px;font-weight:700;text-decoration:none;font-size:13px;">CANCELAR UM AGENDAMENTO</a>`;
+      el.className = 'msg msg-error show';
       return;
     }
   }
@@ -2220,7 +2223,7 @@ function resetar() {
   document.getElementById('client-phone').value = '';
 }
 </script>
-<script src="js/ajuda.js?v=03271101"></script>
-<script src="js/sw-update.js?v=03271101"></script>
+<script src="js/ajuda.js?v=03271107"></script>
+<script src="js/sw-update.js?v=03271107"></script>
 </body>
 </html>
