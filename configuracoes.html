@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03270359">
-  <link rel="stylesheet" href="css/layout.css?v=03270359">
-  <script src="js/theme.js?v=03270359"></script>
+  <link rel="stylesheet" href="css/style.css?v=03270428">
+  <link rel="stylesheet" href="css/layout.css?v=03270428">
+  <script src="js/theme.js?v=03270428"></script>
   <style>
     .cfg-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -338,7 +338,7 @@
           <div class="cfg-param-top">
             <div class="cfg-param-info">
               <div class="cfg-param-label">Comissão padrão</div>
-              <div class="cfg-param-desc">Percentual de comissão para novos barbeiros</div>
+              <div class="cfg-param-desc" id="lbl-comissao-desc">Percentual de comissão para novos profissionais</div>
             </div>
             <div style="display:flex;align-items:center;gap:4px;">
               <input type="number" class="cfg-number" id="cfg-default-commission" min="0" max="100" onchange="markDirty()" oninput="markDirty()">
@@ -523,9 +523,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03270359"></script>
-<script src="js/supabase.js?v=03270359"></script>
-<script src="js/utils.js?v=03270359"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03270428"></script>
+<script src="js/supabase.js?v=03270428"></script>
+<script src="js/utils.js?v=03270428"></script>
 <script>
 let shop = null;
 let isDirty = false;
@@ -574,6 +574,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (!shopData) { window.location.href = 'onboarding.html'; return; }
   shop = shopData;
+
+  // Label dinâmico
+  var _t = getTermos(shop.business_type);
+  var lblComDesc = document.getElementById('lbl-comissao-desc');
+  if (lblComDesc) lblComDesc.textContent = 'Percentual de comissão para novos ' + _t.profissionais;
 
   loadSettings();
   document.getElementById('loading').style.display = 'none';
@@ -764,8 +769,8 @@ window.addEventListener('beforeunload', function(e) {
   }
 });
 </script>
-<script src="js/ajuda.js?v=03270359"></script>
-<script src="js/sw-update.js?v=03270359"></script>
-<script src="js/sidebar.js?v=03270359"></script>
+<script src="js/ajuda.js?v=03270428"></script>
+<script src="js/sw-update.js?v=03270428"></script>
+<script src="js/sidebar.js?v=03270428"></script>
 </body>
 </html>

@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03270359">
-  <link rel="stylesheet" href="css/layout.css?v=03270359">
-  <script src="js/theme.js?v=03270359"></script>
+  <link rel="stylesheet" href="css/style.css?v=03270428">
+  <link rel="stylesheet" href="css/layout.css?v=03270428">
+  <script src="js/theme.js?v=03270428"></script>
   <style>
     .fp-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -344,7 +344,7 @@
     </div>
     <div class="sum-card">
       <div class="sum-num" id="sum-barbers" style="color:var(--texto-principal);">0</div>
-      <div class="sum-label">BARBEIROS ATIVOS</div>
+      <div class="sum-label" id="lbl-ativos">PROFISSIONAIS ATIVOS</div>
     </div>
   </div>
 
@@ -411,9 +411,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03270359"></script>
-<script src="js/supabase.js?v=03270359"></script>
-<script src="js/utils.js?v=03270359"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03270428"></script>
+<script src="js/supabase.js?v=03270428"></script>
+<script src="js/utils.js?v=03270428"></script>
 <script>
 // ── Estado ────────────────────────────────────────────────────
 var shop = null;
@@ -492,6 +492,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   if (!shopData) { window.location.href = isAdminViewing ? 'admin.html' : 'onboarding.html'; return; }
   shop = shopData;
+
+  // Labels dinâmicos
+  var _t = getTermos(shop.business_type);
+  var lblAtivos = document.getElementById('lbl-ativos');
+  if (lblAtivos) lblAtivos.textContent = _t.PROFISSIONAL + 'S ATIVOS';
 
   // Admin banner
   if (isAdminViewing) {
@@ -866,7 +871,7 @@ function sendWhatsApp(barberId) {
   var text = '*FOLHA DE PAGAMENTO*\n';
   text += shop.name + '\n';
   text += mesAno + '\n\n';
-  text += '*Barbeiro:* ' + barber.name + '\n\n';
+  text += '*' + (typeof getTermos === 'function' ? getTermos(shop.business_type).Profissional : 'Profissional') + ':* ' + barber.name + '\n\n';
   text += '*PROVENTOS*\n';
   if (salary > 0) text += 'Salario base: ' + formatMoney(salary) + '\n';
   text += 'Comissao (' + commPct + '%): ' + formatMoney(totalCommission) + '\n';
@@ -890,8 +895,8 @@ function sendWhatsApp(barberId) {
   window.open(url, '_blank');
 }
 </script>
-<script src="js/ajuda.js?v=03270359"></script>
-<script src="js/sw-update.js?v=03270359"></script>
-<script src="js/sidebar.js?v=03270359"></script>
+<script src="js/ajuda.js?v=03270428"></script>
+<script src="js/sw-update.js?v=03270428"></script>
+<script src="js/sidebar.js?v=03270428"></script>
 </body>
 </html>

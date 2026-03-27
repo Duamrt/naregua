@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03270359">
-  <link rel="stylesheet" href="css/layout.css?v=03270359">
-  <script src="js/theme.js?v=03270359"></script>
+  <link rel="stylesheet" href="css/style.css?v=03270428">
+  <link rel="stylesheet" href="css/layout.css?v=03270428">
+  <script src="js/theme.js?v=03270428"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -436,7 +436,7 @@
     <div class="modal-section" style="cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;" onclick="toggleEditSection(this)">PROFISSIONAIS <span style="font-size:14px;">&#x25BE;</span></div>
     <div class="edit-section-content" style="display:none;">
       <div id="edit-barbers"></div>
-      <button class="btn btn-outline" onclick="addBarberRow()" style="margin:10px 0 16px;font-size:12px;">+ ADICIONAR BARBEIRO</button>
+      <button class="btn btn-outline" onclick="addBarberRow()" style="margin:10px 0 16px;font-size:12px;" id="btn-add-barber">+ ADICIONAR PROFISSIONAL</button>
     </div>
 
     <div style="display:flex;gap:10px;">
@@ -576,10 +576,10 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03270359"></script>
-<script src="js/supabase.js?v=03270359"></script>
-<script src="js/utils.js?v=03270359"></script>
-<script src="js/push.js?v=03270359"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03270428"></script>
+<script src="js/supabase.js?v=03270428"></script>
+<script src="js/utils.js?v=03270428"></script>
+<script src="js/push.js?v=03270428"></script>
 <script>
 console.log('Dashboard v3 carregado');
 // ── Estado ────────────────────────────────────────────────────
@@ -686,10 +686,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('filters').style.display = 'flex';
   document.getElementById('appt-list').style.display = 'block';
 
-  // Label dinâmico "CADASTRAR PROFISSIONAL" conforme tipo de negócio
+  // Labels dinâmicos conforme tipo de negócio
   const _t = getTermos(shop.business_type);
   const lblCadProf = document.getElementById('lbl-cadastrar-prof');
   if (lblCadProf) lblCadProf.textContent = _t.PROFISSIONAL;
+  const btnAddBarber = document.getElementById('btn-add-barber');
+  if (btnAddBarber) btnAddBarber.textContent = '+ ADICIONAR ' + _t.PROFISSIONAL;
 
   renderDay();
   checkListaEspera();
@@ -2170,9 +2172,9 @@ function updateBell(count) {
 // Run bell check after shop loads (inside DOMContentLoaded, after renderDay)
 setTimeout(() => { if (shop) checkBellCount(); }, 2000);
 </script>
-<script src="js/ajuda.js?v=03270359"></script>
-<script src="js/tour.js?v=03270359"></script>
-<script src="js/sw-update.js?v=03270359"></script>
-<script src="js/sidebar.js?v=03270359"></script>
+<script src="js/ajuda.js?v=03270428"></script>
+<script src="js/tour.js?v=03270428"></script>
+<script src="js/sw-update.js?v=03270428"></script>
+<script src="js/sidebar.js?v=03270428"></script>
 </body>
 </html>

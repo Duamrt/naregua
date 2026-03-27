@@ -39,14 +39,14 @@
 /* Light Theme */
 [data-theme="light"] {
   --preto: #ffffff;
-  --cinza-escuro: #f8f8f8;
-  --cinza-medio: #f0f0f0;
-  --cinza-claro: #e8e8e8;
+  --cinza-escuro: #f5f5f0;
+  --cinza-medio: #eae8e3;
+  --cinza-claro: #ddd9d3;
   --texto-principal: #1a1a1a;
-  --texto-secundario: #555555;
-  --texto-muted: #888888;
-  --borda: rgba(0,0,0,0.08);
-  --borda-hover: rgba(0,0,0,0.15);
+  --texto-secundario: #3d3d3d;
+  --texto-muted: #5c5c5c;
+  --borda: rgba(0,0,0,0.12);
+  --borda-hover: rgba(0,0,0,0.20);
   --shadow: 0 4px 24px rgba(0,0,0,0.1);
   --accent: #b8923e;
   --accent-hover: #a07d30;
@@ -58,7 +58,7 @@
 }
 
 [data-theme="light"] body {
-  background: #f5f5f5;
+  background: #f0ede8;
   color: #1a1a1a;
 }
 

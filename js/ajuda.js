@@ -452,10 +452,10 @@ function toggleAjudaPainel() {
   document.body.appendChild(overlay);
   requestAnimationFrame(() => overlay.style.opacity = '1');
 
-  // Painel slide-up
+  // Painel slide-in lateral direito
   const painel = document.createElement('div');
   painel.id = 'ajuda-painel';
-  painel.style.cssText = 'position:fixed;bottom:0;left:0;right:0;max-height:70vh;background:var(--bg-card,#1a1a1a);border-top:2px solid rgba(212,168,83,0.3);border-radius:16px 16px 0 0;z-index:9999;overflow-y:auto;padding:0 20px 24px;transform:translateY(100%);transition:transform .25s cubic-bezier(0.4,0,0.2,1);';
+  painel.style.cssText = 'position:fixed;top:0;right:0;width:340px;max-width:90vw;height:100vh;background:var(--bg-card,#1a1a1a);border-left:2px solid rgba(212,168,83,0.3);z-index:9999;overflow-y:auto;padding:0 20px 24px;transform:translateX(100%);transition:transform .25s cubic-bezier(0.4,0,0.2,1);';
 
   // Botão de tour guiado (se disponível no dashboard)
   const tourBtn = (typeof window.startDashboardTour === 'function' && pageId === 'dashboard')
@@ -479,13 +479,13 @@ function toggleAjudaPainel() {
     conteudo;
 
   document.body.appendChild(painel);
-  requestAnimationFrame(() => painel.style.transform = 'translateY(0)');
+  requestAnimationFrame(() => painel.style.transform = 'translateX(0)');
 
-  // Swipe down pra fechar
-  let startY = 0;
-  painel.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
+  // Swipe right pra fechar
+  let startX = 0;
+  painel.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
   painel.addEventListener('touchend', e => {
-    const diff = e.changedTouches[0].clientY - startY;
+    const diff = e.changedTouches[0].clientX - startX;
     if (diff > 60) fecharAjuda();
   }, { passive: true });
 }
@@ -494,7 +494,7 @@ function fecharAjuda() {
   const painel = document.getElementById('ajuda-painel');
   const overlay = document.getElementById('ajuda-overlay');
   if (painel) {
-    painel.style.transform = 'translateY(100%)';
+    painel.style.transform = 'translateX(100%)';
     setTimeout(() => painel.remove(), 250);
   }
   if (overlay) {
@@ -514,7 +514,8 @@ function initAjuda() {
     style.textContent =
       '#ajuda-fab { position:fixed;bottom:80px;right:16px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(212,168,83,0.3);background:rgba(212,168,83,0.9);color:#1a1a1a;font-size:20px;font-weight:900;cursor:pointer;z-index:999;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:.2s;box-shadow:0 2px 12px rgba(212,168,83,0.3); }' +
       '#ajuda-fab:hover { background:rgba(212,168,83,1);transform:scale(1.1);box-shadow:0 4px 20px rgba(212,168,83,0.5); }' +
-      '#ajuda-fab:active { transform:scale(0.95); }';
+      '#ajuda-fab:active { transform:scale(0.95); }' +
+      '@media(max-width:768px) { #ajuda-painel { width:100vw !important;max-width:100vw !important; } }';
     document.head.appendChild(style);
   }
 
