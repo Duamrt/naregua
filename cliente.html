@@ -13,8 +13,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03271052">
-  <script src="js/theme.js?v=03271052"></script>
+  <link rel="stylesheet" href="css/style.css?v=03271101">
+  <script src="js/theme.js?v=03271101"></script>
   <style>
     body { background:#000; }
     .cli-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
@@ -107,9 +107,14 @@
 
     .toast {
       position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
-      background:#22c55e; color:#000; padding:12px 24px; border-radius:10px;
-      font-size:13px; font-weight:700; font-family:inherit; z-index:9999;
-      animation:fadeUp 0.3s ease;
+      background:#22c55e; color:#000; padding:16px 28px; border-radius:12px;
+      font-size:15px; font-weight:700; font-family:inherit; z-index:9999;
+      animation:fadeUp 0.3s ease; box-shadow:0 4px 20px rgba(34,197,94,.4);
+      display:flex; align-items:center; gap:8px;
+    }
+    .appt-card.cancelled-anim {
+      opacity:.5; text-decoration:line-through; border-color:#ef4444 !important;
+      transition:opacity .5s ease;
     }
 
     .cli-footer {
@@ -178,9 +183,9 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271052"></script>
-<script src="js/supabase.js?v=03271052"></script>
-<script src="js/utils.js?v=03271052"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271101"></script>
+<script src="js/supabase.js?v=03271101"></script>
+<script src="js/utils.js?v=03271101"></script>
 <script>
 console.log('Cliente v1');
 
@@ -379,6 +384,10 @@ async function cancelar(id, btn) {
     await sb.rpc('client_cancel_appointment', { p_id: id, p_phone: clientPhone });
   }
 
+  // Marcar card visual como cancelado antes de remover
+  const card = btn.closest('.appt-card');
+  if (card) card.classList.add('cancelled-anim');
+
   // Atualizar local
   allAppts = allAppts.map(a => a.id === id ? { ...a, status: 'cancelled' } : a);
   if (appt && appt.group_id) {
@@ -392,19 +401,21 @@ async function cancelar(id, btn) {
   document.getElementById('stat-proximos').textContent = proximos.length;
   document.getElementById('stat-feitos').textContent = feitos.length;
 
-  renderList();
-  showToast('Agendamento cancelado');
+  showToast('Agendamento cancelado com sucesso!');
+
+  // Espera 1.5s com visual riscado, depois atualiza lista
+  setTimeout(() => renderList(), 1500);
 }
 
 function showToast(msg) {
   const t = document.createElement('div');
   t.className = 'toast';
-  t.textContent = msg;
+  t.innerHTML = '<span style="font-size:18px">&#10003;</span> ' + msg;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
+  setTimeout(() => t.remove(), 4000);
 }
 </script>
-<script src="js/ajuda.js?v=03271052"></script>
-<script src="js/sw-update.js?v=03271052"></script>
+<script src="js/ajuda.js?v=03271101"></script>
+<script src="js/sw-update.js?v=03271101"></script>
 </body>
 </html>
