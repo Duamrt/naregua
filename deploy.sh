@@ -32,15 +32,14 @@ MSG="${1:-deploy: cache busting v$SHORT_V}"
 git add -A
 git commit -m "$MSG" || echo "Nada pra comitar"
 
-# 4. Push dev + squash merge main
+# 4. Push dev + sync main
 echo "[4/4] Publicando..."
 git push
 CURRENT=$(git branch --show-current)
 if [ "$CURRENT" = "dev" ]; then
   git checkout main
-  git merge --squash dev
-  git commit -m "$MSG" || echo "Nada pra comitar na main"
-  git push
+  git reset --hard dev
+  git push --force-with-lease
   git checkout dev
 fi
 

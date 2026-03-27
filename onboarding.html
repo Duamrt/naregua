@@ -13,8 +13,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03270428">
-  <script src="js/theme.js?v=03270428"></script>
+  <link rel="stylesheet" href="css/style.css?v=03270439">
+  <script src="js/theme.js?v=03270439"></script>
 </head>
 <body>
 
@@ -37,7 +37,7 @@
       </div>
 
       <div class="field">
-        <label>TIPO DE NEGÓCIO *</label>
+        <label>TIPO DE NEGÓCIO * <span style="font-weight:400;font-size:10px;color:var(--texto-muted);">(pode marcar mais de um)</span></label>
         <div id="type-grid" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
       </div>
       <div class="field">
@@ -114,9 +114,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03270428"></script>
-<script src="js/supabase.js?v=03270428"></script>
-<script src="js/utils.js?v=03270428"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03270439"></script>
+<script src="js/supabase.js?v=03270439"></script>
+<script src="js/utils.js?v=03270439"></script>
 <script>
 // ── Verificar sessão ──────────────────────────────────────────
 let currentUser = null;
@@ -165,7 +165,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // BUG 11 ALTO FIX: restaurar draft do Step 1 do localStorage
   const draft = JSON.parse(localStorage.getItem('naregua_onboarding_draft') || '{}');
-  if (draft.type) selectedType = draft.type;
+  if (draft.types && draft.types.length) { selectedTypes = draft.types; selectedType = draft.types[0]; }
+  else if (draft.type) { selectedType = draft.type; selectedTypes = [draft.type]; }
   if (draft.name) document.getElementById('shop-name').value = draft.name;
   if (draft.city) document.getElementById('shop-city').value = draft.city;
   if (draft.phone) document.getElementById('shop-phone').value = draft.phone;
@@ -257,6 +258,7 @@ const TIPOS = [
 ];
 
 let selectedType = 'barbearia';
+let selectedTypes = ['barbearia']; // multi-seleção
 
 const DEFAULT_SERVICES = {
   barbearia: [
@@ -315,21 +317,23 @@ const DEFAULT_SERVICES = {
 
 function renderTypes() {
   const el = document.getElementById('type-grid');
-  el.innerHTML = TIPOS.map(t =>
-    `<button type="button" onclick="setType('${t.key}')" style="
+  el.innerHTML = TIPOS.map(t => {
+    const active = selectedTypes.includes(t.key);
+    return `<button type="button" onclick="toggleType('${t.key}')" style="
       flex:1;min-width:90px;padding:12px 8px;border-radius:10px;font-size:12px;font-weight:700;
       font-family:inherit;cursor:pointer;transition:all .2s;text-align:center;
-      border:1.5px solid ${selectedType === t.key ? 'var(--verde-acao)' : 'var(--borda)'};
-      background:${selectedType === t.key ? 'rgba(212,168,83,0.1)' : 'transparent'};
-      color:${selectedType === t.key ? 'var(--verde-acao)' : 'var(--texto-muted)'};
-    "><div style="font-size:20px;margin-bottom:4px;">${t.icon}</div>${t.label}</button>`
-  ).join('');
+      border:1.5px solid ${active ? 'var(--verde-acao)' : 'var(--borda)'};
+      background:${active ? 'rgba(212,168,83,0.1)' : 'transparent'};
+      color:${active ? 'var(--verde-acao)' : 'var(--texto-muted)'};
+    "><div style="font-size:20px;margin-bottom:4px;">${t.icon}</div>${t.label}</button>`;
+  }).join('');
 }
 
 // BUG 11 ALTO FIX: salvar draft do Step 1 no localStorage
 function saveDraft() {
   const draft = {
     type: selectedType,
+    types: selectedTypes,
     name: document.getElementById('shop-name').value,
     city: document.getElementById('shop-city').value,
     phone: document.getElementById('shop-phone').value,
@@ -340,21 +344,49 @@ function saveDraft() {
   localStorage.setItem('naregua_onboarding_draft', JSON.stringify(draft));
 }
 
+function toggleType(type) {
+  if (selectedTypes.includes(type)) {
+    // Não deixar desmarcar tudo
+    if (selectedTypes.length === 1) return;
+    selectedTypes = selectedTypes.filter(t => t !== type);
+  } else {
+    selectedTypes.push(type);
+  }
+  // Tipo principal = primeiro selecionado (define termos no sistema)
+  selectedType = selectedTypes[0];
+  saveDraft();
+  renderTypes();
+  loadDefaultServices();
+  const placeholders = { barbearia: 'Barbearia do João', manicure: 'Studio Maria Nails', sobrancelha: 'Studio Amanda', unha: 'Studio Nails', estetica: 'Studio Estética', salao: 'Salão Beleza Pura', outro: 'Meu Negócio' };
+  document.getElementById('shop-name').placeholder = 'Ex: ' + (placeholders[selectedType] || 'Meu Negócio');
+}
+
+// Compatibilidade com draft antigo (seleção única)
 function setType(type) {
+  selectedTypes = [type];
+  toggleType(type);
+  selectedTypes = [type];
   selectedType = type;
   saveDraft();
   renderTypes();
   loadDefaultServices();
-  // Atualizar placeholder do nome
-  const placeholders = { barbearia: 'Barbearia do João', manicure: 'Studio Maria Nails', salao: 'Salão Beleza Pura', outro: 'Meu Negócio' };
-  document.getElementById('shop-name').placeholder = 'Ex: ' + (placeholders[type] || 'Meu Negócio');
 }
 
 function loadDefaultServices() {
   document.getElementById('services-list').innerHTML = '';
   serviceCount = 0;
-  const defaults = DEFAULT_SERVICES[selectedType] || [];
-  defaults.forEach(s => addServiceRow(s.name, s.price, s.duration_min));
+  // Combinar serviços de todos os tipos selecionados, sem duplicata
+  const seen = new Set();
+  const combined = [];
+  selectedTypes.forEach(type => {
+    (DEFAULT_SERVICES[type] || []).forEach(s => {
+      if (!seen.has(s.name)) {
+        seen.add(s.name);
+        combined.push(s);
+      }
+    });
+  });
+  combined.forEach(s => addServiceRow(s.name, s.price, s.duration_min));
 }
 
 // ── Serviços ──────────────────────────────────────────────────
@@ -567,7 +599,7 @@ function copyLink() {
   });
 }
 </script>
-<script src="js/ajuda.js?v=03270428"></script>
-<script src="js/sw-update.js?v=03270428"></script>
+<script src="js/ajuda.js?v=03270439"></script>
+<script src="js/sw-update.js?v=03270439"></script>
 </body>
 </html>

@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03270428">
-  <link rel="stylesheet" href="css/layout.css?v=03270428">
-  <script src="js/theme.js?v=03270428"></script>
+  <link rel="stylesheet" href="css/style.css?v=03270439">
+  <link rel="stylesheet" href="css/layout.css?v=03270439">
+  <script src="js/theme.js?v=03270439"></script>
   <style>
     .est-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -185,9 +185,10 @@
     </div>
     <div id="modal-prod-msg" class="msg"></div>
     <input type="hidden" id="prod-edit-id">
-    <div class="field">
+    <div class="field" style="position:relative;">
       <label>NOME *</label>
-      <input type="text" id="prod-nome" placeholder="Ex: Shampoo, Cera, Pomada">
+      <input type="text" id="prod-nome" placeholder="Ex: Shampoo, Cera, Pomada" autocomplete="off" oninput="filtrarCatalogo(this.value)">
+      <div id="prod-sugestoes" style="display:none;position:absolute;left:0;right:0;top:100%;background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:0 0 8px 8px;max-height:180px;overflow-y:auto;z-index:10;"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
       <div class="field">
@@ -215,9 +216,11 @@
         <option value="geral">Geral</option>
         <option value="cabelo">Cabelo</option>
         <option value="barba">Barba</option>
-        <option value="skincare">Skincare</option>
-        <option value="acessorios">Acessorios</option>
+        <option value="skincare">Skincare / Pele</option>
+        <option value="acessorios">Acessórios / Insumos</option>
         <option value="higiene">Higiene</option>
+        <option value="unhas">Unhas</option>
+        <option value="cilios">Cílios / Sobrancelha</option>
         <option value="outros">Outros</option>
       </select>
     </div>
@@ -297,9 +300,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03270428"></script>
-<script src="js/supabase.js?v=03270428"></script>
-<script src="js/utils.js?v=03270428"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03270439"></script>
+<script src="js/supabase.js?v=03270439"></script>
+<script src="js/utils.js?v=03270439"></script>
 <script>
 let shop = null;
 let products = [];
@@ -421,6 +424,130 @@ function renderProducts() {
     + '</div>';
   }).join('');
 }
+
+// ── Catálogo de Produtos por Segmento ──────────────────
+const CATALOGO_PRODUTOS = {
+  barbearia: [
+    { name: 'Pomada modeladora', cat: 'cabelo', price: 35 },
+    { name: 'Cera capilar', cat: 'cabelo', price: 30 },
+    { name: 'Shampoo profissional', cat: 'cabelo', price: 45 },
+    { name: 'Condicionador', cat: 'cabelo', price: 40 },
+    { name: 'Óleo para barba', cat: 'barba', price: 40 },
+    { name: 'Balm para barba', cat: 'barba', price: 35 },
+    { name: 'Gel de barbear', cat: 'barba', price: 20 },
+    { name: 'Pós-barba', cat: 'barba', price: 25 },
+    { name: 'Tônico capilar', cat: 'cabelo', price: 30 },
+    { name: 'Lâmina descartável', cat: 'acessorios', price: 2 },
+    { name: 'Pente de madeira', cat: 'acessorios', price: 15 },
+    { name: 'Talco', cat: 'higiene', price: 12 },
+  ],
+  sobrancelha: [
+    { name: 'Henna para sobrancelha', cat: 'skincare', price: 25 },
+    { name: 'Tintura para sobrancelha', cat: 'skincare', price: 20 },
+    { name: 'Cera depilatória', cat: 'skincare', price: 18 },
+    { name: 'Linha para design', cat: 'acessorios', price: 5 },
+    { name: 'Pinça profissional', cat: 'acessorios', price: 35 },
+    { name: 'Gel fixador sobrancelha', cat: 'skincare', price: 20 },
+    { name: 'Lápis de sobrancelha', cat: 'acessorios', price: 15 },
+    { name: 'Cola para cílios', cat: 'acessorios', price: 25 },
+    { name: 'Fios de cílios', cat: 'acessorios', price: 40 },
+    { name: 'Removedor de cílios', cat: 'skincare', price: 30 },
+    { name: 'Primer para cílios', cat: 'skincare', price: 28 },
+    { name: 'Micropore', cat: 'acessorios', price: 8 },
+  ],
+  unha: [
+    { name: 'Esmalte gel', cat: 'acessorios', price: 25 },
+    { name: 'Base fortalecedora', cat: 'acessorios', price: 18 },
+    { name: 'Top coat', cat: 'acessorios', price: 20 },
+    { name: 'Acetona', cat: 'higiene', price: 8 },
+    { name: 'Removedor de esmalte', cat: 'higiene', price: 10 },
+    { name: 'Lixa de unha', cat: 'acessorios', price: 3 },
+    { name: 'Palito de laranjeira', cat: 'acessorios', price: 2 },
+    { name: 'Gel construtor', cat: 'acessorios', price: 45 },
+    { name: 'Pó acrílico', cat: 'acessorios', price: 40 },
+    { name: 'Monômero', cat: 'acessorios', price: 35 },
+    { name: 'Óleo de cutícula', cat: 'skincare', price: 12 },
+    { name: 'Creme hidratante mãos', cat: 'skincare', price: 15 },
+  ],
+  manicure: [
+    { name: 'Esmalte gel', cat: 'acessorios', price: 25 },
+    { name: 'Base fortalecedora', cat: 'acessorios', price: 18 },
+    { name: 'Top coat', cat: 'acessorios', price: 20 },
+    { name: 'Acetona', cat: 'higiene', price: 8 },
+    { name: 'Lixa de unha', cat: 'acessorios', price: 3 },
+    { name: 'Palito de laranjeira', cat: 'acessorios', price: 2 },
+    { name: 'Óleo de cutícula', cat: 'skincare', price: 12 },
+    { name: 'Creme esfoliante pés', cat: 'skincare', price: 20 },
+  ],
+  estetica: [
+    { name: 'Ácido hialurônico', cat: 'skincare', price: 60 },
+    { name: 'Vitamina C sérum', cat: 'skincare', price: 45 },
+    { name: 'Protetor solar facial', cat: 'skincare', price: 35 },
+    { name: 'Máscara facial', cat: 'skincare', price: 25 },
+    { name: 'Cera depilatória', cat: 'skincare', price: 18 },
+    { name: 'Óleo de massagem', cat: 'skincare', price: 30 },
+    { name: 'Esfoliante corporal', cat: 'skincare', price: 22 },
+    { name: 'Gel condutor', cat: 'skincare', price: 15 },
+  ],
+  salao: [
+    { name: 'Shampoo profissional', cat: 'cabelo', price: 45 },
+    { name: 'Condicionador', cat: 'cabelo', price: 40 },
+    { name: 'Máscara capilar', cat: 'cabelo', price: 50 },
+    { name: 'Tintura', cat: 'cabelo', price: 25 },
+    { name: 'Oxidante', cat: 'cabelo', price: 15 },
+    { name: 'Progressiva', cat: 'cabelo', price: 80 },
+    { name: 'Óleo reparador', cat: 'cabelo', price: 35 },
+    { name: 'Spray fixador', cat: 'cabelo', price: 28 },
+    { name: 'Esmalte', cat: 'acessorios', price: 8 },
+  ],
+};
+
+function getCatalogoProdutos() {
+  const tipo = shop?.business_type || 'barbearia';
+  const seen = new Set();
+  const list = [];
+  // Pegar do tipo principal
+  (CATALOGO_PRODUTOS[tipo] || []).forEach(p => { if (!seen.has(p.name)) { seen.add(p.name); list.push(p); } });
+  // Adicionar genéricos de todos os tipos (itens comuns)
+  Object.values(CATALOGO_PRODUTOS).forEach(items => {
+    items.forEach(p => { if (!seen.has(p.name)) { seen.add(p.name); list.push(p); } });
+  });
+  return list;
+}
+
+function filtrarCatalogo(valor) {
+  const container = document.getElementById('prod-sugestoes');
+  if (!valor || valor.length < 2) { container.style.display = 'none'; return; }
+
+  const catalogo = getCatalogoProdutos();
+  const termo = valor.toLowerCase();
+  const matches = catalogo.filter(p => p.name.toLowerCase().includes(termo)).slice(0, 8);
+
+  if (matches.length === 0) { container.style.display = 'none'; return; }
+
+  container.innerHTML = matches.map(p =>
+    '<div style="padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--borda);color:var(--texto-principal);transition:background .1s;" ' +
+    'onmouseover="this.style.background=\'var(--cinza-medio)\'" onmouseout="this.style.background=\'transparent\'" ' +
+    'onclick="selecionarCatalogo(\'' + p.name.replace(/'/g, "\\'") + '\',' + p.price + ',\'' + p.cat + '\')">' +
+    p.name + ' <span style="color:var(--texto-muted);font-size:11px;">R$ ' + p.price + '</span></div>'
+  ).join('');
+  container.style.display = 'block';
+}
+
+function selecionarCatalogo(nome, preco, cat) {
+  document.getElementById('prod-nome').value = nome;
+  document.getElementById('prod-preco').value = preco;
+  if (cat) document.getElementById('prod-cat').value = cat;
+  document.getElementById('prod-sugestoes').style.display = 'none';
+}
+
+// Fechar sugestões ao clicar fora
+document.addEventListener('click', e => {
+  if (!e.target.closest('#prod-sugestoes') && e.target.id !== 'prod-nome') {
+    const s = document.getElementById('prod-sugestoes');
+    if (s) s.style.display = 'none';
+  }
+});
 
 // ── Modal Produto ──────────────────────────────────────
 function abrirModal() {
@@ -576,8 +703,8 @@ async function salvarMov() {
   await loadProducts();
 }
 </script>
-<script src="js/ajuda.js?v=03270428"></script>
-<script src="js/sw-update.js?v=03270428"></script>
-<script src="js/sidebar.js?v=03270428"></script>
+<script src="js/ajuda.js?v=03270439"></script>
+<script src="js/sw-update.js?v=03270439"></script>
+<script src="js/sidebar.js?v=03270439"></script>
 </body>
 </html>
