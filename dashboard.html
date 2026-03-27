@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03271154">
-  <link rel="stylesheet" href="css/layout.css?v=03271154">
-  <script src="js/theme.js?v=03271154"></script>
+  <link rel="stylesheet" href="css/style.css?v=03271157">
+  <link rel="stylesheet" href="css/layout.css?v=03271157">
+  <script src="js/theme.js?v=03271157"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -652,10 +652,10 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271154"></script>
-<script src="js/supabase.js?v=03271154"></script>
-<script src="js/utils.js?v=03271154"></script>
-<script src="js/push.js?v=03271154"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271157"></script>
+<script src="js/supabase.js?v=03271157"></script>
+<script src="js/utils.js?v=03271157"></script>
+<script src="js/push.js?v=03271157"></script>
 <script>
 console.log('Dashboard v3 carregado');
 // ── Estado ────────────────────────────────────────────────────
@@ -1569,55 +1569,178 @@ async function confirmarPagamento() {
 }
 
 // ── Re-agendamento pós-atendimento ──────────────────────────
+let _rebookAppt = null;
+let _rebookSvc = null;
+let _rebookCiclo = 21;
+let _rebookDates = [];
+let _rebookSelDate = '';
+let _rebookSelTime = '';
+
 function sugerirProximoAgendamento(appt) {
   const svc = services.find(s => s.id === appt.service_id);
   if (!svc) return;
 
+  _rebookAppt = appt;
+  _rebookSvc = svc;
+
   // Calcular ciclo baseado nas configurações de lembrete ou padrão 21 dias
   const intervals = (shop.settings && shop.settings.reminder_intervals) || {};
   const svcName = (svc.name || '').toLowerCase();
-  let ciclo = (shop.settings && shop.settings.reminder_default_days) || 21;
+  _rebookCiclo = (shop.settings && shop.settings.reminder_default_days) || 21;
   for (const key in intervals) {
-    if (svcName.includes(key)) { ciclo = intervals[key]; break; }
+    if (svcName.includes(key)) { _rebookCiclo = intervals[key]; break; }
   }
 
-  // Calcular data sugerida (mesmo dia da semana + ciclo)
+  // Gerar datas ao redor do ciclo sugerido (5 antes, sugerida, 5 depois)
   const hoje = new Date();
-  const sugerida = new Date(hoje);
-  sugerida.setDate(sugerida.getDate() + ciclo);
+  _rebookDates = [];
+  const daysOpen = shop.days_open || [1,2,3,4,5,6]; // dias que o salão abre
+  for (let offset = _rebookCiclo - 5; offset <= _rebookCiclo + 8; offset++) {
+    if (offset < 1) continue;
+    const d = new Date(hoje);
+    d.setDate(d.getDate() + offset);
+    if (daysOpen.includes(d.getDay())) {
+      _rebookDates.push({
+        date: d,
+        iso: d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'),
+        isSugerida: offset === _rebookCiclo
+      });
+    }
+  }
 
-  // Mesmo horário do agendamento atual
-  const horaOriginal = new Date(appt.scheduled_at);
-  const horaStr = String(horaOriginal.getHours()).padStart(2, '0') + ':' + String(horaOriginal.getMinutes()).padStart(2, '0');
-
-  const DIAS_SEMANA = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-  const diaSemana = DIAS_SEMANA[sugerida.getDay()];
-  const dataStr = sugerida.toLocaleDateString('pt-BR');
-  const dataISO = sugerida.getFullYear() + '-' + String(sugerida.getMonth() + 1).padStart(2, '0') + '-' + String(sugerida.getDate()).padStart(2, '0');
+  // Selecionar a sugerida por padrão
+  const sugerida = _rebookDates.find(d => d.isSugerida) || _rebookDates[0];
+  _rebookSelDate = sugerida ? sugerida.iso : '';
+  _rebookSelTime = '';
 
   const el = document.createElement('div');
   el.id = 'rebook-overlay';
   el.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
   el.onclick = function(e) { if (e.target === el) el.remove(); };
 
-  el.innerHTML = '<div style="background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:16px;padding:28px 24px;width:100%;max-width:360px;text-align:center;">' +
-    '<div style="font-size:40px;margin-bottom:12px;">📅</div>' +
-    '<div style="font-size:16px;font-weight:800;margin-bottom:6px;">Já quer deixar o próximo marcado?</div>' +
-    '<div style="font-size:12px;color:var(--texto-muted);margin-bottom:20px;">Baseado no ciclo de ' + ciclo + ' dias do serviço</div>' +
-    // Sugestão principal
-    '<div style="background:rgba(212,168,83,0.08);border:1px solid rgba(212,168,83,0.2);border-radius:12px;padding:16px;margin-bottom:16px;">' +
-      '<div style="font-size:11px;color:var(--texto-muted);font-weight:600;letter-spacing:0.5px;margin-bottom:6px;">SUGESTÃO</div>' +
-      '<div style="font-size:18px;font-weight:800;color:var(--verde-acao);">' + diaSemana + ', ' + dataStr + '</div>' +
-      '<div style="font-size:13px;color:var(--texto-secundario);margin-top:4px;">às ' + horaStr + ' · ' + esc(svc.name) + '</div>' +
+  el.innerHTML = '<div style="background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:16px;padding:24px 20px;width:100%;max-width:400px;max-height:85vh;overflow-y:auto;">' +
+    '<div style="text-align:center;margin-bottom:16px;">' +
+      '<div style="font-size:32px;margin-bottom:8px;">📅</div>' +
+      '<div style="font-size:15px;font-weight:800;">Agendar retorno de ' + esc(appt.client_name.split(' ')[0]) + '</div>' +
+      '<div style="font-size:11px;color:var(--texto-muted);margin-top:4px;">' + esc(svc.name) + ' · ciclo de ' + _rebookCiclo + ' dias</div>' +
     '</div>' +
+    // Datas
+    '<div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--texto-muted);margin-bottom:6px;">ESCOLHA A DATA</div>' +
+    '<div id="rebook-dates" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:14px;-webkit-overflow-scrolling:touch;"></div>' +
+    // Horários
+    '<div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--texto-muted);margin-bottom:6px;">HORÁRIOS DISPONÍVEIS</div>' +
+    '<div id="rebook-times" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;min-height:40px;"></div>' +
     // Botões
     '<div style="display:flex;gap:8px;">' +
       '<button onclick="document.getElementById(\'rebook-overlay\').remove()" style="flex:0.4;padding:12px;border-radius:10px;border:1px solid var(--borda);background:transparent;color:var(--texto-muted);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Não, obrigado</button>' +
-      '<button onclick="confirmarRebook(\'' + esc(appt.barber_id || '') + '\',\'' + esc(appt.service_id) + '\',\'' + esc(appt.client_name) + '\',\'' + esc(appt.client_phone) + '\',\'' + dataISO + '\',\'' + horaStr + '\')" style="flex:0.6;padding:12px;border-radius:10px;border:none;background:var(--verde-acao);color:#000;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">AGENDAR</button>' +
+      '<button id="btn-rebook-confirm" onclick="confirmarRebookSelecionado()" disabled style="flex:0.6;padding:12px;border-radius:10px;border:none;background:var(--verde-acao);color:#000;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;opacity:0.5;">AGENDAR</button>' +
     '</div>' +
   '</div>';
 
   document.body.appendChild(el);
+  renderRebookDates();
+  loadRebookTimes();
+}
+
+function renderRebookDates() {
+  const DIAS = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
+  document.getElementById('rebook-dates').innerHTML = _rebookDates.map(d => {
+    const sel = d.iso === _rebookSelDate;
+    const dia = d.date.getDate();
+    const mes = d.date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.','');
+    const dow = DIAS[d.date.getDay()];
+    return '<button onclick="selectRebookDate(\'' + d.iso + '\')" style="min-width:54px;padding:8px 6px;border-radius:10px;border:' + (sel ? '2px solid var(--verde-acao)' : '1px solid var(--borda)') + ';background:' + (sel ? 'rgba(212,168,83,0.15)' : 'transparent') + ';color:' + (sel ? 'var(--verde-acao)' : 'var(--texto-secundario)') + ';font-family:inherit;cursor:pointer;text-align:center;flex-shrink:0;">' +
+      '<div style="font-size:9px;font-weight:700;letter-spacing:0.5px;">' + dow + '</div>' +
+      '<div style="font-size:17px;font-weight:800;">' + dia + '</div>' +
+      '<div style="font-size:9px;color:' + (sel ? 'var(--verde-acao)' : 'var(--texto-muted)') + ';">' + mes + '</div>' +
+      (d.isSugerida ? '<div style="font-size:7px;color:var(--verde-acao);font-weight:700;margin-top:2px;">IDEAL</div>' : '') +
+    '</button>';
+  }).join('');
+}
+
+async function selectRebookDate(iso) {
+  _rebookSelDate = iso;
+  _rebookSelTime = '';
+  renderRebookDates();
+  await loadRebookTimes();
+}
+
+async function loadRebookTimes() {
+  const el = document.getElementById('rebook-times');
+  el.innerHTML = '<div style="font-size:11px;color:var(--texto-muted);">Carregando...</div>';
+
+  const barberId = _rebookAppt.barber_id;
+  const duration = _rebookSvc.duration_min || 30;
+  const interval = (shop.settings && shop.settings.slot_interval) || 30;
+
+  // Buscar agendamentos do dia pro profissional
+  const dayStart = _rebookSelDate + 'T00:00:00-03:00';
+  const dayEnd = _rebookSelDate + 'T23:59:59-03:00';
+  const { data: dayAppts } = await sb.from('appointments')
+    .select('id, scheduled_at, service_id')
+    .eq('barbershop_id', shop.id)
+    .eq('barber_id', barberId)
+    .in('status', ['pending', 'confirmed'])
+    .gte('scheduled_at', dayStart)
+    .lte('scheduled_at', dayEnd);
+
+  // Montar slots ocupados
+  const busy = (dayAppts || []).map(a => {
+    const dt = new Date(a.scheduled_at);
+    const start = dt.getHours() * 60 + dt.getMinutes();
+    const svc = services.find(s => s.id === a.service_id);
+    const dur = svc ? svc.duration_min : 30;
+    return { start, end: start + dur };
+  });
+
+  // Gerar slots livres
+  const openH = parseInt((shop.opening_time || '08:00').split(':')[0]);
+  const openM = parseInt((shop.opening_time || '08:00').split(':')[1] || 0);
+  const closeH = parseInt((shop.closing_time || '19:00').split(':')[0]);
+  const closeM = parseInt((shop.closing_time || '19:00').split(':')[1] || 0);
+  const openMin = openH * 60 + openM;
+  const closeMin = closeH * 60 + closeM;
+
+  const slots = [];
+  for (let m = openMin; m + duration <= closeMin; m += interval) {
+    const conflict = busy.some(b => m < b.end && m + duration > b.start);
+    if (!conflict) {
+      const h = String(Math.floor(m/60)).padStart(2,'0');
+      const mm = String(m%60).padStart(2,'0');
+      slots.push(h + ':' + mm);
+    }
+  }
+
+  if (!slots.length) {
+    el.innerHTML = '<div style="font-size:11px;color:#ef4444;padding:8px;">Nenhum horário livre nesse dia.</div>';
+    document.getElementById('btn-rebook-confirm').disabled = true;
+    document.getElementById('btn-rebook-confirm').style.opacity = '0.5';
+    return;
+  }
+
+  el.innerHTML = slots.map(s => {
+    const sel = s === _rebookSelTime;
+    return '<button onclick="selectRebookTime(\'' + s + '\')" style="padding:8px 14px;border-radius:8px;border:' + (sel ? '2px solid var(--verde-acao)' : '1px solid var(--borda)') + ';background:' + (sel ? 'rgba(212,168,83,0.15)' : 'transparent') + ';color:' + (sel ? 'var(--verde-acao)' : 'var(--texto-secundario)') + ';font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">' + s + '</button>';
+  }).join('');
+}
+
+function selectRebookTime(time) {
+  _rebookSelTime = time;
+  // Re-render times pra mostrar seleção
+  const el = document.getElementById('rebook-times');
+  el.querySelectorAll('button').forEach(btn => {
+    const sel = btn.textContent.trim() === time;
+    btn.style.border = sel ? '2px solid var(--verde-acao)' : '1px solid var(--borda)';
+    btn.style.background = sel ? 'rgba(212,168,83,0.15)' : 'transparent';
+    btn.style.color = sel ? 'var(--verde-acao)' : 'var(--texto-secundario)';
+  });
+  document.getElementById('btn-rebook-confirm').disabled = false;
+  document.getElementById('btn-rebook-confirm').style.opacity = '1';
+}
+
+async function confirmarRebookSelecionado() {
+  if (!_rebookSelDate || !_rebookSelTime || !_rebookAppt) return;
+  confirmarRebook(_rebookAppt.barber_id || '', _rebookAppt.service_id, _rebookAppt.client_name, _rebookAppt.client_phone, _rebookSelDate, _rebookSelTime);
 }
 
 async function confirmarRebook(barberId, serviceId, clientName, clientPhone, dateISO, timeStr) {
@@ -2414,9 +2537,9 @@ function selectCalDay(dateKey) {
   renderDay();
 }
 </script>
-<script src="js/ajuda.js?v=03271154"></script>
-<script src="js/tour.js?v=03271154"></script>
-<script src="js/sw-update.js?v=03271154"></script>
-<script src="js/sidebar.js?v=03271154"></script>
+<script src="js/ajuda.js?v=03271157"></script>
+<script src="js/tour.js?v=03271157"></script>
+<script src="js/sw-update.js?v=03271157"></script>
+<script src="js/sidebar.js?v=03271157"></script>
 </body>
 </html>
