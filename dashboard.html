@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03270443">
-  <link rel="stylesheet" href="css/layout.css?v=03270443">
-  <script src="js/theme.js?v=03270443"></script>
+  <link rel="stylesheet" href="css/style.css?v=03270536">
+  <link rel="stylesheet" href="css/layout.css?v=03270536">
+  <script src="js/theme.js?v=03270536"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -654,10 +654,10 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03270443"></script>
-<script src="js/supabase.js?v=03270443"></script>
-<script src="js/utils.js?v=03270443"></script>
-<script src="js/push.js?v=03270443"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03270536"></script>
+<script src="js/supabase.js?v=03270536"></script>
+<script src="js/utils.js?v=03270536"></script>
+<script src="js/push.js?v=03270536"></script>
 <script>
 console.log('Dashboard v3 carregado');
 // ── Estado ────────────────────────────────────────────────────
@@ -1190,7 +1190,8 @@ function copiarLinkBarbeiro() {
 function enviarLinkBarbeiroZap() {
   const baseUrl = window.location.origin + window.location.pathname.replace('dashboard.html', '');
   const link = baseUrl + 'barbeiro-cadastro.html';
-  const msg = 'Fala! Aqui é da *' + shop.name + '*.\n\n'
+  const _t = getTermos(shop.business_type);
+  const msg = 'Fala! Aqui é do *' + shop.name + '*.\n\n'
     + 'Criei seu acesso no NaRegua pra você ver sua agenda direto no celular.\n\n'
     + 'Acessa esse link, coloca seu número de telefone e cria uma senha:\n'
     + link + '\n\n'
@@ -2411,9 +2412,9 @@ function selectCalDay(dateKey) {
   renderDay();
 }
 </script>
-<script src="js/ajuda.js?v=03270443"></script>
-<script src="js/tour.js?v=03270443"></script>
-<script src="js/sw-update.js?v=03270443"></script>
-<script src="js/sidebar.js?v=03270443"></script>
+<script src="js/ajuda.js?v=03270536"></script>
+<script src="js/tour.js?v=03270536"></script>
+<script src="js/sw-update.js?v=03270536"></script>
+<script src="js/sidebar.js?v=03270536"></script>
 </body>
 </html>

@@ -133,6 +133,11 @@
     if (el && shopDiv && el.textContent.trim()) {
       shopDiv.textContent = el.textContent.trim();
     }
+    // Atualizar subtítulo e footer conforme segmento atual
+    var segKey = localStorage.getItem('naregua_segment') || 'outro';
+    var segLabels = { barbearia:'Gestão para barbearias', manicure:'Gestão para manicures', unha:'Gestão para nail designers', sobrancelha:'Gestão para designers de sobrancelha', estetica:'Gestão para estética', salao:'Gestão para salões', outro:'Gestão para seu negócio' };
+    var subEl = sidebar.querySelector('.nr-logo-sub');
+    if (subEl) subEl.textContent = segLabels[segKey] || segLabels.outro;
   }
 
   function removeSidebar() {
@@ -155,10 +160,16 @@
     if(window._sidebarResizeHandler) window.removeEventListener('resize', window._sidebarResizeHandler);
     window._sidebarResizeHandler = handleResize;
     window.addEventListener('resize', window._sidebarResizeHandler);
-    // Atualizar nome após 3s (tempo pro async carregar)
-    setTimeout(function() {
-      if (document.querySelector('.nr-sidebar-shop-name, .nr-sidebar-shop')) updateShopName();
-    }, 3000);
+    // Atualizar nome e segmento quando async carregar
+    var _sidebarCheckCount = 0;
+    var _sidebarChecker = setInterval(function() {
+      _sidebarCheckCount++;
+      var el = document.querySelector('#shop-name, .shop-name');
+      if ((el && el.textContent.trim()) || _sidebarCheckCount > 20) {
+        updateShopName();
+        clearInterval(_sidebarChecker);
+      }
+    }, 500);
   }
 
   if (document.readyState === 'loading') {
