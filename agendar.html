@@ -17,8 +17,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03271126">
-  <script src="js/theme.js?v=03271126"></script>
+  <link rel="stylesheet" href="css/style.css?v=03271129">
+  <script src="js/theme.js?v=03271129"></script>
   <style>
     .shop-header { text-align:center; margin-bottom:24px; }
     .shop-header h1 { font-size:20px; margin-bottom:4px; }
@@ -475,9 +475,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271126"></script>
-<script src="js/supabase.js?v=03271126"></script>
-<script src="js/utils.js?v=03271126"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271129"></script>
+<script src="js/supabase.js?v=03271129"></script>
+<script src="js/utils.js?v=03271129"></script>
 <script>
 // ── Mascara telefone ──────────────────────────────────────────
 document.getElementById('client-phone').addEventListener('input', function() {
@@ -1643,18 +1643,20 @@ async function confirmarAgendamento() {
         const svcNome = svc ? svc.name : 'Serviço';
         const barb = barbers.find(b => b.id === a.barber_id);
         const barbNome = barb ? barb.name : '';
-        listaHtml += `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--cinza-medio);border-radius:8px;margin-bottom:6px;">
-          <div style="font-size:12px;">
+        listaHtml += `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--cinza-medio);border-radius:8px;margin-bottom:6px;width:100%;box-sizing:border-box;">
+          <div style="font-size:12px;flex:1;min-width:0;">
             <strong>${svcNome}</strong>${barbNome ? ' com ' + barbNome : ''}<br>
             <span style="color:var(--texto-muted);">${dataStr} às ${horaStr}</span>
           </div>
-          <button onclick="cancelarInline('${a.id}',this)" style="padding:6px 12px;background:#ef4444;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">CANCELAR</button>
+          <button onclick="cancelarInline('${a.id}',this)" style="padding:8px 14px;background:#ef4444;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;margin-left:8px;">CANCELAR</button>
         </div>`;
       });
 
       const el = document.getElementById('ag-msg');
-      el.innerHTML = `Você já tem ${(abertosDetalhes || []).length} agendamento(s) em aberto. O máximo é ${maxPending}.<br><span style="font-size:12px;color:var(--texto-muted);">Cancele um pra liberar vaga:</span><br><br>${listaHtml}`;
+      el.innerHTML = `<div style="margin-bottom:8px;">Você já tem ${(abertosDetalhes || []).length} agendamento(s) em aberto. O máximo é ${maxPending}.</div><div style="font-size:12px;color:var(--texto-muted);margin-bottom:10px;">Cancele um pra liberar vaga:</div>${listaHtml}`;
       el.className = 'msg msg-error show';
+      el.style.flexDirection = 'column';
+      el.style.alignItems = 'stretch';
       return;
     }
   }
@@ -2039,20 +2041,23 @@ async function cancelarInline(apptId, btn) {
   btn.disabled = true;
   const phone = document.getElementById('client-phone').value.replace(/\D/g, '');
   await sb.rpc('client_cancel_appointment', { p_id: apptId, p_phone: phone });
-  // Remover o card da lista
-  const card = btn.closest('div[style*="flex"]');
+  // Visual feedback
+  const card = btn.parentElement;
   if (card) {
     card.style.opacity = '0.3';
-    card.style.textDecoration = 'line-through';
-    card.querySelector('button').textContent = 'CANCELADO';
-    card.querySelector('button').style.background = '#666';
+    btn.textContent = 'CANCELADO';
+    btn.style.background = '#666';
   }
-  // Mostrar aviso e habilitar confirmar de novo
+  // Limpar msg e liberar o CONFIRMAR
   setTimeout(() => {
     const el = document.getElementById('ag-msg');
-    el.innerHTML = '<span style="color:#22c55e;font-weight:700;">Agendamento cancelado! Agora pode confirmar seu novo horário.</span>';
+    el.innerHTML = '<span style="color:#22c55e;font-weight:700;">Cancelado! Agora clique em CONFIRMAR pra agendar.</span>';
     el.className = 'msg msg-success show';
-  }, 1000);
+    el.style.flexDirection = '';
+    el.style.alignItems = '';
+    // Reabilitar o botão confirmar
+    document.getElementById('btn-confirm').disabled = false;
+  }, 800);
 }
 
 function showAgMsg(text, type) {
@@ -2289,7 +2294,7 @@ function resetar() {
   document.getElementById('client-phone').value = '';
 }
 </script>
-<script src="js/ajuda.js?v=03271126"></script>
-<script src="js/sw-update.js?v=03271126"></script>
+<script src="js/ajuda.js?v=03271129"></script>
+<script src="js/sw-update.js?v=03271129"></script>
 </body>
 </html>
