@@ -13,9 +13,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03271045">
-  <link rel="stylesheet" href="css/layout.css?v=03271045">
-  <script src="js/theme.js?v=03271045"></script>
+  <link rel="stylesheet" href="css/style.css?v=03271052">
+  <link rel="stylesheet" href="css/layout.css?v=03271052">
+  <script src="js/theme.js?v=03271052"></script>
   <style>
     .pol-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -259,9 +259,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271045"></script>
-<script src="js/supabase.js?v=03271045"></script>
-<script src="js/utils.js?v=03271045"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271052"></script>
+<script src="js/supabase.js?v=03271052"></script>
+<script src="js/utils.js?v=03271052"></script>
 <script>
 let shop = null;
 let isDirty = false;
@@ -443,7 +443,7 @@ async function initPublic(slug) {
     .maybeSingle();
 
   if (error || !data) {
-    document.getElementById('loading').innerHTML = '<div style="font-size:14px;color:var(--texto-muted);text-align:center;padding:40px;">Barbearia nao encontrada.</div>';
+    document.getElementById('loading').innerHTML = '<div style="font-size:14px;color:var(--texto-muted);text-align:center;padding:40px;">Estabelecimento nao encontrado.</div>';
     return;
   }
 
@@ -462,8 +462,13 @@ async function initPublic(slug) {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('public-view').style.display = 'block';
 
-  // No bottom nav in public mode, no padding needed
+  // Esconder sidebar e bottom nav no modo publico
   document.body.style.paddingBottom = '16px';
+  document.body.classList.remove('nr-has-sidebar');
+  var sidebar = document.querySelector('.nr-sidebar');
+  if (sidebar) sidebar.style.display = 'none';
+  var bottomNav = document.getElementById('bottom-nav');
+  if (bottomNav) bottomNav.style.display = 'none';
 }
 
 // ── Render helpers ──
@@ -514,7 +519,7 @@ function showToast(msg, isError) {
   setTimeout(() => el.classList.remove('show'), 3000);
 }
 </script>
-<script src="js/ajuda.js?v=03271045"></script>
-<script src="js/sidebar.js?v=03271045"></script>
+<script src="js/ajuda.js?v=03271052"></script>
+<script src="js/sidebar.js?v=03271052"></script>
 </body>
 </html>
