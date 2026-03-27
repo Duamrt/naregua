@@ -13,8 +13,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03271007">
-  <script src="js/theme.js?v=03271007"></script>
+  <link rel="stylesheet" href="css/style.css?v=03271016">
+  <script src="js/theme.js?v=03271016"></script>
 </head>
 <body>
 
@@ -114,9 +114,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271007"></script>
-<script src="js/supabase.js?v=03271007"></script>
-<script src="js/utils.js?v=03271007"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271016"></script>
+<script src="js/supabase.js?v=03271016"></script>
+<script src="js/utils.js?v=03271016"></script>
 <script>
 // ── Verificar sessão ──────────────────────────────────────────
 let currentUser = null;
@@ -165,8 +165,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // BUG 11 ALTO FIX: restaurar draft do Step 1 do localStorage
   const draft = JSON.parse(localStorage.getItem('naregua_onboarding_draft') || '{}');
-  if (draft.types && draft.types.length) { selectedTypes = draft.types; selectedType = draft.types[0]; }
-  else if (draft.type) { selectedType = draft.type; selectedTypes = [draft.type]; }
+  if (draft.types && draft.types.length) { selectedTypes = draft.types; selectedType = draft.types[0]; _userPickedType = true; }
+  else if (draft.type) { selectedType = draft.type; selectedTypes = [draft.type]; _userPickedType = true; }
   if (draft.name) document.getElementById('shop-name').value = draft.name;
   if (draft.city) document.getElementById('shop-city').value = draft.city;
   if (draft.phone) document.getElementById('shop-phone').value = draft.phone;
@@ -193,6 +193,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 function goStep2() {
   const name = document.getElementById('shop-name').value.trim();
   const city = document.getElementById('shop-city').value.trim();
+  if (!selectedTypes.length) { showOnbMsg('Selecione o tipo de negócio.', 'error'); return; }
   if (!name) { showOnbMsg('Digite o nome do estabelecimento.', 'error'); return; }
   if (!city) { showOnbMsg('Digite a cidade.', 'error'); return; }
   hideOnbMsg();
@@ -257,8 +258,9 @@ const TIPOS = [
   { key: 'outro',       label: 'Outro',       icon: '📋' },
 ];
 
-let selectedType = 'barbearia';
-let selectedTypes = ['barbearia']; // multi-seleção
+let selectedType = '';
+let selectedTypes = []; // multi-seleção — vazio até o usuário escolher
+let _userPickedType = false; // flag: usuário já escolheu tipo
 
 const DEFAULT_SERVICES = {
   barbearia: [
@@ -345,8 +347,12 @@ function saveDraft() {
 }
 
 function toggleType(type) {
-  if (selectedTypes.includes(type)) {
-    // Não deixar desmarcar tudo
+  if (!_userPickedType) {
+    // Primeiro clique: substitui o padrão
+    selectedTypes = [type];
+    _userPickedType = true;
+  } else if (selectedTypes.includes(type)) {
+    // Desmarcar (não deixar vazio)
     if (selectedTypes.length === 1) return;
     selectedTypes = selectedTypes.filter(t => t !== type);
   } else {
@@ -599,7 +605,7 @@ function copyLink() {
   });
 }
 </script>
-<script src="js/ajuda.js?v=03271007"></script>
-<script src="js/sw-update.js?v=03271007"></script>
+<script src="js/ajuda.js?v=03271016"></script>
+<script src="js/sw-update.js?v=03271016"></script>
 </body>
 </html>
