@@ -30,17 +30,16 @@ sed -i -E "s/const CACHE_NAME = 'naregua-v[0-9]+';/const CACHE_NAME = 'naregua-v
 echo "[3/4] Commitando..."
 MSG="${1:-deploy: cache busting v$SHORT_V}"
 git add -A
-git commit -m "$MSG
+git commit -m "$MSG" || echo "Nada pra comitar"
 
-Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>" || echo "Nada pra comitar"
-
-# 4. Push dev + merge main
+# 4. Push dev + squash merge main
 echo "[4/4] Publicando..."
 git push
 CURRENT=$(git branch --show-current)
 if [ "$CURRENT" = "dev" ]; then
   git checkout main
-  git merge dev
+  git merge --squash dev
+  git commit -m "$MSG" || echo "Nada pra comitar na main"
   git push
   git checkout dev
 fi
