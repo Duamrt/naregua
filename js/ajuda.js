@@ -6,13 +6,18 @@
 const AJUDA = {
   'dashboard': {
     titulo: 'Agenda do Dia',
-    itens: [
-      'Veja os agendamentos do dia, confirme, conclua ou cancele',
-      'Use +ENCAIXE pra clientes sem hora marcada',
-      'Navegue entre dias com as setas',
-      'O próximo cliente aparece destacado com borda dourada',
-      'A agenda atualiza automaticamente a cada 30 segundos',
-      'O sino mostra notificações pendentes (novos agendamentos)'
+    resumo: 'Aqui você gerencia o dia a dia — confirma clientes, registra consumo e encerra atendimentos.',
+    passos: [
+      { acao: 'Confirmar cliente', como: 'Quando o cliente chegar, clique em CONFIRMAR no card dele.' },
+      { acao: 'Adicionar consumo', como: 'Clique em + CONSUMO pra registrar produtos ou serviços extras durante o atendimento.' },
+      { acao: 'Concluir atendimento', como: 'Clique em CONCLUIR → escolha forma de pagamento → confirme. O consumo aparece no resumo.' },
+      { acao: 'Agendar retorno', como: 'Após concluir, o sistema sugere datas disponíveis pro cliente voltar. Escolha data e horário junto com ele.' },
+      { acao: 'Encaixe sem agendamento', como: 'Clique em + ENCAIXE pra atender quem chegou sem agendar.' }
+    ],
+    dicas: [
+      'O próximo cliente aparece com borda dourada',
+      'A agenda atualiza sozinha a cada 30 segundos',
+      'O sino no topo avisa de novos agendamentos'
     ]
   },
   'agenda-semana': {
@@ -27,24 +32,28 @@ const AJUDA = {
   },
   'financeiro': {
     titulo: 'Caixa',
-    itens: [
-      'Faturamento e despesas do dia ou mês',
-      'Registre despesas com + DESPESA',
-      'Alterne entre DIA e MÊS nos filtros',
+    resumo: 'Controle o dinheiro que entra e sai do seu negócio, por dia ou por mês.',
+    passos: [
+      { acao: 'Ver faturamento', como: 'Alterne DIA ou MÊS nos filtros pra ver receita e despesas do período.' },
+      { acao: 'Registrar despesa', como: 'Clique + DESPESA → preencha valor, categoria e forma de pagamento.' },
+      { acao: 'Abrir/fechar caixa', como: 'No início do turno clique ABRIR CAIXA. No fim, clique FECHAR e confira os valores.' }
+    ],
+    dicas: [
       'A margem mostra quanto sobra após custos e comissões',
-      'Abra e feche o caixa por turno (manhã/tarde/noite)',
       'Confira valores esperados vs recebidos no fechamento'
     ]
   },
   'equipe': {
     titulo: 'Equipe',
-    itens: [
-      'Gerencie seus profissionais e seus horários',
-      'Configure horário por dia, pausa e modo de agendamento',
-      'Defina a comissão (%) de cada profissional',
+    resumo: 'Cadastre profissionais, defina horários e comissões.',
+    passos: [
+      { acao: 'Adicionar profissional', como: 'Clique + PROFISSIONAL → preencha nome, telefone e comissão (%).' },
+      { acao: 'Configurar horário', como: 'Clique no profissional → defina horário por dia da semana, pausa e folgas.' },
+      { acao: 'Dar acesso ao app', como: 'O profissional acessa o link de cadastro (compartilhe via WhatsApp) e cria senha usando o telefone cadastrado.' }
+    ],
+    dicas: [
       'Desativar mantém o histórico, excluir apaga tudo',
-      'O telefone é necessário pro profissional criar acesso no app',
-      'Compartilhe o link de cadastro via WhatsApp'
+      'A comissão pode ser editada depois em Comissões'
     ]
   },
   'servicos': {
@@ -163,15 +172,16 @@ const AJUDA = {
   },
   'configuracoes': {
     titulo: 'Configurações',
-    itens: [
-      'Segmento: escolha entre barbearia, estética, sobrancelha, unha ou salão',
-      'Intervalo entre horários de agendamento (15, 30, 45 ou 60 min)',
-      'Limite de agendamento futuro (quantos dias à frente)',
-      'Máximo de agendamentos em aberto por cliente',
-      'Limite de cancelamento (horas mínimas de antecedência)',
-      'Comissão padrão aplicada a novos profissionais',
-      'Formas de pagamento aceitas (PIX, Dinheiro, Débito, Crédito)',
-      'Tema visual: claro/escuro + cor de destaque + segmento'
+    resumo: 'Personalize tudo do seu estabelecimento num lugar só.',
+    passos: [
+      { acao: 'Definir segmento', como: 'Escolha seu tipo de negócio (barbearia, estética, salão...). Isso muda os termos em todo o sistema.' },
+      { acao: 'Ajustar agendamento', como: 'Defina intervalo entre horários (15-60 min), limite de dias futuro e máximo de agendamentos por cliente.' },
+      { acao: 'Formas de pagamento', como: 'Ative/desative PIX, Dinheiro, Débito e Crédito. Só as ativas aparecem pro cliente.' },
+      { acao: 'Horário de funcionamento', como: 'Defina abertura, fechamento e dias que abre.' }
+    ],
+    dicas: [
+      'Comissão padrão é aplicada a profissionais novos automaticamente',
+      'Limite de cancelamento define quantas horas antes o cliente pode cancelar'
     ]
   },
   'lista-espera': {
@@ -427,9 +437,43 @@ function renderAjuda(pageId) {
   const data = AJUDA[pageId];
   if (!data) return '<p style="color:var(--texto-muted);">Sem ajuda disponível pra esta tela.</p>';
 
-  let html = '<ul style="margin:0;padding:0 0 0 18px;font-size:13px;color:var(--texto-secundario,#aaa);line-height:2;">';
-  data.itens.forEach(i => html += '<li>' + i + '</li>');
-  html += '</ul>';
+  let html = '';
+
+  // Resumo
+  if (data.resumo) {
+    html += '<p style="font-size:13px;color:var(--texto-secundario,#aaa);margin:0 0 16px;line-height:1.5;">' + data.resumo + '</p>';
+  }
+
+  // Passos (novo formato)
+  if (data.passos && data.passos.length) {
+    html += '<div style="margin-bottom:16px;">';
+    data.passos.forEach((p, i) => {
+      html += '<div style="display:flex;gap:10px;margin-bottom:12px;align-items:flex-start;">' +
+        '<div style="min-width:24px;height:24px;border-radius:50%;background:rgba(212,168,83,0.15);color:#d4a853;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + (i+1) + '</div>' +
+        '<div><div style="font-size:13px;font-weight:700;color:var(--texto-principal,#fff);margin-bottom:2px;">' + p.acao + '</div>' +
+        '<div style="font-size:12px;color:var(--texto-secundario,#aaa);line-height:1.4;">' + p.como + '</div></div>' +
+      '</div>';
+    });
+    html += '</div>';
+  }
+
+  // Dicas
+  if (data.dicas && data.dicas.length) {
+    html += '<div style="background:rgba(212,168,83,0.06);border:1px solid rgba(212,168,83,0.15);border-radius:8px;padding:10px 12px;margin-bottom:8px;">' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#d4a853;margin-bottom:6px;">DICAS</div>';
+    data.dicas.forEach(d => {
+      html += '<div style="font-size:12px;color:var(--texto-secundario,#aaa);margin-bottom:4px;padding-left:12px;position:relative;"><span style="position:absolute;left:0;">•</span>' + d + '</div>';
+    });
+    html += '</div>';
+  }
+
+  // Fallback pro formato antigo (itens simples)
+  if (data.itens && !data.passos) {
+    html += '<ul style="margin:0;padding:0 0 0 18px;font-size:13px;color:var(--texto-secundario,#aaa);line-height:2;">';
+    data.itens.forEach(i => html += '<li>' + i + '</li>');
+    html += '</ul>';
+  }
+
   return html;
 }
 
