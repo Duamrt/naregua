@@ -289,6 +289,71 @@
       from { opacity:0; transform:translateX(-50%) translateY(10px); }
       to { opacity:1; transform:translateX(-50%) translateY(0); }
     }
+
+    /* Mini Calendário Mensal */
+    .mini-cal-wrapper {
+      margin-bottom:16px;
+    }
+    .mini-cal-toggle {
+      padding:6px 12px; border-radius:8px; border:1px solid var(--accent-border,var(--borda));
+      background:var(--accent-soft,transparent); color:var(--accent,var(--verde-acao));
+      font-size:11px; font-weight:700; font-family:inherit; cursor:pointer;
+      text-decoration:none; display:flex; align-items:center; gap:4px;
+      transition:all .2s;
+    }
+    .mini-cal-toggle.active {
+      background:var(--verde-acao); color:#000; border-color:var(--verde-acao);
+    }
+    .mini-cal-body {
+      display:none; background:var(--cinza-escuro); border:1px solid var(--borda);
+      border-radius:12px; padding:12px; margin-top:10px;
+      animation:fadeUp .2s ease;
+    }
+    .mini-cal-body.open { display:block; }
+    .mini-cal-header {
+      display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;
+    }
+    .mini-cal-month {
+      font-size:13px; font-weight:700; text-transform:capitalize;
+    }
+    .mini-cal-nav {
+      width:30px; height:30px; border-radius:6px; border:1px solid var(--borda);
+      background:transparent; color:var(--texto-secundario); font-size:14px;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      transition:all .2s; font-family:inherit;
+    }
+    .mini-cal-nav:hover { border-color:var(--borda-hover); }
+    .mini-cal-grid {
+      display:grid; grid-template-columns:repeat(7,1fr); gap:3px; text-align:center;
+    }
+    .mini-cal-dow {
+      font-size:9px; font-weight:700; color:var(--texto-muted); letter-spacing:0.5px;
+      padding:4px 0;
+    }
+    .mini-cal-day {
+      position:relative; padding:6px 2px; border-radius:8px; font-size:12px;
+      font-weight:600; cursor:pointer; transition:all .15s; border:1.5px solid transparent;
+      background:transparent; color:var(--texto-secundario); font-family:inherit;
+      min-height:32px; display:flex; flex-direction:column; align-items:center;
+      justify-content:center; gap:2px;
+    }
+    .mini-cal-day:hover { background:rgba(255,255,255,0.04); }
+    .mini-cal-day.other-month { opacity:0.25; cursor:default; }
+    .mini-cal-day.today { border-color:var(--verde-acao); }
+    .mini-cal-day.selected { background:var(--verde-acao); color:#000; border-color:var(--verde-acao); }
+    .mini-cal-day.selected .mini-cal-dot { background:#000 !important; }
+    .mini-cal-dot {
+      width:5px; height:5px; border-radius:50%; display:none;
+    }
+    .mini-cal-day[data-count="0"] .mini-cal-dot { display:none; }
+    .mini-cal-dot.dot-green { display:block; background:#22c55e; }
+    .mini-cal-dot.dot-yellow { display:block; background:#f59e0b; }
+    .mini-cal-dot.dot-red { display:block; background:#ef4444; }
+    @media (max-width: 480px) {
+      .mini-cal-day { font-size:11px; padding:5px 1px; min-height:28px; }
+      .mini-cal-dow { font-size:8px; }
+      .mini-cal-dot { width:4px; height:4px; }
+    }
   </style>
 </head>
 <body>
@@ -313,6 +378,7 @@
         <a href="notificacoes.html" class="icon-btn" title="Notificações" style="text-decoration:none;" id="bell-btn">&#x1F514;</a>
         <span class="bell-badge" id="bell-badge">0</span>
       </div>
+      <button class="mini-cal-toggle" id="btn-cal-toggle" onclick="toggleMiniCal()">CALENDARIO</button>
       <a href="agenda-semana.html" style="padding:6px 12px;border-radius:8px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;text-decoration:none;display:flex;align-items:center;">SEMANA</a>
       <button style="padding:6px 12px;border-radius:8px;border:none;background:var(--verde-acao);color:#000;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;" onclick="abrirEncaixe()">+ ENCAIXE</button>
       <button class="icon-btn" onclick="abrirEdicao()" title="Editar">&#x270F;&#xFE0F;</button>
@@ -354,6 +420,18 @@
     <div class="stat-card">
       <div class="stat-num" id="stat-revenue" style="color:var(--verde-acao);">0</div>
       <div class="stat-label">FATURADO</div>
+    </div>
+  </div>
+
+  <!-- Mini Calendário Mensal -->
+  <div class="mini-cal-wrapper" id="mini-cal-wrapper" style="display:none;">
+    <div class="mini-cal-body open" id="mini-cal-body">
+      <div class="mini-cal-header">
+        <button class="mini-cal-nav" onclick="changeCalMonth(-1)">&#x2039;</button>
+        <span class="mini-cal-month" id="mini-cal-month"></span>
+        <button class="mini-cal-nav" onclick="changeCalMonth(1)">&#x203A;</button>
+      </div>
+      <div class="mini-cal-grid" id="mini-cal-grid"></div>
     </div>
   </div>
 
@@ -685,6 +763,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('dash-date-nav').style.display = 'flex';
   document.getElementById('filters').style.display = 'flex';
   document.getElementById('appt-list').style.display = 'block';
+  if (_calOpen) document.getElementById('mini-cal-wrapper').style.display = '';
 
   // Labels dinâmicos conforme tipo de negócio
   const _t = getTermos(shop.business_type);
@@ -694,6 +773,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (btnAddBarber) btnAddBarber.textContent = '+ ADICIONAR ' + _t.PROFISSIONAL;
 
   renderDay();
+  initMiniCal();
   checkListaEspera();
 
   // Atualizar automaticamente a cada 30s (pega novos agendamentos + lista de espera)
@@ -788,6 +868,21 @@ async function renderDay() {
 
   renderFilters();
   renderAppointments();
+
+  // Atualizar mini calendário se está aberto
+  if (_calOpen) {
+    const calM = calViewDate.getMonth();
+    const curM = currentDate.getMonth();
+    const calY = calViewDate.getFullYear();
+    const curY = currentDate.getFullYear();
+    if (calM !== curM || calY !== curY) {
+      calViewDate = new Date(currentDate);
+      renderMiniCal();
+      loadCalMonthData();
+    } else {
+      renderMiniCal();
+    }
+  }
 }
 
 async function autoConfirmar() {
@@ -2171,6 +2266,150 @@ function updateBell(count) {
 
 // Run bell check after shop loads (inside DOMContentLoaded, after renderDay)
 setTimeout(() => { if (shop) checkBellCount(); }, 2000);
+
+// ── Mini Calendário Mensal ────────────────────────────────────
+let calViewDate = new Date(); // mês/ano do calendário
+let calMonthData = {}; // { 'YYYY-MM-DD': count }
+let _calOpen = localStorage.getItem('naregua_cal_open') === '1';
+
+function toggleMiniCal() {
+  _calOpen = !_calOpen;
+  localStorage.setItem('naregua_cal_open', _calOpen ? '1' : '0');
+  const wrapper = document.getElementById('mini-cal-wrapper');
+  const btn = document.getElementById('btn-cal-toggle');
+  if (_calOpen) {
+    wrapper.style.display = '';
+    btn.classList.add('active');
+    calViewDate = new Date(currentDate);
+    renderMiniCal();
+    loadCalMonthData();
+  } else {
+    wrapper.style.display = 'none';
+    btn.classList.remove('active');
+  }
+}
+
+function initMiniCal() {
+  if (_calOpen) {
+    const wrapper = document.getElementById('mini-cal-wrapper');
+    const btn = document.getElementById('btn-cal-toggle');
+    wrapper.style.display = '';
+    btn.classList.add('active');
+    calViewDate = new Date(currentDate);
+    renderMiniCal();
+    loadCalMonthData();
+  }
+}
+
+function changeCalMonth(delta) {
+  calViewDate.setMonth(calViewDate.getMonth() + delta);
+  renderMiniCal();
+  loadCalMonthData();
+}
+
+async function loadCalMonthData() {
+  if (!shop) return;
+  const y = calViewDate.getFullYear();
+  const m = calViewDate.getMonth();
+  const firstDay = new Date(y, m, 1);
+  const lastDay = new Date(y, m + 1, 0);
+  const startStr = firstDay.getFullYear() + '-' + String(firstDay.getMonth()+1).padStart(2,'0') + '-01';
+  const endStr = lastDay.getFullYear() + '-' + String(lastDay.getMonth()+1).padStart(2,'0') + '-' + String(lastDay.getDate()).padStart(2,'0');
+
+  try {
+    const { data } = await sb
+      .from('appointments')
+      .select('scheduled_at,status')
+      .eq('barbershop_id', shop.id)
+      .gte('scheduled_at', startStr + 'T00:00:00-03:00')
+      .lte('scheduled_at', endStr + 'T23:59:59-03:00')
+      .in('status', ['pending','confirmed','done']);
+
+    calMonthData = {};
+    (data || []).forEach(a => {
+      const d = new Date(a.scheduled_at);
+      const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+      calMonthData[key] = (calMonthData[key] || 0) + 1;
+    });
+    renderMiniCalDots();
+  } catch (e) { console.error('loadCalMonthData:', e); }
+}
+
+function renderMiniCal() {
+  const y = calViewDate.getFullYear();
+  const m = calViewDate.getMonth();
+
+  // Header
+  document.getElementById('mini-cal-month').textContent = MESES[m] + ' ' + y;
+
+  const grid = document.getElementById('mini-cal-grid');
+  const dows = ['D','S','T','Q','Q','S','S'];
+  let html = dows.map(d => '<div class="mini-cal-dow">' + d + '</div>').join('');
+
+  const firstDay = new Date(y, m, 1);
+  const lastDay = new Date(y, m + 1, 0);
+  const startDow = firstDay.getDay(); // 0=dom
+
+  // Dias do mês anterior
+  const prevMonthLast = new Date(y, m, 0).getDate();
+  for (let i = startDow - 1; i >= 0; i--) {
+    const day = prevMonthLast - i;
+    html += '<button class="mini-cal-day other-month" disabled><span>' + day + '</span></button>';
+  }
+
+  // Dias do mês atual
+  const today = new Date();
+  const selStr = currentDate.getFullYear() + '-' + String(currentDate.getMonth()+1).padStart(2,'0') + '-' + String(currentDate.getDate()).padStart(2,'0');
+
+  for (let d = 1; d <= lastDay.getDate(); d++) {
+    const dateKey = y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const isToday2 = today.getFullYear() === y && today.getMonth() === m && today.getDate() === d;
+    const isSelected = dateKey === selStr;
+    let cls = 'mini-cal-day';
+    if (isToday2) cls += ' today';
+    if (isSelected) cls += ' selected';
+    html += '<button class="' + cls + '" data-date="' + dateKey + '" data-count="0" onclick="selectCalDay(\'' + dateKey + '\')">' +
+      '<span>' + d + '</span><span class="mini-cal-dot"></span></button>';
+  }
+
+  // Dias do próximo mês (preencher até completar a grade)
+  const totalCells = startDow + lastDay.getDate();
+  const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (let i = 1; i <= remaining; i++) {
+    html += '<button class="mini-cal-day other-month" disabled><span>' + i + '</span></button>';
+  }
+
+  grid.innerHTML = html;
+  renderMiniCalDots();
+}
+
+function renderMiniCalDots() {
+  const barberCount = Math.max(1, (barbers || []).filter(b => b.active !== false).length);
+  // Thresholds ajustados pelo numero de profissionais
+  const tLow = barberCount * 2;   // verde: até 2 por barbeiro
+  const tMed = barberCount * 4;   // amarelo: até 4 por barbeiro
+
+  const days = document.querySelectorAll('#mini-cal-grid .mini-cal-day[data-date]');
+  days.forEach(el => {
+    const key = el.getAttribute('data-date');
+    const count = calMonthData[key] || 0;
+    el.setAttribute('data-count', count);
+    const dot = el.querySelector('.mini-cal-dot');
+    if (!dot) return;
+    dot.className = 'mini-cal-dot';
+    if (count === 0) return;
+    if (count <= tLow) dot.classList.add('dot-green');
+    else if (count <= tMed) dot.classList.add('dot-yellow');
+    else dot.classList.add('dot-red');
+  });
+}
+
+function selectCalDay(dateKey) {
+  const parts = dateKey.split('-');
+  currentDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  renderMiniCal();
+  renderDay();
+}
 </script>
 <script src="js/ajuda.js?v=03270439"></script>
 <script src="js/tour.js?v=03270439"></script>
