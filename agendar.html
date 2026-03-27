@@ -17,8 +17,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=03271132">
-  <script src="js/theme.js?v=03271132"></script>
+  <link rel="stylesheet" href="css/style.css?v=03271142">
+  <script src="js/theme.js?v=03271142"></script>
   <style>
     .shop-header { text-align:center; margin-bottom:24px; }
     .shop-header h1 { font-size:20px; margin-bottom:4px; }
@@ -475,9 +475,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271132"></script>
-<script src="js/supabase.js?v=03271132"></script>
-<script src="js/utils.js?v=03271132"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=03271142"></script>
+<script src="js/supabase.js?v=03271142"></script>
+<script src="js/utils.js?v=03271142"></script>
 <script>
 // ── Mascara telefone ──────────────────────────────────────────
 document.getElementById('client-phone').addEventListener('input', function() {
@@ -2041,7 +2041,7 @@ async function cancelarInline(apptId, btn) {
   btn.textContent = '...';
   btn.disabled = true;
   const phone = document.getElementById('client-phone').value.replace(/\D/g, '');
-  await sb.rpc('client_cancel_appointment', { p_id: apptId, p_phone: phone });
+  await sb.from('appointments').update({ status: 'cancelled' }).eq('id', apptId);
   skipLimitCheck = true; // Pular limite na próxima confirmação
   // Visual feedback
   const card = btn.parentElement;
@@ -2296,7 +2296,7 @@ function resetar() {
   document.getElementById('client-phone').value = '';
 }
 </script>
-<script src="js/ajuda.js?v=03271132"></script>
-<script src="js/sw-update.js?v=03271132"></script>
+<script src="js/ajuda.js?v=03271142"></script>
+<script src="js/sw-update.js?v=03271142"></script>
 </body>
 </html>
