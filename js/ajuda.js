@@ -351,7 +351,7 @@ const AJUDA = {
     ]
   },
   'admin': {
-    titulo: 'Painel Admin',
+    titulo: 'Painel Master',
     itens: [
       'Gerenciamento de todos os estabelecimentos do NaRegua',
       'Crie, edite e acesse qualquer estabelecimento',
