@@ -114,7 +114,14 @@
     if (typeof getTermos === 'function' && segKey !== 'outro') {
       try { var _t = getTermos(segKey); if (_t && _t.Estabelecimento) shopLabel = 'Meu ' + _t.Estabelecimento; } catch(e) {}
     }
-    footer.innerHTML = '<div class="nr-sidebar-shop">' + shopLabel + '</div><button class="nr-sidebar-logout" onclick="if(typeof logout===\'function\')logout();else{window.location.href=\'app.html\';}">Sair</button>';
+    var _themeIcon = document.documentElement.getAttribute('data-theme') === 'light' ? '🌙' : '☀️';
+    footer.innerHTML = '<div class="nr-sidebar-shop">' + shopLabel + '</div><div style="display:flex;gap:6px;align-items:center;"><button id="nr-theme-toggle" style="background:none;border:1px solid var(--borda);border-radius:6px;color:var(--texto-muted);font-size:14px;padding:4px 8px;cursor:pointer;transition:all .2s;" title="Alternar tema">' + _themeIcon + '</button><button class="nr-sidebar-logout" onclick="if(typeof logout===\'function\')logout();else{window.location.href=\'app.html\';}">Sair</button></div>';
+    footer.querySelector('#nr-theme-toggle').addEventListener('click', function() {
+      if (typeof toggleTheme === 'function') {
+        var next = toggleTheme();
+        this.textContent = next === 'light' ? '🌙' : '☀️';
+      }
+    });
     sidebar.appendChild(footer);
 
     // Inserir no body SEM mover nada
