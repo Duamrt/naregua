@@ -1,5 +1,5 @@
 // NaRegua — Autenticação
-const _NR_VER = 'naregua-04111200';
+const _NR_VER = 'naregua-04110533';
 console.log('%c NaRegua %c '+_NR_VER+' ','background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa','background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0');
 
 // ── Estado ────────────────────────────────────────────────────
