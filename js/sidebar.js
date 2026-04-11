@@ -117,10 +117,15 @@
     var _themeIcon = document.documentElement.getAttribute('data-theme') === 'light' ? '🌙' : '☀️';
     footer.innerHTML = '<div class="nr-sidebar-shop">' + shopLabel + '</div><div style="display:flex;gap:6px;align-items:center;"><button id="nr-theme-toggle" style="background:none;border:1px solid var(--borda);border-radius:6px;color:var(--texto-muted);font-size:14px;padding:4px 8px;cursor:pointer;transition:all .2s;" title="Alternar tema">' + _themeIcon + '</button><button class="nr-sidebar-logout" onclick="if(typeof logout===\'function\')logout();else{window.location.href=\'app.html\';}">Sair</button></div>';
     footer.querySelector('#nr-theme-toggle').addEventListener('click', function() {
-      if (typeof toggleTheme === 'function') {
-        var next = toggleTheme();
-        this.textContent = next === 'light' ? '🌙' : '☀️';
+      var current = document.documentElement.getAttribute('data-theme');
+      var next = current === 'light' ? 'dark' : 'light';
+      if (next === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
       }
+      try { localStorage.setItem('naregua_theme', next); } catch(e) {}
+      this.textContent = next === 'light' ? '🌙' : '☀️';
     });
     sidebar.appendChild(footer);
 
