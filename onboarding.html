@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111231";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
-  <title>NaRegua — Configurar seu negócio</title>
-    <link rel="manifest" href="manifest.json">
+  <script>const _NR_VER="naregua-04111302";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <title>NaRegua — Configure seu negócio</title>
+  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -13,257 +13,492 @@
   <link rel="apple-touch-icon" href="img/icon-192.png">
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111231">
-  <script src="js/theme.js?v=04111231"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=04111302">
+  <script src="js/theme.js?v=04111302"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100dvh;
+      background: var(--bg-principal, #0a0a0f);
+      font-family: 'DM Sans', 'Inter', sans-serif;
+      color: var(--texto-principal, #f0f0f5);
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 0;
+    }
+
+    /* ── Top bar ── */
+    .ob-topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(10,10,15,.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--borda, rgba(255,255,255,.08));
+      padding: 0 24px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    [data-theme="light"] .ob-topbar { background: rgba(248,248,252,.94); }
+    .ob-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px; font-weight: 900; letter-spacing: -.5px; color: #fff;
+    }
+    .ob-logo span { color: var(--accent, #c0c1ff); }
+    [data-theme="light"] .ob-logo { color: #1a1a2e; }
+    .ob-logout-btn {
+      background: none; border: none; font-size: 12px; font-weight: 600;
+      color: var(--texto-muted, #666); cursor: pointer; font-family: inherit;
+      padding: 6px 10px; border-radius: 6px; transition: color .2s;
+    }
+    .ob-logout-btn:hover { color: var(--texto-secundario, #bbb); }
+
+    /* ── Stepper ── */
+    .ob-stepper { display: flex; align-items: center; gap: 0; }
+    .ob-step { display: flex; align-items: center; gap: 6px; }
+    .ob-step-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; font-family: 'Space Grotesk', sans-serif;
+      transition: all .2s;
+      border: 1.5px solid var(--borda, rgba(255,255,255,.1));
+      color: var(--texto-muted, #666); background: transparent;
+    }
+    .ob-step-dot.active { background: var(--accent, #c0c1ff); border-color: var(--accent, #c0c1ff); color: #07004a; }
+    .ob-step-dot.done { background: rgba(192,193,255,.12); border-color: var(--accent, #c0c1ff); color: var(--accent, #c0c1ff); }
+    .ob-step-label { font-size: 11px; font-weight: 600; color: var(--texto-muted, #666); white-space: nowrap; }
+    .ob-step-label.active { color: var(--texto-principal, #f0f0f5); }
+    .ob-step-label.done { color: var(--accent, #c0c1ff); }
+    .ob-step-line { width: 32px; height: 1px; background: var(--borda, rgba(255,255,255,.08)); margin: 0 4px; }
+    @media (max-width: 520px) {
+      .ob-step-label { display: none; }
+      .ob-step-line { width: 18px; }
+    }
+
+    /* ── Body ── */
+    .ob-body {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 40px 16px 60px;
+    }
+    .ob-form { width: 100%; max-width: 480px; }
+
+    /* ── Step header ── */
+    .ob-step-hd { margin-bottom: 28px; }
+    .ob-step-hd h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 24px; font-weight: 800; color: var(--texto-principal, #f0f0f5);
+      line-height: 1.2; margin-bottom: 6px;
+    }
+    .ob-step-hd p { font-size: 13px; color: var(--texto-muted, #666); line-height: 1.5; }
+
+    /* ── Fields ── */
+    .ob-field { margin-bottom: 14px; }
+    .ob-field label {
+      display: block; font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--texto-muted, #666); margin-bottom: 6px;
+    }
+    .ob-field input, .ob-field select {
+      width: 100%; padding: 11px 14px;
+      background: var(--cinza-medio, #1b1b20);
+      border: 1px solid var(--borda, rgba(255,255,255,.08));
+      border-radius: 10px; color: var(--texto-principal, #f0f0f5);
+      font-size: 14px; font-family: 'DM Sans', 'Inter', sans-serif;
+      outline: none; transition: border-color .2s;
+    }
+    .ob-field input:focus, .ob-field select:focus { border-color: var(--accent, #c0c1ff); }
+    .ob-field input::placeholder { color: var(--texto-muted, #666); }
+    .ob-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ── Type grid ── */
+    .ob-type-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .ob-type-btn {
+      flex: 1; min-width: 88px; padding: 12px 8px;
+      border-radius: 12px; font-size: 12px; font-weight: 600;
+      font-family: 'DM Sans', 'Inter', sans-serif;
+      cursor: pointer; transition: all .2s; text-align: center;
+      border: 1.5px solid var(--borda, rgba(255,255,255,.08));
+      background: transparent; color: var(--texto-muted, #666);
+    }
+    .ob-type-btn:hover { border-color: var(--borda-hover, rgba(255,255,255,.15)); color: var(--texto-secundario, #bbb); }
+    .ob-type-btn.active { border-color: var(--accent, #c0c1ff); background: rgba(192,193,255,.08); color: var(--accent, #c0c1ff); }
+    .ob-type-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+    /* ── Days ── */
+    .ob-days { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ob-day-btn {
+      padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;
+      font-family: inherit; cursor: pointer; transition: all .2s;
+      border: 1px solid var(--borda, rgba(255,255,255,.08));
+      background: transparent; color: var(--texto-muted, #666);
+    }
+    .ob-day-btn.active { border-color: var(--accent, #c0c1ff); background: rgba(192,193,255,.08); color: var(--accent, #c0c1ff); }
+
+    /* ── Services ── */
+    .ob-svc-row {
+      display: grid; grid-template-columns: 1fr 76px 72px 32px;
+      gap: 8px; align-items: end; margin-bottom: 8px;
+    }
+    .ob-svc-row .ob-field { margin-bottom: 0; }
+    .ob-svc-del {
+      background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.2);
+      border-radius: 8px; color: #ef4444; font-size: 14px; cursor: pointer;
+      height: 42px; display: flex; align-items: center; justify-content: center;
+      transition: opacity .2s;
+    }
+    .ob-svc-del:hover { opacity: .75; }
+
+    /* ── Buttons ── */
+    .ob-btn {
+      width: 100%; padding: 13px; border-radius: 12px; font-size: 14px;
+      font-weight: 700; font-family: 'Space Grotesk', sans-serif;
+      cursor: pointer; transition: all .2s; border: none; margin-top: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ob-btn-primary { background: var(--accent, #c0c1ff); color: #07004a; }
+    [data-theme="light"] .ob-btn-primary { color: #fff; }
+    .ob-btn-primary:hover { opacity: .88; }
+    .ob-btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+    .ob-btn-outline {
+      background: transparent; border: 1px solid var(--borda, rgba(255,255,255,.08));
+      color: var(--texto-muted, #666);
+    }
+    .ob-btn-outline:hover { border-color: var(--borda-hover, rgba(255,255,255,.15)); color: var(--texto-secundario, #bbb); }
+    .ob-btn-row { display: flex; gap: 10px; margin-top: 24px; }
+    .ob-btn-row .ob-btn { margin-top: 0; }
+
+    .ob-add-svc {
+      display: flex; align-items: center; gap: 6px; padding: 9px 14px;
+      border-radius: 8px; border: 1px dashed var(--borda, rgba(255,255,255,.1));
+      background: transparent; color: var(--texto-muted, #666); font-size: 12px;
+      font-weight: 600; cursor: pointer; font-family: inherit; transition: all .2s;
+      margin-bottom: 20px;
+    }
+    .ob-add-svc:hover { border-color: var(--accent, #c0c1ff); color: var(--accent, #c0c1ff); }
+
+    /* ── Msg ── */
+    .ob-msg {
+      padding: 10px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+      margin-bottom: 16px; display: none;
+    }
+    .ob-msg.error {
+      background: rgba(239,68,68,.08); color: #ef4444;
+      border: 1px solid rgba(239,68,68,.2); display: block;
+    }
+
+    /* ── Divider ── */
+    .ob-divider { border: none; border-top: 1px solid var(--borda, rgba(255,255,255,.08)); margin: 20px 0 16px; }
+    .ob-section-label {
+      font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--texto-muted, #666); margin-bottom: 12px;
+    }
+
+    /* ── Step 4: Pronto ── */
+    .ob-success-wrap { text-align: center; }
+    .ob-success-icon {
+      width: 72px; height: 72px; border-radius: 20px;
+      background: rgba(192,193,255,.1); display: flex; align-items: center; justify-content: center;
+      font-size: 36px; margin: 0 auto 24px;
+    }
+    .ob-link-box {
+      background: var(--cinza-medio, #1b1b20); border: 1px solid var(--borda, rgba(255,255,255,.08));
+      border-radius: 12px; padding: 14px 16px;
+      font-size: 13px; color: var(--accent, #c0c1ff); word-break: break-all;
+      margin: 16px 0 6px; cursor: pointer; transition: border-color .2s;
+      font-weight: 600; line-height: 1.5; text-align: left;
+    }
+    .ob-link-box:hover { border-color: var(--accent, #c0c1ff); }
+    .ob-copy-hint { font-size: 11px; color: var(--texto-muted, #666); margin-bottom: 4px; }
+    .ob-copy-ok { font-size: 12px; color: #4ade80; text-align: center; height: 18px; margin-bottom: 4px; font-weight: 600; }
+
+    /* ── Footer link ── */
+    .ob-footer-link { text-align: center; margin-top: 20px; }
+    .ob-footer-link button {
+      background: none; border: none; font-size: 12px; color: var(--texto-muted, #666);
+      cursor: pointer; font-family: inherit;
+    }
+    .ob-footer-link button:hover { color: var(--texto-secundario, #bbb); text-decoration: underline; }
+  </style>
 </head>
 <body>
 
-<div class="page-center">
-  <div class="card" style="max-width:480px;">
-    <div class="card-header">
-      <img src="img/logo.png" alt="NaRegua" class="logo-img" style="height:48px;margin-bottom:8px;">
-      <p>Vamos configurar seu negócio</p>
-      <button onclick="sairConta()" style="background:none;border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:6px 14px;font-size:11px;color:#a3a3a3;cursor:pointer;font-family:inherit;margin-top:8px;">Nao e voce? Trocar conta</button>
-    </div>
+<!-- Top bar com stepper -->
+<div class="ob-topbar">
+  <div class="ob-logo">Na<span>Regua</span></div>
+  <div class="ob-stepper" id="ob-stepper"></div>
+  <button class="ob-logout-btn" onclick="sairConta()">Sair</button>
+</div>
 
-    <div id="onboarding-msg" class="msg"></div>
+<div class="ob-body">
+  <div class="ob-form">
 
-    <!-- Step 1: Dados da barbearia -->
+    <div id="ob-msg" class="ob-msg"></div>
+
+    <!-- ══ Step 1: Negócio ══ -->
     <div id="step-1">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
-        <span style="background:var(--verde-acao);color:#000;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;">1</span>
-        <span style="font-size:14px;font-weight:700;">Seu negócio</span>
-        <span style="font-size:11px;color:var(--texto-muted);margin-left:auto;">Passo 1 de 3</span>
+      <div class="ob-step-hd">
+        <h1>Seu negócio</h1>
+        <p>Vamos configurar tudo em 4 passos rápidos.</p>
       </div>
 
-      <div class="field">
-        <label>TIPO DE NEGÓCIO * <span style="font-weight:400;font-size:10px;color:var(--texto-muted);">(pode marcar mais de um)</span></label>
-        <div id="type-grid" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      <div class="ob-field">
+        <label>Tipo de negócio *</label>
+        <div id="type-grid" class="ob-type-grid"></div>
       </div>
-      <div class="field">
-        <label>NOME DO ESTABELECIMENTO *</label>
+
+      <div class="ob-field">
+        <label>Nome do estabelecimento *</label>
         <input type="text" id="shop-name" placeholder="Ex: Studio Maria, Barbearia do João">
       </div>
-      <div class="field">
-        <label>CIDADE *</label>
-        <input type="text" id="shop-city" placeholder="Ex: Jupi-PE">
-      </div>
-      <div class="field">
-        <label>WHATSAPP</label>
-        <input type="tel" autocomplete="tel" id="shop-phone" placeholder="(87) 9 9999-9999">
+
+      <div class="ob-field-row">
+        <div class="ob-field">
+          <label>Cidade *</label>
+          <input type="text" id="shop-city" placeholder="Ex: Jupi-PE">
+        </div>
+        <div class="ob-field">
+          <label>WhatsApp</label>
+          <input type="tel" id="shop-phone" autocomplete="tel" placeholder="(87) 9 9999-9999">
+        </div>
       </div>
 
-      <button class="btn btn-primary" onclick="goStep2()">
-        <span class="btn-label">CONTINUAR</span>
-      </button>
+      <button class="ob-btn ob-btn-primary" onclick="goStep2()" style="margin-top:24px;">Continuar →</button>
+
+      <div class="ob-footer-link">
+        <button onclick="sairConta()">Não é você? Trocar conta</button>
+      </div>
     </div>
 
-    <!-- Step 2: Horários -->
+    <!-- ══ Step 2: Horários ══ -->
     <div id="step-2" style="display:none;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
-        <span style="background:var(--verde-acao);color:#000;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;">2</span>
-        <span style="font-size:14px;font-weight:700;">Horários de funcionamento</span>
-        <span style="font-size:11px;color:var(--texto-muted);margin-left:auto;">Passo 2 de 3</span>
+      <div class="ob-step-hd">
+        <h1>Horários de funcionamento</h1>
+        <p>Quando seu negócio está aberto para atendimentos?</p>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="field">
-          <label>ABRE ÀS</label>
-          <select id="shop-open" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;"></select>
+      <div class="ob-field">
+        <label>Dias que abre</label>
+        <div id="days-grid" class="ob-days"></div>
+      </div>
+
+      <div class="ob-field-row" style="margin-top:16px;">
+        <div class="ob-field">
+          <label>Abre às</label>
+          <select id="shop-open"></select>
         </div>
-        <div class="field">
-          <label>FECHA ÀS</label>
-          <select id="shop-close" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;"></select>
+        <div class="ob-field">
+          <label>Fecha às</label>
+          <select id="shop-close"></select>
         </div>
       </div>
 
-      <div class="field">
-        <label>DIAS QUE ABRE</label>
-        <div id="days-grid" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
-      </div>
-
-      <div style="display:flex;gap:10px;">
-        <button class="btn btn-outline" onclick="backStep1()" style="flex:0.4;">VOLTAR</button>
-        <button class="btn btn-primary" onclick="goStep3()" style="flex:0.6;">CONTINUAR</button>
+      <div class="ob-btn-row">
+        <button class="ob-btn ob-btn-outline" onclick="backStep1()" style="flex:.35;">← Voltar</button>
+        <button class="ob-btn ob-btn-primary" onclick="goStep3()" style="flex:.65;">Continuar →</button>
       </div>
     </div>
 
-    <!-- Step 3: Serviços -->
+    <!-- ══ Step 3: Equipe & Serviços ══ -->
     <div id="step-3" style="display:none;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
-        <span style="background:var(--verde-acao);color:#000;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;">3</span>
-        <span style="font-size:14px;font-weight:700;">Seus serviços</span>
-        <span style="font-size:11px;color:var(--texto-muted);margin-left:auto;">Passo 3 de 3</span>
+      <div class="ob-step-hd">
+        <h1>Equipe e serviços</h1>
+        <p>Quem vai atender e o que você oferece?</p>
       </div>
+
+      <div class="ob-field">
+        <label>Nome do primeiro profissional *</label>
+        <input type="text" id="prof-name" placeholder="Ex: João, Maria...">
+      </div>
+
+      <hr class="ob-divider">
+      <div class="ob-section-label">Serviços</div>
 
       <div id="services-list"></div>
 
-      <button class="btn btn-outline" onclick="addServiceRow()" style="margin-bottom:16px;font-size:12px;">
-        + ADICIONAR SERVIÇO
-      </button>
+      <button type="button" class="ob-add-svc" onclick="addServiceRow()">+ Adicionar serviço</button>
 
-      <div style="display:flex;gap:10px;">
-        <button class="btn btn-outline" onclick="backStep2()" style="flex:0.4;">VOLTAR</button>
-        <button class="btn btn-primary" onclick="finishOnboarding()" id="btn-finish" style="flex:0.6;">
-          <span class="btn-label">FINALIZAR</span>
-          <div class="spinner" style="display:none;"></div>
+      <div class="ob-btn-row">
+        <button class="ob-btn ob-btn-outline" onclick="backStep2()" style="flex:.35;">← Voltar</button>
+        <button class="ob-btn ob-btn-primary" id="btn-finish" onclick="finishOnboarding()" style="flex:.65;">
+          <span id="btn-finish-label">Finalizar cadastro</span>
         </button>
+      </div>
+    </div>
+
+    <!-- ══ Step 4: Tudo pronto ══ -->
+    <div id="step-4" style="display:none;">
+      <div class="ob-success-wrap">
+        <div class="ob-success-icon">🎉</div>
+        <div class="ob-step-hd">
+          <h1>Tudo pronto!</h1>
+          <p>Seu negócio está configurado. Compartilhe o link abaixo com seus clientes para receber agendamentos online.</p>
+        </div>
+
+        <div class="ob-copy-hint">Toque no link para copiar</div>
+        <div class="ob-link-box" id="success-link" onclick="copyLink()"></div>
+        <div class="ob-copy-ok" id="copy-ok"></div>
+
+        <div class="ob-btn-row" style="margin-top:8px;">
+          <a id="btn-test-link" href="#" target="_blank" class="ob-btn ob-btn-outline" style="flex:.45;text-decoration:none;">Testar link</a>
+          <button class="ob-btn ob-btn-primary" onclick="window.location.href='dashboard.html'" style="flex:.55;">Ir pro painel →</button>
+        </div>
       </div>
     </div>
 
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111231"></script>
-<script src="js/supabase.js?v=04111231"></script>
-<script src="js/utils.js?v=04111231"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111302"></script>
+<script src="js/supabase.js?v=04111302"></script>
+<script src="js/utils.js?v=04111302"></script>
 <script>
-// ── Verificar sessão ──────────────────────────────────────────
-let currentUser = null;
+'use strict';
 
-// ADMIN_EMAILS centralizado em utils.js
+var currentUser = null;
 
+// ── Stepper ──────────────────────────────────────────────────────
+var STEPS_META = ['Negócio', 'Horários', 'Equipe', 'Pronto'];
+
+function renderStepper(active) {
+  var el = document.getElementById('ob-stepper');
+  var html = '';
+  STEPS_META.forEach(function(label, i) {
+    var n = i + 1;
+    var isDone = n < active;
+    var isActive = n === active;
+    var dotCls = isDone ? 'done' : isActive ? 'active' : '';
+    var lblCls = isDone ? 'done' : isActive ? 'active' : '';
+    if (i > 0) html += '<div class="ob-step-line"></div>';
+    html += '<div class="ob-step">'
+      + '<div class="ob-step-dot ' + dotCls + '">' + (isDone ? '✓' : n) + '</div>'
+      + '<div class="ob-step-label ' + lblCls + '">' + label + '</div>'
+      + '</div>';
+  });
+  el.innerHTML = html;
+}
+
+// ── Init ─────────────────────────────────────────────────────────
 function populateTimeSelect(id, defaultVal) {
-  const sel = document.getElementById(id);
-  for (let h = 6; h <= 23; h++) {
-    for (let m = 0; m < 60; m += 30) {
-      const val = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
-      const opt = document.createElement('option');
-      opt.value = val;
-      opt.textContent = val;
+  var sel = document.getElementById(id);
+  for (var h = 6; h <= 23; h++) {
+    for (var m = 0; m < 60; m += 30) {
+      var val = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+      var opt = document.createElement('option');
+      opt.value = val; opt.textContent = val;
       if (val === defaultVal) opt.selected = true;
       sel.appendChild(opt);
     }
   }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const { data: { session }, error: sessErr } = await sb.auth.getSession();
+document.addEventListener('DOMContentLoaded', async function() {
+  var sessRes = await sb.auth.getSession();
+  var session = sessRes.data && sessRes.data.session;
   if (!session) { window.location.href = 'app.html'; return; }
   currentUser = session.user;
 
-  // Admin vai pro painel, não pro onboarding
   if (ADMIN_EMAILS.includes(currentUser.email)) {
-    window.location.href = 'admin.html';
-    return;
+    window.location.href = 'admin.html'; return;
   }
 
-  // Já tem barbearia? Vai pro dashboard
-  const { data: shops } = await sb
-    .from('barbershops')
-    .select('id')
-    .eq('owner_id', currentUser.id)
-    .limit(1);
-  if (shops && shops.length > 0) { window.location.href = 'dashboard.html'; return; }
-
-  // Preencher nome do user se tiver
-  const nome = currentUser.user_metadata?.nome || '';
-  if (nome) {
-    const nameInput = document.getElementById('shop-name');
-    if (!nameInput.value) nameInput.placeholder = `Ex: Studio ${nome.split(' ')[0]}`;
+  var shopsRes = await sb.from('barbershops').select('id').eq('owner_id', currentUser.id).limit(1);
+  if (shopsRes.data && shopsRes.data.length > 0) {
+    window.location.href = 'dashboard.html'; return;
   }
 
-  // BUG 11 ALTO FIX: restaurar draft do Step 1 do localStorage
-  const draft = JSON.parse(localStorage.getItem('naregua_onboarding_draft') || '{}');
+  // Restaurar draft
+  var draft = {};
+  try { draft = JSON.parse(localStorage.getItem('naregua_onboarding_draft') || '{}'); } catch(e) {}
+
   if (draft.types && draft.types.length) { selectedTypes = draft.types; selectedType = draft.types[0]; _userPickedType = true; }
   else if (draft.type) { selectedType = draft.type; selectedTypes = [draft.type]; _userPickedType = true; }
   if (draft.name) document.getElementById('shop-name').value = draft.name;
   if (draft.city) document.getElementById('shop-city').value = draft.city;
   if (draft.phone) document.getElementById('shop-phone').value = draft.phone;
   if (draft.days) selectedDays = draft.days;
+  if (draft.profName) document.getElementById('prof-name').value = draft.profName;
 
-  // Preencher selects de horário
   populateTimeSelect('shop-open', draft.openTime || '08:00');
   populateTimeSelect('shop-close', draft.closeTime || '19:00');
 
-  // Dias da semana
+  renderStepper(1);
   renderDays();
-  // Tipo de negócio
   renderTypes();
-  // Serviços padrão (barbearia por default)
   loadDefaultServices();
 
-  // BUG 11 ALTO FIX: salvar draft conforme preenche Step 1
-  ['shop-name', 'shop-city', 'shop-phone'].forEach(id => {
+  ['shop-name','shop-city','shop-phone'].forEach(function(id) {
     document.getElementById(id).addEventListener('input', saveDraft);
   });
+  document.getElementById('prof-name').addEventListener('input', saveDraft);
 });
 
-// ── Steps navigation ──────────────────────────────────────────
+// ── Navegação de steps ────────────────────────────────────────────
 function goStep2() {
-  const name = document.getElementById('shop-name').value.trim();
-  const city = document.getElementById('shop-city').value.trim();
-  if (!selectedTypes.length) { showOnbMsg('Selecione o tipo de negócio.', 'error'); return; }
-  if (!name) { showOnbMsg('Digite o nome do estabelecimento.', 'error'); return; }
-  if (!city) { showOnbMsg('Digite a cidade.', 'error'); return; }
-  hideOnbMsg();
-  saveDraft();
+  var name = document.getElementById('shop-name').value.trim();
+  var city = document.getElementById('shop-city').value.trim();
+  if (!selectedTypes.length) { showMsg('Selecione o tipo de negócio.'); return; }
+  if (!name) { showMsg('Digite o nome do estabelecimento.'); return; }
+  if (!city) { showMsg('Digite a cidade.'); return; }
+  hideMsg(); saveDraft();
   document.getElementById('step-1').style.display = 'none';
   document.getElementById('step-2').style.display = 'block';
+  renderStepper(2); window.scrollTo(0, 0);
 }
 
 function backStep1() {
   document.getElementById('step-2').style.display = 'none';
   document.getElementById('step-1').style.display = 'block';
+  renderStepper(1); window.scrollTo(0, 0);
 }
 
 function goStep3() {
-  hideOnbMsg();
-  saveDraft();
+  hideMsg(); saveDraft();
   document.getElementById('step-2').style.display = 'none';
   document.getElementById('step-3').style.display = 'block';
+  renderStepper(3); window.scrollTo(0, 0);
 }
 
 function backStep2() {
   document.getElementById('step-3').style.display = 'none';
   document.getElementById('step-2').style.display = 'block';
+  renderStepper(2); window.scrollTo(0, 0);
 }
 
-// ── Dias da semana ────────────────────────────────────────────
-const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-let selectedDays = [1, 2, 3, 4, 5, 6]; // seg-sab por padrão
+// ── Dias da semana ────────────────────────────────────────────────
+var DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+var selectedDays = [1, 2, 3, 4, 5, 6];
 
 function renderDays() {
-  const grid = document.getElementById('days-grid');
-  grid.innerHTML = DIAS.map((d, i) => {
-    const active = selectedDays.includes(i);
-    return `<button type="button" onclick="toggleDay(${i})" style="
-      padding:8px 12px;border-radius:8px;font-size:12px;font-weight:700;
-      font-family:inherit;cursor:pointer;transition:all .2s;
-      border:1px solid ${active ? 'var(--verde-acao)' : 'var(--borda)'};
-      background:${active ? 'rgba(212,168,83,0.15)' : 'transparent'};
-      color:${active ? 'var(--verde-acao)' : 'var(--texto-muted)'};
-    ">${d}</button>`;
+  var grid = document.getElementById('days-grid');
+  grid.innerHTML = DIAS.map(function(d, i) {
+    var active = selectedDays.includes(i);
+    return '<button type="button" onclick="toggleDay(' + i + ')" class="ob-day-btn' + (active ? ' active' : '') + '">' + d + '</button>';
   }).join('');
 }
 
 function toggleDay(i) {
   if (selectedDays.includes(i)) {
-    selectedDays = selectedDays.filter(d => d !== i);
+    selectedDays = selectedDays.filter(function(d){ return d !== i; });
   } else {
-    selectedDays.push(i);
-    selectedDays.sort();
+    selectedDays.push(i); selectedDays.sort();
   }
   renderDays();
 }
 
-// ── Tipo de negócio ───────────────────────────────────────────
-const TIPOS = [
-  { key: 'barbearia',   label: 'Barbearia',   icon: '💈' },
-  { key: 'manicure',    label: 'Manicure',    icon: '💅' },
-  { key: 'unha',        label: 'Nail Designer', icon: '💅' },
-  { key: 'sobrancelha', label: 'Sobrancelha', icon: '🪒' },
-  { key: 'estetica',    label: 'Estética',    icon: '✨' },
-  { key: 'salao',       label: 'Salão',       icon: '✂️' },
-  { key: 'outro',       label: 'Outro',       icon: '📋' },
+// ── Tipo de negócio ───────────────────────────────────────────────
+var TIPOS = [
+  { key: 'barbearia',   label: 'Barbearia',     icon: '💈' },
+  { key: 'manicure',    label: 'Manicure',       icon: '💅' },
+  { key: 'unha',        label: 'Nail Designer',  icon: '💅' },
+  { key: 'sobrancelha', label: 'Sobrancelha',    icon: '🪒' },
+  { key: 'estetica',    label: 'Estética',       icon: '✨' },
+  { key: 'salao',       label: 'Salão',          icon: '✂️' },
+  { key: 'outro',       label: 'Outro',          icon: '📋' },
 ];
 
-let selectedType = '';
-let selectedTypes = []; // multi-seleção — vazio até o usuário escolher
-let _userPickedType = false; // flag: usuário já escolheu tipo
+var selectedType = '';
+var selectedTypes = [];
+var _userPickedType = false;
 
-const DEFAULT_SERVICES = {
+var DEFAULT_SERVICES = {
   barbearia: [
     { name: 'Corte', price: 25, duration_min: 30 },
     { name: 'Barba', price: 15, duration_min: 20 },
@@ -319,189 +554,151 @@ const DEFAULT_SERVICES = {
 };
 
 function renderTypes() {
-  const el = document.getElementById('type-grid');
-  el.innerHTML = TIPOS.map(t => {
-    const active = selectedTypes.includes(t.key);
-    return `<button type="button" onclick="toggleType('${t.key}')" style="
-      flex:1;min-width:90px;padding:12px 8px;border-radius:10px;font-size:12px;font-weight:700;
-      font-family:inherit;cursor:pointer;transition:all .2s;text-align:center;
-      border:1.5px solid ${active ? 'var(--verde-acao)' : 'var(--borda)'};
-      background:${active ? 'rgba(212,168,83,0.1)' : 'transparent'};
-      color:${active ? 'var(--verde-acao)' : 'var(--texto-muted)'};
-    "><div style="font-size:20px;margin-bottom:4px;">${t.icon}</div>${t.label}</button>`;
+  var el = document.getElementById('type-grid');
+  el.innerHTML = TIPOS.map(function(t) {
+    var active = selectedTypes.includes(t.key);
+    return '<button type="button" onclick="toggleType(\'' + t.key + '\')" class="ob-type-btn' + (active ? ' active' : '') + '">'
+      + '<span class="ob-type-icon">' + t.icon + '</span>' + t.label + '</button>';
   }).join('');
 }
 
-// BUG 11 ALTO FIX: salvar draft do Step 1 no localStorage
 function saveDraft() {
-  const draft = {
-    type: selectedType,
-    types: selectedTypes,
-    name: document.getElementById('shop-name').value,
-    city: document.getElementById('shop-city').value,
-    phone: document.getElementById('shop-phone').value,
-    openTime: document.getElementById('shop-open')?.value || '08:00',
-    closeTime: document.getElementById('shop-close')?.value || '19:00',
-    days: selectedDays
-  };
-  localStorage.setItem('naregua_onboarding_draft', JSON.stringify(draft));
+  try {
+    var draft = {
+      type: selectedType, types: selectedTypes,
+      name: document.getElementById('shop-name').value,
+      city: document.getElementById('shop-city').value,
+      phone: document.getElementById('shop-phone').value,
+      openTime: (document.getElementById('shop-open') || {}).value || '08:00',
+      closeTime: (document.getElementById('shop-close') || {}).value || '19:00',
+      days: selectedDays,
+      profName: (document.getElementById('prof-name') || {}).value || ''
+    };
+    localStorage.setItem('naregua_onboarding_draft', JSON.stringify(draft));
+  } catch(e) {}
 }
 
 function toggleType(type) {
   if (!_userPickedType) {
-    // Primeiro clique: substitui o padrão
-    selectedTypes = [type];
-    _userPickedType = true;
+    selectedTypes = [type]; _userPickedType = true;
   } else if (selectedTypes.includes(type)) {
-    // Desmarcar (não deixar vazio)
     if (selectedTypes.length === 1) return;
-    selectedTypes = selectedTypes.filter(t => t !== type);
+    selectedTypes = selectedTypes.filter(function(t){ return t !== type; });
   } else {
     selectedTypes.push(type);
   }
-  // Tipo principal = primeiro selecionado (define termos no sistema)
   selectedType = selectedTypes[0];
-  saveDraft();
-  renderTypes();
-  loadDefaultServices();
-  const placeholders = { barbearia: 'Barbearia do João', manicure: 'Studio Maria Nails', sobrancelha: 'Studio Amanda', unha: 'Studio Nails', estetica: 'Studio Estética', salao: 'Salão Beleza Pura', outro: 'Meu Negócio' };
+  saveDraft(); renderTypes(); loadDefaultServices();
+  var placeholders = { barbearia: 'Barbearia do João', manicure: 'Studio Maria Nails', sobrancelha: 'Studio Amanda', unha: 'Studio Nails', estetica: 'Studio Estética', salao: 'Salão Beleza Pura', outro: 'Meu Negócio' };
   document.getElementById('shop-name').placeholder = 'Ex: ' + (placeholders[selectedType] || 'Meu Negócio');
 }
 
-// Compatibilidade com draft antigo (seleção única)
 function setType(type) {
-  selectedTypes = [type];
+  selectedTypes = [type]; _userPickedType = false;
   toggleType(type);
-  selectedTypes = [type];
-  selectedType = type;
-  saveDraft();
-  renderTypes();
-  loadDefaultServices();
 }
 
 function loadDefaultServices() {
   document.getElementById('services-list').innerHTML = '';
   serviceCount = 0;
-  // Combinar serviços de todos os tipos selecionados, sem duplicata
-  const seen = new Set();
-  const combined = [];
-  selectedTypes.forEach(type => {
-    (DEFAULT_SERVICES[type] || []).forEach(s => {
-      if (!seen.has(s.name)) {
-        seen.add(s.name);
-        combined.push(s);
-      }
+  var seen = new Set();
+  var combined = [];
+  selectedTypes.forEach(function(type) {
+    (DEFAULT_SERVICES[type] || []).forEach(function(s) {
+      if (!seen.has(s.name)) { seen.add(s.name); combined.push(s); }
     });
   });
-  combined.forEach(s => addServiceRow(s.name, s.price, s.duration_min));
+  combined.forEach(function(s){ addServiceRow(s.name, s.price, s.duration_min); });
 }
 
-// ── Serviços ──────────────────────────────────────────────────
-let serviceCount = 0;
+// ── Serviços ──────────────────────────────────────────────────────
+var serviceCount = 0;
 
 function addServiceRow(nome, preco, duracao) {
   serviceCount++;
-  const id = serviceCount;
-  const list = document.getElementById('services-list');
-  const row = document.createElement('div');
-  row.id = `svc-${id}`;
-  row.style.cssText = 'display:grid;grid-template-columns:1fr 80px 80px 32px;gap:8px;align-items:end;margin-bottom:10px;';
-  row.innerHTML = `
-    <div class="field" style="margin:0;">
-      <label style="font-size:9px;">SERVIÇO</label>
-      <input type="text" class="svc-name" placeholder="Nome" value="${nome || ''}">
-    </div>
-    <div class="field" style="margin:0;">
-      <label style="font-size:9px;">PREÇO</label>
-      <input type="number" class="svc-price" placeholder="R$" min="0" step="1" value="${preco || ''}">
-    </div>
-    <div class="field" style="margin:0;">
-      <label style="font-size:9px;">DURAÇÃO (min)</label>
-      <input type="number" class="svc-duration" placeholder="30" min="5" step="5" value="${duracao || ''}">
-    </div>
-    <button type="button" onclick="document.getElementById('svc-${id}').remove()" style="
-      background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.2);
-      border-radius:8px;color:#e74c3c;font-size:16px;cursor:pointer;
-      height:42px;display:flex;align-items:center;justify-content:center;
-    ">✕</button>
-  `;
+  var id = serviceCount;
+  var list = document.getElementById('services-list');
+  var row = document.createElement('div');
+  row.id = 'svc-' + id;
+  row.className = 'ob-svc-row';
+  row.innerHTML = '<div class="ob-field">'
+    + '<label style="font-size:9px;">SERVIÇO</label>'
+    + '<input type="text" class="svc-name" placeholder="Nome" value="' + (nome ? String(nome).replace(/"/g,'&quot;') : '') + '">'
+    + '</div>'
+    + '<div class="ob-field">'
+    + '<label style="font-size:9px;">PREÇO (R$)</label>'
+    + '<input type="number" class="svc-price" placeholder="0" min="0" step="1" value="' + (preco || '') + '">'
+    + '</div>'
+    + '<div class="ob-field">'
+    + '<label style="font-size:9px;">MIN</label>'
+    + '<input type="number" class="svc-duration" placeholder="30" min="5" step="5" value="' + (duracao || '') + '">'
+    + '</div>'
+    + '<button type="button" class="ob-svc-del" onclick="document.getElementById(\'svc-' + id + '\').remove()">✕</button>';
   list.appendChild(row);
 }
 
-// ── Finalizar onboarding ──────────────────────────────────────
+// ── Finalizar ─────────────────────────────────────────────────────
 async function finishOnboarding() {
-  const btn = document.getElementById('btn-finish');
-  // Anti double-click: desabilitar imediatamente
+  var btn = document.getElementById('btn-finish');
+  var btnLabel = document.getElementById('btn-finish-label');
   if (btn.disabled) return;
   btn.disabled = true;
 
-  const name = document.getElementById('shop-name').value.trim();
-  const city = document.getElementById('shop-city').value.trim();
-  const phone = document.getElementById('shop-phone').value.trim();
-  const opening = document.getElementById('shop-open').value;
-  const closing = document.getElementById('shop-close').value;
-  let slug = gerarSlug(name);
+  var name = document.getElementById('shop-name').value.trim();
+  var city = document.getElementById('shop-city').value.trim();
+  var phone = document.getElementById('shop-phone').value.trim();
+  var opening = document.getElementById('shop-open').value;
+  var closing = document.getElementById('shop-close').value;
+  var profName = document.getElementById('prof-name').value.trim();
 
-  // BUG 9 FIX: verificar se slug já existe
-  const { data: existingSlug } = await sb.from('barbershops').select('id').eq('slug', slug);
-  if (existingSlug && existingSlug.length > 0) {
-    slug = slug + '-' + Math.random().toString(36).slice(2, 6);
-  }
+  if (!profName) { showMsg('Digite o nome do profissional.'); btn.disabled = false; return; }
 
-  // Coletar serviços
-  const svcRows = document.querySelectorAll('#services-list > div');
-  const services = [];
-  svcRows.forEach(row => {
-    const n = row.querySelector('.svc-name').value.trim();
-    const p = parseFloat(row.querySelector('.svc-price').value) || 0;
-    const d = parseInt(row.querySelector('.svc-duration').value) || 30;
+  var svcRows = document.querySelectorAll('#services-list > div');
+  var services = [];
+  svcRows.forEach(function(row) {
+    var n = row.querySelector('.svc-name').value.trim();
+    var p = parseFloat(row.querySelector('.svc-price').value) || 0;
+    var d = parseInt(row.querySelector('.svc-duration').value) || 30;
     if (n) services.push({ name: n, price: p, duration_min: d });
   });
+  if (services.length === 0) { showMsg('Adicione pelo menos um serviço.'); btn.disabled = false; return; }
 
-  if (services.length === 0) {
-    showOnbMsg('Adicione pelo menos um serviço.', 'error');
-    btn.disabled = false;
-    return;
-  }
-
-  // Verificar se dono já tem barbearia (evita duplicata)
-  const { data: jaExiste } = await sb.from('barbershops').select('id').eq('owner_id', currentUser.id);
-  if (jaExiste && jaExiste.length > 0) {
-    showOnbMsg('Você já tem uma barbearia cadastrada. Redirecionando...', 'error');
-    setTimeout(() => window.location.href = 'dashboard.html', 2000);
-    return;
-  }
-
-  btn.disabled = true;
-  btn.querySelector('.btn-label').style.display = 'none';
-  btn.querySelector('.spinner').style.display = 'inline-block';
-  hideOnbMsg();
+  btnLabel.textContent = 'Salvando...';
+  hideMsg();
 
   try {
-    // 1. Criar barbearia
-    const { data: shop, error: errShop } = await sb
-      .from('barbershops')
-      .insert({
-        owner_id: currentUser.id,
-        name,
-        slug,
-        city: city.toUpperCase(),
-        phone,
-        business_type: selectedTypes[0] || selectedType || 'outro',
-        opening_time: opening,
-        closing_time: closing,
-        days_open: selectedDays
-      })
-      .select()
-      .single();
+    var slug = gerarSlug(name);
 
-    if (errShop) throw errShop;
+    var slugRes = await sb.from('barbershops').select('id').eq('slug', slug);
+    if (slugRes.data && slugRes.data.length > 0) {
+      slug = slug + '-' + Math.random().toString(36).slice(2,6);
+    }
 
-    // 2. Criar barbeiro padrao (o proprio dono)
-    const nomeUser = currentUser.user_metadata?.nome || name;
+    var existeRes = await sb.from('barbershops').select('id').eq('owner_id', currentUser.id);
+    if (existeRes.data && existeRes.data.length > 0) {
+      window.location.href = 'dashboard.html'; return;
+    }
+
+    // 1. Criar estabelecimento
+    var shopRes = await sb.from('barbershops').insert({
+      owner_id: currentUser.id,
+      name: name,
+      slug: slug,
+      city: city.toUpperCase(),
+      phone: phone,
+      business_type: selectedTypes[0] || selectedType || 'outro',
+      opening_time: opening,
+      closing_time: closing,
+      days_open: selectedDays
+    }).select().single();
+
+    if (shopRes.error) throw shopRes.error;
+    var shop = shopRes.data;
+
+    // 2. Criar profissional
     await sb.from('barbers').insert({
       barbershop_id: shop.id,
-      name: nomeUser.split(' ')[0],
+      name: profName.split(' ')[0],
       commission_pct: 0,
       is_owner: true,
       user_id: currentUser.id,
@@ -513,100 +710,80 @@ async function finishOnboarding() {
     });
 
     // 3. Criar serviços
-    const svcPayload = services.map(s => ({
-      barbershop_id: shop.id,
-      name: s.name,
-      price: s.price,
-      duration_min: s.duration_min
-    }));
+    var svcPayload = services.map(function(s) {
+      return { barbershop_id: shop.id, name: s.name, price: s.price, duration_min: s.duration_min };
+    });
     await sb.from('services').insert(svcPayload);
 
-    // 4. Criar assinatura trial
-    const expires = new Date();
+    // 4. Trial 30 dias
+    var expires = new Date();
     expires.setDate(expires.getDate() + 30);
-    await sb.from('subscriptions').insert({
-      barbershop_id: shop.id,
-      plan: 'basico',
-      expires_at: expires.toISOString()
-    });
+    await sb.from('subscriptions').insert({ barbershop_id: shop.id, plan: 'basico', expires_at: expires.toISOString() });
 
-    // BUG 11 ALTO FIX: limpar draft ao finalizar
     localStorage.removeItem('naregua_onboarding_draft');
 
-    // Notificar no Telegram
+    // Telegram
     fetch('https://api.telegram.org/bot8644194982:AAH6-26NFAbYYtq4TM45hOapqqMguid9qpI/sendMessage', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: '-5132930435',
-        text: '💈 <b>Novo cliente NaRegua!</b>\n\n👤 ' + name + '\n📍 ' + (city || 'N/I') + '\n📞 ' + (phone || 'N/I') + '\n📧 ' + currentUser.email + '\n📅 ' + new Date().toLocaleString('pt-BR'),
+        text: '💈 <b>Novo cliente NaRegua!</b>\n\n👤 ' + name + '\n📍 ' + (city||'N/I') + '\n📞 ' + (phone||'N/I') + '\n📧 ' + currentUser.email + '\n📅 ' + new Date().toLocaleString('pt-BR'),
         parse_mode: 'HTML'
       })
-    }).catch(() => {});
+    }).catch(function(){});
 
-    // Mostrar modal de sucesso com link de agendamento
-    const baseUrl = window.location.origin + window.location.pathname.replace('onboarding.html', '');
-    const linkAgendamento = baseUrl + 'agendar.html?slug=' + slug;
-    navigator.clipboard.writeText(linkAgendamento).catch(() => {});
-    showSuccessModal(linkAgendamento);
+    // Ir pro passo 4
+    var baseUrl = window.location.origin + window.location.pathname.replace('onboarding.html', '');
+    var linkAgendamento = baseUrl + 'agendar.html?slug=' + slug;
+    navigator.clipboard.writeText(linkAgendamento).catch(function(){});
 
-  } catch (e) {
+    document.getElementById('success-link').textContent = linkAgendamento;
+    document.getElementById('btn-test-link').href = linkAgendamento;
+    document.getElementById('step-3').style.display = 'none';
+    document.getElementById('step-4').style.display = 'block';
+    renderStepper(4);
+    window.scrollTo(0, 0);
+
+  } catch(e) {
     console.error(e);
-    const msg = e.message?.includes('duplicate')
+    var errMsg = (e.message && e.message.indexOf('duplicate') !== -1)
       ? 'Já existe um estabelecimento com esse nome. Tente outro.'
       : 'Erro ao cadastrar. Tente novamente.';
-    showOnbMsg(msg, 'error');
+    showMsg(errMsg);
     btn.disabled = false;
-    btn.querySelector('.btn-label').style.display = 'inline';
-    btn.querySelector('.spinner').style.display = 'none';
+    btnLabel.textContent = 'Finalizar cadastro';
   }
 }
 
-// ── Feedback ──────────────────────────────────────────────────
+// ── Link ──────────────────────────────────────────────────────────
+function copyLink() {
+  var link = document.getElementById('success-link').textContent;
+  var ok = document.getElementById('copy-ok');
+  navigator.clipboard.writeText(link).then(function() {
+    ok.textContent = '✓ Link copiado!';
+    setTimeout(function(){ ok.textContent = ''; }, 3000);
+  }).catch(function() {
+    ok.textContent = link;
+  });
+}
+
+// ── Feedback / Auth ───────────────────────────────────────────────
 async function sairConta() {
   localStorage.removeItem('naregua_onboarding_draft');
   await sb.auth.signOut();
   window.location.href = 'app.html';
 }
 
-function showOnbMsg(text, type) {
-  const el = document.getElementById('onboarding-msg');
-  el.textContent = text;
-  el.className = `msg msg-${type} show`;
+function showMsg(text) {
+  var el = document.getElementById('ob-msg');
+  el.textContent = text; el.className = 'ob-msg error';
 }
-function hideOnbMsg() {
-  document.getElementById('onboarding-msg').className = 'msg';
-}
-</script>
-<!-- Modal Sucesso -->
-<div id="success-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;">
-  <div style="background:var(--cinza-escuro,#0a0a0a);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px 24px;width:90%;max-width:400px;text-align:center;">
-    <div style="font-size:48px;margin-bottom:12px;">&#x1F389;</div>
-    <h2 style="font-size:20px;font-weight:800;margin-bottom:8px;">Tudo pronto!</h2>
-    <p style="font-size:13px;color:#a3a3a3;margin-bottom:20px;">Seu estabelecimento foi criado. Compartilhe o link abaixo com seus clientes:</p>
-    <div id="success-link" style="background:#141414;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px;font-size:12px;font-weight:600;color:var(--accent,#d4a853);word-break:break-all;margin-bottom:16px;cursor:pointer;" onclick="copyLink()"></div>
-    <div id="copy-feedback" style="font-size:11px;color:#22c55e;margin-bottom:16px;display:none;">Link copiado!</div>
-    <div style="display:flex;gap:8px;">
-      <a id="btn-test-link" href="#" target="_blank" style="flex:1;padding:12px;border-radius:10px;background:var(--accent,#d4a853);color:#000;font-size:13px;font-weight:700;text-decoration:none;text-align:center;font-family:Inter,sans-serif;">Testar agendamento</a>
-      <button onclick="window.location.href='dashboard.html'" style="flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#fafafa;font-size:13px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;">Ir pro painel</button>
-    </div>
-  </div>
-</div>
-<script>
-function showSuccessModal(link) {
-  document.getElementById('success-link').textContent = link;
-  document.getElementById('btn-test-link').href = link;
-  document.getElementById('success-modal').style.display = 'flex';
-}
-function copyLink() {
-  const link = document.getElementById('success-link').textContent;
-  navigator.clipboard.writeText(link).then(() => {
-    document.getElementById('copy-feedback').style.display = 'block';
-    setTimeout(() => document.getElementById('copy-feedback').style.display = 'none', 3000);
-  });
+function hideMsg() {
+  document.getElementById('ob-msg').className = 'ob-msg';
 }
 </script>
-<script src="js/ajuda.js?v=04111231"></script>
-<script src="js/sw-update.js?v=04111231"></script>
+<script src="js/ajuda.js?v=04111302"></script>
+<script src="js/sw-update.js?v=04111302"></script>
 </body>
 </html>
