@@ -26,6 +26,14 @@ done
 echo "[2/4] Atualizando Service Worker e versao..."
 sed -i -E "s/const CACHE_NAME = 'naregua-v[0-9]+';/const CACHE_NAME = 'naregua-v$VERSION';/" sw.js
 sed -i -E "s/const _NR_VER = 'naregua-[0-9]+';/const _NR_VER = 'naregua-$SHORT_V';/" js/auth.js js/sidebar.js
+python3 -c "
+import glob, re, sys
+v='$SHORT_V'
+for f in glob.glob('*.html'):
+    t=open(f,encoding='utf-8').read()
+    t2=re.sub(r'const _NR_VER=\"naregua-[0-9]+\"',f'const _NR_VER=\"naregua-{v}\"',t)
+    if t2!=t: open(f,'w',encoding='utf-8').write(t2)
+"
 
 # 3. Git commit + push
 echo "[3/4] Commitando..."
