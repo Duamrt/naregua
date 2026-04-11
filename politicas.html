@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111059";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111106";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Políticas</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111059">
-  <link rel="stylesheet" href="css/layout.css?v=04111059">
-  <script src="js/theme.js?v=04111059"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111106">
+  <link rel="stylesheet" href="css/layout.css?v=04111106">
+  <script src="js/theme.js?v=04111106"></script>
   <style>
     .pol-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -261,9 +261,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111059"></script>
-<script src="js/supabase.js?v=04111059"></script>
-<script src="js/utils.js?v=04111059"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111106"></script>
+<script src="js/supabase.js?v=04111106"></script>
+<script src="js/utils.js?v=04111106"></script>
 <script>
 let shop = null;
 let isDirty = false;
@@ -283,6 +283,7 @@ const _params = new URLSearchParams(window.location.search);
 const shopSlug = _params.get('shop');
 const adminViewingShop = _params.get('admin_shop') || sessionStorage.getItem('admin_viewing_shop');
 if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
+const isAdminViewing = !!adminViewingShop;
 
 // ── Init ──
 document.addEventListener('DOMContentLoaded', async () => {
@@ -322,7 +323,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     banner.style.cssText = 'background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3);border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;';
     banner.innerHTML = `<span style="font-size:11px;color:#e74c3c;font-weight:700;">ADMIN &middot; Visualizando ${esc(shop.name)}</span>
       <button onclick="sessionStorage.removeItem('admin_viewing_shop');location.href='admin.html'" style="background:#e74c3c;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">VOLTAR</button>`;
-    document.querySelector('.pol-container').insertBefore(banner, document.querySelector('.pol-header'));
+    const _polHeader = document.querySelector('.pol-header'); _polHeader.parentNode.insertBefore(banner, _polHeader);
   }
 
   initAdmin();
@@ -530,7 +531,7 @@ function showToast(msg, isError) {
   setTimeout(() => el.classList.remove('show'), 3000);
 }
 </script>
-<script src="js/ajuda.js?v=04111059"></script>
-<script src="js/sidebar.js?v=04111059"></script>
+<script src="js/ajuda.js?v=04111106"></script>
+<script src="js/sidebar.js?v=04111106"></script>
 </body>
 </html>

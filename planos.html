@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111059";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111106";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Meu Plano</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,8 +14,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111059">
-  <script src="js/theme.js?v=04111059"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111106">
+  <script src="js/theme.js?v=04111106"></script>
   <style>
     .plan-container { max-width:520px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -254,9 +254,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111059"></script>
-<script src="js/supabase.js?v=04111059"></script>
-<script src="js/utils.js?v=04111059"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111106"></script>
+<script src="js/supabase.js?v=04111106"></script>
+<script src="js/utils.js?v=04111106"></script>
 <script>
 const PLAN_NAMES = {
   trial: 'Trial Gratuito',
@@ -345,7 +345,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     banner.style.cssText = 'background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3);border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;';
     banner.innerHTML = `<span style="font-size:11px;color:#e74c3c;font-weight:700;">ADMIN &middot; Visualizando ${esc(shop.name)}</span>
       <button onclick="sessionStorage.removeItem('admin_viewing_shop');location.href='admin.html'" style="background:#e74c3c;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">VOLTAR</button>`;
-    document.querySelector('.plan-container').insertBefore(banner, document.querySelector('.plan-header'));
+    const _planHeader = document.querySelector('.plan-header'); _planHeader.parentNode.insertBefore(banner, _planHeader);
   }
 
   renderPage();
@@ -497,7 +497,8 @@ function copiarPix() {
 function toggleMore(){var m=document.getElementById('more-menu');m.style.display=m.style.display==='none'?'block':'none';}
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
-<script src="js/ajuda.js?v=04111059"></script>
-<script src="js/sw-update.js?v=04111059"></script>
+<script src="js/ajuda.js?v=04111106"></script>
+<script src="js/sw-update.js?v=04111106"></script>
+<script src="js/sidebar.js?v=04111106"></script>
 </body>
 </html>
