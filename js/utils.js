@@ -51,6 +51,17 @@ function getTermos(tipo) {
   return map[tipo] || map.outro;
 }
 
+// ── Normalizar nome de serviço (Title Case, preposições minúsculas) ─────
+function normServico(nome) {
+  if (!nome) return nome;
+  const prep = new Set(['de','da','do','das','dos','e','a','o','as','os','em','na','no','nas','nos','para','com','por','sem','ao','à','às','aos']);
+  return nome.trim()
+    .toLowerCase()
+    .replace(/\S+/g, function(w, i) {
+      return (i === 0 || !prep.has(w)) ? w.charAt(0).toUpperCase() + w.slice(1) : w;
+    });
+}
+
 // ── Google Analytics 4 ──────────────────────────────────────
 (function() {
   var GA_ID = 'G-FH9DRF8LBR';
