@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04110729";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04110742";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Minha Agenda</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04110729">
-  <link rel="stylesheet" href="css/layout.css?v=04110729">
-  <script src="js/theme.js?v=04110729"></script>
+  <link rel="stylesheet" href="css/style.css?v=04110742">
+  <link rel="stylesheet" href="css/layout.css?v=04110742">
+  <script src="js/theme.js?v=04110742"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -219,7 +219,7 @@
         <div class="shop-city" id="shop-info"></div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
-        <span class="barber-badge">BARBEIRO</span>
+        <span class="barber-badge" id="barber-badge">PROFISSIONAL</span>
         <button class="icon-btn" onclick="logout()" title="Sair">&#x23FB;</button>
       </div>
     </div>
@@ -304,7 +304,7 @@
     <div class="ranking-card" id="ranking-section">
       <div style="display:flex;align-items:baseline;gap:8px;">
         <div class="ranking-pos" id="rank-pos">#—</div>
-        <div class="ranking-label" id="rank-label">de — barbeiros</div>
+        <div class="ranking-label" id="rank-label">de — profissionais</div>
       </div>
       <div class="ranking-bar-wrap">
         <div style="flex:1;">
@@ -345,10 +345,10 @@
   <button class="barber-logout-btn" onclick="logout()">SAIR</button>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04110729"></script>
-<script src="js/supabase.js?v=04110729"></script>
-<script src="js/utils.js?v=04110729"></script>
-<script src="js/push.js?v=04110729"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04110742"></script>
+<script src="js/supabase.js?v=04110742"></script>
+<script src="js/utils.js?v=04110742"></script>
+<script src="js/push.js?v=04110742"></script>
 <script>
 console.log('Barbeiro dashboard v1');
 
@@ -372,7 +372,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     .maybeSingle();
 
   if (!barberData) {
-    alert('Sua conta de barbeiro não foi encontrada. Fale com o dono da barbearia.');
+    alert('Sua conta de profissional não foi encontrada. Fale com o dono do estabelecimento.');
     await sb.auth.signOut();
     window.location.href = 'app.html';
     return;
@@ -380,6 +380,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   barber = barberData;
   shopData = barberData.barbershops;
+  const T = getTermos(shopData.type || 'barbearia');
 
   // Buscar servicos da barbearia
   const { data: svcData } = await sb
@@ -392,6 +393,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Preencher header
   document.getElementById('barber-name').textContent = barber.name;
   document.getElementById('shop-info').textContent = shopData.name + (shopData.city ? ' · ' + shopData.city : '');
+  document.getElementById('barber-badge').textContent = T.PROFISSIONAL;
+  document.getElementById('rank-label').textContent = 'de — ' + T.profissionais;
 
   // Mostrar conteudo
   document.getElementById('loading').style.display = 'none';
@@ -667,7 +670,7 @@ async function loadStatsPro() {
         const teamAvg = totalBarbers > 1 ? othersFat / (totalBarbers - 1) : 0;
 
         document.getElementById('rank-pos').textContent = '#' + myPos;
-        document.getElementById('rank-label').textContent = 'de ' + totalBarbers + ' barbeiros';
+        document.getElementById('rank-label').textContent = 'de ' + totalBarbers + ' ' + T.profissionais;
         document.getElementById('rank-you-label').textContent = 'Voce: ' + formatMoney(myFat);
         document.getElementById('rank-team-label').textContent = 'Equipe media: ' + formatMoney(teamAvg);
 
@@ -675,7 +678,7 @@ async function loadStatsPro() {
         document.getElementById('rank-bar-you').style.width = Math.round((myFat / maxVal) * 100) + '%';
       } else {
         document.getElementById('ranking-section').innerHTML =
-          '<div style="text-align:center;padding:8px;font-size:12px;color:var(--texto-muted);">Voce e o unico barbeiro</div>';
+          '<div style="text-align:center;padding:8px;font-size:12px;color:var(--texto-muted);">Voce e o unico ' + T.profissional + '</div>';
       }
     } catch(e) { console.log('Ranking error:', e.message); }
 
@@ -785,8 +788,8 @@ async function logout() {
   window.location.href = 'app.html';
 }
 </script>
-<script src="js/ajuda.js?v=04110729"></script>
-<script src="js/sw-update.js?v=04110729"></script>
-<script src="js/sidebar.js?v=04110729"></script>
+<script src="js/ajuda.js?v=04110742"></script>
+<script src="js/sw-update.js?v=04110742"></script>
+<script src="js/sidebar.js?v=04110742"></script>
 </body>
 </html>
