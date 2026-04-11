@@ -61,6 +61,19 @@
     outro:     'Gestão para seu negócio'
   };
 
+  // NAV limitada para recepcionista
+  var RECEP_NAV = [
+    { group: 'PRINCIPAL', items: [
+      { icon: 'calendar_month', label: 'Agenda', href: 'dashboard.html' }
+    ]},
+    { group: 'ATENDIMENTO', items: [
+      { icon: 'people', label: 'Clientes', href: 'clientes.html' },
+      { icon: 'receipt_long', label: 'Comandas', href: 'comandas.html' },
+      { icon: 'account_balance_wallet', label: 'Caixa', href: 'financeiro.html' },
+      { icon: 'hourglass_empty', label: 'Lista de Espera', href: 'lista-espera.html' }
+    ]}
+  ];
+
   var currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
   var sidebar = null;
 
@@ -68,6 +81,8 @@
     if (sidebar) return;
 
     var segKey = localStorage.getItem('naregua_segment') || 'outro';
+    var userRole = localStorage.getItem('naregua_role') || '';
+    var navItems = userRole === 'recepcionista' ? RECEP_NAV : NAV;
 
     sidebar = document.createElement('aside');
     sidebar.className = 'nr-sidebar';
@@ -82,7 +97,7 @@
     var nav = document.createElement('nav');
     nav.className = 'nr-sidebar-nav';
 
-    NAV.forEach(function (group) {
+    navItems.forEach(function (group) {
       // Label do grupo
       var label = document.createElement('span');
       label.className = 'nr-sidebar-group-label';

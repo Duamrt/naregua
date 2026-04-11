@@ -129,8 +129,13 @@ async function redirectUser(user) {
     .maybeSingle();
 
   if (barber) {
-    // Se e barbeiro-dono, vai pro dashboard (nao pro barbeiro.html)
-    window.location.href = barber.is_owner ? 'dashboard.html' : 'barbeiro.html';
+    if (barber.is_owner || barber.role === 'dono') {
+      window.location.href = 'dashboard.html';
+    } else if (barber.role === 'recepcionista') {
+      window.location.href = 'dashboard.html';
+    } else {
+      window.location.href = 'barbeiro.html';
+    }
     return;
   }
 

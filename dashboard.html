@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111311";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111317";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Dashboard</title>
     <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111311">
-  <link rel="stylesheet" href="css/layout.css?v=04111311">
-  <script src="js/theme.js?v=04111311"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111317">
+  <link rel="stylesheet" href="css/layout.css?v=04111317">
+  <script src="js/theme.js?v=04111317"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -486,7 +486,7 @@
       <span style="font-size:14px;font-family:'Material Symbols Outlined';line-height:1">add</span>
       Encaixe Rápido
     </button>
-    <button class="icon-btn" onclick="abrirEdicao()" title="Editar estabelecimento" style="width:auto;padding:0 12px;gap:5px;font-size:12px;font-family:inherit;font-weight:600;"><span style="font-size:15px;font-family:'Material Symbols Outlined';line-height:1">edit</span>Editar</button>
+    <button id="btn-editar-shop" class="icon-btn" onclick="abrirEdicao()" title="Editar estabelecimento" style="width:auto;padding:0 12px;gap:5px;font-size:12px;font-family:inherit;font-weight:600;"><span style="font-size:15px;font-family:'Material Symbols Outlined';line-height:1">edit</span>Editar</button>
   </div>
   <!-- Elementos ocultos mantidos para o JS -->
   <span id="shop-name" style="display:none"></span>
@@ -780,10 +780,10 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111311"></script>
-<script src="js/supabase.js?v=04111311"></script>
-<script src="js/utils.js?v=04111311"></script>
-<script src="js/push.js?v=04111311"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111317"></script>
+<script src="js/supabase.js?v=04111317"></script>
+<script src="js/utils.js?v=04111317"></script>
+<script src="js/push.js?v=04111317"></script>
 <script>
 console.log('Dashboard v3 carregado');
 // ── Estado ────────────────────────────────────────────────────
@@ -804,6 +804,7 @@ const _params = new URLSearchParams(window.location.search);
 const adminViewingShop = _params.get('shop') || sessionStorage.getItem('admin_viewing_shop');
 if (adminViewingShop) sessionStorage.setItem('admin_viewing_shop', adminViewingShop);
 const isAdminViewing = !!adminViewingShop;
+let isRecepcionista = false;
 
 // Helpers — usam sb autenticado (RLS cuida do acesso)
 async function restUpdate(table, filter, data) {
@@ -847,7 +848,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     shopData = data && data[0] ? data[0] : null;
   }
 
-  if (!shopData) { window.location.href = 'onboarding.html'; return; }
+  if (!shopData) {
+    // Verificar se é recepcionista (barber vinculado com role=recepcionista)
+    const { data: barberCheck } = await sb
+      .from('barbers')
+      .select('role, barbershops(*)')
+      .eq('user_id', session.user.id)
+      .eq('active', true)
+      .maybeSingle();
+    if (barberCheck && barberCheck.role === 'recepcionista') {
+      shopData = barberCheck.barbershops;
+      isRecepcionista = true;
+      localStorage.setItem('naregua_role', 'recepcionista');
+    } else {
+      window.location.href = 'onboarding.html';
+      return;
+    }
+  } else {
+    localStorage.removeItem('naregua_role');
+  }
   shop = shopData;
   if (typeof syncThemeFromSettings === 'function') syncThemeFromSettings(shop.settings);
 
@@ -864,6 +883,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     banner.innerHTML = `<span style="font-size:11px;color:#a78bfa;font-weight:700;">👁 Admin · Visualizando ${esc(shop.name)}</span>
       <button onclick="sessionStorage.removeItem('admin_viewing_shop');location.href='admin.html'" style="background:rgba(167,139,250,0.15);color:#a78bfa;border:1px solid rgba(167,139,250,0.3);border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">Voltar</button>`;
     const _dash_cont = document.querySelector('.dash-container'); if (_dash_cont) _dash_cont.insertBefore(banner, _dash_cont.firstChild);
+  }
+
+  // Recepcionista — ocultar botões de gestão
+  if (isRecepcionista) {
+    const btnEdit = document.getElementById('btn-editar-shop');
+    if (btnEdit) btnEdit.style.display = 'none';
+    const badge = document.createElement('span');
+    badge.style.cssText = 'font-size:9px;font-weight:700;padding:3px 8px;border-radius:12px;background:rgba(96,165,250,0.15);color:#60a5fa;letter-spacing:0.5px;flex-shrink:0;';
+    badge.textContent = 'RECEPCIONISTA';
+    const topbarLeft = document.querySelector('.nr-topbar-left');
+    if (topbarLeft) topbarLeft.appendChild(badge);
   }
 
   // Buscar serviços, barbeiros e produtos
@@ -2757,9 +2787,9 @@ function selectCalDay(dateKey) {
   renderDay();
 }
 </script>
-<script src="js/ajuda.js?v=04111311"></script>
-<script src="js/tour.js?v=04111311"></script>
-<script src="js/sw-update.js?v=04111311"></script>
-<script src="js/sidebar.js?v=04111311"></script>
+<script src="js/ajuda.js?v=04111317"></script>
+<script src="js/tour.js?v=04111317"></script>
+<script src="js/sw-update.js?v=04111317"></script>
+<script src="js/sidebar.js?v=04111317"></script>
 </body>
 </html>

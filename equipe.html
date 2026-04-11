@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111311";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111317";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Equipe</title>
     <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111311">
-  <link rel="stylesheet" href="css/layout.css?v=04111311">
-  <script src="js/theme.js?v=04111311"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111317">
+  <link rel="stylesheet" href="css/layout.css?v=04111317">
+  <script src="js/theme.js?v=04111317"></script>
   <style>
     .eq-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -188,6 +188,14 @@
       <div style="font-size:10px;color:var(--texto-muted);margin-top:4px;">Se preencher, o profissional pode criar conta e ver a agenda dele</div>
     </div>
     <div class="field">
+      <label>FUNÇÃO</label>
+      <select id="eq-role" style="width:100%;padding:10px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;">
+        <option value="profissional">Profissional</option>
+        <option value="recepcionista">Recepcionista</option>
+      </select>
+      <div style="font-size:10px;color:var(--texto-muted);margin-top:4px;">Recepcionista vê agenda, clientes, comandas, caixa e lista de espera</div>
+    </div>
+    <div class="field">
       <label>COMISSÃO (%)</label>
       <input type="number" id="eq-comissao" min="0" max="100" step="1" placeholder="0" value="0">
       <div style="font-size:10px;color:var(--texto-muted);margin-top:4px;">Percentual sobre cada atendimento</div>
@@ -248,9 +256,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111311"></script>
-<script src="js/supabase.js?v=04111311"></script>
-<script src="js/utils.js?v=04111311"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111317"></script>
+<script src="js/supabase.js?v=04111317"></script>
+<script src="js/utils.js?v=04111317"></script>
 <script>
 console.log('Equipe v2 carregado');
 
@@ -445,7 +453,7 @@ function renderBarbers() {
         <div style="display:flex;align-items:center;gap:12px;">
           <div class="eq-avatar">${inicial}</div>
           <div>
-            <div class="eq-name">${esc(b.name)}${b.is_owner ? ' <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;background:rgba(212,168,83,0.15);color:#d4a853;margin-left:4px;">DONO</span>' : ''}</div>
+            <div class="eq-name">${esc(b.name)}${b.is_owner ? ' <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;background:rgba(212,168,83,0.15);color:#d4a853;margin-left:4px;">DONO</span>' : ''}${b.role === 'recepcionista' ? ' <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;background:rgba(96,165,250,0.15);color:#60a5fa;margin-left:4px;">RECEP.</span>' : ''}</div>
             <div class="eq-meta">${comissao} comissao · <span class="eq-badge ${badgeCls}">${badgeLabel}</span></div>
             <div class="eq-meta">${diasStr} · ${horario}</div>
             ${phoneInfo}
@@ -467,6 +475,7 @@ function abrirModal() {
   document.getElementById('eq-edit-id').value = '';
   document.getElementById('eq-nome').value = '';
   document.getElementById('eq-phone').value = '';
+  document.getElementById('eq-role').value = 'profissional';
   document.getElementById('eq-comissao').value = '0';
   editSchedule = defaultSchedule(shop);
   renderScheduleEditor();
@@ -482,6 +491,7 @@ function editar(id) {
   document.getElementById('eq-edit-id').value = b.id;
   document.getElementById('eq-nome').value = b.name;
   document.getElementById('eq-phone').value = b.phone || '';
+  document.getElementById('eq-role').value = b.role || 'profissional';
   document.getElementById('eq-comissao').value = b.commission_pct || 0;
   editSchedule = scheduleFromBarber(b, shop);
   renderScheduleEditor();
@@ -517,8 +527,10 @@ async function salvar() {
   // Pegar primeiro dia como referencia pros campos antigos
   const firstDay = editSchedule[activeDays[0]] || { start: '08:00', end: '19:00', break_start: '12:00', break_end: '13:00' };
 
+  const role = document.getElementById('eq-role').value || 'profissional';
   const payload = {
     name: nome, commission_pct: comissao, phone: phone || null,
+    role: role,
     schedule: editSchedule,
     working_days: activeDays,
     working_start: firstDay.start, working_end: firstDay.end,
@@ -604,8 +616,8 @@ function showModalMsg(text, type) {
   el.className = `msg msg-${type} show`;
 }
 </script>
-<script src="js/ajuda.js?v=04111311"></script>
-<script src="js/sw-update.js?v=04111311"></script>
-<script src="js/sidebar.js?v=04111311"></script>
+<script src="js/ajuda.js?v=04111317"></script>
+<script src="js/sw-update.js?v=04111317"></script>
+<script src="js/sidebar.js?v=04111317"></script>
 </body>
 </html>
