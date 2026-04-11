@@ -1,4 +1,4 @@
-/* NaRegua — Layout System */
+/* NaRegua — Layout System V3 */
 
 /* ══════════════════════════════════════════
    SIDEBAR — oculta por padrão (mobile first)
@@ -32,7 +32,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 240px;
+    width: 256px;
     height: 100vh;
     background: var(--cinza-escuro);
     border-right: 1px solid var(--borda);
@@ -42,15 +42,15 @@
 
   /* ── Branding ── */
   .nr-sidebar-brand {
-    padding: 22px 18px 14px;
+    padding: 28px 20px 18px;
     border-bottom: 1px solid var(--borda);
     flex-shrink: 0;
   }
 
   .nr-sidebar-brand .nr-logo {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 22px;
-    font-weight: 800;
+    font-size: 24px;
+    font-weight: 900;
     letter-spacing: -0.5px;
     color: #ffffff;
     line-height: 1;
@@ -61,13 +61,12 @@
   }
 
   .nr-sidebar-brand .nr-logo-sub {
-    font-family: 'Space Grotesk', sans-serif;
     font-size: 9px;
     font-weight: 600;
     color: var(--texto-muted);
-    letter-spacing: 1.5px;
+    letter-spacing: 1.8px;
     text-transform: uppercase;
-    margin-top: 4px;
+    margin-top: 5px;
     opacity: 0.8;
   }
 
@@ -76,90 +75,41 @@
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 10px 0;
+    padding: 8px 0;
   }
 
-  .nr-sidebar-nav::-webkit-scrollbar { width: 3px; }
+  .nr-sidebar-nav::-webkit-scrollbar { width: 2px; }
   .nr-sidebar-nav::-webkit-scrollbar-track { background: transparent; }
   .nr-sidebar-nav::-webkit-scrollbar-thumb {
     background: var(--borda);
-    border-radius: 2px;
-  }
-  .nr-sidebar-nav::-webkit-scrollbar-thumb:hover {
-    background: var(--borda-hover);
+    border-radius: 1px;
   }
 
-  /* ── Grupo ── */
-  .nr-sidebar-group {
-    margin-bottom: 2px;
-  }
-
-  .nr-sidebar-group-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 18px 6px;
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.15s;
-  }
-
-  .nr-sidebar-group-header:hover {
-    background: rgba(255,255,255,0.02);
-  }
-
-  [data-theme="light"] .nr-sidebar-group-header:hover {
-    background: rgba(0,0,0,0.025);
-  }
-
+  /* ── Label de grupo — separador simples ── */
   .nr-sidebar-group-label {
-    font-family: 'Space Grotesk', sans-serif;
+    display: block;
     font-size: 9px;
     font-weight: 700;
-    letter-spacing: 1.8px;
+    letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--texto-muted);
-    opacity: 0.75;
-  }
-
-  .nr-sidebar-group-chevron {
-    font-size: 9px;
-    color: var(--texto-muted);
-    opacity: 0.6;
-    transition: transform 0.2s ease;
-    line-height: 1;
-  }
-
-  .nr-sidebar-group.collapsed .nr-sidebar-group-chevron {
-    transform: rotate(-90deg);
-  }
-
-  /* ── Itens do grupo ── */
-  .nr-sidebar-group-items {
-    overflow: hidden;
-    transition: max-height 0.25s ease;
-    max-height: 1000px;
-  }
-
-  .nr-sidebar-group.collapsed .nr-sidebar-group-items {
-    max-height: 0;
+    padding: 12px 20px 4px;
+    opacity: 0.7;
   }
 
   /* ── Link de nav ── */
   .nr-sidebar-link {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 9px 22px 9px 18px;
+    gap: 12px;
+    padding: 9px 20px;
     color: var(--texto-muted);
     text-decoration: none;
-    font-family: 'Space Grotesk', sans-serif;
     font-size: 13px;
     font-weight: 500;
     transition: all 0.15s ease;
     border-right: 3px solid transparent;
     white-space: nowrap;
-    position: relative;
   }
 
   .nr-sidebar-link:hover {
@@ -169,7 +119,8 @@
   }
 
   [data-theme="light"] .nr-sidebar-link:hover {
-    background: rgba(0,0,0,0.04);
+    background: rgba(255,255,255,0.06);
+    color: var(--texto-secundario);
   }
 
   .nr-sidebar-link.active {
@@ -181,10 +132,10 @@
 
   .nr-sidebar-link .nr-icon {
     font-size: 18px;
-    width: 22px;
+    width: 20px;
     text-align: center;
     flex-shrink: 0;
-    opacity: 0.75;
+    opacity: 0.8;
     line-height: 1;
     font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
   }
@@ -196,7 +147,7 @@
 
   /* ── Footer ── */
   .nr-sidebar-footer {
-    padding: 12px 18px;
+    padding: 14px 20px;
     border-top: 1px solid var(--borda);
     flex-shrink: 0;
     display: flex;
@@ -205,33 +156,51 @@
   }
 
   .nr-sidebar-shop {
-    font-family: 'Space Grotesk', sans-serif;
     font-size: 12px;
     font-weight: 600;
-    letter-spacing: 0.1px;
     color: var(--texto-secundario);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
+  .nr-sidebar-footer-btns {
+    display: flex;
+    gap: 8px;
+  }
+
+  .nr-sidebar-theme {
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--borda);
+    background: transparent;
+    color: var(--texto-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+  }
+
+  .nr-sidebar-theme:hover {
+    border-color: var(--borda-hover);
+    color: var(--texto-secundario);
+  }
+
   .nr-sidebar-logout {
+    flex: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 8px 12px;
+    padding: 7px 12px;
     border-radius: var(--radius-xs);
     border: 1px solid var(--borda);
     background: transparent;
     color: var(--texto-muted);
-    font-family: 'Space Grotesk', sans-serif;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
     font-family: inherit;
-    width: 100%;
   }
 
   .nr-sidebar-logout:hover {
@@ -245,7 +214,7 @@
   ══════════════════════════════════════════ */
   body.nr-has-sidebar {
     padding-bottom: 0 !important;
-    margin-left: 240px;
+    margin-left: 256px;
   }
 
   /* Containers desktop */
@@ -267,24 +236,11 @@
 ══════════════════════════════════════════ */
 @media (min-width: 768px) and (max-width: 1024px) {
   .nr-sidebar {
-    width: 200px;
-  }
-
-  .nr-sidebar-link {
-    font-size: 12px;
-    padding: 8px 14px 8px 18px;
-  }
-
-  .nr-sidebar-brand {
-    padding: 18px 14px 12px;
-  }
-
-  .nr-sidebar-brand .nr-logo {
-    font-size: 19px;
+    width: 220px;
   }
 
   body.nr-has-sidebar {
-    margin-left: 200px;
+    margin-left: 220px;
   }
 }
 
