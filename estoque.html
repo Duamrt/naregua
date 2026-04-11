@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04110953";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111001";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Estoque</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04110953">
-  <link rel="stylesheet" href="css/layout.css?v=04110953">
-  <script src="js/theme.js?v=04110953"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111001">
+  <link rel="stylesheet" href="css/layout.css?v=04111001">
+  <script src="js/theme.js?v=04111001"></script>
   <style>
     .est-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -225,6 +225,26 @@
         <option value="outros">Outros</option>
       </select>
     </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="field">
+        <label>UNIDADE</label>
+        <select id="prod-unit" style="width:100%;padding:10px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;">
+          <option value="un">un (unidade)</option>
+          <option value="kg">kg</option>
+          <option value="g">g (gramas)</option>
+          <option value="L">L (litros)</option>
+          <option value="ml">ml</option>
+          <option value="m">m (metros)</option>
+          <option value="par">par</option>
+          <option value="cx">cx (caixa)</option>
+          <option value="pct">pct (pacote)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>FORNECEDOR</label>
+        <input type="text" id="prod-fornecedor" placeholder="Ex: Amend, Loreal">
+      </div>
+    </div>
     <button class="btn btn-primary" onclick="salvarProduto()" id="btn-prod-save">
       <span class="btn-label">SALVAR</span>
       <div class="spinner" style="display:none;"></div>
@@ -301,9 +321,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04110953"></script>
-<script src="js/supabase.js?v=04110953"></script>
-<script src="js/utils.js?v=04110953"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111001"></script>
+<script src="js/supabase.js?v=04111001"></script>
+<script src="js/utils.js?v=04111001"></script>
 <script>
 let shop = null;
 let products = [];
@@ -409,6 +429,8 @@ function renderProducts() {
       + '</div>'
       + '<div class="prod-info">'
         + 'Venda: ' + formatMoney(p.price) + (p.cost ? ' · Custo: ' + formatMoney(p.cost) : '') + (lucro ? ' · Lucro: ' + lucro : '')
+        + (p.unit && p.unit !== 'un' ? ' · ' + p.unit : '')
+        + (p.supplier ? ' · ' + esc(p.supplier) : '')
       + '</div>'
       + '<div class="prod-stock">'
         + '<div class="prod-qty ' + qtyClass + '">' + p.quantity + '</div>'
@@ -560,6 +582,8 @@ function abrirModal() {
   document.getElementById('prod-qty').value = '0';
   document.getElementById('prod-min').value = '5';
   document.getElementById('prod-cat').value = 'geral';
+  document.getElementById('prod-unit').value = 'un';
+  document.getElementById('prod-fornecedor').value = '';
   document.getElementById('modal-prod-msg').className = 'msg';
   document.getElementById('modal-prod').classList.add('show');
 }
@@ -575,6 +599,8 @@ function editarProduto(id) {
   document.getElementById('prod-qty').value = p.quantity || 0;
   document.getElementById('prod-min').value = p.min_stock || 5;
   document.getElementById('prod-cat').value = p.category || 'geral';
+  document.getElementById('prod-unit').value = p.unit || 'un';
+  document.getElementById('prod-fornecedor').value = p.supplier || '';
   document.getElementById('modal-prod-msg').className = 'msg';
   document.getElementById('modal-prod').classList.add('show');
 }
@@ -593,7 +619,9 @@ async function salvarProduto() {
     cost: parseFloat(document.getElementById('prod-custo').value) || 0,
     quantity: parseInt(document.getElementById('prod-qty').value) || 0,
     min_stock: parseInt(document.getElementById('prod-min').value) || 5,
-    category: document.getElementById('prod-cat').value
+    category: document.getElementById('prod-cat').value,
+    unit: document.getElementById('prod-unit').value || 'un',
+    supplier: document.getElementById('prod-fornecedor').value.trim() || null
   };
 
   btn.disabled = true;
@@ -704,8 +732,8 @@ async function salvarMov() {
   await loadProducts();
 }
 </script>
-<script src="js/ajuda.js?v=04110953"></script>
-<script src="js/sw-update.js?v=04110953"></script>
-<script src="js/sidebar.js?v=04110953"></script>
+<script src="js/ajuda.js?v=04111001"></script>
+<script src="js/sw-update.js?v=04111001"></script>
+<script src="js/sidebar.js?v=04111001"></script>
 </body>
 </html>

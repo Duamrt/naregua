@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04110953";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111001";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Clientes</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04110953">
-  <link rel="stylesheet" href="css/layout.css?v=04110953">
-  <script src="js/theme.js?v=04110953"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111001">
+  <link rel="stylesheet" href="css/layout.css?v=04111001">
+  <script src="js/theme.js?v=04111001"></script>
   <style>
     .cli-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -71,6 +71,28 @@
       text-align:center; padding:40px 20px; color:var(--texto-muted);
     }
 
+    .btn-novo-cliente {
+      padding:8px 14px; border-radius:8px; border:none;
+      background:var(--verde-acao); color:#000; font-size:11px;
+      font-weight:700; font-family:inherit; cursor:pointer; transition:all .2s;
+    }
+    .btn-novo-cliente:hover { opacity:.85; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:1000; align-items:center; justify-content:center; padding:16px; }
+    .modal-overlay.show { display:flex; }
+    .modal { background:var(--cinza-escuro); border:1px solid var(--borda); border-radius:16px; padding:20px; width:100%; max-width:360px; }
+    .modal-title { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+    .modal-title h2 { font-size:16px; font-weight:700; }
+    .modal-close { background:none; border:none; color:var(--texto-muted); font-size:18px; cursor:pointer; padding:2px 6px; }
+    .field { margin-bottom:12px; }
+    .field label { display:block; font-size:10px; font-weight:700; letter-spacing:.5px; color:var(--texto-muted); margin-bottom:6px; }
+    .field input { width:100%; padding:10px 12px; background:var(--cinza-medio); border:1px solid var(--borda); border-radius:8px; color:var(--texto-principal); font-size:14px; font-family:inherit; box-sizing:border-box; }
+    .field input:focus { border-color:var(--verde-acao); outline:none; }
+    .msg { display:none; padding:8px 12px; border-radius:8px; font-size:12px; font-weight:600; margin-bottom:12px; }
+    .msg.show { display:block; }
+    .msg-error { background:rgba(239,68,68,.15); color:#ef4444; border:1px solid rgba(239,68,68,.3); }
+    .msg-success { background:rgba(34,197,94,.15); color:#22c55e; border:1px solid rgba(34,197,94,.3); }
+
     .bottom-nav {
       position:fixed; bottom:0; left:0; right:0;
       background:var(--cinza-escuro); border-top:1px solid var(--borda);
@@ -108,7 +130,7 @@
   <div id="content" style="display:none;">
     <div class="cli-header">
       <div style="display:flex;align-items:center;gap:8px;"><button class="btn-back" onclick="history.back()" title="Voltar">&#x2190;</button><h1>Clientes</h1></div>
-      <span class="cli-count" id="cli-total"></span>
+      <div style="display:flex;align-items:center;gap:8px;"><span class="cli-count" id="cli-total"></span><button class="btn-novo-cliente" onclick="abrirModalCliente()">+ NOVO</button></div>
     </div>
 
     <div class="search-bar">
@@ -116,6 +138,29 @@
     </div>
 
     <div id="cli-list"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-cli">
+  <div class="modal">
+    <div class="modal-title">
+      <h2>Novo Cliente</h2>
+      <button class="modal-close" onclick="fecharModalCliente()">&#x2715;</button>
+    </div>
+    <div id="modal-cli-msg" class="msg"></div>
+    <div class="field">
+      <label>NOME *</label>
+      <input type="text" id="cli-nome" placeholder="Nome completo" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>TELEFONE *</label>
+      <input type="tel" id="cli-tel" placeholder="(11) 99999-9999" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>ANIVERSÁRIO (opcional)</label>
+      <input type="date" id="cli-bday">
+    </div>
+    <button class="btn-novo-cliente" style="width:100%;padding:12px;" onclick="salvarCliente()" id="btn-cli-save">SALVAR CLIENTE</button>
   </div>
 </div>
 
@@ -162,9 +207,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04110953"></script>
-<script src="js/supabase.js?v=04110953"></script>
-<script src="js/utils.js?v=04110953"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111001"></script>
+<script src="js/supabase.js?v=04111001"></script>
+<script src="js/utils.js?v=04111001"></script>
 <script>
 let shop = null;
 let allClients = [];
@@ -237,6 +282,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // Incluir clientes cadastrados manualmente (sem agendamento)
+  const { data: cliManual } = await sb.from('clients').select('name,phone,birthday').eq('barbershop_id', shop.id);
+  for (const c of (cliManual || [])) {
+    const phoneClean = (c.phone || '').replace(/\D/g, '');
+    if (!phoneClean || map[phoneClean]) continue;
+    map[phoneClean] = { name: c.name, phone: c.phone, phoneClean, visits: 0, done: 0, lastVisit: null, firstVisit: null };
+  }
+
   allClients = Object.values(map).sort((a, b) => (b.lastVisit || '').localeCompare(a.lastVisit || ''));
 
   document.getElementById('loading').style.display = 'none';
@@ -293,6 +346,52 @@ function renderClients(list) {
   }).join('');
 }
 
+function abrirModalCliente() {
+  document.getElementById('cli-nome').value = '';
+  document.getElementById('cli-tel').value = '';
+  document.getElementById('cli-bday').value = '';
+  document.getElementById('modal-cli-msg').className = 'msg';
+  document.getElementById('modal-cli').classList.add('show');
+  setTimeout(() => document.getElementById('cli-nome').focus(), 100);
+}
+
+function fecharModalCliente() {
+  document.getElementById('modal-cli').classList.remove('show');
+}
+
+async function salvarCliente() {
+  const btn = document.getElementById('btn-cli-save');
+  const nome = document.getElementById('cli-nome').value.trim();
+  const tel = document.getElementById('cli-tel').value.trim();
+  const bday = document.getElementById('cli-bday').value;
+  const msg = document.getElementById('modal-cli-msg');
+
+  if (!nome) { msg.textContent = 'Digite o nome.'; msg.className = 'msg msg-error show'; return; }
+  if (!tel) { msg.textContent = 'Digite o telefone.'; msg.className = 'msg msg-error show'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'SALVANDO...';
+
+  const row = { barbershop_id: shop.id, name: nome, phone: tel };
+  if (bday) row.birthday = bday;
+
+  const { error } = await sb.from('clients').upsert(row, { onConflict: 'barbershop_id,phone' });
+  if (error) {
+    msg.textContent = 'Erro ao salvar.'; msg.className = 'msg msg-error show';
+    btn.disabled = false; btn.textContent = 'SALVAR CLIENTE'; return;
+  }
+
+  // Adicionar ao array local se não existir
+  const phoneClean = tel.replace(/\D/g, '');
+  if (!allClients.find(c => c.phoneClean === phoneClean)) {
+    allClients.unshift({ name: nome, phone: tel, phoneClean, visits: 0, done: 0, lastVisit: null, firstVisit: null });
+    document.getElementById('cli-total').textContent = allClients.length + ' cliente' + (allClients.length !== 1 ? 's' : '');
+  }
+  renderClients(allClients);
+  fecharModalCliente();
+  btn.disabled = false; btn.textContent = 'SALVAR CLIENTE';
+}
+
 function copiarTelefone(phone, btn) {
   navigator.clipboard.writeText(phone).then(() => {
     btn.textContent = 'COPIADO!';
@@ -300,8 +399,8 @@ function copiarTelefone(phone, btn) {
   });
 }
 </script>
-<script src="js/ajuda.js?v=04110953"></script>
-<script src="js/sw-update.js?v=04110953"></script>
-<script src="js/sidebar.js?v=04110953"></script>
+<script src="js/ajuda.js?v=04111001"></script>
+<script src="js/sw-update.js?v=04111001"></script>
+<script src="js/sidebar.js?v=04111001"></script>
 </body>
 </html>
