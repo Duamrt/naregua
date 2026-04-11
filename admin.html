@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111317";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111324";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Admin</title>
     <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111317">
-  <link rel="stylesheet" href="css/layout.css?v=04111317">
-  <script src="js/theme.js?v=04111317"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111324">
+  <link rel="stylesheet" href="css/layout.css?v=04111324">
+  <script src="js/theme.js?v=04111324"></script>
   <style>
     .admin-container { max-width:900px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -144,6 +144,23 @@
     .empty-admin {
       text-align:center; padding:60px 20px; color:var(--texto-muted);
     }
+
+    /* Filtros admin */
+    .adm-filter {
+      padding:6px 12px; border-radius:8px; font-size:11px; font-weight:700;
+      font-family:inherit; cursor:pointer; border:1px solid var(--borda);
+      background:transparent; color:var(--texto-muted); transition:all .2s;
+    }
+    .adm-filter.active { border-color:var(--verde-acao); color:var(--verde-acao); background:rgba(212,168,83,0.1); }
+
+    /* Feature flags */
+    .feat-toggle {
+      padding:7px 14px; border-radius:8px; font-size:11px; font-weight:700;
+      font-family:inherit; cursor:pointer; transition:all .2s;
+      border:1px solid var(--borda); background:transparent; color:var(--texto-muted);
+    }
+    .feat-toggle.active { border-color:#a78bfa; background:rgba(167,139,250,0.12); color:#a78bfa; }
+    .feat-toggle.disabled { border-color:rgba(231,76,60,0.3); background:rgba(231,76,60,0.08); color:#e74c3c; text-decoration:line-through; }
   </style>
 </head>
 <body>
@@ -168,9 +185,18 @@
   <div class="global-stats" id="global-stats"></div>
 
   <!-- Lista de barbearias -->
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
     <h2>Clientes</h2>
     <button class="btn btn-primary" onclick="abrirNovaShop()" style="width:auto;padding:8px 16px;font-size:12px;">+ NOVA</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+    <input type="text" id="admin-search" placeholder="Buscar por nome, cidade ou email..." oninput="renderShops()" style="flex:1;min-width:180px;padding:8px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-family:inherit;font-size:13px;">
+    <div style="display:flex;gap:4px;flex-wrap:wrap;">
+      <button class="adm-filter active" onclick="setAdmFilter(this,'todas')">Todas</button>
+      <button class="adm-filter" onclick="setAdmFilter(this,'ativas')">Ativas</button>
+      <button class="adm-filter" onclick="setAdmFilter(this,'inadimplentes')">Vencidas</button>
+      <button class="adm-filter" onclick="setAdmFilter(this,'seminfo')">Sem info</button>
+    </div>
   </div>
   <div id="shops-list"></div>
 
@@ -265,6 +291,10 @@
       <div class="days-modal" id="adm-days"></div>
     </div>
 
+    <div class="modal-section">Feature Flags</div>
+    <div style="font-size:11px;color:var(--texto-muted);margin-bottom:10px;">Clique pra ativar/desativar módulos pra esse cliente.</div>
+    <div id="adm-features" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;"></div>
+
     <div class="modal-section">Serviços</div>
     <div id="adm-services"></div>
     <button class="btn btn-outline" onclick="admAddService()" style="margin:10px 0 16px;font-size:12px;">+ SERVIÇO</button>
@@ -301,9 +331,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111317"></script>
-<script src="js/supabase.js?v=04111317"></script>
-<script src="js/utils.js?v=04111317"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111324"></script>
+<script src="js/supabase.js?v=04111324"></script>
+<script src="js/utils.js?v=04111324"></script>
 <script>
 // ── Config admin — só seu e-mail tem acesso ───────────────────
 // ADMIN_EMAILS centralizado em utils.js
@@ -318,7 +348,19 @@ let editShopBarbers = [];
 let editShopServices = [];
 let editDays = [];
 let editPayments = [];
+let editFeatures = {};
+let _admFilter = 'todas';
 const PAY_OPTIONS = ['dinheiro', 'pix', 'credito', 'debito'];
+const PLAN_PRICE = { basico: 29.90, profissional: 49.90, premium: 79.90 };
+const FEATURES_DEF = [
+  { key: 'comandas',           label: 'Comandas' },
+  { key: 'estoque',            label: 'Estoque' },
+  { key: 'pacotes',            label: 'Pacotes' },
+  { key: 'campanhas',          label: 'Campanhas' },
+  { key: 'financeiro_avancado',label: 'Financeiro+' },
+  { key: 'lista_espera',       label: 'Lista Espera' },
+  { key: 'comissoes',          label: 'Comissões' },
+];
 
 const DEFAULT_SERVICES = {
   barbearia: [
@@ -440,32 +482,57 @@ function renderGlobalStats() {
   const totalAppts = allAppointments.length;
   const totalDone = allAppointments.filter(a => a.status === 'done').length;
   const totalNoShow = allAppointments.filter(a => a.status === 'no_show').length;
-  // BUG 7 FIX: price_paid como fonte primária
   const revenue = allAppointments.filter(a => a.status === 'done').reduce((s, a) => {
     const valor = (a.price_paid != null ? Number(a.price_paid) : (() => { const svc = allServices.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })());
     return s + valor;
   }, 0);
 
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const ativas = allShops.filter(s => s.paid_until && new Date(s.paid_until + 'T00:00:00') >= hoje);
+  const inadimplentes = allShops.filter(s => s.paid_until && new Date(s.paid_until + 'T00:00:00') < hoje);
+  const mrr = ativas.reduce((sum, s) => sum + (PLAN_PRICE[s.plan] || 29.90), 0);
+
   document.getElementById('global-stats').innerHTML = `
     <div class="g-stat"><div class="g-stat-num" style="color:var(--verde-acao);">${totalShops}</div><div class="g-stat-label">CLIENTES</div></div>
+    <div class="g-stat"><div class="g-stat-num" style="color:#22c55e;">${ativas.length}</div><div class="g-stat-label">ATIVAS</div></div>
+    <div class="g-stat"><div class="g-stat-num" style="color:#e74c3c;">${inadimplentes.length}</div><div class="g-stat-label">VENCIDAS</div></div>
+    <div class="g-stat"><div class="g-stat-num" style="color:#a78bfa;">${formatMoney(mrr)}</div><div class="g-stat-label">MRR</div></div>
     <div class="g-stat"><div class="g-stat-num" style="color:var(--texto-principal);">${totalBarbers}</div><div class="g-stat-label">PROFISSIONAIS</div></div>
-    <div class="g-stat"><div class="g-stat-num" style="color:var(--texto-principal);">${totalAppts}</div><div class="g-stat-label">AGENDAMENTOS</div></div>
     <div class="g-stat"><div class="g-stat-num" style="color:var(--verde-acao);">${totalDone}</div><div class="g-stat-label">ATENDIDOS</div></div>
-    <div class="g-stat"><div class="g-stat-num" style="color:#9b59b6;">${totalNoShow}</div><div class="g-stat-label">FALTARAM</div></div>
     <div class="g-stat"><div class="g-stat-num" style="color:var(--verde-acao);">${formatMoney(revenue)}</div><div class="g-stat-label">FATURADO TOTAL</div></div>
   `;
+}
+
+// ── Filtro admin ──────────────────────────────────────────────
+function setAdmFilter(btn, filter) {
+  _admFilter = filter;
+  document.querySelectorAll('.adm-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderShops();
 }
 
 // ── Lista de barbearias ───────────────────────────────────────
 function renderShops() {
   const el = document.getElementById('shops-list');
+  const q = (document.getElementById('admin-search')?.value || '').toLowerCase().trim();
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
 
-  if (!allShops.length) {
-    el.innerHTML = '<div class="empty-admin">Nenhum cliente cadastrado.</div>';
+  let filtered = allShops;
+  if (_admFilter === 'ativas') filtered = filtered.filter(s => s.paid_until && new Date(s.paid_until + 'T00:00:00') >= hoje);
+  else if (_admFilter === 'inadimplentes') filtered = filtered.filter(s => s.paid_until && new Date(s.paid_until + 'T00:00:00') < hoje);
+  else if (_admFilter === 'seminfo') filtered = filtered.filter(s => !s.paid_until);
+  if (q) filtered = filtered.filter(s =>
+    (s.name || '').toLowerCase().includes(q) ||
+    (s.city || '').toLowerCase().includes(q) ||
+    (s._owner_email || '').toLowerCase().includes(q)
+  );
+
+  if (!filtered.length) {
+    el.innerHTML = '<div class="empty-admin">Nenhum cliente encontrado.</div>';
     return;
   }
 
-  el.innerHTML = allShops.map(s => {
+  el.innerHTML = filtered.map(s => {
     const shopBarbers = allBarbers.filter(b => b.barbershop_id === s.id && b.active);
     const shopSvcs = allServices.filter(sv => sv.barbershop_id === s.id && sv.active);
     const shopAppts = allAppointments.filter(a => a.barbershop_id === s.id);
@@ -624,6 +691,9 @@ function editarShop(id) {
   editShopServices = allServices.filter(sv => sv.barbershop_id === id).map(sv => ({ id: sv.id, name: sv.name, price: sv.price, duration_min: sv.duration_min }));
   renderAdmServices();
 
+  editFeatures = { ...s.features } || {};
+  renderAdmFeatures();
+
   document.getElementById('admin-edit-msg').className = 'msg';
   document.getElementById('modal-admin-edit').classList.add('show');
 }
@@ -657,6 +727,9 @@ function abrirNovaShop() {
   editShopServices = JSON.parse(JSON.stringify(DEFAULT_SERVICES[type] || DEFAULT_SERVICES.barbearia));
   renderAdmServices();
 
+  editFeatures = {};
+  renderAdmFeatures();
+
   document.getElementById('admin-edit-msg').className = 'msg';
   document.getElementById('modal-admin-edit').classList.add('show');
 }
@@ -675,6 +748,17 @@ function renderAdmPayments() {
 function toggleAdmPay(p) {
   editPayments = editPayments.includes(p) ? editPayments.filter(x => x !== p) : [...editPayments, p];
   renderAdmPayments();
+}
+
+function renderAdmFeatures() {
+  document.getElementById('adm-features').innerHTML = FEATURES_DEF.map(f => {
+    const isOff = editFeatures[f.key] === false;
+    return `<button type="button" class="feat-toggle ${isOff ? 'disabled' : 'active'}" onclick="toggleAdmFeature('${f.key}')">${f.label}</button>`;
+  }).join('');
+}
+function toggleAdmFeature(key) {
+  editFeatures[key] = editFeatures[key] === false ? true : false;
+  renderAdmFeatures();
 }
 
 function renderAdmDays() {
@@ -778,7 +862,8 @@ async function salvarAdmin() {
       // Atualizar barbearia
       const { error } = await sb.from('barbershops').update({
         name, slug, city, phone, address, instagram, payment_methods: editPayments,
-        business_type: businessType, plan, paid_until: paidUntil, opening_time: opening, closing_time: closing, days_open: editDays
+        business_type: businessType, plan, paid_until: paidUntil, opening_time: opening, closing_time: closing, days_open: editDays,
+        features: editFeatures
       }).eq('id', editId);
       if (error) throw error;
 
@@ -810,7 +895,7 @@ async function salvarAdmin() {
         owner_id: ownerId, name, slug, city, phone, address, instagram,
         payment_methods: editPayments, business_type: businessType, plan, paid_until: paidUntil,
         opening_time: opening, closing_time: closing, days_open: editDays,
-        owner_password_hint: ownerPassword
+        owner_password_hint: ownerPassword, features: editFeatures
       }).select().single();
       if (error) throw error;
       shopId = data.id;
@@ -998,8 +1083,8 @@ async function logout() {
   window.location.href = 'app.html';
 }
 </script>
-<script src="js/ajuda.js?v=04111317"></script>
-<script src="js/sw-update.js?v=04111317"></script>
-<script src="js/sidebar.js?v=04111317"></script>
+<script src="js/ajuda.js?v=04111324"></script>
+<script src="js/sw-update.js?v=04111324"></script>
+<script src="js/sidebar.js?v=04111324"></script>
 </body>
 </html>
