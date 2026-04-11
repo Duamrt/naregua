@@ -65,6 +65,4 @@ if [ -z "$DMS_KW" ]; then
     grep -vE '^(cache|busting|deploy|versao|fixes|update|remove|corrige|corrigir|adiciona|adicionar|atualiza|atualizar|insere|inserir)$' | \
     head -1)
 fi
-if [ -n "$DMS_KW" ]; then
-  bash "$HOME/dms-resolve.sh" "$DMS_KW" "NAREGUA"
-fi
+bash "$HOME/dms-resolve.sh" "${DMS_KW:-deploy}" "NAREGUA" "$SHORT_V" "$MSG"
