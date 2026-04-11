@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111328";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111344";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Dashboard</title>
     <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111328">
-  <link rel="stylesheet" href="css/layout.css?v=04111328">
-  <script src="js/theme.js?v=04111328"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111344">
+  <link rel="stylesheet" href="css/layout.css?v=04111344">
+  <script src="js/theme.js?v=04111344"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -84,7 +84,7 @@
       border-radius:20px; text-transform:uppercase;
     }
     .status-pending { background:rgba(243,156,18,0.15); color:#f39c12; }
-    .status-confirmed { background:rgba(212,168,83,0.15); color:#d4a853; }
+    .status-confirmed { background:var(--accent-soft); color:var(--accent); }
     .status-done { background:rgba(255,255,255,0.08); color:var(--texto-muted); }
     .status-cancelled { background:rgba(231,76,60,0.1); color:#e74c3c; text-decoration:line-through; }
     .status-no_show { background:rgba(155,89,182,0.15); color:#9b59b6; }
@@ -98,8 +98,8 @@
       letter-spacing:0.5px;
     }
     .appt-btn:hover { border-color:var(--borda-hover); transform:translateY(-1px); }
-    .btn-confirm-appt { background:rgba(212,168,83,0.15); color:#d4a853; }
-    .btn-done-appt { background:rgba(212,168,83,0.15); color:#d4a853; }
+    .btn-confirm-appt { background:var(--accent-soft); color:var(--accent); }
+    .btn-done-appt { background:var(--accent-soft); color:var(--accent); }
     .btn-cancel-appt { background:rgba(231,76,60,0.1); color:#e74c3c; }
     .btn-noshow { background:rgba(155,89,182,0.15); color:#9b59b6; }
     .btn-whatsapp { background:rgba(37,211,102,0.15); color:#25d366; }
@@ -198,13 +198,13 @@
       cursor:pointer; font-family:inherit; transition:all .2s; white-space:nowrap;
     }
     .filter-chip:hover { border-color:var(--borda-hover); }
-    .filter-chip.active { border-color:var(--verde-acao); background:rgba(212,168,83,0.1); color:var(--verde-acao); }
+    .filter-chip.active { border-color:var(--verde-acao); background:var(--accent-soft); color:var(--verde-acao); }
     .filter-chip .count {
       display:inline-block; min-width:16px; text-align:center;
       background:rgba(255,255,255,0.08); border-radius:10px; padding:1px 5px;
       font-size:9px; margin-left:4px;
     }
-    .filter-chip.active .count { background:rgba(212,168,83,0.2); }
+    .filter-chip.active .count { background:var(--accent-soft); }
 
     .btn-delete {
       flex:1; padding:8px 0; border-radius:8px; border:none; font-size:11px;
@@ -264,7 +264,7 @@
       font-family:inherit; cursor:pointer; transition:all .2s; border:1px solid var(--borda);
       background:transparent; color:var(--texto-muted);
     }
-    .day-btn.active { border-color:var(--verde-acao); background:rgba(212,168,83,0.15); color:var(--verde-acao); }
+    .day-btn.active { border-color:var(--verde-acao); background:var(--accent-soft); color:var(--verde-acao); }
 
     .pay-method-btn {
       flex:1; padding:12px 0; border-radius:10px; border:1.5px solid var(--borda);
@@ -273,7 +273,7 @@
       text-align:center;
     }
     .pay-method-btn:hover { border-color:var(--borda-hover); }
-    .pay-method-btn.active { border-color:var(--verde-acao); background:rgba(212,168,83,0.1); color:var(--verde-acao); }
+    .pay-method-btn.active { border-color:var(--verde-acao); background:var(--accent-soft); color:var(--verde-acao); }
     .pay-method-btn .pay-icon { font-size:18px; display:block; margin-bottom:4px; }
 
     body { padding-bottom:70px; }
@@ -428,7 +428,7 @@
     /* Toast auto-confirm */
     .toast-auto {
       position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
-      background:rgba(212,168,83,0.95); color:#000; font-size:12px; font-weight:700;
+      background:var(--accent); color:var(--preto); font-size:12px; font-weight:700;
       padding:10px 20px; border-radius:10px; z-index:9999;
       animation:toastIn .3s ease;
       box-shadow:0 4px 16px rgba(0,0,0,0.3);
@@ -546,7 +546,7 @@
       <button onclick="compartilharWhatsApp()" style="flex:1;padding:10px 8px;border-radius:12px;border:none;background:rgba(37,211,102,0.12);color:#25d366;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;line-height:1.3;">
         <span style="font-size:18px;">&#x1F4C5;</span>ENVIAR LINK DE<br>AGENDAMENTO
       </button>
-      <button onclick="enviarLinkBarbeiroZap()" style="flex:1;padding:10px 8px;border-radius:12px;border:none;background:rgba(212,168,83,0.1);color:var(--verde-acao);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;line-height:1.3;">
+      <button onclick="enviarLinkBarbeiroZap()" style="flex:1;padding:10px 8px;border-radius:12px;border:none;background:var(--accent-soft);color:var(--verde-acao);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;line-height:1.3;">
         <span style="font-size:18px;">&#x1F4AA;</span>CADASTRAR<br><span id="lbl-cadastrar-prof">PROFISSIONAL</span>
       </button>
     </div>
@@ -592,21 +592,21 @@
   <div class="mini-cal-wrapper" id="mini-cal-wrapper" style="display:none;">
     <div class="mini-cal-body open" id="mini-cal-body">
       <div class="mini-cal-header">
-        <button class="mini-cal-nav" onclick="changeCalMonth(-1)">&#x2039;</button>
+        <button class="mini-cal-nav" onclick="changeCalMonth(-1)" aria-label="Mês anterior">&#x2039;</button>
         <span class="mini-cal-month" id="mini-cal-month"></span>
-        <button class="mini-cal-nav" onclick="changeCalMonth(1)">&#x203A;</button>
+        <button class="mini-cal-nav" onclick="changeCalMonth(1)" aria-label="Próximo mês">&#x203A;</button>
       </div>
       <div class="mini-cal-grid" id="mini-cal-grid"></div>
     </div>
   </div>
 
   <!-- Banner Lista de Espera -->
-  <div id="le-banner" style="display:none;background:rgba(212,168,83,0.08);border:1px solid rgba(212,168,83,0.2);border-radius:10px;padding:12px 14px;margin-bottom:16px;cursor:pointer;" onclick="location.href='lista-espera.html'">
+  <div id="le-banner" style="display:none;background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:10px;padding:12px 14px;margin-bottom:16px;cursor:pointer;" onclick="location.href='lista-espera.html'">
     <div style="display:flex;align-items:center;justify-content:space-between;">
       <div style="display:flex;align-items:center;gap:8px;">
         <span style="font-size:16px;">&#x23F3;</span>
         <div>
-          <div style="font-size:12px;font-weight:700;color:#d4a853;" id="le-banner-text">0 na lista de espera</div>
+          <div style="font-size:12px;font-weight:700;color:var(--accent);" id="le-banner-text">0 na lista de espera</div>
           <div style="font-size:10px;color:var(--texto-muted);">Toque pra gerenciar</div>
         </div>
       </div>
@@ -616,12 +616,12 @@
 
   <!-- Navegação de data -->
   <div class="date-nav" id="dash-date-nav" style="display:none;">
-    <button class="date-nav-btn" onclick="changeDay(-1)">‹</button>
+    <button class="date-nav-btn" onclick="changeDay(-1)" aria-label="Dia anterior">‹</button>
     <div style="text-align:center;">
       <div class="date-nav-label" id="date-label"></div>
       <button class="date-nav-today" id="btn-today" onclick="goToday()" style="display:none;">voltar pra hoje</button>
     </div>
-    <button class="date-nav-btn" onclick="changeDay(1)">›</button>
+    <button class="date-nav-btn" onclick="changeDay(1)" aria-label="Próximo dia">›</button>
   </div>
 
   <!-- Filtros -->
@@ -637,7 +637,7 @@
   <div class="modal">
     <div class="modal-title">
       <h2>Editar Estabelecimento</h2>
-      <button class="modal-close" onclick="fecharEdicao()">✕</button>
+      <button class="modal-close" onclick="fecharEdicao()" aria-label="Fechar">✕</button>
     </div>
 
     <div id="edit-msg" class="msg"></div>
@@ -697,7 +697,7 @@
   <div class="modal" style="max-width:400px;">
     <div class="modal-title">
       <h2>Vaga aberta!</h2>
-      <button class="modal-close" onclick="fecharModalVaga()">✕</button>
+      <button class="modal-close" onclick="fecharModalVaga()" aria-label="Fechar">✕</button>
     </div>
     <div style="font-size:12px;color:var(--texto-muted);margin-bottom:16px;" id="vaga-info"></div>
     <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--texto-muted);margin-bottom:10px;">CLIENTES COM HORÁRIO MAIS TARDE</div>
@@ -744,7 +744,7 @@
   <div class="modal" style="max-width:380px;">
     <div class="modal-title">
       <h2>Encaixe rapido</h2>
-      <button class="modal-close" onclick="fecharEncaixe()">&#x2715;</button>
+      <button class="modal-close" onclick="fecharEncaixe()" aria-label="Fechar">&#x2715;</button>
     </div>
     <div id="encaixe-msg" class="msg"></div>
     <div class="field">
@@ -818,10 +818,10 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111328"></script>
-<script src="js/supabase.js?v=04111328"></script>
-<script src="js/utils.js?v=04111328"></script>
-<script src="js/push.js?v=04111328"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111344"></script>
+<script src="js/supabase.js?v=04111344"></script>
+<script src="js/utils.js?v=04111344"></script>
+<script src="js/push.js?v=04111344"></script>
 <script>
 console.log('Dashboard v3 carregado');
 // ── Estado ────────────────────────────────────────────────────
@@ -1026,7 +1026,7 @@ function renderPrimeirosPassos() {
         <div class="pp-title">Primeiros passos</div>
         <div class="pp-sub">${done} de ${total} concluídos</div>
       </div>
-      <button class="pp-dismiss" onclick="dispensarPassos()" title="Dispensar">✕</button>
+      <button class="pp-dismiss" onclick="dispensarPassos()" aria-label="Dispensar checklist">✕</button>
     </div>
     <div class="pp-items">
       ${steps.map(s => {
@@ -1381,7 +1381,7 @@ function renderApptCard(a, isNext) {
   return `<div class="barber-appt" style="${nextStyle}">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
       <div class="barber-appt-time">${timeStr}</div>
-      <div style="display:flex;align-items:center;gap:6px;">${isNext ? '<span style="font-size:8px;font-weight:800;letter-spacing:1px;padding:2px 6px;border-radius:4px;background:rgba(212,168,83,0.2);color:var(--verde-acao);">PROXIMO</span>' : ''}<span class="appt-status ${st.cls}">${st.label}</span></div>
+      <div style="display:flex;align-items:center;gap:6px;">${isNext ? '<span style="font-size:8px;font-weight:800;letter-spacing:1px;padding:2px 6px;border-radius:4px;background:var(--accent-soft);color:var(--verde-acao);">PROXIMO</span>' : ''}<span class="appt-status ${st.cls}">${st.label}</span></div>
     </div>
     <div class="barber-appt-client">${esc(a.client_name)}</div>
     <div class="barber-appt-svc">${svcName} · ${svcPrice}${isDiaInteiro ? ' · <span style="color:#9b59b6;font-weight:700;">DIA INTEIRO</span>' : ''}</div>
@@ -2032,7 +2032,7 @@ function renderRebookDates() {
     const dia = d.date.getDate();
     const mes = d.date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.','');
     const dow = DIAS[d.date.getDay()];
-    return '<button onclick="selectRebookDate(\'' + d.iso + '\')" style="min-width:54px;padding:8px 6px;border-radius:10px;border:' + (sel ? '2px solid var(--verde-acao)' : '1px solid var(--borda)') + ';background:' + (sel ? 'rgba(212,168,83,0.15)' : 'transparent') + ';color:' + (sel ? 'var(--verde-acao)' : 'var(--texto-secundario)') + ';font-family:inherit;cursor:pointer;text-align:center;flex-shrink:0;">' +
+    return '<button onclick="selectRebookDate(\'' + d.iso + '\')" style="min-width:54px;padding:8px 6px;border-radius:10px;border:' + (sel ? '2px solid var(--verde-acao)' : '1px solid var(--borda)') + ';background:' + (sel ? 'var(--accent-soft)' : 'transparent') + ';color:' + (sel ? 'var(--verde-acao)' : 'var(--texto-secundario)') + ';font-family:inherit;cursor:pointer;text-align:center;flex-shrink:0;">' +
       '<div style="font-size:9px;font-weight:700;letter-spacing:0.5px;">' + dow + '</div>' +
       '<div style="font-size:17px;font-weight:800;">' + dia + '</div>' +
       '<div style="font-size:9px;color:' + (sel ? 'var(--verde-acao)' : 'var(--texto-muted)') + ';">' + mes + '</div>' +
@@ -2103,7 +2103,7 @@ async function loadRebookTimes() {
 
   el.innerHTML = slots.map(s => {
     const sel = s === _rebookSelTime;
-    return '<button onclick="selectRebookTime(\'' + s + '\')" style="padding:8px 14px;border-radius:8px;border:' + (sel ? '2px solid var(--verde-acao)' : '1px solid var(--borda)') + ';background:' + (sel ? 'rgba(212,168,83,0.15)' : 'transparent') + ';color:' + (sel ? 'var(--verde-acao)' : 'var(--texto-secundario)') + ';font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">' + s + '</button>';
+    return '<button onclick="selectRebookTime(\'' + s + '\')" style="padding:8px 14px;border-radius:8px;border:' + (sel ? '2px solid var(--verde-acao)' : '1px solid var(--borda)') + ';background:' + (sel ? 'var(--accent-soft)' : 'transparent') + ';color:' + (sel ? 'var(--verde-acao)' : 'var(--texto-secundario)') + ';font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">' + s + '</button>';
   }).join('');
 }
 
@@ -2114,7 +2114,7 @@ function selectRebookTime(time) {
   el.querySelectorAll('button').forEach(btn => {
     const sel = btn.textContent.trim() === time;
     btn.style.border = sel ? '2px solid var(--verde-acao)' : '1px solid var(--borda)';
-    btn.style.background = sel ? 'rgba(212,168,83,0.15)' : 'transparent';
+    btn.style.background = sel ? 'var(--accent-soft)' : 'transparent';
     btn.style.color = sel ? 'var(--verde-acao)' : 'var(--texto-secundario)';
   });
   document.getElementById('btn-rebook-confirm').disabled = false;
@@ -2227,7 +2227,7 @@ function renderConsumoTabs() {
   document.getElementById('consumo-tabs').innerHTML = tabs.map(t =>
     '<button onclick="setConsumoTab(\'' + t.key + '\')" style="flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s;border:1px solid ' +
     (_consumoTab === t.key ? 'var(--verde-acao)' : 'var(--borda)') + ';background:' +
-    (_consumoTab === t.key ? 'rgba(212,168,83,0.15)' : 'transparent') + ';color:' +
+    (_consumoTab === t.key ? 'var(--accent-soft)' : 'transparent') + ';color:' +
     (_consumoTab === t.key ? 'var(--verde-acao)' : 'var(--texto-muted)') + ';">' + t.icon + ' ' + t.label + '</button>'
   ).join('');
 }
@@ -2923,9 +2923,9 @@ function selectCalDay(dateKey) {
   renderDay();
 }
 </script>
-<script src="js/ajuda.js?v=04111328"></script>
-<script src="js/tour.js?v=04111328"></script>
-<script src="js/sw-update.js?v=04111328"></script>
-<script src="js/sidebar.js?v=04111328"></script>
+<script src="js/ajuda.js?v=04111344"></script>
+<script src="js/tour.js?v=04111344"></script>
+<script src="js/sw-update.js?v=04111344"></script>
+<script src="js/sidebar.js?v=04111344"></script>
 </body>
 </html>
