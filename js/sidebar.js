@@ -4,50 +4,50 @@
 
   var NAV = [
     { group: 'PRINCIPAL', open: true, items: [
-      { icon: '📅', label: 'Agenda', href: 'dashboard.html' },
-      { icon: '📊', label: 'Resumo', href: 'resumo.html' }
+      { icon: 'calendar_month', label: 'Agenda', href: 'dashboard.html' },
+      { icon: 'bar_chart', label: 'Resumo', href: 'resumo.html' }
     ]},
     { group: 'GESTÃO', open: true, items: [
-      { icon: '👥', label: 'Equipe', href: 'equipe.html' },
-      { icon: '✂️', label: 'Serviços', href: 'servicos.html' },
-      { icon: '🔀', label: 'Combos', href: 'combos.html' },
-      { icon: '📋', label: 'Clientes', href: 'clientes.html' },
-      { icon: '📦', label: 'Estoque', href: 'estoque.html' }
+      { icon: 'group', label: 'Equipe', href: 'equipe.html' },
+      { icon: 'content_cut', label: 'Serviços', href: 'servicos.html' },
+      { icon: 'shuffle', label: 'Combos', href: 'combos.html' },
+      { icon: 'people', label: 'Clientes', href: 'clientes.html' },
+      { icon: 'inventory_2', label: 'Estoque', href: 'estoque.html' }
     ]},
     { group: 'FINANCEIRO', open: true, items: [
-      { icon: '💰', label: 'Caixa', href: 'financeiro.html' },
-      { icon: '📝', label: 'Comandas', href: 'comandas.html' },
-      { icon: '💵', label: 'Comissões', href: 'comissoes.html' },
-      { icon: '📄', label: 'Folha Pagamento', href: 'folha-pagamento.html' },
-      { icon: '🎯', label: 'Metas', href: 'metas.html' }
+      { icon: 'account_balance_wallet', label: 'Caixa', href: 'financeiro.html' },
+      { icon: 'receipt_long', label: 'Comandas', href: 'comandas.html' },
+      { icon: 'paid', label: 'Comissões', href: 'comissoes.html' },
+      { icon: 'payments', label: 'Folha Pagamento', href: 'folha-pagamento.html' },
+      { icon: 'flag', label: 'Metas', href: 'metas.html' }
     ]},
     { group: 'COMERCIAL', open: false, items: [
-      { icon: '📦', label: 'Pacotes', href: 'pacotes.html' },
-      { icon: '👑', label: 'Assinaturas', href: 'assinaturas.html' },
-      { icon: '🎫', label: 'Cupons', href: 'cupons.html' },
-      { icon: '📣', label: 'Promoções', href: 'promocoes.html' }
+      { icon: 'redeem', label: 'Pacotes', href: 'pacotes.html' },
+      { icon: 'workspace_premium', label: 'Assinaturas', href: 'assinaturas.html' },
+      { icon: 'local_offer', label: 'Cupons', href: 'cupons.html' },
+      { icon: 'campaign', label: 'Promoções', href: 'promocoes.html' }
     ]},
     { group: 'CLIENTES', open: false, items: [
-      { icon: '🔔', label: 'Lembretes', href: 'lembretes.html' },
-      { icon: '🔄', label: 'Retenção', href: 'retencao.html' },
-      { icon: '⭐', label: 'Satisfação', href: 'satisfacao.html' },
-      { icon: '⏳', label: 'Lista de Espera', href: 'lista-espera.html' },
-      { icon: '📥', label: 'Importar', href: 'importar-clientes.html' }
+      { icon: 'notifications', label: 'Lembretes', href: 'lembretes.html' },
+      { icon: 'loyalty', label: 'Retenção', href: 'retencao.html' },
+      { icon: 'thumb_up', label: 'Satisfação', href: 'satisfacao.html' },
+      { icon: 'hourglass_empty', label: 'Lista de Espera', href: 'lista-espera.html' },
+      { icon: 'upload', label: 'Importar', href: 'importar-clientes.html' }
     ]},
     { group: 'ANÁLISE', open: false, items: [
-      { icon: '📊', label: 'Relatório', href: 'relatorio.html' },
-      { icon: '📉', label: 'Horários Ociosos', href: 'horarios-ociosos.html' },
-      { icon: '📋', label: 'Atividades', href: 'atividades.html' }
+      { icon: 'analytics', label: 'Relatório', href: 'relatorio.html' },
+      { icon: 'schedule', label: 'Horários Ociosos', href: 'horarios-ociosos.html' },
+      { icon: 'history', label: 'Atividades', href: 'atividades.html' }
     ]},
     { group: 'CONFIGURAR', open: false, items: [
-      { icon: '⚙', label: 'Configurações', href: 'configuracoes.html' },
-      { icon: '📱', label: 'QR Code', href: 'qrcode.html' },
-      { icon: '📷', label: 'Galeria', href: 'galeria.html' },
-      { icon: '📜', label: 'Políticas', href: 'politicas.html' },
-      { icon: '💾', label: 'Backup', href: 'backup.html' },
-      { icon: '💳', label: 'Meu Plano', href: 'planos.html' },
-      { icon: '🔍', label: 'Busca', href: 'busca.html' },
-      { icon: '🔔', label: 'Notificações', href: 'notificacoes.html' }
+      { icon: 'settings', label: 'Configurações', href: 'configuracoes.html' },
+      { icon: 'qr_code', label: 'QR Code', href: 'qrcode.html' },
+      { icon: 'photo_library', label: 'Galeria', href: 'galeria.html' },
+      { icon: 'policy', label: 'Políticas', href: 'politicas.html' },
+      { icon: 'cloud_download', label: 'Backup', href: 'backup.html' },
+      { icon: 'credit_card', label: 'Meu Plano', href: 'planos.html' },
+      { icon: 'search', label: 'Busca', href: 'busca.html' },
+      { icon: 'notifications_active', label: 'Notificações', href: 'notificacoes.html' }
     ]}
   ];
 
@@ -98,7 +98,7 @@
         var a = document.createElement('a');
         a.className = 'nr-sidebar-link' + (item.href === currentPage ? ' active' : '');
         a.href = item.href;
-        a.innerHTML = '<span class="nr-icon">' + item.icon + '</span><span class="nr-label">' + item.label + '</span>';
+        a.innerHTML = '<span class="nr-icon material-symbols-outlined">' + item.icon + '</span><span class="nr-label">' + item.label + '</span>';
         items.appendChild(a);
       });
       g.appendChild(items);

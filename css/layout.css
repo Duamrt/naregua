@@ -52,7 +52,7 @@
     font-size: 22px;
     font-weight: 800;
     letter-spacing: -0.5px;
-    color: var(--texto-principal);
+    color: #ffffff;
     line-height: 1;
   }
 
@@ -150,14 +150,14 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 9px 18px 9px 22px;
+    padding: 9px 22px 9px 18px;
     color: var(--texto-muted);
     text-decoration: none;
     font-family: 'Space Grotesk', sans-serif;
     font-size: 13px;
     font-weight: 500;
     transition: all 0.15s ease;
-    border-left: 2px solid transparent;
+    border-right: 3px solid transparent;
     white-space: nowrap;
     position: relative;
   }
@@ -174,22 +174,24 @@
 
   .nr-sidebar-link.active {
     color: var(--accent);
-    border-left-color: var(--accent);
+    border-right-color: var(--accent);
     background: var(--accent-soft);
     font-weight: 600;
   }
 
   .nr-sidebar-link .nr-icon {
-    font-size: 14px;
-    width: 20px;
+    font-size: 18px;
+    width: 22px;
     text-align: center;
     flex-shrink: 0;
-    opacity: 0.85;
+    opacity: 0.75;
     line-height: 1;
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
   }
 
   .nr-sidebar-link.active .nr-icon {
     opacity: 1;
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
   }
 
   /* ── Footer ── */
