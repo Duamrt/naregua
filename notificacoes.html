@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111114";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111117";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Notificações</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111114">
-  <link rel="stylesheet" href="css/layout.css?v=04111114">
-  <script src="js/theme.js?v=04111114"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111117">
+  <link rel="stylesheet" href="css/layout.css?v=04111117">
+  <script src="js/theme.js?v=04111117"></script>
   <style>
     .notif-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -211,9 +211,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111114"></script>
-<script src="js/supabase.js?v=04111114"></script>
-<script src="js/utils.js?v=04111114"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111117"></script>
+<script src="js/supabase.js?v=04111117"></script>
+<script src="js/utils.js?v=04111117"></script>
 <script>
 console.log('Notificações v1 carregado');
 
@@ -350,7 +350,7 @@ async function loadNotifications() {
     sb.from('products').select('*').eq('barbershop_id', shop.id),
 
     // 4. Satisfaction ratings
-    sb.from('ratings').select('*').eq('barbershop_id', shop.id)
+    sb.from('respostas_satisfacao').select('*').eq('barbershop_id', shop.id)
       .gte('created_at', sevenDaysAgo)
       .order('created_at', { ascending: false })
       .limit(10),
@@ -366,10 +366,10 @@ async function loadNotifications() {
 
     // 7. Expenses due today
     sb.from('expenses').select('*').eq('barbershop_id', shop.id)
-      .eq('due_date', today),
+      .eq('date', today),
 
     // 8. Clients with birthday this week
-    sb.from('clients').select('id,name,phone,birth_date').eq('barbershop_id', shop.id),
+    sb.from('clients').select('id,name,phone,birthday').eq('barbershop_id', shop.id),
   ]);
 
   // ── 1. AGENDAMENTOS ──────────────────────────────────────────
@@ -489,8 +489,8 @@ async function loadNotifications() {
     const weekEndMD = (weekEnd.getMonth() + 1) * 100 + weekEnd.getDate();
 
     const aniversariantes = clients.filter(c => {
-      if (!c.birth_date) return false;
-      const d = new Date(c.birth_date + 'T12:00:00');
+      if (!c.birthday) return false;
+      const d = new Date(c.birthday + 'T12:00:00');
       const md = (d.getMonth() + 1) * 100 + d.getDate();
       if (todayMD <= weekEndMD) return md >= todayMD && md <= weekEndMD;
       return md >= todayMD || md <= weekEndMD; // virada de ano
@@ -601,7 +601,7 @@ async function loadNotifications() {
 
     // Low satisfaction ratings
     const ratings = results[3].status === 'fulfilled' ? (results[3].value.data || []) : [];
-    const lowRatings = ratings.filter(r => (r.rating || r.stars || 0) < 3);
+    const lowRatings = ratings.filter(r => (r.rating || 0) < 3);
     if (lowRatings.length > 0) {
       notifications.push({
         id: 'sys-satis-' + today,
@@ -753,8 +753,8 @@ function renderNotifications() {
   el.innerHTML = html;
 }
 </script>
-<script src="js/ajuda.js?v=04111114"></script>
-<script src="js/sw-update.js?v=04111114"></script>
-<script src="js/sidebar.js?v=04111114"></script>
+<script src="js/ajuda.js?v=04111117"></script>
+<script src="js/sw-update.js?v=04111117"></script>
+<script src="js/sidebar.js?v=04111117"></script>
 </body>
 </html>
