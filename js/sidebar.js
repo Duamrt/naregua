@@ -132,6 +132,9 @@
     if (el && shopDiv && el.textContent.trim()) {
       shopDiv.textContent = el.textContent.trim();
     }
+    // Atualizar segmento se a página já carregou o shop do banco
+    var bt = (window.shop && window.shop.business_type) || (window.shopData && window.shopData.business_type);
+    if (bt) { try { localStorage.setItem('naregua_segment', bt); } catch(e) {} }
     // Atualizar subtítulo e footer conforme segmento atual
     var segKey = localStorage.getItem('naregua_segment') || 'outro';
     var segLabels = { barbearia:'Gestão para barbearias', manicure:'Gestão para manicures', unha:'Gestão para nail designers', sobrancelha:'Gestão para designers de sobrancelha', estetica:'Gestão para estética', salao:'Gestão para salões', outro:'Gestão para seu negócio' };
