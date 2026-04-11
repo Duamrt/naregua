@@ -25,7 +25,6 @@ done
 # 2. Atualizar CACHE_NAME no service worker + versao no console
 echo "[2/4] Atualizando Service Worker e versao..."
 sed -i -E "s/const CACHE_NAME = 'naregua-v[0-9]+';/const CACHE_NAME = 'naregua-v$VERSION';/" sw.js
-sed -i -E "s/const _NR_VER = 'naregua-[0-9]+';/const _NR_VER = 'naregua-$SHORT_V';/" js/auth.js js/sidebar.js
 python3 -c "
 import glob, re, sys
 v='$SHORT_V'
