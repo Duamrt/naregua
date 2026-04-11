@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111307";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111311";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Minha Agenda</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111307">
-  <link rel="stylesheet" href="css/layout.css?v=04111307">
-  <script src="js/theme.js?v=04111307"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111311">
+  <link rel="stylesheet" href="css/layout.css?v=04111311">
+  <script src="js/theme.js?v=04111311"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -201,6 +201,49 @@
       transition:all .2s; letter-spacing:0.5px;
     }
     .barber-logout-btn:hover { border-color:#ef4444; color:#ef4444; }
+
+    /* ── Tabs ── */
+    .barber-tabs {
+      display:flex; gap:4px; margin-bottom:16px;
+      background:var(--cinza-escuro); border:1px solid var(--borda);
+      border-radius:10px; padding:4px;
+    }
+    .barber-tab {
+      flex:1; padding:9px 4px; border:none; border-radius:7px;
+      background:transparent; color:var(--texto-muted);
+      font-size:12px; font-weight:700; font-family:inherit;
+      cursor:pointer; transition:all .2s; letter-spacing:0.3px;
+    }
+    .barber-tab.active { background:var(--accent); color:#07004a; }
+    [data-theme="light"] .barber-tab.active { color:#fff; }
+
+    /* ── Clientes ── */
+    .client-card {
+      background:var(--cinza-escuro); border:1px solid var(--borda);
+      border-radius:10px; padding:12px 14px; margin-bottom:8px;
+      display:flex; justify-content:space-between; align-items:center; gap:8px;
+    }
+    .client-name { font-size:14px; font-weight:600; }
+    .client-meta { font-size:11px; color:var(--texto-muted); margin-top:2px; }
+    .client-badge { font-size:10px; font-weight:700; color:var(--accent);
+      background:rgba(212,168,83,0.12); padding:4px 10px; border-radius:12px; white-space:nowrap; }
+
+    /* ── Comissões ── */
+    .comis-card {
+      background:var(--cinza-escuro); border:1px solid var(--borda);
+      border-radius:10px; padding:14px; margin-bottom:8px;
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .comis-month { font-size:13px; font-weight:700; }
+    .comis-meta { font-size:11px; color:var(--texto-muted); margin-top:3px; }
+    .comis-val { font-size:17px; font-weight:800; color:var(--accent); }
+    .comis-total {
+      background:var(--accent-soft); border:1px solid rgba(212,168,83,0.25);
+      border-radius:10px; padding:14px; margin-bottom:16px;
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .comis-total-label { font-size:11px; font-weight:700; color:var(--accent); letter-spacing:0.5px; }
+    .comis-total-val { font-size:20px; font-weight:800; color:var(--accent); }
   </style>
 </head>
 <body>
@@ -224,6 +267,15 @@
       </div>
     </div>
 
+    <!-- Tabs de navegação -->
+    <div class="barber-tabs">
+      <button class="barber-tab active" onclick="switchTab('agenda',this)">Agenda</button>
+      <button class="barber-tab" onclick="switchTab('clientes',this)">Clientes</button>
+      <button class="barber-tab" onclick="switchTab('comissoes',this)">Comissões</button>
+    </div>
+
+    <!-- ═══ TAB: AGENDA ═══ -->
+    <div id="tab-agenda">
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-num" id="stat-total" style="color:var(--texto-principal);">0</div>
@@ -336,8 +388,36 @@
         <div class="perf-ticket-val" id="perf-ticket">R$ 0</div>
       </div>
     </div>
+    </div><!-- /tab-agenda -->
 
-  </div>
+    <!-- ═══ TAB: CLIENTES ═══ -->
+    <div id="tab-clientes" style="display:none;">
+      <div class="section-title" style="margin-top:0;">Meus clientes</div>
+      <div id="clients-search-wrap" style="position:relative;margin-bottom:12px;">
+        <input id="clients-search" type="text" placeholder="Buscar cliente..." oninput="filtrarClientes(this.value)"
+          style="width:100%;padding:10px 10px 10px 36px;background:var(--cinza-escuro);border:1px solid var(--borda);border-radius:10px;color:var(--texto-principal);font-size:13px;font-family:inherit;box-sizing:border-box;">
+        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--texto-muted);font-family:'Material Symbols Outlined'">search</span>
+      </div>
+      <div id="clients-list"><div class="empty-state" style="padding:30px 0;"><div style="font-size:12px;">Carregando...</div></div></div>
+    </div>
+
+    <!-- ═══ TAB: COMISSÕES ═══ -->
+    <div id="tab-comissoes" style="display:none;">
+      <div class="section-title" style="margin-top:0;">Comissões</div>
+      <div id="comissoes-total" class="comis-total">
+        <div>
+          <div class="comis-total-label">TOTAL ACUMULADO</div>
+          <div class="comis-total-val" id="comis-total-val">R$ 0</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:10px;color:var(--texto-muted);font-weight:700;">SUA % DE COMISSÃO</div>
+          <div id="comis-pct-label" style="font-size:18px;font-weight:800;color:var(--accent);">—%</div>
+        </div>
+      </div>
+      <div id="comissoes-list"><div class="empty-state" style="padding:20px 0;"><div style="font-size:12px;">Carregando...</div></div></div>
+    </div>
+
+  </div><!-- /content -->
 
 </div>
 
@@ -345,10 +425,10 @@
   <button class="barber-logout-btn" onclick="logout()">SAIR</button>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111307"></script>
-<script src="js/supabase.js?v=04111307"></script>
-<script src="js/utils.js?v=04111307"></script>
-<script src="js/push.js?v=04111307"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111311"></script>
+<script src="js/supabase.js?v=04111311"></script>
+<script src="js/utils.js?v=04111311"></script>
+<script src="js/push.js?v=04111311"></script>
 <script>
 console.log('Barbeiro dashboard v1');
 
@@ -787,9 +867,163 @@ async function logout() {
   await sb.auth.signOut();
   window.location.href = 'app.html';
 }
+
+// ── Tabs ─────────────────────────────────────────────────────
+var _tabLoaded = {};
+
+function switchTab(name, btn) {
+  ['agenda','clientes','comissoes'].forEach(function(t) {
+    var el = document.getElementById('tab-' + t);
+    if (el) el.style.display = t === name ? '' : 'none';
+  });
+  document.querySelectorAll('.barber-tab').forEach(function(b) { b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+
+  if (!_tabLoaded[name]) {
+    _tabLoaded[name] = true;
+    if (name === 'clientes') loadClientes();
+    if (name === 'comissoes') loadComissoes();
+  }
+}
+
+// ── Meus Clientes ─────────────────────────────────────────────
+var _allClients = [];
+
+async function loadClientes() {
+  var el = document.getElementById('clients-list');
+  el.innerHTML = '<div class="empty-state" style="padding:30px 0;"><div style="font-size:12px;">Carregando...</div></div>';
+  try {
+    // Buscar todos os agendamentos do barbeiro (done + confirmed + pending)
+    var { data: appts } = await sb
+      .from('appointments')
+      .select('client_name, client_phone, scheduled_at, status')
+      .eq('barbershop_id', shopData.id)
+      .eq('barber_id', barber.id)
+      .not('status', 'eq', 'cancelled')
+      .order('scheduled_at', { ascending: false });
+
+    if (!appts || !appts.length) {
+      el.innerHTML = '<div class="empty-state" style="padding:30px 0;"><div class="empty-icon">&#x1F464;</div><div style="font-size:12px;">Nenhum cliente ainda</div></div>';
+      return;
+    }
+
+    // Agrupar por telefone ou nome
+    var map = {};
+    appts.forEach(function(a) {
+      var key = a.client_phone || a.client_name;
+      if (!map[key]) {
+        map[key] = { name: a.client_name, phone: a.client_phone, total: 0, last: a.scheduled_at };
+      }
+      map[key].total++;
+      if (a.scheduled_at > map[key].last) map[key].last = a.scheduled_at;
+    });
+
+    _allClients = Object.values(map).sort(function(a,b) { return b.total - a.total; });
+    renderClientes(_allClients);
+  } catch(e) {
+    el.innerHTML = '<div class="empty-state" style="padding:20px;font-size:12px;color:#ef4444;">Erro ao carregar clientes.</div>';
+    console.error('loadClientes:', e);
+  }
+}
+
+function renderClientes(list) {
+  var el = document.getElementById('clients-list');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state" style="padding:20px;font-size:12px;">Nenhum resultado</div>';
+    return;
+  }
+  el.innerHTML = list.map(function(c) {
+    var lastDate = new Date(c.last);
+    var lastStr = lastDate.getDate() + '/' + (lastDate.getMonth()+1) + '/' + lastDate.getFullYear();
+    var phone = (c.phone || '').replace(/\D/g,'');
+    var zapBtn = phone ? '<a href="https://wa.me/55' + phone + '" target="_blank" style="font-size:10px;color:#25d366;text-decoration:none;font-weight:700;">&#x1F4F1; ZAP</a>' : '';
+    return '<div class="client-card">'
+      + '<div style="min-width:0;">'
+      + '<div class="client-name">' + esc(c.name) + '</div>'
+      + '<div class="client-meta">' + (c.phone ? c.phone + ' · ' : '') + 'Último: ' + lastStr + '</div>'
+      + (zapBtn ? '<div style="margin-top:4px;">' + zapBtn + '</div>' : '')
+      + '</div>'
+      + '<div class="client-badge">' + c.total + ' ' + (c.total === 1 ? 'visita' : 'visitas') + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function filtrarClientes(q) {
+  if (!_allClients.length) return;
+  var term = q.trim().toLowerCase();
+  renderClientes(term ? _allClients.filter(function(c) {
+    return c.name.toLowerCase().includes(term) || (c.phone && c.phone.includes(term));
+  }) : _allClients);
+}
+
+// ── Comissões por mês ─────────────────────────────────────────
+async function loadComissoes() {
+  var el = document.getElementById('comissoes-list');
+  el.innerHTML = '<div class="empty-state" style="padding:20px;font-size:12px;">Carregando...</div>';
+  try {
+    var pct = barber.commission_pct || 0;
+    document.getElementById('comis-pct-label').textContent = pct + '%';
+
+    // Buscar atendimentos dos últimos 6 meses
+    var now = new Date();
+    var sixMoAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+    var startStr = sixMoAgo.getFullYear() + '-' + String(sixMoAgo.getMonth()+1).padStart(2,'0') + '-01';
+
+    var { data: appts } = await sb
+      .from('appointments')
+      .select('scheduled_at, price_paid, service_id')
+      .eq('barbershop_id', shopData.id)
+      .eq('barber_id', barber.id)
+      .eq('status', 'done')
+      .gte('scheduled_at', startStr + 'T00:00:00-03:00')
+      .order('scheduled_at', { ascending: false });
+
+    function getPrice(a) {
+      var p = Number(a.price_paid);
+      if (p > 0) return p;
+      var svc = services.find(function(s) { return s.id === a.service_id; });
+      return svc ? Number(svc.price) : 0;
+    }
+
+    // Agrupar por ano-mês
+    var monthMap = {};
+    var meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    (appts || []).forEach(function(a) {
+      var d = new Date(a.scheduled_at);
+      var key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+      var label = meses[d.getMonth()] + ' ' + d.getFullYear();
+      if (!monthMap[key]) monthMap[key] = { label: label, fat: 0, count: 0 };
+      monthMap[key].fat += getPrice(a);
+      monthMap[key].count++;
+    });
+
+    var months = Object.entries(monthMap).sort(function(a,b) { return b[0].localeCompare(a[0]); });
+    var totalFat = months.reduce(function(s, m) { return s + m[1].fat; }, 0);
+    var totalComis = totalFat * (pct / 100);
+    document.getElementById('comis-total-val').textContent = formatMoney(totalComis);
+
+    if (!months.length) {
+      el.innerHTML = '<div class="empty-state" style="padding:20px;font-size:12px;">Nenhum atendimento registrado</div>';
+      return;
+    }
+
+    el.innerHTML = months.map(function(m) {
+      var comis = m[1].fat * (pct / 100);
+      return '<div class="comis-card">'
+        + '<div>'
+        + '<div class="comis-month">' + m[1].label + '</div>'
+        + '<div class="comis-meta">' + m[1].count + ' atend. · Fat. ' + formatMoney(m[1].fat) + '</div>'
+        + '</div>'
+        + '<div class="comis-val">' + formatMoney(comis) + '</div>'
+        + '</div>';
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<div class="empty-state" style="padding:20px;font-size:12px;color:#ef4444;">Erro ao carregar comissões.</div>';
+    console.error('loadComissoes:', e);
+  }
+}
 </script>
-<script src="js/ajuda.js?v=04111307"></script>
-<script src="js/sw-update.js?v=04111307"></script>
-<script src="js/sidebar.js?v=04111307"></script>
+<script src="js/ajuda.js?v=04111311"></script>
+<script src="js/sw-update.js?v=04111311"></script>
 </body>
 </html>
