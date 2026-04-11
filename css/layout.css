@@ -1,20 +1,19 @@
-/* NaRegua — Layout System (Sidebar Desktop + Responsive) */
+/* NaRegua — Layout System */
 
-/* ============================================
-   SIDEBAR — Desktop only (>= 768px)
-   ============================================ */
+/* ══════════════════════════════════════════
+   SIDEBAR — oculta por padrão (mobile first)
+══════════════════════════════════════════ */
 .nr-sidebar {
   display: none;
 }
 
-/* ============================================
-   MOBILE — Global overrides
-   ============================================ */
+/* ══════════════════════════════════════════
+   MOBILE — overrides gerais
+══════════════════════════════════════════ */
 .nav-item {
   font-size: 10px !important;
 }
 
-/* Touch targets mínimo 44px em mobile */
 @media (max-width: 767px) {
   .btn-back, .icon-btn, .date-nav-btn, .week-nav-btn, .month-btn, .period-btn {
     min-width: 44px !important;
@@ -22,8 +21,11 @@
   }
 }
 
+/* ══════════════════════════════════════════
+   DESKTOP — sidebar visível
+══════════════════════════════════════════ */
 @media (min-width: 768px) {
-  /* Show sidebar on desktop */
+
   .nr-sidebar {
     display: flex;
     flex-direction: column;
@@ -38,18 +40,20 @@
     overflow: hidden;
   }
 
-  /* Sidebar branding */
+  /* ── Branding ── */
   .nr-sidebar-brand {
-    padding: 20px 16px 12px;
+    padding: 22px 18px 14px;
     border-bottom: 1px solid var(--borda);
     flex-shrink: 0;
   }
 
   .nr-sidebar-brand .nr-logo {
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 22px;
     font-weight: 800;
     letter-spacing: -0.5px;
     color: var(--texto-principal);
+    line-height: 1;
   }
 
   .nr-sidebar-brand .nr-logo span {
@@ -57,69 +61,80 @@
   }
 
   .nr-sidebar-brand .nr-logo-sub {
-    font-size: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
     color: var(--texto-muted);
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    margin-top: 2px;
+    margin-top: 4px;
+    opacity: 0.8;
   }
 
-  /* Sidebar nav area — scrollable */
+  /* ── Nav area — scrollável ── */
   .nr-sidebar-nav {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 8px 0;
+    padding: 10px 0;
   }
 
-  /* Custom scrollbar */
-  .nr-sidebar-nav::-webkit-scrollbar {
-    width: 4px;
-  }
-  .nr-sidebar-nav::-webkit-scrollbar-track {
-    background: transparent;
-  }
+  .nr-sidebar-nav::-webkit-scrollbar { width: 3px; }
+  .nr-sidebar-nav::-webkit-scrollbar-track { background: transparent; }
   .nr-sidebar-nav::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.1);
+    background: var(--borda);
     border-radius: 2px;
   }
   .nr-sidebar-nav::-webkit-scrollbar-thumb:hover {
-    background: rgba(255,255,255,0.2);
+    background: var(--borda-hover);
   }
 
-  /* Group header */
+  /* ── Grupo ── */
+  .nr-sidebar-group {
+    margin-bottom: 2px;
+  }
+
   .nr-sidebar-group-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 16px 6px;
+    padding: 10px 18px 6px;
     cursor: pointer;
     user-select: none;
+    transition: background 0.15s;
   }
 
   .nr-sidebar-group-header:hover {
     background: rgba(255,255,255,0.02);
   }
 
+  [data-theme="light"] .nr-sidebar-group-header:hover {
+    background: rgba(0,0,0,0.025);
+  }
+
   .nr-sidebar-group-label {
-    font-size: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 9px;
     font-weight: 700;
-    letter-spacing: 1.5px;
+    letter-spacing: 1.8px;
     text-transform: uppercase;
     color: var(--texto-muted);
+    opacity: 0.75;
   }
 
   .nr-sidebar-group-chevron {
-    font-size: 10px;
+    font-size: 9px;
     color: var(--texto-muted);
+    opacity: 0.6;
     transition: transform 0.2s ease;
+    line-height: 1;
   }
 
   .nr-sidebar-group.collapsed .nr-sidebar-group-chevron {
     transform: rotate(-90deg);
   }
 
-  /* Group items */
+  /* ── Itens do grupo ── */
   .nr-sidebar-group-items {
     overflow: hidden;
     transition: max-height 0.25s ease;
@@ -130,25 +145,31 @@
     max-height: 0;
   }
 
-  /* Nav link */
+  /* ── Link de nav ── */
   .nr-sidebar-link {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 9px 16px 9px 20px;
-    color: var(--texto-secundario);
+    padding: 9px 18px 9px 22px;
+    color: var(--texto-muted);
     text-decoration: none;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 13px;
     font-weight: 500;
     transition: all 0.15s ease;
-    border-left: 3px solid transparent;
+    border-left: 2px solid transparent;
     white-space: nowrap;
+    position: relative;
   }
 
   .nr-sidebar-link:hover {
-    background: rgba(255,255,255,0.03);
-    color: var(--texto-principal);
+    background: rgba(255,255,255,0.04);
+    color: var(--texto-secundario);
     text-decoration: none;
+  }
+
+  [data-theme="light"] .nr-sidebar-link:hover {
+    background: rgba(0,0,0,0.04);
   }
 
   .nr-sidebar-link.active {
@@ -159,62 +180,73 @@
   }
 
   .nr-sidebar-link .nr-icon {
-    font-size: 15px;
+    font-size: 14px;
     width: 20px;
     text-align: center;
     flex-shrink: 0;
+    opacity: 0.85;
+    line-height: 1;
   }
 
-  /* Sidebar footer */
+  .nr-sidebar-link.active .nr-icon {
+    opacity: 1;
+  }
+
+  /* ── Footer ── */
   .nr-sidebar-footer {
-    padding: 12px 16px;
+    padding: 12px 18px;
     border-top: 1px solid var(--borda);
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 
   .nr-sidebar-shop {
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 12px;
     font-weight: 600;
-    color: var(--texto-principal);
-    margin-bottom: 8px;
+    letter-spacing: 0.1px;
+    color: var(--texto-secundario);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .nr-sidebar-logout {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 6px;
     padding: 8px 12px;
-    border-radius: 8px;
+    border-radius: var(--radius-xs);
     border: 1px solid var(--borda);
     background: transparent;
     color: var(--texto-muted);
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    width: 100%;
     font-family: inherit;
+    width: 100%;
   }
 
   .nr-sidebar-logout:hover {
-    border-color: var(--vermelho);
-    color: var(--vermelho);
-    background: rgba(239,68,68,0.05);
+    border-color: rgba(239,68,68,0.4);
+    color: #ef4444;
+    background: rgba(239,68,68,0.06);
   }
 
-  /* ============================================
-     MAIN CONTENT — push right for sidebar
-     ============================================ */
-  /* Quando sidebar está ativa, empurra conteúdo pra direita */
+  /* ══════════════════════════════════════════
+     MAIN CONTENT — deslocado pela sidebar
+  ══════════════════════════════════════════ */
   body.nr-has-sidebar {
     padding-bottom: 0 !important;
     margin-left: 240px;
   }
 
-  /* Override narrow containers on desktop */
+  /* Containers desktop */
   .dash-container,
   .fin-container,
   .cmd-container,
@@ -223,19 +255,14 @@
     max-width: 900px !important;
   }
 
-  /* Hide bottom nav and more menu on desktop */
-  .bottom-nav {
-    display: none !important;
-  }
-
-  #more-menu {
-    display: none !important;
-  }
+  /* Bottom nav e more menu ocultos no desktop */
+  .bottom-nav     { display: none !important; }
+  #more-menu      { display: none !important; }
 }
 
-/* ============================================
-   TRANSITION ZONE (768px - 1024px)
-   ============================================ */
+/* ══════════════════════════════════════════
+   TABLET (768–1024px) — sidebar menor
+══════════════════════════════════════════ */
 @media (min-width: 768px) and (max-width: 1024px) {
   .nr-sidebar {
     width: 200px;
@@ -243,15 +270,15 @@
 
   .nr-sidebar-link {
     font-size: 12px;
-    padding: 8px 12px 8px 16px;
+    padding: 8px 14px 8px 18px;
   }
 
   .nr-sidebar-brand {
-    padding: 16px 12px 10px;
+    padding: 18px 14px 12px;
   }
 
   .nr-sidebar-brand .nr-logo {
-    font-size: 18px;
+    font-size: 19px;
   }
 
   body.nr-has-sidebar {
@@ -259,20 +286,9 @@
   }
 }
 
-/* ============================================
-   LIGHT THEME overrides
-   ============================================ */
-[data-theme="light"] .nr-sidebar-nav::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.1);
-}
-
-[data-theme="light"] .nr-sidebar-nav::-webkit-scrollbar-thumb:hover {
-  background: rgba(0,0,0,0.2);
-}
-
-/* ============================================
-   MOBILE — no changes, everything as-is
-   ============================================ */
+/* ══════════════════════════════════════════
+   MOBILE — sidebar sempre oculta
+══════════════════════════════════════════ */
 @media (max-width: 767px) {
   .nr-sidebar {
     display: none !important;
