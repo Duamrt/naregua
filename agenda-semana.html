@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111344";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111410";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Agenda Semanal</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111344">
-  <link rel="stylesheet" href="css/layout.css?v=04111344">
-  <script src="js/theme.js?v=04111344"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111410">
+  <link rel="stylesheet" href="css/layout.css?v=04111410">
+  <script src="js/theme.js?v=04111410"></script>
   <style>
     .ws-container { max-width:1100px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -52,7 +52,7 @@
       background:var(--accent-soft); color:var(--accent); font-size:11px;
       font-weight:700; cursor:pointer; font-family:inherit; transition:all .2s;
     }
-    .btn-hoje:hover { background:rgba(212,168,83,0.2); }
+    .btn-hoje:hover { background: var(--accent-soft); }
     .btn-hoje.hidden { display:none; }
 
     /* Toggle mode */
@@ -91,7 +91,7 @@
       color:var(--texto-principal);
     }
     .wg-day-header.today {
-      background:rgba(212,168,83,0.08);
+      background: var(--accent-soft);
       border-bottom:2px solid var(--accent);
     }
     .wg-day-header.today .day-num { color:var(--accent); }
@@ -113,7 +113,7 @@
       display:flex; flex-direction:column; gap:3px; overflow-y:auto;
       max-height:200px;
     }
-    .wg-cell.today-col { background:rgba(212,168,83,0.03); }
+    .wg-cell.today-col { background: var(--accent-soft); }
     .wg-cell.closed-col {
       background:rgba(255,255,255,0.01); display:flex;
       align-items:center; justify-content:center;
@@ -145,7 +145,7 @@
     .appt-mini .am-time { font-weight:800; }
     .appt-mini .am-name { font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-    .appt-mini.st-confirmed { background:rgba(212,168,83,0.1); border-color:#d4a853; color:#d4a853; }
+    .appt-mini.st-confirmed { background: var(--accent-soft); border-color:var(--accent); color:var(--accent); }
     .appt-mini.st-done { background:rgba(46,204,113,0.1); border-color:#2ecc71; color:#2ecc71; }
     .appt-mini.st-cancelled { background:rgba(231,76,60,0.08); border-color:#e74c3c; color:#e74c3c; opacity:0.6; }
     .appt-mini.st-no_show { background:rgba(155,89,182,0.1); border-color:#9b59b6; color:#9b59b6; }
@@ -162,7 +162,7 @@
       display:flex; flex-direction:column; gap:3px;
       overflow-y:auto; max-height:400px;
     }
-    .wgt-day.today-col { background:rgba(212,168,83,0.03); }
+    .wgt-day.today-col { background: var(--accent-soft); }
     .wgt-day.closed-col {
       display:flex; align-items:center; justify-content:center;
       background:rgba(255,255,255,0.01);
@@ -222,7 +222,7 @@
       font-size:8px; font-weight:700; padding:3px 8px; border-radius:12px;
       text-transform:uppercase; letter-spacing:0.5px; flex-shrink:0;
     }
-    .mw-st-confirmed { background:rgba(212,168,83,0.15); color:#d4a853; }
+    .mw-st-confirmed { background: var(--accent-soft); color:var(--accent); }
     .mw-st-done { background:rgba(46,204,113,0.12); color:#2ecc71; }
     .mw-st-cancelled { background:rgba(231,76,60,0.1); color:#e74c3c; }
     .mw-st-no_show { background:rgba(155,89,182,0.15); color:#9b59b6; }
@@ -387,9 +387,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111344"></script>
-<script src="js/supabase.js?v=04111344"></script>
-<script src="js/utils.js?v=04111344"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111410"></script>
+<script src="js/supabase.js?v=04111410"></script>
+<script src="js/utils.js?v=04111410"></script>
 <script>
 console.log('Agenda Semanal v1 carregado');
 
@@ -863,7 +863,7 @@ function renderMobile() {
 }
 
 function statusColor(status) {
-  const map = { confirmed:'#d4a853', done:'#2ecc71', cancelled:'#e74c3c', no_show:'#9b59b6', pending:'#f39c12' };
+  const map = { confirmed:'var(--accent)', done:'#2ecc71', cancelled:'#e74c3c', no_show:'#9b59b6', pending:'#f39c12' };
   return map[status] || '#a3a3a3';
 }
 
@@ -876,8 +876,8 @@ function goToDay(dateStr) {
   window.location.href = 'dashboard.html?date=' + dateStr;
 }
 </script>
-<script src="js/ajuda.js?v=04111344" defer></script>
-<script src="js/sw-update.js?v=04111344" defer></script>
-<script src="js/sidebar.js?v=04111344"></script>
+<script src="js/ajuda.js?v=04111410" defer></script>
+<script src="js/sw-update.js?v=04111410" defer></script>
+<script src="js/sidebar.js?v=04111410"></script>
 </body>
 </html>

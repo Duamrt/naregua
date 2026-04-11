@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111344";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111410";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Minha Conta</title>
   <meta property="og:type" content="website">
   <meta property="og:title" content="Minha Conta — NaRegua">
@@ -17,8 +17,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111344">
-  <script src="js/theme.js?v=04111344"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111410">
+  <script src="js/theme.js?v=04111410"></script>
   <style>
     /* ── Entry Screen ─────────────────────────── */
     .entry-container {
@@ -46,7 +46,7 @@
       text-align:center; letter-spacing:1px;
     }
     .entry-field input::placeholder { color:var(--texto-muted); }
-    .entry-field input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(212,168,83,0.15); }
+    .entry-field input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
     .entry-btn {
       width:100%; padding:14px; border-radius:12px; border:none;
       background:linear-gradient(135deg, var(--accent), var(--accent-hover));
@@ -135,7 +135,7 @@
     }
     .badge-confirmed { background:rgba(34,197,94,0.12); color:#22c55e; }
     .badge-pending { background:rgba(245,158,11,0.12); color:#f59e0b; }
-    .badge-done { background:rgba(212,168,83,0.12); color:var(--accent); }
+    .badge-done { background: var(--accent-soft); color:var(--accent); }
     .badge-cancelled { background:rgba(239,68,68,0.12); color:#ef4444; }
     .appt-detail {
       font-size:12px; color:var(--texto-secundario); margin-bottom:2px;
@@ -156,10 +156,10 @@
     }
     .btn-cancel:hover { background:rgba(239,68,68,0.15); }
     .btn-reschedule {
-      background:rgba(212,168,83,0.08); border:1px solid rgba(212,168,83,0.2);
+      background: var(--accent-soft); border:1px solid var(--accent-soft);
       color:var(--accent);
     }
-    .btn-reschedule:hover { background:rgba(212,168,83,0.15); }
+    .btn-reschedule:hover { background: var(--accent-soft); }
 
     /* History cards */
     .hist-card {
@@ -191,7 +191,7 @@
 
     /* Subscription card */
     .sub-card {
-      background:var(--cinza-escuro); border:1px solid rgba(212,168,83,0.15);
+      background:var(--cinza-escuro); border:1px solid var(--accent-soft);
       border-radius:12px; padding:14px; margin-bottom:8px;
     }
     .sub-plan { font-size:14px; font-weight:700; color:var(--accent); margin-bottom:4px; }
@@ -211,10 +211,10 @@
     .coupon-copy-btn {
       padding:6px 12px; border-radius:6px; font-size:10px; font-weight:700;
       font-family:inherit; cursor:pointer; transition:all .2s;
-      background:rgba(212,168,83,0.1); border:1px solid rgba(212,168,83,0.2);
+      background: var(--accent-soft); border:1px solid var(--accent-soft);
       color:var(--accent); white-space:nowrap;
     }
-    .coupon-copy-btn:hover { background:rgba(212,168,83,0.2); }
+    .coupon-copy-btn:hover { background: var(--accent-soft); }
 
     /* Empty states */
     .empty-section {
@@ -337,9 +337,9 @@
 </div>
 
 <!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111344"></script>
-<script src="js/supabase.js?v=04111344"></script>
-<script src="js/utils.js?v=04111344"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111410"></script>
+<script src="js/supabase.js?v=04111410"></script>
+<script src="js/utils.js?v=04111410"></script>
 <script>
 console.log('MinhaConta v1 carregado');
 
@@ -829,6 +829,6 @@ function copyCoupon(code, btn) {
   });
 }
 </script>
-<script src="js/ajuda.js?v=04111344"></script>
+<script src="js/ajuda.js?v=04111410"></script>
 </body>
 </html>

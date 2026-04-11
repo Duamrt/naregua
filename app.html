@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111344";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111410";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Agenda e gestão premium</title>
   <meta name="description" content="Sistema de agendamento e gestão para barbearias, salões, manicures e mais. Agenda, financeiro e clientes num só lugar.">
   <meta property="og:type" content="website">
@@ -20,8 +20,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111344">
-  <script src="js/theme.js?v=04111344"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111410">
+  <script src="js/theme.js?v=04111410"></script>
   <style>
     body { background:#000; overflow-x:hidden; }
 
@@ -49,11 +49,11 @@
 
     /* Logo grande */
     .hero-logo { margin-bottom:32px; text-align:center; position:relative; z-index:1; }
-    .hero-logo img { height:110px; filter:drop-shadow(0 4px 20px rgba(212,168,83,0.15)) brightness(1.8); }
+    .hero-logo img { height:110px; filter:drop-shadow(0 4px 20px var(--accent-soft)) brightness(1.8); }
     .hero-tagline {
       font-size:13px; color:#525252; margin-top:10px; letter-spacing:0.5px;
     }
-    .hero-tagline strong { color:#d4a853; font-weight:600; }
+    .hero-tagline strong { color:var(--accent); font-weight:600; }
 
     /* Card de login */
     .login-card {
@@ -74,10 +74,10 @@
       letter-spacing:1px; color:#525252; background:none; border:none;
       cursor:pointer; font-family:inherit; position:relative; transition:all .2s;
     }
-    .login-tab.active { color:#d4a853; }
+    .login-tab.active { color:var(--accent); }
     .login-tab.active::after {
       content:''; position:absolute; bottom:-1px; left:20%; right:20%;
-      height:2px; background:linear-gradient(90deg, transparent, #d4a853, transparent);
+      height:2px; background:linear-gradient(90deg, transparent, var(--accent), transparent);
       border-radius:2px;
     }
     .login-tab:not(.active):hover { color:#a3a3a3; }
@@ -97,8 +97,8 @@
     }
     .login-input::placeholder { color:#525252; }
     .login-input:focus {
-      border-color:rgba(212,168,83,0.3);
-      box-shadow:0 0 0 3px rgba(212,168,83,0.15);
+      border-color:var(--accent-soft);
+      box-shadow:0 0 0 3px var(--accent-soft);
       background:rgba(255,255,255,0.04);
     }
     .login-eye {
@@ -116,12 +116,12 @@
       display:flex; align-items:center; justify-content:center; gap:8px;
     }
     .login-btn-primary {
-      background:linear-gradient(135deg, #d4a853 0%, #c49a45 50%, #b08a38 100%);
+      background:linear-gradient(135deg, var(--accent) 0%, #c49a45 50%, #b08a38 100%);
       color:#000;
     }
     .login-btn-primary:hover {
       transform:translateY(-1px);
-      box-shadow:0 4px 20px rgba(212,168,83,0.3);
+      box-shadow:0 4px 20px var(--accent-soft);
     }
     .login-btn-primary:disabled { opacity:0.6; transform:none; box-shadow:none; cursor:not-allowed; }
 
@@ -135,7 +135,7 @@
     .login-bottom {
       text-align:center; margin-top:18px; font-size:12px; color:#525252;
     }
-    .login-bottom a { color:#d4a853; text-decoration:none; font-weight:600; }
+    .login-bottom a { color:var(--accent); text-decoration:none; font-weight:600; }
     .login-bottom a:hover { text-decoration:underline; }
 
     /* Mensagem */
@@ -145,7 +145,7 @@
     }
     .login-msg.show { display:flex; }
     .login-msg-error { background:rgba(239,68,68,0.08); color:#ef4444; border:1px solid rgba(239,68,68,0.15); }
-    .login-msg-success { background:rgba(212,168,83,0.08); color:#d4a853; border:1px solid rgba(212,168,83,0.15); }
+    .login-msg-success { background: var(--accent-soft); color:var(--accent); border:1px solid var(--accent-soft); }
 
     /* Features abaixo do card */
     .features {
@@ -165,7 +165,7 @@
 
     @media (max-width:480px) {
       .login-card { padding:24px 20px; border-radius:var(--radius); }
-      .hero-logo img { height:90px; filter:drop-shadow(0 4px 20px rgba(212,168,83,0.15)) brightness(1.8); }
+      .hero-logo img { height:90px; filter:drop-shadow(0 4px 20px var(--accent-soft)) brightness(1.8); }
       .features { gap:16px; }
     }
   </style>
@@ -287,7 +287,7 @@
 
     <!-- Tab: login ou criar -->
     <div style="display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid rgba(255,255,255,0.06);">
-      <button class="barb-tab active" data-tab="login" onclick="switchBarbTab('login')" style="flex:1;padding:10px 0;background:none;border:none;border-bottom:2px solid #d4a853;color:#d4a853;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:1px;">ENTRAR</button>
+      <button class="barb-tab active" data-tab="login" onclick="switchBarbTab('login')" style="flex:1;padding:10px 0;background:none;border:none;border-bottom:2px solid var(--accent);color:var(--accent);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:1px;">ENTRAR</button>
       <button class="barb-tab" data-tab="signup" onclick="switchBarbTab('signup')" style="flex:1;padding:10px 0;background:none;border:none;border-bottom:2px solid transparent;color:#525252;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:1px;">PRIMEIRO ACESSO</button>
     </div>
 
@@ -335,10 +335,10 @@
 </div>
 
 <!-- Supabase CDN -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111344"></script>
-<script src="js/supabase.js?v=04111344"></script>
-<script src="js/utils.js?v=04111344"></script>
-<script src="js/auth.js?v=04111344"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111410"></script>
+<script src="js/supabase.js?v=04111410"></script>
+<script src="js/utils.js?v=04111410"></script>
+<script src="js/auth.js?v=04111410"></script>
 <script>
 // Override tabs pro novo layout
 document.querySelectorAll('.login-tab').forEach(tab => {
@@ -398,8 +398,8 @@ function toggleBarbPass(btn) {
 
 function switchBarbTab(tab) {
   document.querySelectorAll('.barb-tab').forEach(t => {
-    t.style.borderBottomColor = t.dataset.tab === tab ? '#d4a853' : 'transparent';
-    t.style.color = t.dataset.tab === tab ? '#d4a853' : '#525252';
+    t.style.borderBottomColor = t.dataset.tab === tab ? 'var(--accent)' : 'transparent';
+    t.style.color = t.dataset.tab === tab ? 'var(--accent)' : '#525252';
   });
   document.getElementById('barb-form-login').style.display = tab === 'login' ? 'block' : 'none';
   document.getElementById('barb-form-signup').style.display = tab === 'signup' ? 'block' : 'none';
@@ -505,6 +505,6 @@ async function signupBarbeiro() {
   }
 }
 </script>
-<script src="js/sw-update.js?v=04111344"></script>
+<script src="js/sw-update.js?v=04111410"></script>
 </body>
 </html>

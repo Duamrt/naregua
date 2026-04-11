@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111344";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111410";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Galeria</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111344">
-  <link rel="stylesheet" href="css/layout.css?v=04111344">
-  <script src="js/theme.js?v=04111344"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111410">
+  <link rel="stylesheet" href="css/layout.css?v=04111410">
+  <script src="js/theme.js?v=04111410"></script>
   <style>
     .gal-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -50,7 +50,7 @@
       border:1px solid var(--borda); background:transparent; color:var(--texto-muted);
       cursor:pointer; font-family:inherit; transition:all .2s;
     }
-    .gal-chip.active { border-color:var(--verde-acao); background:rgba(212,168,83,0.1); color:var(--verde-acao); }
+    .gal-chip.active { border-color:var(--verde-acao); background: var(--accent-soft); color:var(--verde-acao); }
 
     /* Masonry grid */
     .gal-grid {
@@ -72,7 +72,7 @@
     .gal-item-barber {
       font-size:10px; font-weight:700; color:var(--verde-acao);
       display:inline-block; padding:2px 6px; border-radius:6px;
-      background:rgba(212,168,83,0.1);
+      background: var(--accent-soft);
     }
     .gal-item-cat {
       font-size:8px; font-weight:700; color:var(--texto-muted);
@@ -182,7 +182,7 @@
       text-align:center; cursor:pointer; transition:all .2s; margin-bottom:12px;
     }
     .upload-dropzone:hover, .upload-dropzone.drag-over {
-      border-color:var(--verde-acao); background:rgba(212,168,83,0.05);
+      border-color:var(--verde-acao); background: var(--accent-soft);
     }
     .upload-dropzone .icon { font-size:32px; margin-bottom:8px; }
     .upload-dropzone .text { font-size:12px; color:var(--texto-muted); }
@@ -190,8 +190,8 @@
 
     /* URL fallback */
     .url-fallback {
-      margin-top:8px; padding:10px; background:rgba(212,168,83,0.05);
-      border:1px solid rgba(212,168,83,0.15); border-radius:8px;
+      margin-top:8px; padding:10px; background: var(--accent-soft);
+      border:1px solid var(--accent-soft); border-radius:8px;
     }
     .url-fallback summary {
       font-size:11px; font-weight:700; color:var(--verde-acao); cursor:pointer;
@@ -406,9 +406,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){var mm=document.getElementById('more-menu');if(mm&&!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){mm.style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111344"></script>
-<script src="js/supabase.js?v=04111344"></script>
-<script src="js/utils.js?v=04111344"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111410"></script>
+<script src="js/supabase.js?v=04111410"></script>
+<script src="js/utils.js?v=04111410"></script>
 <script>
 console.log('Galeria v1 carregado');
 
@@ -900,8 +900,8 @@ async function deletarFoto(id) {
   renderGrid();
 }
 </script>
-<script src="js/ajuda.js?v=04111344"></script>
-<script src="js/sw-update.js?v=04111344"></script>
-<script src="js/sidebar.js?v=04111344"></script>
+<script src="js/ajuda.js?v=04111410"></script>
+<script src="js/sw-update.js?v=04111410"></script>
+<script src="js/sidebar.js?v=04111410"></script>
 </body>
 </html>

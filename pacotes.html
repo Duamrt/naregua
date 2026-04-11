@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111344";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111410";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Pacotes</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111344">
-  <link rel="stylesheet" href="css/layout.css?v=04111344">
-  <script src="js/theme.js?v=04111344"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111410">
+  <link rel="stylesheet" href="css/layout.css?v=04111410">
+  <script src="js/theme.js?v=04111410"></script>
   <style>
     .pkt-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -58,7 +58,7 @@
       text-align:center;
     }
     .pkt-action-btn:hover { border-color:var(--verde-acao); color:var(--verde-acao); }
-    .pkt-action-btn.primary { border-color:var(--verde-acao); background:rgba(212,168,83,0.1); color:var(--verde-acao); }
+    .pkt-action-btn.primary { border-color:var(--verde-acao); background: var(--accent-soft); color:var(--verde-acao); }
     .pkt-action-btn.danger:hover { border-color:#ef4444; color:#ef4444; }
 
     /* Toggle switch */
@@ -106,7 +106,7 @@
       font-size:9px; font-weight:700; padding:2px 8px; border-radius:10px;
       display:inline-block;
     }
-    .venda-badge.ativo { background:rgba(212,168,83,0.15); color:var(--verde-acao); }
+    .venda-badge.ativo { background: var(--accent-soft); color:var(--verde-acao); }
     .venda-badge.esgotado { background:rgba(255,255,255,0.06); color:var(--texto-muted); }
     .venda-badge.expirado { background:rgba(239,68,68,0.15); color:#e74c3c; }
     .venda-badge.cancelado { background:rgba(239,68,68,0.15); color:#e74c3c; }
@@ -181,7 +181,7 @@
       text-align:center;
     }
     .pay-method-btn:hover { border-color:var(--borda-hover); }
-    .pay-method-btn.active { border-color:var(--verde-acao); background:rgba(212,168,83,0.1); color:var(--verde-acao); }
+    .pay-method-btn.active { border-color:var(--verde-acao); background: var(--accent-soft); color:var(--verde-acao); }
     .pay-method-btn .pay-icon { font-size:16px; display:block; margin-bottom:2px; }
 
     /* Bottom nav */
@@ -371,9 +371,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111344"></script>
-<script src="js/supabase.js?v=04111344"></script>
-<script src="js/utils.js?v=04111344"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111410"></script>
+<script src="js/supabase.js?v=04111410"></script>
+<script src="js/utils.js?v=04111410"></script>
 <script>
 // ── Estado ────────────────────────────────────────────────────
 let shop = null;
@@ -877,8 +877,8 @@ function formatTime(iso) {
   return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 </script>
-<script src="js/ajuda.js?v=04111344"></script>
-<script src="js/sw-update.js?v=04111344"></script>
-<script src="js/sidebar.js?v=04111344"></script>
+<script src="js/ajuda.js?v=04111410"></script>
+<script src="js/sw-update.js?v=04111410"></script>
+<script src="js/sidebar.js?v=04111410"></script>
 </body>
 </html>

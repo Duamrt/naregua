@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111344";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111410";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Recibo de Comissao</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,8 +14,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111344">
-  <script src="js/theme.js?v=04111344"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111410">
+  <script src="js/theme.js?v=04111410"></script>
   <style>
     .rec-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -68,7 +68,7 @@
     .barber-info-name { font-size:20px; font-weight:800; margin-bottom:6px; }
     .barber-info-pct {
       display:inline-block; font-size:12px; font-weight:700; color:var(--accent);
-      background:rgba(212,168,83,0.15); padding:4px 12px; border-radius:20px;
+      background: var(--accent-soft); padding:4px 12px; border-radius:20px;
       margin-bottom:6px;
     }
     .barber-info-shop { font-size:12px; color:var(--texto-muted); font-weight:600; }
@@ -143,7 +143,7 @@
       .rec-container { max-width:100%; padding:20px 30px; }
       .btn-back, .period-btn, .btn-hoje, .barber-selector, .rec-actions { display:none !important; }
 
-      .rec-header { border-bottom:2px solid #d4a853; padding-bottom:12px; justify-content:center; }
+      .rec-header { border-bottom:2px solid var(--accent); padding-bottom:12px; justify-content:center; }
       .rec-header h1 { color:#111 !important; text-align:center; font-size:22px; }
 
       .period-nav { justify-content:center; margin-bottom:12px; }
@@ -298,9 +298,9 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111344"></script>
-<script src="js/supabase.js?v=04111344"></script>
-<script src="js/utils.js?v=04111344"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111410"></script>
+<script src="js/supabase.js?v=04111410"></script>
+<script src="js/utils.js?v=04111410"></script>
 <script>
 // ── Estado ────────────────────────────────────────────────────
 let session = null;
@@ -586,7 +586,7 @@ function shareWhatsApp() {
   window.open(url, '_blank');
 }
 </script>
-<script src="js/ajuda.js?v=04111344"></script>
-<script src="js/sw-update.js?v=04111344"></script>
+<script src="js/ajuda.js?v=04111410"></script>
+<script src="js/sw-update.js?v=04111410"></script>
 </body>
 </html>

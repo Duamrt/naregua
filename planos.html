@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111344";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111410";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Meu Plano</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111344">
-  <link rel="stylesheet" href="css/layout.css?v=04111344">
-  <script src="js/theme.js?v=04111344"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111410">
+  <link rel="stylesheet" href="css/layout.css?v=04111410">
+  <script src="js/theme.js?v=04111410"></script>
   <style>
     .plan-container { max-width:520px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -39,7 +39,7 @@
       padding:4px 14px; border-radius:20px; text-transform:uppercase;
     }
     .badge-active { background:rgba(34,197,94,0.15); color:#22c55e; }
-    .badge-trial { background:rgba(212,168,83,0.15); color:#d4a853; }
+    .badge-trial { background: var(--accent-soft); color:var(--accent); }
     .badge-expired { background:rgba(239,68,68,0.15); color:#ef4444; }
 
     .trial-countdown {
@@ -98,7 +98,7 @@
     .plan-card-current-tag {
       display:inline-block; font-size:9px; font-weight:800; letter-spacing:0.5px;
       padding:3px 10px; border-radius:10px; margin-bottom:10px;
-      background:rgba(212,168,83,0.15); color:var(--accent);
+      background: var(--accent-soft); color:var(--accent);
     }
 
     .plan-features { list-style:none; margin-bottom:16px; }
@@ -192,7 +192,25 @@
       text-align:center; padding:60px 0;
     }
 
-    body { padding-bottom:20px; }
+    body { padding-bottom:70px; }
+
+    .bottom-nav {
+      position:fixed; bottom:0; left:0; right:0;
+      background:var(--cinza-escuro); border-top:1px solid var(--borda);
+      display:flex; justify-content:center; gap:0; padding:8px 0;
+      padding-bottom:max(8px, env(safe-area-inset-bottom));
+      padding-left:max(0px, env(safe-area-inset-left));
+      padding-right:max(0px, env(safe-area-inset-right));
+    }
+    .nav-item {
+      flex:1; max-width:65px; display:flex; flex-direction:column;
+      align-items:center; gap:2px; padding:6px 0;
+      color:var(--texto-muted); font-size:8px; font-weight:600;
+      text-decoration:none; cursor:pointer; border:none; background:none;
+      font-family:inherit; transition:all .2s;
+    }
+    .nav-item.active { color:var(--verde-acao); }
+    .nav-item .nav-icon { font-size:16px; }
   </style>
 </head>
 <body style="padding-bottom:70px;">
@@ -255,9 +273,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111344"></script>
-<script src="js/supabase.js?v=04111344"></script>
-<script src="js/utils.js?v=04111344"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111410"></script>
+<script src="js/supabase.js?v=04111410"></script>
+<script src="js/utils.js?v=04111410"></script>
 <script>
 const PLAN_NAMES = {
   trial: 'Trial Gratuito',
@@ -386,7 +404,7 @@ function renderPage() {
     const pct = Math.max(0, Math.min(100, (daysLeft / totalDays) * 100));
     const bar = document.getElementById('trial-progress-bar');
     bar.style.width = pct + '%';
-    bar.style.background = pct > 30 ? '#d4a853' : pct > 10 ? '#f59e0b' : '#ef4444';
+    bar.style.background = pct > 30 ? 'var(--accent)' : pct > 10 ? '#f59e0b' : '#ef4444';
   }
 
   // Expired banner
@@ -498,8 +516,8 @@ function copiarPix() {
 function toggleMore(){var m=document.getElementById('more-menu');m.style.display=m.style.display==='none'?'block':'none';}
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
-<script src="js/ajuda.js?v=04111344"></script>
-<script src="js/sw-update.js?v=04111344"></script>
-<script src="js/sidebar.js?v=04111344"></script>
+<script src="js/ajuda.js?v=04111410"></script>
+<script src="js/sw-update.js?v=04111410"></script>
+<script src="js/sidebar.js?v=04111410"></script>
 </body>
 </html>

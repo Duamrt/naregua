@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111344";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111410";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Horarios Ociosos</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111344">
-  <link rel="stylesheet" href="css/layout.css?v=04111344">
-  <script src="js/theme.js?v=04111344"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111410">
+  <link rel="stylesheet" href="css/layout.css?v=04111410">
+  <script src="js/theme.js?v=04111410"></script>
   <style>
     .ho-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -78,7 +78,7 @@
     .hm-cell:hover { transform:scale(1.15); z-index:2; }
     .hm-cell.occ-0   { background:rgba(239,68,68,0.25); color:#ef4444; }
     .hm-cell.occ-20  { background:rgba(249,115,22,0.25); color:#f97316; }
-    .hm-cell.occ-40  { background:rgba(212,168,83,0.25); color:var(--accent); }
+    .hm-cell.occ-40  { background: var(--accent-soft); color:var(--accent); }
     .hm-cell.occ-60  { background:rgba(34,197,94,0.20); color:#22c55e; }
     .hm-cell.occ-80  { background:rgba(34,197,94,0.40); color:#15803d; }
     .hm-cell.closed  { background:rgba(255,255,255,0.03); color:var(--texto-muted); }
@@ -313,9 +313,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111344"></script>
-<script src="js/supabase.js?v=04111344"></script>
-<script src="js/utils.js?v=04111344"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111410"></script>
+<script src="js/supabase.js?v=04111410"></script>
+<script src="js/utils.js?v=04111410"></script>
 <script>
 // ── Estado ────────────────────────────────────────────────────
 let shop = null;
@@ -709,7 +709,7 @@ function renderHeatmap(heatmap, hourSlots) {
     + '<span>Baixo</span>'
     + '<span class="legend-box" style="background:rgba(239,68,68,0.25);"></span>'
     + '<span class="legend-box" style="background:rgba(249,115,22,0.25);"></span>'
-    + '<span class="legend-box" style="background:rgba(212,168,83,0.25);"></span>'
+    + '<span class="legend-box" style="background: var(--accent-soft);"></span>'
     + '<span class="legend-box" style="background:rgba(34,197,94,0.20);"></span>'
     + '<span class="legend-box" style="background:rgba(34,197,94,0.40);"></span>'
     + '<span>Alto</span>'
@@ -1028,8 +1028,8 @@ async function renderComparison(appts, prevAppts, range, prevRange, hourSlots) {
     + '</div>';
 }
 </script>
-<script src="js/ajuda.js?v=04111344"></script>
-<script src="js/sw-update.js?v=04111344"></script>
-<script src="js/sidebar.js?v=04111344"></script>
+<script src="js/ajuda.js?v=04111410"></script>
+<script src="js/sw-update.js?v=04111410"></script>
+<script src="js/sidebar.js?v=04111410"></script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111344";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111410";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Configurações</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111344">
-  <link rel="stylesheet" href="css/layout.css?v=04111344">
-  <script src="js/theme.js?v=04111344"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111410">
+  <link rel="stylesheet" href="css/layout.css?v=04111410">
+  <script src="js/theme.js?v=04111410"></script>
   <style>
     .cfg-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -123,7 +123,7 @@
       font-size:12px; font-weight:600; transition:all .2s; user-select:none;
     }
     .cfg-check.active {
-      border-color:rgba(212,168,83,0.4); background:rgba(212,168,83,0.08); color:var(--verde-acao);
+      border-color:var(--accent); background: var(--accent-soft); color:var(--verde-acao);
     }
     .cfg-check input { display:none; }
 
@@ -156,6 +156,24 @@
     }
     .toast.show { transform:translateX(-50%) translateY(0); }
     .toast.error { background:#ef4444; color:#fff; }
+
+    .bottom-nav {
+      position:fixed; bottom:0; left:0; right:0;
+      background:var(--cinza-escuro); border-top:1px solid var(--borda);
+      display:flex; justify-content:center; gap:0; padding:8px 0;
+      padding-bottom:max(8px, env(safe-area-inset-bottom));
+      padding-left:max(0px, env(safe-area-inset-left));
+      padding-right:max(0px, env(safe-area-inset-right));
+    }
+    .nav-item {
+      flex:1; max-width:65px; display:flex; flex-direction:column;
+      align-items:center; gap:2px; padding:6px 0;
+      color:var(--texto-muted); font-size:8px; font-weight:600;
+      text-decoration:none; cursor:pointer; border:none; background:none;
+      font-family:inherit; transition:all .2s;
+    }
+    .nav-item.active { color:var(--verde-acao); }
+    .nav-item .nav-icon { font-size:16px; }
   </style>
 </head>
 <body style="padding-bottom:70px;">
@@ -389,7 +407,7 @@
           </div>
           <div class="cfg-colors" id="cfg-segment" style="margin-top:8px;">
             <div class="cfg-color-wrap">
-              <div class="cfg-color" data-segment="barbearia" style="background:#d4a853;" onclick="selectSegment(this)"></div>
+              <div class="cfg-color" data-segment="barbearia" style="background:var(--accent);" onclick="selectSegment(this)"></div>
               <div class="cfg-color-label">Barbearia</div>
             </div>
             <div class="cfg-color-wrap">
@@ -435,7 +453,7 @@
           </div>
           <div class="cfg-colors" id="cfg-accent-color">
             <div class="cfg-color-wrap">
-              <div class="cfg-color active" data-color="#d4a853" style="background:#d4a853;" onclick="selectColor(this)"></div>
+              <div class="cfg-color active" data-color="var(--accent)" style="background:var(--accent);" onclick="selectColor(this)"></div>
               <div class="cfg-color-label">Gold</div>
             </div>
             <div class="cfg-color-wrap">
@@ -524,9 +542,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111344"></script>
-<script src="js/supabase.js?v=04111344"></script>
-<script src="js/utils.js?v=04111344"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111410"></script>
+<script src="js/supabase.js?v=04111410"></script>
+<script src="js/utils.js?v=04111410"></script>
 <script>
 let shop = null;
 let isDirty = false;
@@ -542,7 +560,7 @@ const DEFAULTS = {
   send_confirmation: true,
   default_commission: 0,
   payment_methods: ['pix', 'dinheiro', 'debito', 'credito'],
-  accent_color: '#d4a853'
+  accent_color: 'var(--accent)'
 };
 
 // ADMIN_EMAILS centralizado em utils.js
@@ -745,8 +763,8 @@ function selectSegment(el) {
   var seg = el.dataset.segment;
   if (typeof setSegment === 'function') setSegment(seg);
   // Auto-selecionar cor padrão do segmento
-  var segDefaults = { barbearia:'#d4a853', estetica:'#e91e8c', sobrancelha:'#c4956a', unha:'#a855f7', salao:'#b76e79' };
-  var defaultColor = segDefaults[seg] || '#d4a853';
+  var segDefaults = { barbearia:'var(--accent)', estetica:'#e91e8c', sobrancelha:'#c4956a', unha:'#a855f7', salao:'#b76e79' };
+  var defaultColor = segDefaults[seg] || 'var(--accent)';
   document.querySelectorAll('#cfg-accent-color .cfg-color').forEach(c => {
     c.classList.toggle('active', c.dataset.color === defaultColor);
   });
@@ -779,8 +797,8 @@ window.addEventListener('beforeunload', function(e) {
   }
 });
 </script>
-<script src="js/ajuda.js?v=04111344"></script>
-<script src="js/sw-update.js?v=04111344"></script>
-<script src="js/sidebar.js?v=04111344"></script>
+<script src="js/ajuda.js?v=04111410"></script>
+<script src="js/sw-update.js?v=04111410"></script>
+<script src="js/sidebar.js?v=04111410"></script>
 </body>
 </html>

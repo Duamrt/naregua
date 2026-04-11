@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111344";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111410";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Admin</title>
     <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111344">
-  <link rel="stylesheet" href="css/layout.css?v=04111344">
-  <script src="js/theme.js?v=04111344"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111410">
+  <link rel="stylesheet" href="css/layout.css?v=04111410">
+  <script src="js/theme.js?v=04111410"></script>
   <style>
     .admin-container { max-width:900px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -56,7 +56,7 @@
       font-size:9px; font-weight:700; letter-spacing:0.5px; padding:4px 10px;
       border-radius:20px; text-transform:uppercase;
     }
-    .plan-basico { background:rgba(212,168,83,0.15); color:#d4a853; }
+    .plan-basico { background: var(--accent-soft); color:var(--accent); }
     .plan-profissional { background:rgba(52,152,219,0.15); color:#3498db; }
     .plan-premium { background:rgba(243,156,18,0.15); color:#f39c12; }
 
@@ -331,9 +331,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111344"></script>
-<script src="js/supabase.js?v=04111344"></script>
-<script src="js/utils.js?v=04111344"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111410"></script>
+<script src="js/supabase.js?v=04111410"></script>
+<script src="js/utils.js?v=04111410"></script>
 <script>
 // ── Config admin — só seu e-mail tem acesso ───────────────────
 // ADMIN_EMAILS centralizado em utils.js
@@ -580,8 +580,8 @@ function renderShops() {
       ${shopBarbers.filter(b => b.phone).sort((a, b) => (b.is_owner ? 1 : 0) - (a.is_owner ? 1 : 0)).map(b => {
         const isDono = b.is_owner;
         const vinc = b.user_id ? 'vinculado' : 'aguardando';
-        const donoBadge = isDono ? ' <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:6px;background:rgba(212,168,83,0.15);color:#d4a853;">DONO</span>' : '';
-        const donoNote = isDono ? ' · <span style="color:#d4a853;font-size:9px;">usa login email acima</span>' : '';
+        const donoBadge = isDono ? ' <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:6px;background: var(--accent-soft);color:var(--accent);">DONO</span>' : '';
+        const donoNote = isDono ? ' · <span style="color:var(--accent);font-size:9px;">usa login email acima</span>' : '';
         const senhaBtn = !isDono && b.user_id ? ' <button class="shop-action-btn" style="padding:1px 6px;font-size:8px;margin-left:2px;" onclick="definirSenhaBarbeiro(\'' + esc(b.id) + '\',\'' + esc(b.user_id) + '\',\'' + esc(b.name) + '\')">SENHA</button>' : '';
         const senhaHint = !isDono && b.password_hint ? ' · Senha: <strong>' + esc(b.password_hint) + '</strong>' : '';
         return '<div class="shop-meta" style="margin-top:1px;font-size:11px;">&#x1F4F1; ' + esc(b.name) + donoBadge + ' · ' + esc(b.phone) + ' · <span style="color:' + (b.user_id ? '#22c55e' : '#f59e0b') + '">' + vinc + '</span>' + donoNote + senhaHint + senhaBtn + '</div>';
@@ -1083,8 +1083,8 @@ async function logout() {
   window.location.href = 'app.html';
 }
 </script>
-<script src="js/ajuda.js?v=04111344"></script>
-<script src="js/sw-update.js?v=04111344"></script>
-<script src="js/sidebar.js?v=04111344"></script>
+<script src="js/ajuda.js?v=04111410"></script>
+<script src="js/sw-update.js?v=04111410"></script>
+<script src="js/sidebar.js?v=04111410"></script>
 </body>
 </html>

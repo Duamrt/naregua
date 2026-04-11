@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111344";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111410";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Relatório</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111344">
-  <link rel="stylesheet" href="css/layout.css?v=04111344">
-  <script src="js/theme.js?v=04111344"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111410">
+  <link rel="stylesheet" href="css/layout.css?v=04111410">
+  <script src="js/theme.js?v=04111410"></script>
   <style>
     .rel-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -209,9 +209,9 @@
     .rank-meta .accent { color:var(--accent); font-weight:700; }
     .rank-bar-bg {
       position:absolute; left:0; top:0; bottom:0;
-      background:rgba(212,168,83,0.06); border-radius:12px; transition:width .6s ease;
+      background: var(--accent-soft); border-radius:12px; transition:width .6s ease;
     }
-    .rank-row:first-child .rank-bar-bg { background:rgba(212,168,83,0.12); }
+    .rank-row:first-child .rank-bar-bg { background: var(--accent-soft); }
     .rank-star { color:#f59e0b; font-size:10px; }
 
     /* ═══ COMPARATIVO MÊS A MÊS V2 ═══ */
@@ -287,9 +287,9 @@
     }
     .peak-cell .peak-hour { font-size:9px; color:var(--texto-muted); margin-top:1px; }
     .peak-cell.l0 { background:rgba(255,255,255,0.02); color:var(--texto-muted); }
-    .peak-cell.l1 { background:rgba(212,168,83,0.10); color:var(--accent); }
-    .peak-cell.l2 { background:rgba(212,168,83,0.25); color:var(--accent); }
-    .peak-cell.l3 { background:rgba(212,168,83,0.45); color:#000; }
+    .peak-cell.l1 { background: var(--accent-soft); color:var(--accent); }
+    .peak-cell.l2 { background: var(--accent-soft); color:var(--accent); }
+    .peak-cell.l3 { background:var(--accent); color:#000; }
     .peak-cell.l4 { background:var(--accent); color:#000; font-weight:800; }
     .peak-busiest {
       margin-top:10px; text-align:center; font-size:12px; color:var(--texto-secundario);
@@ -320,16 +320,16 @@
       }
       .kpi-num, .rank-name, .svc-name, .svc-count, .comp-v2-current, .donut-total { color:#111 !important; }
       .kpi-label, .comp-v2-label, .section-title { color:#555 !important; }
-      .rank-bar-bg { background:rgba(212,168,83,0.12) !important; }
-      .barber-minibar-fill, .svc-bar-fill { background:#d4a853 !important; }
-      .chart-bar { background:#d4a853 !important; }
+      .rank-bar-bg { background: var(--accent-soft) !important; }
+      .barber-minibar-fill, .svc-bar-fill { background:var(--accent) !important; }
+      .chart-bar { background:var(--accent) !important; }
       .peak-cell.l1, .peak-cell.l2, .peak-cell.l3, .peak-cell.l4 {
         -webkit-print-color-adjust:exact; print-color-adjust:exact;
       }
       .donut-chart { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
       .print-header {
         display:block !important; text-align:center; padding:20px 0 10px;
-        border-bottom:2px solid #d4a853; margin-bottom:16px;
+        border-bottom:2px solid var(--accent); margin-bottom:16px;
       }
       .print-header h2 { font-size:20px; color:#111; }
       .print-header p { font-size:11px; color:#555; margin-top:4px; }
@@ -476,9 +476,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111344"></script>
-<script src="js/supabase.js?v=04111344"></script>
-<script src="js/utils.js?v=04111344"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111410"></script>
+<script src="js/supabase.js?v=04111410"></script>
+<script src="js/utils.js?v=04111410"></script>
 <script>
 // ── Estado ────────────────────────────────────────────────────
 let shop = null;
@@ -1053,8 +1053,8 @@ function exportPDF() {
   window.print();
 }
 </script>
-<script src="js/ajuda.js?v=04111344"></script>
-<script src="js/sw-update.js?v=04111344"></script>
-<script src="js/sidebar.js?v=04111344"></script>
+<script src="js/ajuda.js?v=04111410"></script>
+<script src="js/sw-update.js?v=04111410"></script>
+<script src="js/sidebar.js?v=04111410"></script>
 </body>
 </html>

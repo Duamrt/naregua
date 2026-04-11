@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111344";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111410";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Agendar</title>
   <meta property="og:type" content="website">
   <meta property="og:title" content="Agende seu horário — NaRegua">
@@ -18,8 +18,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111344">
-  <script src="js/theme.js?v=04111344"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111410">
+  <script src="js/theme.js?v=04111410"></script>
   <style>
     .shop-header { text-align:center; margin-bottom:24px; }
     .shop-header h1 { font-size:20px; margin-bottom:4px; }
@@ -35,7 +35,7 @@
     .payment-badges { display:flex; gap:6px; flex-wrap:wrap; justify-content:center; }
     .pay-badge {
       font-size:10px; font-weight:600; padding:4px 10px; border-radius:6px;
-      background:rgba(212,168,83,0.08); border:1px solid rgba(212,168,83,0.15);
+      background: var(--accent-soft); border:1px solid var(--accent-soft);
       color:var(--verde-acao);
     }
 
@@ -57,13 +57,13 @@
       cursor:pointer; font-family:inherit; transition:all .2s; white-space:nowrap;
     }
     .cat-chip:hover { border-color:var(--borda-hover); }
-    .cat-chip.active { border-color:var(--verde-acao); background:rgba(212,168,83,0.1); color:var(--verde-acao); }
+    .cat-chip.active { border-color:var(--verde-acao); background: var(--accent-soft); color:var(--verde-acao); }
     .cat-chip .chip-count {
       display:inline-block; min-width:14px; text-align:center;
       background:rgba(255,255,255,0.08); border-radius:10px; padding:1px 5px;
       font-size:9px; margin-left:4px;
     }
-    .cat-chip.active .chip-count { background:rgba(212,168,83,0.2); }
+    .cat-chip.active .chip-count { background: var(--accent-soft); }
 
     .step-indicator {
       display:flex; gap:4px; justify-content:center; margin-bottom:24px;
@@ -83,7 +83,7 @@
       border-radius:10px; cursor:pointer; transition:all .2s;
     }
     .option-card:hover { border-color:var(--borda-hover); }
-    .option-card.selected { border-color:var(--verde-acao); background:rgba(212,168,83,0.08); }
+    .option-card.selected { border-color:var(--verde-acao); background: var(--accent-soft); }
     .option-card .name { font-size:14px; font-weight:600; }
     .option-card .detail { font-size:11px; color:var(--texto-muted); margin-top:2px; }
     .option-card .price { font-size:15px; font-weight:700; color:var(--verde-acao); }
@@ -100,7 +100,7 @@
       border-radius:10px; cursor:pointer; transition:all .2s; flex-shrink:0;
     }
     .date-card:hover { border-color:var(--borda-hover); }
-    .date-card.selected { border-color:var(--verde-acao); background:rgba(212,168,83,0.08); }
+    .date-card.selected { border-color:var(--verde-acao); background: var(--accent-soft); }
     .date-card .dia-semana { font-size:10px; color:var(--texto-muted); font-weight:700; text-transform:uppercase; }
     .date-card .dia-num { font-size:20px; font-weight:800; margin:4px 0; }
     .date-card .mes { font-size:10px; color:var(--texto-muted); }
@@ -115,7 +115,7 @@
       border-radius:8px; cursor:pointer; transition:all .2s;
     }
     .time-slot:hover { border-color:var(--borda-hover); }
-    .time-slot.selected { border-color:var(--verde-acao); background:rgba(212,168,83,0.08); color:var(--verde-acao); }
+    .time-slot.selected { border-color:var(--verde-acao); background: var(--accent-soft); color:var(--verde-acao); }
     .time-slot.disabled {
       opacity:0.3; cursor:not-allowed; pointer-events:none;
     }
@@ -140,14 +140,14 @@
       text-transform:uppercase;
     }
     .combos-divider::before, .combos-divider::after {
-      content:''; flex:1; height:1px; background:rgba(212,168,83,0.25);
+      content:''; flex:1; height:1px; background: var(--accent-soft);
     }
     .combo-card {
       padding:14px 16px; background:var(--cinza-medio); border:1.5px solid var(--borda);
       border-radius:10px; cursor:pointer; transition:all .2s; position:relative;
     }
     .combo-card:hover { border-color:var(--borda-hover); }
-    .combo-card.selected { border-color:var(--verde-acao); background:rgba(212,168,83,0.08); }
+    .combo-card.selected { border-color:var(--verde-acao); background: var(--accent-soft); }
     .combo-card .combo-name { font-size:14px; font-weight:700; margin-bottom:6px; }
     .combo-card .combo-services-tags { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:8px; }
     .combo-card .combo-tag {
@@ -186,11 +186,11 @@
     .coupon-row input:focus { border-color:var(--verde-acao); outline:none; }
     .coupon-row button {
       padding:8px 16px; border-radius:8px; font-size:12px; font-weight:700;
-      background:rgba(212,168,83,0.15); border:1.5px solid rgba(212,168,83,0.3);
+      background: var(--accent-soft); border:1.5px solid var(--accent-soft);
       color:var(--verde-acao); cursor:pointer; font-family:inherit; white-space:nowrap;
       transition:all .2s;
     }
-    .coupon-row button:hover { background:rgba(212,168,83,0.25); }
+    .coupon-row button:hover { background: var(--accent-soft); }
     .coupon-result { margin-top:8px; font-size:12px; padding:6px 10px; border-radius:6px; display:none; }
     .coupon-result.success { display:block; background:rgba(34,197,94,0.1); color:#22c55e; border:1px solid rgba(34,197,94,0.2); }
     .coupon-result.error { display:block; background:rgba(231,76,60,0.1); color:#e74c3c; border:1px solid rgba(231,76,60,0.2); }
@@ -224,7 +224,7 @@
       width:16px; height:16px; border-radius:50%; background:#fff;
       transition:all .2s;
     }
-    .rec-switch.on { background:rgba(212,168,83,0.3); border-color:var(--verde-acao); }
+    .rec-switch.on { background: var(--accent-soft); border-color:var(--verde-acao); }
     .rec-switch.on::after { left:20px; background:var(--verde-acao); }
     .recurrence-dates {
       margin-top:12px; padding-top:12px; border-top:1px solid var(--borda);
@@ -233,7 +233,7 @@
     .recurrence-dates.open { display:block; }
     .recurrence-dates .rec-date {
       display:inline-flex; align-items:center; gap:4px;
-      padding:2px 8px; background:rgba(212,168,83,0.08); border:1px solid rgba(212,168,83,0.15);
+      padding:2px 8px; background: var(--accent-soft); border:1px solid var(--accent-soft);
       border-radius:6px; margin:2px 4px 2px 0; font-weight:600; color:var(--texto-secundario);
     }
 
@@ -253,10 +253,10 @@
     .suggestions-scroll::-webkit-scrollbar { display:none; }
     .suggestion-card {
       min-width:120px; padding:10px 14px; border:1.5px solid var(--verde-acao);
-      border-radius:10px; background:rgba(212,168,83,0.06); cursor:pointer;
+      border-radius:10px; background: var(--accent-soft); cursor:pointer;
       transition:all .2s; flex-shrink:0; text-align:center;
     }
-    .suggestion-card:hover { background:rgba(212,168,83,0.14); }
+    .suggestion-card:hover { background: var(--accent-soft); }
     .suggestion-card .sug-time { font-size:18px; font-weight:800; color:var(--verde-acao); }
     .suggestion-card .sug-label { font-size:10px; color:var(--texto-muted); margin-top:2px; font-weight:600; }
 
@@ -272,7 +272,7 @@
     /* ── Returning client bar ── */
     .returning-bar {
       display:none; margin-bottom:14px; padding:12px 14px;
-      background:rgba(212,168,83,0.06); border:1.5px solid rgba(212,168,83,0.25);
+      background: var(--accent-soft); border:1.5px solid var(--accent-soft);
       border-radius:10px;
     }
     .returning-bar.visible { display:block; }
@@ -280,10 +280,10 @@
     .returning-bar .ret-info { font-size:13px; font-weight:600; margin-bottom:8px; }
     .returning-bar .ret-btn {
       padding:8px 16px; border-radius:8px; font-size:12px; font-weight:700;
-      background:rgba(212,168,83,0.15); border:1.5px solid rgba(212,168,83,0.3);
+      background: var(--accent-soft); border:1.5px solid var(--accent-soft);
       color:var(--verde-acao); cursor:pointer; font-family:inherit; transition:all .2s;
     }
-    .returning-bar .ret-btn:hover { background:rgba(212,168,83,0.25); }
+    .returning-bar .ret-btn:hover { background: var(--accent-soft); }
 
     /* ── Wait time estimate ── */
     .wait-estimate {
@@ -476,9 +476,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111344"></script>
-<script src="js/supabase.js?v=04111344"></script>
-<script src="js/utils.js?v=04111344"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111410"></script>
+<script src="js/supabase.js?v=04111410"></script>
+<script src="js/utils.js?v=04111410"></script>
 <script>
 // ── Mascara telefone ──────────────────────────────────────────
 document.getElementById('client-phone').addEventListener('input', function() {
@@ -919,7 +919,7 @@ function renderBarbers() {
   let html = '';
   if (barbers.length > 1) {
     html += `<div class="option-card ${selectedBarber?.id === 'any' ? 'selected' : ''}"
-         onclick="selectBarber('any')" style="border-color:rgba(212,168,83,0.3);">
+         onclick="selectBarber('any')" style="border-color:var(--accent-soft);">
       <div>
         <div class="name">Qualquer profissional</div>
         <div class="detail">Primeiro horário disponível</div>
@@ -2303,7 +2303,7 @@ function resetar() {
   document.getElementById('client-phone').value = '';
 }
 </script>
-<script src="js/ajuda.js?v=04111344"></script>
-<script src="js/sw-update.js?v=04111344"></script>
+<script src="js/ajuda.js?v=04111410"></script>
+<script src="js/sw-update.js?v=04111410"></script>
 </body>
 </html>

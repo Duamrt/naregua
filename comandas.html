@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111344";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111410";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Comandas</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111344">
-  <link rel="stylesheet" href="css/layout.css?v=04111344">
-  <script src="js/theme.js?v=04111344"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111410">
+  <link rel="stylesheet" href="css/layout.css?v=04111410">
+  <script src="js/theme.js?v=04111410"></script>
   <style>
     .cmd-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -83,7 +83,7 @@
       font-size:9px; font-weight:700; padding:2px 8px; border-radius:10px;
       display:inline-block; margin-top:4px;
     }
-    .cmd-card-badge.aberta { background:rgba(212,168,83,0.15); color:var(--verde-acao); }
+    .cmd-card-badge.aberta { background: var(--accent-soft); color:var(--verde-acao); }
     .cmd-card-badge.fechada { background:rgba(255,255,255,0.06); color:var(--texto-muted); }
     .cmd-card-badge.cancelada { background:rgba(239,68,68,0.15); color:#e74c3c; }
 
@@ -101,7 +101,7 @@
       font-size:8px; font-weight:700; padding:1px 6px; border-radius:6px;
       margin-right:6px; display:inline-block;
     }
-    .cmd-item-type.servico { background:rgba(212,168,83,0.15); color:var(--verde-acao); }
+    .cmd-item-type.servico { background: var(--accent-soft); color:var(--verde-acao); }
     .cmd-item-type.produto { background:rgba(59,130,246,0.15); color:#60a5fa; }
 
     .cmd-card-footer {
@@ -120,7 +120,7 @@
       text-align:center;
     }
     .cmd-action-btn:hover { border-color:var(--borda-hover); }
-    .cmd-action-btn.primary { border-color:var(--verde-acao); background:rgba(212,168,83,0.1); color:var(--verde-acao); }
+    .cmd-action-btn.primary { border-color:var(--verde-acao); background: var(--accent-soft); color:var(--verde-acao); }
     .cmd-action-btn.danger { border-color:rgba(239,68,68,0.3); color:#e74c3c; }
 
     /* Empty state */
@@ -168,7 +168,7 @@
       padding:12px; border:1px solid var(--borda); border-radius:10px;
       margin-bottom:6px; cursor:pointer; transition:all .2s;
     }
-    .item-pick:hover { border-color:var(--verde-acao); background:rgba(212,168,83,0.05); }
+    .item-pick:hover { border-color:var(--verde-acao); background: var(--accent-soft); }
     .item-pick:active { transform:scale(0.98); }
     .item-pick-name { font-size:13px; font-weight:600; }
     .item-pick-price { font-size:13px; font-weight:700; color:var(--verde-acao); white-space:nowrap; }
@@ -196,7 +196,7 @@
       text-align:center;
     }
     .pay-method-btn:hover { border-color:var(--borda-hover); }
-    .pay-method-btn.active { border-color:var(--verde-acao); background:rgba(212,168,83,0.1); color:var(--verde-acao); }
+    .pay-method-btn.active { border-color:var(--verde-acao); background: var(--accent-soft); color:var(--verde-acao); }
     .pay-method-btn .pay-icon { font-size:18px; display:block; margin-bottom:4px; }
 
     /* Bottom nav */
@@ -399,9 +399,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111344"></script>
-<script src="js/supabase.js?v=04111344"></script>
-<script src="js/utils.js?v=04111344"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111410"></script>
+<script src="js/supabase.js?v=04111410"></script>
+<script src="js/utils.js?v=04111410"></script>
 <script>
 // ── Estado ────────────────────────────────────────────────────
 let shop = null;
@@ -971,8 +971,8 @@ function showMsg(id, text, type) {
   el.className = `msg msg-${type} show`;
 }
 </script>
-<script src="js/ajuda.js?v=04111344"></script>
-<script src="js/sw-update.js?v=04111344"></script>
-<script src="js/sidebar.js?v=04111344"></script>
+<script src="js/ajuda.js?v=04111410"></script>
+<script src="js/sw-update.js?v=04111410"></script>
+<script src="js/sidebar.js?v=04111410"></script>
 </body>
 </html>

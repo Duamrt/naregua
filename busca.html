@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111344";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111410";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Busca</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111344">
-  <link rel="stylesheet" href="css/layout.css?v=04111344">
-  <script src="js/theme.js?v=04111344"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111410">
+  <link rel="stylesheet" href="css/layout.css?v=04111410">
+  <script src="js/theme.js?v=04111410"></script>
   <style>
     .busca-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -63,7 +63,7 @@
       cursor:pointer; font-family:inherit; transition:all .2s; white-space:nowrap;
     }
     .filter-chip:hover { border-color:var(--borda-hover); }
-    .filter-chip.active { border-color:var(--verde-acao); background:rgba(212,168,83,0.1); color:var(--verde-acao); }
+    .filter-chip.active { border-color:var(--verde-acao); background: var(--accent-soft); color:var(--verde-acao); }
 
     /* Recent searches */
     .recent-section { margin-bottom:20px; }
@@ -115,24 +115,24 @@
     .result-top { display:flex; justify-content:space-between; align-items:flex-start; }
     .result-name { font-size:13px; font-weight:700; }
     .result-name mark {
-      background:rgba(212,168,83,0.25); color:var(--verde-acao); border-radius:2px;
+      background: var(--accent-soft); color:var(--verde-acao); border-radius:2px;
       padding:0 1px;
     }
     .result-meta { font-size:11px; color:var(--texto-muted); margin-top:2px; }
     .result-meta mark {
-      background:rgba(212,168,83,0.25); color:var(--verde-acao); border-radius:2px;
+      background: var(--accent-soft); color:var(--verde-acao); border-radius:2px;
       padding:0 1px;
     }
     .result-badge {
       font-size:9px; font-weight:700; padding:3px 8px; border-radius:12px;
       text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;
     }
-    .badge-active { background:rgba(212,168,83,0.15); color:#d4a853; }
+    .badge-active { background: var(--accent-soft); color:var(--accent); }
     .badge-inactive { background:rgba(243,156,18,0.15); color:#f39c12; }
     .result-price { font-size:14px; font-weight:800; color:var(--verde-acao); }
 
     .status-pending { background:rgba(243,156,18,0.15); color:#f39c12; }
-    .status-confirmed { background:rgba(212,168,83,0.15); color:#d4a853; }
+    .status-confirmed { background: var(--accent-soft); color:var(--accent); }
     .status-done { background:rgba(255,255,255,0.08); color:var(--texto-muted); }
     .status-cancelled { background:rgba(231,76,60,0.1); color:#e74c3c; }
     .status-no_show { background:rgba(155,89,182,0.15); color:#9b59b6; }
@@ -288,9 +288,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111344"></script>
-<script src="js/supabase.js?v=04111344"></script>
-<script src="js/utils.js?v=04111344"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111410"></script>
+<script src="js/supabase.js?v=04111410"></script>
+<script src="js/utils.js?v=04111410"></script>
 <script>
 console.log('Busca v1 carregado');
 
@@ -798,8 +798,8 @@ function expandFilter(filter) {
   if (val.length >= 2) doSearch(val);
 }
 </script>
-<script src="js/ajuda.js?v=04111344"></script>
-<script src="js/sw-update.js?v=04111344"></script>
-<script src="js/sidebar.js?v=04111344"></script>
+<script src="js/ajuda.js?v=04111410"></script>
+<script src="js/sw-update.js?v=04111410"></script>
+<script src="js/sidebar.js?v=04111410"></script>
 </body>
 </html>
