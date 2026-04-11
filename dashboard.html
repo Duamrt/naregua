@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111227";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111231";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Dashboard</title>
     <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111227">
-  <link rel="stylesheet" href="css/layout.css?v=04111227">
-  <script src="js/theme.js?v=04111227"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111231">
+  <link rel="stylesheet" href="css/layout.css?v=04111231">
+  <script src="js/theme.js?v=04111231"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -346,32 +346,42 @@
     .nr-table-head-sub { font-size:11px; color:var(--texto-muted); text-transform:uppercase; letter-spacing:1.2px; margin-top:2px; }
     .nr-table-head-actions { display:flex; gap:8px; align-items:center; }
     .nr-table { width:100%; border-collapse:collapse; }
-    .nr-table thead th { padding:11px 20px; text-align:left; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1.2px; color:var(--texto-muted); background:var(--cinza-escuro); border-bottom:1px solid var(--borda); }
+    .nr-table thead th { padding:11px 20px; text-align:left; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1.2px; color:var(--texto-muted); background:var(--cinza-medio); border-bottom:1px solid var(--borda); }
     .nr-table tbody td { padding:14px 20px; font-size:13px; color:var(--texto-secundario); border-top:1px solid var(--borda); vertical-align:middle; }
     .nr-table tbody tr:hover td { background:rgba(255,255,255,.025); }
     [data-theme="light"] .nr-table tbody tr:hover td { background:rgba(0,0,0,.018); }
     .nr-time-cell { font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px; color:var(--accent); white-space:nowrap; }
+    .nr-client-name { font-weight:600; color:var(--texto-principal); }
     .nr-client-cell { display:flex; align-items:center; gap:10px; }
     .nr-avatar { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:11px; font-weight:800; color:#fff; flex-shrink:0; }
     .nr-prof-cell { display:flex; align-items:center; gap:8px; }
     .nr-prof-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
 
-    /* Badges pill V3 */
-    .nr-badge { display:inline-flex; align-items:center; font-size:9px; font-weight:800; padding:3px 9px; border-radius:9999px; letter-spacing:.3px; text-transform:uppercase; }
-    .nb-green  { background:rgba(34,197,94,.12);  color:#22c55e; }
-    .nb-amber  { background:rgba(245,158,11,.12);  color:#f59e0b; }
-    .nb-red    { background:rgba(239,68,68,.12);   color:#ef4444; }
-    .nb-purple { background:rgba(168,85,247,.12);  color:#a855f7; }
-    .nb-muted  { background:rgba(136,136,170,.1);  color:var(--texto-muted); }
+    /* Badges pill — cores exatas da referência */
+    .nr-badge { display:inline-flex; align-items:center; font-size:10px; font-weight:700; padding:3px 9px; border-radius:9999px; letter-spacing:.3px; text-transform:uppercase; }
+    .nb-green  { background:rgba(74,222,128,.12);  color:#4ade80; }
+    .nb-amber  { background:rgba(251,191,36,.12);  color:#fbbf24; }
+    .nb-red    { background:rgba(248,113,113,.12); color:#f87171; }
+    .nb-purple { background:rgba(167,139,250,.12); color:#a78bfa; }
+    .nb-muted  { background:rgba(136,136,170,.12); color:var(--texto-muted); }
     .nb-primary{ background:var(--accent-soft);    color:var(--accent); }
+
+    /* Botões ghost da tabela (Anterior / Hoje / Próximo) */
+    .nr-btn-ghost {
+      padding:6px 14px; border-radius:6px; border:1px solid var(--borda);
+      background:transparent; color:var(--texto-muted); font-size:11px; font-weight:700;
+      font-family:'Space Grotesk',sans-serif; cursor:pointer; transition:all .15s;
+    }
+    .nr-btn-ghost:hover { border-color:var(--borda-hover); color:var(--texto-secundario); }
+    .nr-btn-ghost.today { color:var(--accent); border-color:var(--accent-border); }
 
     /* Row actions mini */
     .nr-row-actions { display:flex; gap:5px; justify-content:flex-end; }
-    .nr-act-btn { padding:5px 11px; border-radius:6px; font-size:10px; font-weight:700; font-family:'Space Grotesk',sans-serif; cursor:pointer; border:none; transition:opacity .15s; white-space:nowrap; }
+    .nr-act-btn { padding:6px 14px; border-radius:6px; font-size:11px; font-weight:700; font-family:'Space Grotesk',sans-serif; cursor:pointer; border:none; transition:opacity .15s; white-space:nowrap; }
     .nr-act-btn:hover { opacity:.82; }
     .nab-confirm { background:var(--accent); color:#07004a; }
     [data-theme="light"] .nab-confirm { color:#fff; }
-    .nab-done { background:rgba(34,197,94,.15); color:#22c55e; }
+    .nab-done { background:rgba(74,222,128,.15); color:#4ade80; }
     .nab-cancel { background:rgba(239,68,68,.1); color:#ef4444; }
     .nab-ghost { background:transparent; border:1px solid var(--borda); color:var(--texto-muted); }
     .nab-ghost:hover { border-color:var(--borda-hover); color:var(--texto-secundario); opacity:1; }
@@ -773,10 +783,10 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111227"></script>
-<script src="js/supabase.js?v=04111227"></script>
-<script src="js/utils.js?v=04111227"></script>
-<script src="js/push.js?v=04111227"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111231"></script>
+<script src="js/supabase.js?v=04111231"></script>
+<script src="js/utils.js?v=04111231"></script>
+<script src="js/push.js?v=04111231"></script>
 <script>
 console.log('Dashboard v3 carregado');
 // ── Estado ────────────────────────────────────────────────────
@@ -1132,9 +1142,9 @@ function renderAppointments() {
     '<div class="nr-table-head">' +
       '<div><h3>Agenda do Dia</h3><div class="nr-table-head-sub" id="nr-table-date-sub"></div></div>' +
       '<div class="nr-table-head-actions">' +
-        '<button class="appt-btn" onclick="changeDay(-1)" style="font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid var(--borda);background:transparent;color:var(--texto-muted);cursor:pointer;font-family:inherit;">‹ Anterior</button>' +
-        '<button class="appt-btn" onclick="goToday()" id="btn-today-tbl" style="font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid var(--borda);background:transparent;color:var(--verde-acao);cursor:pointer;font-family:inherit;">Hoje</button>' +
-        '<button class="appt-btn" onclick="changeDay(1)" style="font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid var(--borda);background:transparent;color:var(--texto-muted);cursor:pointer;font-family:inherit;">Próximo ›</button>' +
+        '<button class="nr-btn-ghost" onclick="changeDay(-1)">‹ Anterior</button>' +
+        '<button class="nr-btn-ghost today" onclick="goToday()" id="btn-today-tbl">Hoje</button>' +
+        '<button class="nr-btn-ghost" onclick="changeDay(1)">Próximo ›</button>' +
       '</div>' +
     '</div>' +
     '<table class="nr-table"><thead><tr>' +
@@ -1285,7 +1295,7 @@ function renderApptRow(a, isNext) {
 
   return '<tr class="nr-appt-row" data-search="' + searchStr + '" style="' + rowStyle + '">' +
     '<td><span class="nr-time-cell">' + timeStr + '</span>' + (isNext ? '<span class="nr-badge nb-primary" style="margin-left:6px;font-size:9px;vertical-align:middle;">PRÓXIMO</span>' : '') + '</td>' +
-    '<td><div class="nr-client-cell"><div class="nr-avatar" style="background:' + aColor + '">' + initials + '</div><span>' + esc(a.client_name) + '</span></div></td>' +
+    '<td><div class="nr-client-cell"><div class="nr-avatar" style="background:' + aColor + '">' + initials + '</div><span class="nr-client-name">' + esc(a.client_name) + '</span></div></td>' +
     '<td><span class="nr-badge nb-muted">' + esc(svcName) + '</span>' + consumoTag + '</td>' +
     '<td><div class="nr-prof-cell"><div class="nr-prof-dot" style="background:' + bColor + '"></div>' + esc(barberName) + '</div></td>' +
     '<td><span class="nr-badge ' + st.cls + '">' + st.label + '</span></td>' +
@@ -2750,9 +2760,9 @@ function selectCalDay(dateKey) {
   renderDay();
 }
 </script>
-<script src="js/ajuda.js?v=04111227"></script>
-<script src="js/tour.js?v=04111227"></script>
-<script src="js/sw-update.js?v=04111227"></script>
-<script src="js/sidebar.js?v=04111227"></script>
+<script src="js/ajuda.js?v=04111231"></script>
+<script src="js/tour.js?v=04111231"></script>
+<script src="js/sw-update.js?v=04111231"></script>
+<script src="js/sidebar.js?v=04111231"></script>
 </body>
 </html>
