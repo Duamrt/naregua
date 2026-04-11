@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04110858";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04110929";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Dashboard</title>
     <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04110858">
-  <link rel="stylesheet" href="css/layout.css?v=04110858">
-  <script src="js/theme.js?v=04110858"></script>
+  <link rel="stylesheet" href="css/style.css?v=04110929">
+  <link rel="stylesheet" href="css/layout.css?v=04110929">
+  <script src="js/theme.js?v=04110929"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -656,10 +656,10 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04110858"></script>
-<script src="js/supabase.js?v=04110858"></script>
-<script src="js/utils.js?v=04110858"></script>
-<script src="js/push.js?v=04110858"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04110929"></script>
+<script src="js/supabase.js?v=04110929"></script>
+<script src="js/utils.js?v=04110929"></script>
+<script src="js/push.js?v=04110929"></script>
 <script>
 console.log('Dashboard v3 carregado');
 // ── Estado ────────────────────────────────────────────────────
@@ -2377,10 +2377,14 @@ async function checkBellCount() {
 
   } catch (e) { console.error('Bell check error:', e); }
 
-  // Subtract read notifs
+  // Se o usuário já visitou notificacoes.html nessa sessão, usar o count real
   try {
-    const read = JSON.parse(localStorage.getItem('naregua_read_notifs') || '[]');
-    total = Math.max(0, total - Math.min(read.length, total));
+    const exact = sessionStorage.getItem('naregua_notif_unread');
+    if (exact !== null) { total = Math.min(total, parseInt(exact, 10) || 0); }
+    else {
+      const read = JSON.parse(localStorage.getItem('naregua_read_notifs') || '[]');
+      total = Math.max(0, total - Math.min(read.length, total));
+    }
   } catch (e) { console.warn('Bell read error:', e); }
 
   sessionStorage.setItem(BELL_CACHE_KEY, JSON.stringify({ ts: Date.now(), count: total }));
@@ -2545,9 +2549,9 @@ function selectCalDay(dateKey) {
   renderDay();
 }
 </script>
-<script src="js/ajuda.js?v=04110858"></script>
-<script src="js/tour.js?v=04110858"></script>
-<script src="js/sw-update.js?v=04110858"></script>
-<script src="js/sidebar.js?v=04110858"></script>
+<script src="js/ajuda.js?v=04110929"></script>
+<script src="js/tour.js?v=04110929"></script>
+<script src="js/sw-update.js?v=04110929"></script>
+<script src="js/sidebar.js?v=04110929"></script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04110858";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04110929";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Relatório</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04110858">
-  <link rel="stylesheet" href="css/layout.css?v=04110858">
-  <script src="js/theme.js?v=04110858"></script>
+  <link rel="stylesheet" href="css/style.css?v=04110929">
+  <link rel="stylesheet" href="css/layout.css?v=04110929">
+  <script src="js/theme.js?v=04110929"></script>
   <style>
     .rel-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -476,9 +476,9 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04110858"></script>
-<script src="js/supabase.js?v=04110858"></script>
-<script src="js/utils.js?v=04110858"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04110929"></script>
+<script src="js/supabase.js?v=04110929"></script>
+<script src="js/utils.js?v=04110929"></script>
 <script>
 // ── Estado ────────────────────────────────────────────────────
 let shop = null;
@@ -649,7 +649,12 @@ async function renderReport() {
   const ticket = atendimentos > 0 ? faturamento / atendimentos : 0;
   const taxaFalta = scheduled.length > 0 ? (noShow.length / scheduled.length * 100) : 0;
   const despesasTotal = data.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
-  const lucro = faturamento - despesasTotal;
+  const totalComissoes = done.reduce((s, a) => {
+    const barber = barbersList.find(b => b.id === a.barber_id);
+    const pct = barber ? (barber.commission_pct || 0) : 0;
+    return s + (getPrice(a) * pct / 100);
+  }, 0);
+  const lucro = faturamento - despesasTotal - totalComissoes;
   const margem = faturamento > 0 ? (lucro / faturamento * 100) : 0;
 
   document.getElementById('kpi-faturamento').textContent = formatMoney(faturamento);
@@ -842,8 +847,19 @@ function renderComparisonV2(data, prevData) {
   const desp = data.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
   const prevDesp = prevData.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
 
-  const lucro = fat - desp;
-  const prevLucro = prevFat - prevDesp;
+  const comm = done.reduce((s, a) => {
+    const barber = barbersList.find(b => b.id === a.barber_id);
+    const pct = barber ? (barber.commission_pct || 0) : 0;
+    return s + (getPrice(a) * pct / 100);
+  }, 0);
+  const prevComm = prevDone.reduce((s, a) => {
+    const barber = barbersList.find(b => b.id === a.barber_id);
+    const pct = barber ? (barber.commission_pct || 0) : 0;
+    return s + (getPrice(a) * pct / 100);
+  }, 0);
+
+  const lucro = fat - desp - comm;
+  const prevLucro = prevFat - prevDesp - prevComm;
 
   const ticket = atend > 0 ? fat / atend : 0;
   const prevTicket = prevAtend > 0 ? prevFat / prevAtend : 0;
@@ -1037,8 +1053,8 @@ function exportPDF() {
   window.print();
 }
 </script>
-<script src="js/ajuda.js?v=04110858"></script>
-<script src="js/sw-update.js?v=04110858"></script>
-<script src="js/sidebar.js?v=04110858"></script>
+<script src="js/ajuda.js?v=04110929"></script>
+<script src="js/sw-update.js?v=04110929"></script>
+<script src="js/sidebar.js?v=04110929"></script>
 </body>
 </html>
