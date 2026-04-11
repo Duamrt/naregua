@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04111205";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04111216";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Dashboard</title>
     <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04111205">
-  <link rel="stylesheet" href="css/layout.css?v=04111205">
-  <script src="js/theme.js?v=04111205"></script>
+  <link rel="stylesheet" href="css/style.css?v=04111216">
+  <link rel="stylesheet" href="css/layout.css?v=04111216">
+  <script src="js/theme.js?v=04111216"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -278,6 +278,95 @@
 
     body { padding-bottom:70px; }
 
+    /* ── V3 Topbar ── */
+    .nr-topbar {
+      position:sticky; top:0; z-index:50;
+      background:rgba(19,19,24,.92); backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--borda);
+      padding:0 28px; height:64px;
+      display:none; align-items:center; justify-content:space-between;
+      flex-shrink:0; gap:16px;
+    }
+    [data-theme="light"] .nr-topbar { background:rgba(248,248,252,.92); }
+    .nr-topbar.show { display:flex; }
+    .nr-topbar-left h2 { font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:700; color:var(--texto-principal); }
+    .nr-topbar-left p { font-size:11px; color:var(--texto-muted); margin-top:1px; }
+    .nr-topbar-right { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+    .nr-search-wrap { position:relative; display:flex; align-items:center; }
+    .nr-search-wrap .ms-icon { position:absolute; left:10px; font-size:17px; color:var(--texto-muted); font-family:'Material Symbols Outlined'; pointer-events:none; }
+    .nr-search-input {
+      background:var(--cinza-medio); border:1px solid var(--borda); border-radius:10px;
+      padding:8px 14px 8px 34px; font-size:12px; color:var(--texto-principal);
+      width:180px; outline:none; transition:all .2s; font-family:inherit;
+    }
+    .nr-search-input::placeholder { color:var(--texto-muted); }
+    .nr-search-input:focus { border-color:var(--accent); width:220px; }
+    .btn-encaixe-top {
+      background:var(--accent); color:#07004a; border:none;
+      border-radius:10px; padding:9px 16px; font-size:12px; font-weight:700;
+      font-family:'Space Grotesk',sans-serif; cursor:pointer; display:flex;
+      align-items:center; gap:5px; white-space:nowrap; transition:opacity .15s;
+    }
+    [data-theme="light"] .btn-encaixe-top { color:#fff; }
+    .btn-encaixe-top:hover { opacity:.88; }
+
+    /* ── V3 Metric Grid ── */
+    .nr-metric-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+    @media(max-width:600px) { .nr-metric-grid { grid-template-columns:1fr 1fr; } }
+    .nr-metric-card {
+      background:var(--cinza-claro); border:1px solid var(--borda); border-radius:14px;
+      padding:18px 20px; position:relative; overflow:hidden;
+    }
+    .nr-metric-icon {
+      width:36px; height:36px; border-radius:10px; display:flex; align-items:center;
+      justify-content:center; margin-bottom:12px;
+      font-family:'Material Symbols Outlined'; font-size:20px; line-height:1;
+    }
+    .nr-metric-val { font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:800; color:var(--texto-principal); line-height:1; }
+    .nr-metric-label { font-size:9px; font-weight:700; color:var(--texto-muted); text-transform:uppercase; letter-spacing:1.2px; margin-top:6px; }
+    .nr-metric-trend { display:flex; align-items:center; gap:4px; margin-top:6px; font-size:11px; font-weight:600; color:var(--texto-muted); }
+
+    /* ── V3 Table Card ── */
+    .nr-table-card { background:var(--cinza-claro); border:1px solid var(--borda); border-radius:14px; overflow:hidden; margin-bottom:20px; }
+    .nr-table-head { padding:14px 20px; border-bottom:1px solid var(--borda); display:flex; align-items:center; justify-content:space-between; }
+    .nr-table-head h3 { font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:700; color:var(--texto-principal); }
+    .nr-table-head-sub { font-size:10px; color:var(--texto-muted); text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
+    .nr-table-head-actions { display:flex; gap:6px; align-items:center; }
+    .nr-table { width:100%; border-collapse:collapse; }
+    .nr-table thead th { padding:10px 16px; text-align:left; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:1.2px; color:var(--texto-muted); background:var(--cinza-medio); border-bottom:1px solid var(--borda); }
+    .nr-table tbody td { padding:13px 16px; font-size:13px; color:var(--texto-secundario); border-top:1px solid var(--borda); vertical-align:middle; }
+    .nr-table tbody tr:hover td { background:rgba(255,255,255,.025); }
+    [data-theme="light"] .nr-table tbody tr:hover td { background:rgba(0,0,0,.018); }
+    .nr-time-cell { font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:15px; color:var(--accent); white-space:nowrap; }
+    .nr-client-cell { display:flex; align-items:center; gap:9px; }
+    .nr-avatar { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:10px; font-weight:800; color:#fff; flex-shrink:0; }
+    .nr-prof-cell { display:flex; align-items:center; gap:7px; }
+    .nr-prof-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+    /* Badges pill V3 */
+    .nr-badge { display:inline-flex; align-items:center; font-size:9px; font-weight:800; padding:3px 9px; border-radius:9999px; letter-spacing:.3px; text-transform:uppercase; }
+    .nb-green  { background:rgba(34,197,94,.12);  color:#22c55e; }
+    .nb-amber  { background:rgba(245,158,11,.12);  color:#f59e0b; }
+    .nb-red    { background:rgba(239,68,68,.12);   color:#ef4444; }
+    .nb-purple { background:rgba(168,85,247,.12);  color:#a855f7; }
+    .nb-muted  { background:rgba(136,136,170,.1);  color:var(--texto-muted); }
+    .nb-primary{ background:var(--accent-soft);    color:var(--accent); }
+
+    /* Row actions mini */
+    .nr-row-actions { display:flex; gap:5px; justify-content:flex-end; }
+    .nr-act-btn { padding:5px 11px; border-radius:6px; font-size:10px; font-weight:700; font-family:'Space Grotesk',sans-serif; cursor:pointer; border:none; transition:opacity .15s; white-space:nowrap; }
+    .nr-act-btn:hover { opacity:.82; }
+    .nab-confirm { background:var(--accent); color:#07004a; }
+    [data-theme="light"] .nab-confirm { color:#fff; }
+    .nab-done { background:rgba(34,197,94,.15); color:#22c55e; }
+    .nab-cancel { background:rgba(239,68,68,.1); color:#ef4444; }
+    .nab-ghost { background:transparent; border:1px solid var(--borda); color:var(--texto-muted); }
+    .nab-ghost:hover { border-color:var(--borda-hover); color:var(--texto-secundario); opacity:1; }
+    .nab-zap { background:rgba(37,211,102,.12); color:#25d366; }
+    .nab-noshow { background:rgba(168,85,247,.12); color:#a855f7; }
+    .nab-delete { background:rgba(239,68,68,.1); color:#ef4444; }
+    .nab-consumo { background:rgba(168,85,247,.12); color:#a855f7; }
+
     /* Toast auto-confirm */
     .toast-auto {
       position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
@@ -359,32 +448,39 @@
 </head>
 <body>
 
+<!-- Topbar V3 -->
+<div class="nr-topbar" id="nr-topbar">
+  <div class="nr-topbar-left">
+    <h2>Agenda</h2>
+    <p id="nr-topbar-date">Carregando...</p>
+  </div>
+  <div class="nr-topbar-right">
+    <div class="nr-search-wrap">
+      <span class="ms-icon">search</span>
+      <input class="nr-search-input" placeholder="Buscar agendamento..." oninput="filtrarBuscaRapida(this.value)">
+    </div>
+    <button class="btn-encaixe-top" onclick="abrirEncaixe()">
+      <span style="font-size:14px;font-family:'Material Symbols Outlined';line-height:1">add</span>
+      Encaixe Rápido
+    </button>
+    <button class="icon-btn" onclick="abrirEdicao()" title="Editar estabelecimento" style="font-size:14px;font-family:'Material Symbols Outlined'">edit</button>
+  </div>
+  <!-- Elementos ocultos mantidos para o JS -->
+  <span id="shop-name" style="display:none"></span>
+  <span id="shop-city" style="display:none"></span>
+  <span id="bell-badge" style="display:none">0</span>
+</div>
+
 <div class="dash-container">
 
-  <!-- BUG 14 ALTO FIX: Loading screen enquanto carrega dados -->
+  <!-- Loading -->
   <div id="dash-loading" style="text-align:center;padding:60px 0;">
-    <div class="spinner" style="margin:0 auto 12px;width:24px;height:24px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--verde-acao);border-radius:50%;animation:spin .6s linear infinite;"></div>
+    <div class="spinner" style="margin:0 auto 12px;width:24px;height:24px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;"></div>
     <div style="font-size:13px;color:var(--texto-muted);">Carregando agenda...</div>
   </div>
 
-  <!-- Header -->
-  <div class="dash-header" style="display:none;" id="dash-content-header">
-    <div>
-      <div class="shop-name" id="shop-name"></div>
-      <div class="shop-city" id="shop-city"></div>
-    </div>
-    <div class="header-actions">
-      <a href="busca.html" class="icon-btn" title="Buscar" style="text-decoration:none;">&#x1F50D;</a>
-      <div class="bell-wrapper">
-        <a href="notificacoes.html" class="icon-btn" title="Notificações" style="text-decoration:none;" id="bell-btn">&#x1F514;</a>
-        <span class="bell-badge" id="bell-badge">0</span>
-      </div>
-      <button class="mini-cal-toggle" id="btn-cal-toggle" onclick="toggleMiniCal()">CALENDARIO</button>
-      <button style="padding:6px 12px;border-radius:8px;border:none;background:var(--verde-acao);color:#000;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;" onclick="abrirEncaixe()">+ ENCAIXE</button>
-      <button class="icon-btn" onclick="abrirEdicao()" title="Editar">&#x270F;&#xFE0F;</button>
-      <button class="icon-btn" onclick="logout()" title="Sair">&#x23FB;</button>
-    </div>
-  </div>
+  <!-- Header oculto — mantido para o JS (salvarEdicao popula shop-name/city) -->
+  <div id="dash-content-header" style="display:none;"></div>
 
   <!-- Acoes rapidas -->
   <div id="share-bar" style="display:none;">
@@ -406,23 +502,31 @@
     <div style="font-size:10px;color:var(--texto-muted);word-break:break-all;margin-top:6px;display:none;" id="share-link"></div>
   </div>
 
-  <!-- Stats -->
-  <div class="stats-row" id="dash-stats" style="grid-template-columns:1fr 1fr 1fr 1fr;display:none;">
-    <div class="stat-card">
-      <div class="stat-num" id="stat-total" style="color:var(--texto-principal);">0</div>
-      <div class="stat-label">AGENDADOS</div>
+  <!-- Metric Cards V3 -->
+  <div class="nr-metric-grid" id="dash-stats" style="display:none;">
+    <div class="nr-metric-card">
+      <div class="nr-metric-icon" style="background:var(--accent-soft);color:var(--accent)">event_note</div>
+      <div class="nr-metric-val" id="stat-total">0</div>
+      <div class="nr-metric-label">Agendamentos hoje</div>
+      <div class="nr-metric-trend" id="stat-pending-trend" style="color:var(--texto-muted)">—</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-num" id="stat-done" style="color:var(--verde-acao);">0</div>
-      <div class="stat-label">ATENDIDOS</div>
+    <div class="nr-metric-card">
+      <div class="nr-metric-icon" style="background:rgba(34,197,94,.12);color:#22c55e">payments</div>
+      <div class="nr-metric-val" id="stat-revenue">R$0</div>
+      <div class="nr-metric-label">Faturamento</div>
+      <div class="nr-metric-trend" id="stat-rev-trend" style="color:var(--texto-muted)">—</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-num" id="stat-noshow" style="color:#9b59b6;">0</div>
-      <div class="stat-label">FALTARAM</div>
+    <div class="nr-metric-card">
+      <div class="nr-metric-icon" style="background:rgba(34,197,94,.12);color:#22c55e">done_all</div>
+      <div class="nr-metric-val" id="stat-done">0</div>
+      <div class="nr-metric-label">Atendidos</div>
+      <div class="nr-metric-trend" style="color:var(--texto-muted)">no dia</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-num" id="stat-revenue" style="color:var(--verde-acao);">0</div>
-      <div class="stat-label">FATURADO</div>
+    <div class="nr-metric-card">
+      <div class="nr-metric-icon" style="background:rgba(168,85,247,.12);color:#a855f7">group</div>
+      <div class="nr-metric-val" id="stat-noshow">0</div>
+      <div class="nr-metric-label">Faltaram</div>
+      <div class="nr-metric-trend" style="color:var(--texto-muted)">no dia</div>
     </div>
   </div>
 
@@ -656,10 +760,10 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111205"></script>
-<script src="js/supabase.js?v=04111205"></script>
-<script src="js/utils.js?v=04111205"></script>
-<script src="js/push.js?v=04111205"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04111216"></script>
+<script src="js/supabase.js?v=04111216"></script>
+<script src="js/utils.js?v=04111216"></script>
+<script src="js/push.js?v=04111216"></script>
 <script>
 console.log('Dashboard v3 carregado');
 // ── Estado ────────────────────────────────────────────────────
@@ -762,7 +866,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // BUG 14 ALTO FIX: esconder loading e mostrar conteúdo
   document.getElementById('dash-loading').style.display = 'none';
-  document.getElementById('dash-content-header').style.display = 'flex';
+  document.getElementById('dash-content-header').style.display = 'none';
+  document.getElementById('nr-topbar').classList.add('show');
   document.getElementById('share-bar').style.display = '';
   // dash-stats é exibido após renderAppointments() preencher os valores (não antes)
   document.getElementById('dash-date-nav').style.display = 'flex';
@@ -830,13 +935,18 @@ function renderDateLabel() {
   const d = currentDate;
   const label = document.getElementById('date-label');
   const btnToday = document.getElementById('btn-today');
+  const topbarDate = document.getElementById('nr-topbar-date');
 
   if (isToday(d)) {
-    label.textContent = 'Hoje, ' + d.getDate() + ' de ' + MESES[d.getMonth()];
-    btnToday.style.display = 'none';
+    const txt = 'Hoje, ' + d.getDate() + ' de ' + MESES[d.getMonth()];
+    if (label) label.textContent = txt;
+    if (topbarDate) topbarDate.textContent = txt;
+    if (btnToday) btnToday.style.display = 'none';
   } else {
-    label.textContent = DIAS_SEMANA[d.getDay()] + ', ' + d.getDate() + ' de ' + MESES[d.getMonth()];
-    btnToday.style.display = 'block';
+    const txt = DIAS_SEMANA[d.getDay()] + ', ' + d.getDate() + ' de ' + MESES[d.getMonth()];
+    if (label) label.textContent = txt;
+    if (topbarDate) topbarDate.textContent = txt;
+    if (btnToday) btnToday.style.display = 'block';
   }
 }
 
@@ -945,6 +1055,24 @@ function setFilter(f) {
   renderAppointments();
 }
 
+// Paleta de cores para profissionais/avatares
+const _PROF_COLORS = ['#6366f1','#8b5cf6','#ec4899','#0891b2','#059669','#d97706','#dc2626','#0284c7'];
+function _avatarColor(str) {
+  if (!str) return _PROF_COLORS[0];
+  let h = 0; for (let i = 0; i < str.length; i++) h = str.charCodeAt(i) + ((h << 5) - h);
+  return _PROF_COLORS[Math.abs(h) % _PROF_COLORS.length];
+}
+function _barberColor(barberId) {
+  const idx = barbers.findIndex(b => b.id === barberId);
+  return _PROF_COLORS[(idx >= 0 ? idx : 0) % _PROF_COLORS.length];
+}
+function filtrarBuscaRapida(val) {
+  // busca rápida filtra visualmente as linhas da tabela
+  const rows = document.querySelectorAll('#appt-list .nr-appt-row');
+  const q = val.toLowerCase();
+  rows.forEach(r => { r.style.display = (!q || r.dataset.search.includes(q)) ? '' : 'none'; });
+}
+
 function renderAppointments() {
   const list = currentFilter === 'all' ? dayAppointments : dayAppointments.filter(a => a.status === currentFilter);
   const el = document.getElementById('appt-list');
@@ -953,6 +1081,7 @@ function renderAppointments() {
   const ativos = dayAppointments.filter(a => !['cancelled','no_show'].includes(a.status));
   const done = dayAppointments.filter(a => a.status === 'done');
   const noShow = dayAppointments.filter(a => a.status === 'no_show');
+  const pendentes = dayAppointments.filter(a => a.status === 'pending');
   // BUG 7 FIX: price_paid como fonte primária
   const faturamento = done.reduce((s, a) => {
     const valor = (a.price_paid != null ? Number(a.price_paid) : (() => { const svc = services.find(sv => sv.id === a.service_id); return svc ? Number(svc.price) : 0; })());
@@ -962,34 +1091,17 @@ function renderAppointments() {
   document.getElementById('stat-total').textContent = ativos.length;
   document.getElementById('stat-done').textContent = done.length;
   document.getElementById('stat-noshow').textContent = noShow.length;
-  document.getElementById('stat-revenue').textContent = faturamento > 0 ? formatMoney(faturamento).replace('R$ ', '') : '0';
-  // Exibir bloco de stats somente após preencher (evita flash de zeros)
+  document.getElementById('stat-revenue').textContent = faturamento > 0 ? formatMoney(faturamento) : 'R$0';
+  const trendEl = document.getElementById('stat-pending-trend');
+  if (trendEl) trendEl.textContent = pendentes.length ? pendentes.length + ' pendente' + (pendentes.length > 1 ? 's' : '') : 'Todos confirmados';
   document.getElementById('dash-stats').style.display = 'grid';
 
   if (!dayAppointments.length) {
-    el.innerHTML = `<div class="empty-state">
-      <div class="empty-icon">📭</div>
-      <div class="empty-text">Nenhum agendamento${isToday(currentDate) ? ' pra hoje' : ' neste dia'}.</div>
-      <div style="margin-top:12px;font-size:11px;color:var(--texto-muted);">
-        Compartilhe seu link pra receber agendamentos!
-      </div>
-    </div>`;
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Nenhum agendamento' + (isToday(currentDate) ? ' pra hoje' : ' neste dia') + '.</div><div style="margin-top:12px;font-size:11px;color:var(--texto-muted);">Compartilhe seu link pra receber agendamentos!</div></div>';
     return;
   }
 
-  // Agrupar por barbeiro
-  const columns = barbers.map(b => {
-    const appts = list.filter(a => a.barber_id === b.id).sort((a,c) => new Date(a.scheduled_at) - new Date(c.scheduled_at));
-    return { barber: b, appts };
-  });
-
-  // Agendamentos sem barbeiro definido
-  const semBarbeiro = list.filter(a => !a.barber_id || !barbers.find(b => b.id === a.barber_id));
-  if (semBarbeiro.length) {
-    columns.push({ barber: { id: null, name: 'Sem profissional' }, appts: semBarbeiro });
-  }
-
-  // Identificar proximo agendamento (confirmado, futuro, mais proximo de agora)
+  // Identificar próximo agendamento
   const agora = new Date();
   let nextApptId = null;
   if (isToday(currentDate)) {
@@ -1000,30 +1112,31 @@ function renderAppointments() {
     }
   }
 
-  el.innerHTML = `<div class="barbers-grid">${columns.map(col => {
-    const inicial = col.barber.name.charAt(0).toUpperCase();
-    const cards = col.appts.map(a => renderApptCard(a, a.id === nextApptId)).join('');
-    // Verificar se e folga ou livre
-    let empty = '';
-    if (col.appts.length === 0) {
-      const dow = currentDate.getDay();
-      const sched = col.barber.schedule;
-      const workDays = col.barber.working_days || [];
-      const isFolga = sched ? !sched[dow] : (workDays.length > 0 && !workDays.includes(dow));
-      empty = isFolga
-        ? '<div class="barber-empty" style="color:#f59e0b;">FOLGA</div>'
-        : '<div class="barber-empty">Sem agendamentos</div>';
-    }
+  // Tabela ordenada por horário
+  const sorted = [...list].sort((a, b) => new Date(a.scheduled_at) - new Date(b.scheduled_at));
 
-    return `<div class="barber-column">
-      <div class="barber-header">
-        <div class="barber-avatar">${inicial}</div>
-        <div class="barber-name">${esc(col.barber.name)}</div>
-        <div class="barber-count">${col.appts.length}</div>
-      </div>
-      ${cards}${empty}
-    </div>`;
-  }).join('')}</div>`;
+  el.innerHTML = '<div class="nr-table-card">' +
+    '<div class="nr-table-head">' +
+      '<div><h3>Agenda do Dia</h3><div class="nr-table-head-sub" id="nr-table-date-sub"></div></div>' +
+      '<div class="nr-table-head-actions">' +
+        '<button class="appt-btn" onclick="changeDay(-1)" style="font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid var(--borda);background:transparent;color:var(--texto-muted);cursor:pointer;font-family:inherit;">‹ Anterior</button>' +
+        '<button class="appt-btn" onclick="goToday()" id="btn-today-tbl" style="font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid var(--borda);background:transparent;color:var(--verde-acao);cursor:pointer;font-family:inherit;">Hoje</button>' +
+        '<button class="appt-btn" onclick="changeDay(1)" style="font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid var(--borda);background:transparent;color:var(--texto-muted);cursor:pointer;font-family:inherit;">Próximo ›</button>' +
+      '</div>' +
+    '</div>' +
+    '<table class="nr-table"><thead><tr>' +
+      '<th>Horário</th><th>Cliente</th><th>Serviço</th><th>Profissional</th><th>Status</th><th style="text-align:right">Ações</th>' +
+    '</tr></thead><tbody>' +
+    sorted.map(a => renderApptRow(a, a.id === nextApptId)).join('') +
+    '</tbody></table>' +
+    '<div style="padding:10px 16px;border-top:1px solid var(--borda);display:flex;justify-content:space-between;align-items:center;">' +
+      '<span style="font-size:11px;color:var(--texto-muted);">Exibindo ' + sorted.length + ' de ' + dayAppointments.length + ' agendamentos</span>' +
+    '</div>' +
+  '</div>';
+
+  // Atualizar subtítulo da tabela
+  const subEl = document.getElementById('nr-table-date-sub');
+  if (subEl) { const d = currentDate; subEl.textContent = DIAS_SEMANA[d.getDay()] + ', ' + d.getDate() + ' de ' + MESES[d.getMonth()].charAt(0).toUpperCase() + MESES[d.getMonth()].slice(1); }
 }
 
 function renderApptCard(a, isNext) {
@@ -1090,6 +1203,81 @@ function renderApptCard(a, isNext) {
     ${a.client_phone ? `<div class="barber-appt-svc">📱 ${esc(a.client_phone)}</div>` : ''}
     ${actions ? `<div class="barber-appt-actions">${actions}</div>` : ''}
   </div>`;
+}
+
+function renderApptRow(a, isNext) {
+  var svc = services.find(function(s){ return s.id === a.service_id; });
+  var hora = new Date(a.scheduled_at);
+  var timeStr = hora.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+  var svcName = svc ? svc.name : '—';
+  var phone = (a.client_phone || '').replace(/\D/g, '');
+
+  // Barber
+  var barber = (barbers || []).find(function(b){ return b.id === a.barber_id; });
+  var barberName = barber ? barber.name.split(' ')[0] : '—';
+  var bColor = _barberColor(a.barber_id);
+
+  // Client avatar
+  var initials = (a.client_name || '?').split(' ').slice(0,2).map(function(w){ return w[0]||''; }).join('').toUpperCase();
+  var aColor = _avatarColor(a.client_name);
+
+  // Status badge
+  var stMap = {
+    pending:   { label: 'Pendente',   cls: 'nb-amber' },
+    confirmed: { label: 'Confirmado', cls: 'nb-primary' },
+    done:      { label: 'Atendido',   cls: 'nb-green' },
+    cancelled: { label: 'Cancelado',  cls: 'nb-red' },
+    no_show:   { label: 'Faltou',     cls: 'nb-muted' }
+  };
+  var st = stMap[a.status] || stMap.pending;
+
+  // Tolerância 15 min
+  var agora = new Date();
+  var limiteTolerancia = new Date(hora.getTime() + 15 * 60000);
+  var jaPassou = agora > limiteTolerancia;
+
+  // Ações
+  var actions = '';
+  if (a.status === 'pending') {
+    actions =
+      '<button class="nr-act-btn nab-confirm" onclick="updateStatus(\'' + esc(a.id) + '\',\'confirmed\',this)">Confirmar</button>' +
+      '<button class="nr-act-btn nab-cancel" onclick="cancelarComVaga(\'' + esc(a.id) + '\',this)">Cancelar</button>' +
+      (phone ? '<button class="nr-act-btn nab-zap" onclick="abrirWhatsApp(\'' + esc(a.id) + '\')"><span class="material-symbols-outlined" style="font-size:14px">whatsapp</span></button>' : '');
+  } else if (a.status === 'confirmed') {
+    if (jaPassou) {
+      actions =
+        '<button class="nr-act-btn nab-done" onclick="abrirModalPagamento(\'' + esc(a.id) + '\')">Atendido</button>' +
+        '<button class="nr-act-btn nab-consumo" onclick="addConsumoRapido(\'' + esc(a.id) + '\')" title="Consumo">+</button>' +
+        '<button class="nr-act-btn nab-noshow" onclick="updateStatus(\'' + esc(a.id) + '\',\'no_show\',this)">Faltou</button>';
+    } else {
+      actions =
+        '<button class="nr-act-btn nab-done" onclick="abrirModalPagamento(\'' + esc(a.id) + '\')">Concluir</button>' +
+        '<button class="nr-act-btn nab-consumo" onclick="addConsumoRapido(\'' + esc(a.id) + '\')" title="Consumo">+</button>' +
+        '<button class="nr-act-btn nab-cancel" onclick="cancelarComVaga(\'' + esc(a.id) + '\',this)">Cancelar</button>' +
+        (phone ? '<button class="nr-act-btn nab-zap" onclick="abrirWhatsApp(\'' + esc(a.id) + '\')"><span class="material-symbols-outlined" style="font-size:14px">whatsapp</span></button>' : '');
+    }
+  } else if (a.status === 'cancelled' || a.status === 'no_show') {
+    actions = '<button class="nr-act-btn nab-delete" onclick="excluirAgendamento(\'' + esc(a.id) + '\',this)">Excluir</button>';
+  }
+
+  // Indicador de consumo
+  var consumoTag = '';
+  if (a._consumoItems && a._consumoItems.length) {
+    consumoTag = '<span class="nr-badge nb-purple" style="margin-left:4px;font-size:9px;">+' + a._consumoItems.length + ' item</span>';
+  }
+
+  // Linha destacada se for o próximo
+  var rowStyle = isNext ? 'outline:2px solid rgba(192,193,255,0.4);outline-offset:-1px;' : '';
+  var searchStr = [(a.client_name||'').toLowerCase(),(svcName||'').toLowerCase(),(barberName||'').toLowerCase()].join(' ');
+
+  return '<tr class="nr-appt-row" data-search="' + searchStr + '" style="' + rowStyle + '">' +
+    '<td><span class="nr-time-cell">' + timeStr + '</span>' + (isNext ? '<span class="nr-badge nb-primary" style="margin-left:6px;font-size:9px;vertical-align:middle;">PRÓXIMO</span>' : '') + '</td>' +
+    '<td><div class="nr-client-cell"><div class="nr-avatar" style="background:' + aColor + '">' + initials + '</div><span>' + esc(a.client_name) + '</span></div></td>' +
+    '<td><span class="nr-badge nb-muted">' + esc(svcName) + '</span>' + consumoTag + '</td>' +
+    '<td><div class="nr-prof-cell"><div class="nr-prof-dot" style="background:' + bColor + '"></div>' + esc(barberName) + '</div></td>' +
+    '<td><span class="nr-badge ' + st.cls + '">' + st.label + '</span></td>' +
+    '<td style="text-align:right"><div class="nr-row-actions">' + actions + '</div></td>' +
+    '</tr>';
 }
 
 // ── Ações ─────────────────────────────────────────────────────
@@ -2549,9 +2737,9 @@ function selectCalDay(dateKey) {
   renderDay();
 }
 </script>
-<script src="js/ajuda.js?v=04111205"></script>
-<script src="js/tour.js?v=04111205"></script>
-<script src="js/sw-update.js?v=04111205"></script>
-<script src="js/sidebar.js?v=04111205"></script>
+<script src="js/ajuda.js?v=04111216"></script>
+<script src="js/tour.js?v=04111216"></script>
+<script src="js/sw-update.js?v=04111216"></script>
+<script src="js/sidebar.js?v=04111216"></script>
 </body>
 </html>
