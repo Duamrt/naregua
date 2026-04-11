@@ -22,9 +22,10 @@ for f in *.html; do
   sed -i -E "s/\.css(\?v=[0-9a-zA-Z]+)?\"/.css?v=$SHORT_V\"/g" "$f"
 done
 
-# 2. Atualizar CACHE_NAME no service worker
-echo "[2/4] Atualizando Service Worker..."
+# 2. Atualizar CACHE_NAME no service worker + versao no console
+echo "[2/4] Atualizando Service Worker e versao..."
 sed -i -E "s/const CACHE_NAME = 'naregua-v[0-9]+';/const CACHE_NAME = 'naregua-v$VERSION';/" sw.js
+sed -i -E "s/const _NR_VER = 'naregua-[0-9]+';/const _NR_VER = 'naregua-$SHORT_V';/" js/auth.js
 
 # 3. Git commit + push
 echo "[3/4] Commitando..."
@@ -48,3 +49,15 @@ echo "=== Deploy concluido! ==="
 echo "Versao: $SHORT_V"
 echo "Cache SW: naregua-v$VERSION"
 echo "Todos os clientes vao atualizar automaticamente."
+
+# Fechar itens no DM Stack automaticamente pelo commit message
+DMS_KW="${2:-}"
+if [ -z "$DMS_KW" ]; then
+  DMS_KW=$(echo "$MSG" | tr '[:upper:]' '[:lower:]' | \
+    grep -oE '[a-záàâãéèêíïóôõöúüç-]{5,}' | \
+    grep -vE '^(cache|busting|deploy|versao|fixes|update|remove|corrige|corrigir|adiciona|adicionar|atualiza|atualizar|insere|inserir)$' | \
+    head -1)
+fi
+if [ -n "$DMS_KW" ]; then
+  bash "$HOME/dms-resolve.sh" "$DMS_KW" "NAREGUA"
+fi
