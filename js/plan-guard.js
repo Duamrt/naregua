@@ -2,10 +2,10 @@
 // Verifica se o plano está ativo. Se expirado, redireciona pra planos.html.
 
 const PLAN_LIMITS = {
-  trial:        { maxBarbers: 1 },
-  basico:       { maxBarbers: 1 },
-  profissional: { maxBarbers: 3 },
-  premium:      { maxBarbers: 999 }
+  trial:     { maxBarbers: 1 },
+  essencial: { maxBarbers: 1 },
+  studio:    { maxBarbers: 5 },
+  master:    { maxBarbers: 999 }
 };
 
 const PLAN_CACHE_KEY = 'naregua_plan_cache';

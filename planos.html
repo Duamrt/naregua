@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04120640";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04120649";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Meu Plano</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04120640">
-  <link rel="stylesheet" href="css/layout.css?v=04120640">
-  <script src="js/theme.js?v=04120640"></script>
+  <link rel="stylesheet" href="css/style.css?v=04120649">
+  <link rel="stylesheet" href="css/layout.css?v=04120649">
+  <script src="js/theme.js?v=04120649"></script>
   <style>
     .plan-container { max-width:520px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -273,22 +273,22 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04120640"></script>
-<script src="js/supabase.js?v=04120640"></script>
-<script src="js/utils.js?v=04120640"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04120649"></script>
+<script src="js/supabase.js?v=04120649"></script>
+<script src="js/utils.js?v=04120649"></script>
 <script>
 const PLAN_NAMES = {
-  trial: 'Trial Gratuito',
-  basico: 'Basico',
-  profissional: 'Profissional',
-  premium: 'Premium'
+  trial:     'Trial Gratuito',
+  essencial: 'Essencial',
+  studio:    'Studio',
+  master:    'Master'
 };
 
 const PLANS = [
   {
-    key: 'basico',
-    name: 'Básico',
-    price: 29.90,
+    key: 'essencial',
+    name: 'Essencial',
+    price: 49.90,
     features: [
       '1 profissional',
       'Agendamento online 24/7',
@@ -300,13 +300,13 @@ const PLANS = [
     ]
   },
   {
-    key: 'profissional',
-    name: 'Profissional',
-    price: 49.90,
+    key: 'studio',
+    name: 'Studio',
+    price: 89.90,
     popular: true,
     features: [
-      'Até 3 profissionais',
-      'Tudo do Básico',
+      'Até 5 profissionais',
+      'Tudo do Essencial',
       'Estoque + produtos',
       'Comandas + comissões',
       'Pacotes de serviços',
@@ -317,12 +317,12 @@ const PLANS = [
     ]
   },
   {
-    key: 'premium',
-    name: 'Premium',
-    price: 79.90,
+    key: 'master',
+    name: 'Master',
+    price: 129.90,
     features: [
       'Profissionais ilimitados',
-      'Tudo do Profissional',
+      'Tudo do Studio',
       'Assinaturas / mensalidades',
       'Promoções e cupons',
       'Folha de pagamento',
@@ -334,7 +334,7 @@ const PLANS = [
 ];
 
 let shop = null;
-let selectedPlan = 'profissional'; // default pra mensagem WhatsApp
+let selectedPlan = 'studio'; // default pra mensagem WhatsApp
 
 // ADMIN_EMAILS centralizado em utils.js
 const _params = new URLSearchParams(window.location.search);
@@ -516,8 +516,8 @@ function copiarPix() {
 function toggleMore(){var m=document.getElementById('more-menu');m.style.display=m.style.display==='none'?'block':'none';}
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
-<script src="js/ajuda.js?v=04120640"></script>
-<script src="js/sw-update.js?v=04120640"></script>
-<script src="js/sidebar.js?v=04120640"></script>
+<script src="js/ajuda.js?v=04120649"></script>
+<script src="js/sw-update.js?v=04120649"></script>
+<script src="js/sidebar.js?v=04120649"></script>
 </body>
 </html>
