@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<script>const _NR_VER="naregua-04120622";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+<script>const _NR_VER="naregua-04120640";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
 <title>NaRegua — Agenda e gestão para profissionais de beleza</title>
 <meta name="description" content="Sistema completo de agenda online para nail designer, esteticista, sobrancelha, salão e barbearia. Controle de caixa, estoque e relatórios. 30 dias grátis, sem cartão.">
 <meta property="og:type" content="website">
@@ -50,6 +50,21 @@
   }
   details[open] .faq-icon { transform: rotate(180deg); }
   .faq-icon { transition: transform 0.2s; }
+
+  /* Partículas flutuantes */
+  #hero-particles { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+  .p-dot {
+    position:absolute;
+    border-radius:50%;
+    opacity:0;
+    animation: p-float linear infinite;
+  }
+  @keyframes p-float {
+    0%   { transform: translateY(0) scale(1);   opacity:0; }
+    10%  { opacity:var(--op); }
+    90%  { opacity:var(--op); }
+    100% { transform: translateY(-110vh) scale(0.6); opacity:0; }
+  }
 </style>
 </head>
 <body class="bg-offwhite font-body text-slate-800">
@@ -90,8 +105,9 @@
 <main class="pt-24">
 
 <!-- HERO -->
-<section class="max-w-7xl mx-auto px-6 py-12 md:py-24 grid md:grid-cols-2 gap-12 items-center hero-gradient">
-  <div class="space-y-8">
+<section class="relative max-w-7xl mx-auto px-6 py-12 md:py-24 grid md:grid-cols-2 gap-12 items-center hero-gradient">
+  <div id="hero-particles" aria-hidden="true"></div>
+  <div class="relative z-10 space-y-8">
     <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-violet-100 text-violet-700 text-sm font-bold border border-violet-200">
       <span class="material-symbols-outlined mr-2 text-lg" style="font-size:16px">star</span>
       Sua agenda, seu caixa, sua equipe — tudo num só lugar
@@ -123,7 +139,7 @@
   </div>
 
   <!-- Mockup agenda -->
-  <div class="relative">
+  <div class="relative z-10">
     <div class="absolute -inset-4 bg-violet-400/10 blur-3xl rounded-full"></div>
     <div class="relative bg-white p-6 rounded-[2rem] shadow-2xl border border-slate-100">
       <div class="flex items-center justify-between mb-6">
@@ -185,6 +201,25 @@
     </div>
   </div>
 </section>
+<script>
+(function(){
+  var c=document.getElementById('hero-particles');
+  if(!c)return;
+  var colors=['#a78bfa','#c4b5fd','#f0abfc','#7c3aed','#ddd6fe','#e879f9'];
+  for(var i=0;i<28;i++){
+    var d=document.createElement('div');
+    d.className='p-dot';
+    var sz=Math.random()*10+4;
+    var op=Math.round((Math.random()*0.25+0.07)*100)/100;
+    var dur=Math.random()*18+10;
+    var delay=-(Math.random()*20);
+    var left=Math.random()*100;
+    var col=colors[Math.floor(Math.random()*colors.length)];
+    d.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+left+'%;bottom:-60px;background:'+col+';--op:'+op+';animation-duration:'+dur+'s;animation-delay:'+delay+'s;';
+    c.appendChild(d);
+  }
+})();
+</script>
 
 <!-- STATS BAR -->
 <section class="bg-white py-12 border-y border-slate-100">
