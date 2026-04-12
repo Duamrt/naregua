@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04120701";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04120720";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Admin</title>
     <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04120701">
-  <link rel="stylesheet" href="css/layout.css?v=04120701">
-  <script src="js/theme.js?v=04120701"></script>
+  <link rel="stylesheet" href="css/style.css?v=04120720">
+  <link rel="stylesheet" href="css/layout.css?v=04120720">
+  <script src="js/theme.js?v=04120720"></script>
   <style>
     .admin-container { max-width:900px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -387,9 +387,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04120701"></script>
-<script src="js/supabase.js?v=04120701"></script>
-<script src="js/utils.js?v=04120701"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04120720"></script>
+<script src="js/supabase.js?v=04120720"></script>
+<script src="js/utils.js?v=04120720"></script>
 <script>
 // ── Config admin — só seu e-mail tem acesso ───────────────────
 // ADMIN_EMAILS centralizado em utils.js
@@ -672,7 +672,7 @@ function renderShops() {
       </div>
       <div class="shop-actions">
         <button class="shop-action-btn" style="border-color:var(--accent-border);color:var(--verde-acao);font-weight:700;" onclick="entrarComo('${esc(s.id)}')">Entrar como</button>
-        ${isTrial ? `<button class="shop-action-btn" style="border-color:#a78bfa;color:#a78bfa;font-weight:800;" onclick="ativarPlano('${esc(s.id)}','${esc(s.name)}')">Ativar plano</button>` : ''}
+        <button class="shop-action-btn" style="border-color:#a78bfa;color:#a78bfa;font-weight:800;" onclick="ativarPlano('${esc(s.id)}','${esc(s.name)}','${esc(s.plan||'trial')}','${esc(s.paid_until||'')}')">Plano</button>
         <button class="shop-action-btn" onclick="editarShop('${esc(s.id)}')">Editar</button>
         <button class="shop-action-btn" onclick="copiarLinkShop('${esc(s.slug)}')">Copiar link</button>
         <button class="shop-action-btn" onclick="window.open('${baseUrl}agendar.html?slug=${esc(s.slug)}','_blank')">Ver pagina</button>
@@ -735,16 +735,16 @@ function copiarLinkBarbeiro() {
 // ── Quick plan modal ──────────────────────────────────────────
 let _qplanDays = 30;
 
-function ativarPlano(shopId, shopName) {
+function ativarPlano(shopId, shopName, currentPlan, currentPaidUntil) {
   document.getElementById('qplan-shop-id').value = shopId;
-  document.getElementById('qplan-shop-name').textContent = shopName;
-  document.getElementById('qplan-plan').value = 'essencial';
+  document.getElementById('qplan-shop-name').textContent = shopName + (currentPlan && currentPlan !== 'trial' ? ' · plano atual: ' + currentPlan : ' · trial');
+  document.getElementById('qplan-plan').value = (currentPlan && currentPlan !== 'trial') ? currentPlan : 'essencial';
   _qplanDays = 30;
-  // Reset duração buttons
   document.querySelectorAll('.qplan-dur-btn').forEach((b,i) => b.classList.toggle('active', i===0));
-  // Default date = hoje + 30d
-  const d = new Date(); d.setDate(d.getDate() + 30);
-  document.getElementById('qplan-date').value = d.toISOString().split('T')[0];
+  // Se já tem paid_until, usar como base; senão hoje + 30d
+  const base = currentPaidUntil ? new Date(currentPaidUntil + 'T00:00:00') : new Date();
+  base.setDate(base.getDate() + 30);
+  document.getElementById('qplan-date').value = base.toISOString().split('T')[0];
   document.getElementById('qplan-msg').className = 'msg';
   document.getElementById('modal-qplan').classList.add('show');
 }
@@ -1229,8 +1229,8 @@ async function logout() {
   window.location.href = 'app.html';
 }
 </script>
-<script src="js/ajuda.js?v=04120701"></script>
-<script src="js/sw-update.js?v=04120701"></script>
-<script src="js/sidebar.js?v=04120701"></script>
+<script src="js/ajuda.js?v=04120720"></script>
+<script src="js/sw-update.js?v=04120720"></script>
+<script src="js/sidebar.js?v=04120720"></script>
 </body>
 </html>
