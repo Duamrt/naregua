@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04120654";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04120701";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Admin</title>
     <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04120654">
-  <link rel="stylesheet" href="css/layout.css?v=04120654">
-  <script src="js/theme.js?v=04120654"></script>
+  <link rel="stylesheet" href="css/style.css?v=04120701">
+  <link rel="stylesheet" href="css/layout.css?v=04120701">
+  <script src="js/theme.js?v=04120701"></script>
   <style>
     .admin-container { max-width:900px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -154,6 +154,23 @@
     }
     .adm-filter.active { border-color:var(--verde-acao); color:var(--verde-acao); background:var(--accent-soft); }
 
+    /* Quick plan modal */
+    .qplan-modal {
+      background:var(--cinza-escuro); border:1px solid var(--borda);
+      border-radius:12px; width:100%; max-width:360px; padding:20px;
+      animation:fadeUp 0.25s ease;
+    }
+    .qplan-dur { display:flex; gap:6px; flex-wrap:wrap; margin:10px 0; }
+    .qplan-dur-btn {
+      padding:8px 14px; border-radius:8px; font-size:12px; font-weight:700;
+      font-family:inherit; cursor:pointer; border:1px solid var(--borda);
+      background:transparent; color:var(--texto-muted); transition:all .2s;
+    }
+    .qplan-dur-btn.active { border-color:var(--verde-acao); background:var(--accent-soft); color:var(--verde-acao); }
+    .trial-urgent { background:rgba(231,76,60,0.15); color:#e74c3c; }
+    .trial-warn   { background:rgba(243,156,18,0.15); color:#f39c12; }
+    .trial-ok     { background:rgba(167,139,250,0.12); color:#a78bfa; }
+
     /* Feature flags */
     .feat-toggle {
       padding:7px 14px; border-radius:8px; font-size:11px; font-weight:700;
@@ -194,6 +211,7 @@
     <input type="text" id="admin-search" placeholder="Buscar por nome, cidade ou email..." oninput="renderShops()" style="flex:1;min-width:180px;padding:8px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-family:inherit;font-size:13px;">
     <div style="display:flex;gap:4px;flex-wrap:wrap;">
       <button class="adm-filter active" onclick="setAdmFilter(this,'todas')">Todas</button>
+      <button class="adm-filter" onclick="setAdmFilter(this,'trial')">Trial</button>
       <button class="adm-filter" onclick="setAdmFilter(this,'ativas')">Ativas</button>
       <button class="adm-filter" onclick="setAdmFilter(this,'inadimplentes')">Vencidas</button>
       <button class="adm-filter" onclick="setAdmFilter(this,'seminfo')">Sem info</button>
@@ -333,9 +351,45 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04120654"></script>
-<script src="js/supabase.js?v=04120654"></script>
-<script src="js/utils.js?v=04120654"></script>
+<!-- Modal ativação rápida de plano -->
+<div class="modal-overlay" id="modal-qplan">
+  <div class="qplan-modal">
+    <div class="modal-title">
+      <h2 style="font-size:15px;">Ativar plano</h2>
+      <button class="modal-close" onclick="document.getElementById('modal-qplan').classList.remove('show')">✕</button>
+    </div>
+    <input type="hidden" id="qplan-shop-id">
+    <div style="font-size:12px;color:var(--texto-muted);margin-bottom:12px;" id="qplan-shop-name"></div>
+    <div class="field" style="margin-bottom:10px;">
+      <label>PLANO</label>
+      <select id="qplan-plan" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;">
+        <option value="essencial">Essencial — R$49,90/mês</option>
+        <option value="studio">Studio — R$89,90/mês</option>
+        <option value="master">Master — R$129,90/mês</option>
+      </select>
+    </div>
+    <label style="font-size:10px;color:var(--texto-muted);font-weight:700;letter-spacing:1px;">DURAÇÃO</label>
+    <div class="qplan-dur" id="qplan-dur-btns">
+      <button class="qplan-dur-btn active" onclick="setQplanDur(this,30)">30 dias</button>
+      <button class="qplan-dur-btn" onclick="setQplanDur(this,90)">3 meses</button>
+      <button class="qplan-dur-btn" onclick="setQplanDur(this,180)">6 meses</button>
+      <button class="qplan-dur-btn" onclick="setQplanDur(this,365)">1 ano</button>
+    </div>
+    <div class="field" style="margin-bottom:16px;">
+      <label>OU ESCOLHA DATA FINAL</label>
+      <input type="date" id="qplan-date" oninput="clearQplanDurBtns()" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;">
+    </div>
+    <div id="qplan-msg" class="msg"></div>
+    <button class="btn btn-primary" onclick="salvarPlanoRapido()" id="btn-qplan-save" style="margin-top:4px;">
+      <span class="btn-label">ATIVAR PLANO</span>
+      <div class="spinner" style="display:none;"></div>
+    </button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04120701"></script>
+<script src="js/supabase.js?v=04120701"></script>
+<script src="js/utils.js?v=04120701"></script>
 <script>
 // ── Config admin — só seu e-mail tem acesso ───────────────────
 // ADMIN_EMAILS centralizado em utils.js
@@ -490,13 +544,15 @@ function renderGlobalStats() {
   }, 0);
 
   const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const ativas = allShops.filter(s => s.paid_until && new Date(s.paid_until + 'T00:00:00') >= hoje);
+  const ativas = allShops.filter(s => s.paid_until && new Date(s.paid_until + 'T00:00:00') >= hoje && s.plan !== 'trial');
+  const trials = allShops.filter(s => !s.plan || s.plan === 'trial');
   const inadimplentes = allShops.filter(s => s.paid_until && new Date(s.paid_until + 'T00:00:00') < hoje);
-  const mrr = ativas.reduce((sum, s) => sum + (PLAN_PRICE[s.plan] || 29.90), 0);
+  const mrr = ativas.reduce((sum, s) => sum + (PLAN_PRICE[s.plan] || 0), 0);
 
   document.getElementById('global-stats').innerHTML = `
     <div class="g-stat"><div class="g-stat-num" style="color:var(--verde-acao);">${totalShops}</div><div class="g-stat-label">CLIENTES</div></div>
     <div class="g-stat"><div class="g-stat-num" style="color:#22c55e;">${ativas.length}</div><div class="g-stat-label">ATIVAS</div></div>
+    <div class="g-stat" style="cursor:pointer;" onclick="document.querySelector('.adm-filter[onclick*=trial]').click()"><div class="g-stat-num" style="color:#a78bfa;">${trials.length}</div><div class="g-stat-label">TRIAL</div></div>
     <div class="g-stat"><div class="g-stat-num" style="color:#e74c3c;">${inadimplentes.length}</div><div class="g-stat-label">VENCIDAS</div></div>
     <div class="g-stat"><div class="g-stat-num" style="color:#a78bfa;">${formatMoney(mrr)}</div><div class="g-stat-label">MRR</div></div>
     <div class="g-stat"><div class="g-stat-num" style="color:var(--texto-principal);">${totalBarbers}</div><div class="g-stat-label">PROFISSIONAIS</div></div>
@@ -520,7 +576,8 @@ function renderShops() {
   const hoje = new Date(); hoje.setHours(0,0,0,0);
 
   let filtered = allShops;
-  if (_admFilter === 'ativas') filtered = filtered.filter(s => s.paid_until && new Date(s.paid_until + 'T00:00:00') >= hoje);
+  if (_admFilter === 'trial') filtered = filtered.filter(s => !s.plan || s.plan === 'trial');
+  else if (_admFilter === 'ativas') filtered = filtered.filter(s => s.paid_until && new Date(s.paid_until + 'T00:00:00') >= hoje && s.plan !== 'trial');
   else if (_admFilter === 'inadimplentes') filtered = filtered.filter(s => s.paid_until && new Date(s.paid_until + 'T00:00:00') < hoje);
   else if (_admFilter === 'seminfo') filtered = filtered.filter(s => !s.paid_until);
   if (q) filtered = filtered.filter(s =>
@@ -550,11 +607,30 @@ function renderShops() {
 
     // Mensalidade
     let mensBadge = '';
-    if (s.paid_until) {
-      const hoje = new Date();
-      hoje.setHours(0,0,0,0);
+    const isTrial = !s.plan || s.plan === 'trial';
+    if (isTrial) {
+      // Calcular dias de trial restantes
+      let trialExp = s.plan_expires_at || s.paid_until;
+      if (!trialExp && s.trial_started_at) {
+        trialExp = new Date(new Date(s.trial_started_at).getTime() + 30*24*60*60*1000).toISOString();
+      } else if (!trialExp) {
+        trialExp = new Date(new Date(s.created_at || Date.now()).getTime() + 30*24*60*60*1000).toISOString();
+      }
+      const trialMs = new Date(trialExp).getTime() - Date.now();
+      const trialDays = Math.max(0, Math.ceil(trialMs / 86400000));
+      if (trialDays <= 0) {
+        mensBadge = `<span class="shop-plan trial-urgent" style="font-size:9px;padding:3px 8px;border-radius:12px;">TRIAL EXPIRADO</span>`;
+      } else if (trialDays <= 5) {
+        mensBadge = `<span class="shop-plan trial-urgent" style="font-size:9px;padding:3px 8px;border-radius:12px;">TRIAL ${trialDays}d restante${trialDays!==1?'s':''}</span>`;
+      } else if (trialDays <= 15) {
+        mensBadge = `<span class="shop-plan trial-warn" style="font-size:9px;padding:3px 8px;border-radius:12px;">TRIAL ${trialDays}d restante${trialDays!==1?'s':''}</span>`;
+      } else {
+        mensBadge = `<span class="shop-plan trial-ok" style="font-size:9px;padding:3px 8px;border-radius:12px;">TRIAL ${trialDays}d restante${trialDays!==1?'s':''}</span>`;
+      }
+    } else if (s.paid_until) {
+      const hoje2 = new Date(); hoje2.setHours(0,0,0,0);
       const pago = new Date(s.paid_until + 'T00:00:00');
-      const diff = Math.ceil((pago - hoje) / 86400000);
+      const diff = Math.ceil((pago - hoje2) / 86400000);
       if (diff < 0) {
         mensBadge = `<span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:12px;background:rgba(231,76,60,0.15);color:#e74c3c;">VENCIDO ${Math.abs(diff)}d</span>`;
       } else if (diff <= 7) {
@@ -596,6 +672,7 @@ function renderShops() {
       </div>
       <div class="shop-actions">
         <button class="shop-action-btn" style="border-color:var(--accent-border);color:var(--verde-acao);font-weight:700;" onclick="entrarComo('${esc(s.id)}')">Entrar como</button>
+        ${isTrial ? `<button class="shop-action-btn" style="border-color:#a78bfa;color:#a78bfa;font-weight:800;" onclick="ativarPlano('${esc(s.id)}','${esc(s.name)}')">Ativar plano</button>` : ''}
         <button class="shop-action-btn" onclick="editarShop('${esc(s.id)}')">Editar</button>
         <button class="shop-action-btn" onclick="copiarLinkShop('${esc(s.slug)}')">Copiar link</button>
         <button class="shop-action-btn" onclick="window.open('${baseUrl}agendar.html?slug=${esc(s.slug)}','_blank')">Ver pagina</button>
@@ -653,6 +730,71 @@ function copiarLinkBarbeiro() {
   const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
   navigator.clipboard.writeText(baseUrl + 'barbeiro-cadastro.html');
   alert('Link copiado! Envie pro profissional: ' + baseUrl + 'barbeiro-cadastro.html');
+}
+
+// ── Quick plan modal ──────────────────────────────────────────
+let _qplanDays = 30;
+
+function ativarPlano(shopId, shopName) {
+  document.getElementById('qplan-shop-id').value = shopId;
+  document.getElementById('qplan-shop-name').textContent = shopName;
+  document.getElementById('qplan-plan').value = 'essencial';
+  _qplanDays = 30;
+  // Reset duração buttons
+  document.querySelectorAll('.qplan-dur-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  // Default date = hoje + 30d
+  const d = new Date(); d.setDate(d.getDate() + 30);
+  document.getElementById('qplan-date').value = d.toISOString().split('T')[0];
+  document.getElementById('qplan-msg').className = 'msg';
+  document.getElementById('modal-qplan').classList.add('show');
+}
+
+function setQplanDur(btn, days) {
+  _qplanDays = days;
+  document.querySelectorAll('.qplan-dur-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const d = new Date(); d.setDate(d.getDate() + days);
+  document.getElementById('qplan-date').value = d.toISOString().split('T')[0];
+}
+
+function clearQplanDurBtns() {
+  document.querySelectorAll('.qplan-dur-btn').forEach(b => b.classList.remove('active'));
+  _qplanDays = null;
+}
+
+async function salvarPlanoRapido() {
+  const btn = document.getElementById('btn-qplan-save');
+  const shopId = document.getElementById('qplan-shop-id').value;
+  const plan = document.getElementById('qplan-plan').value;
+  const dateVal = document.getElementById('qplan-date').value;
+  if (!dateVal) {
+    document.getElementById('qplan-msg').className = 'msg error';
+    document.getElementById('qplan-msg').textContent = 'Escolha a data de validade.';
+    return;
+  }
+  btn.disabled = true;
+  btn.querySelector('.btn-label').style.display = 'none';
+  btn.querySelector('.spinner').style.display = 'inline-block';
+
+  const planExpiresAt = dateVal + 'T23:59:59Z';
+  const { error } = await sb.from('barbershops').update({
+    plan,
+    paid_until: dateVal,
+    plan_expires_at: planExpiresAt
+  }).eq('id', shopId);
+
+  btn.disabled = false;
+  btn.querySelector('.btn-label').style.display = '';
+  btn.querySelector('.spinner').style.display = 'none';
+
+  if (error) {
+    document.getElementById('qplan-msg').className = 'msg error';
+    document.getElementById('qplan-msg').textContent = 'Erro: ' + error.message;
+    return;
+  }
+
+  document.getElementById('modal-qplan').classList.remove('show');
+  await loadAll();
 }
 
 function copiarLinkShop(slug) {
@@ -1087,8 +1229,8 @@ async function logout() {
   window.location.href = 'app.html';
 }
 </script>
-<script src="js/ajuda.js?v=04120654"></script>
-<script src="js/sw-update.js?v=04120654"></script>
-<script src="js/sidebar.js?v=04120654"></script>
+<script src="js/ajuda.js?v=04120701"></script>
+<script src="js/sw-update.js?v=04120701"></script>
+<script src="js/sidebar.js?v=04120701"></script>
 </body>
 </html>
