@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04120649";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04120654";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Admin</title>
     <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04120649">
-  <link rel="stylesheet" href="css/layout.css?v=04120649">
-  <script src="js/theme.js?v=04120649"></script>
+  <link rel="stylesheet" href="css/style.css?v=04120654">
+  <link rel="stylesheet" href="css/layout.css?v=04120654">
+  <script src="js/theme.js?v=04120654"></script>
   <style>
     .admin-container { max-width:900px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -56,9 +56,10 @@
       font-size:9px; font-weight:700; letter-spacing:0.5px; padding:4px 10px;
       border-radius:20px; text-transform:uppercase;
     }
-    .plan-basico { background: var(--accent-soft); color:var(--accent); }
-    .plan-profissional { background:rgba(52,152,219,0.15); color:#3498db; }
-    .plan-premium { background:rgba(243,156,18,0.15); color:#f39c12; }
+    .plan-trial { background:var(--accent-soft); color:var(--accent); }
+    .plan-essencial { background:rgba(124,58,237,0.12); color:#7c3aed; }
+    .plan-studio { background:rgba(52,152,219,0.15); color:#3498db; }
+    .plan-master { background:rgba(243,156,18,0.15); color:#f39c12; }
 
     .shop-meta { font-size:12px; color:var(--texto-muted); margin-bottom:8px; }
     .shop-stats { display:flex; gap:16px; font-size:12px; }
@@ -264,9 +265,10 @@
       <div class="field">
         <label>PLANO</label>
         <select id="adm-plan" style="width:100%;padding:10px 12px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:13px;font-family:inherit;">
-          <option value="basico">Básico</option>
-          <option value="profissional">Profissional</option>
-          <option value="premium">Premium</option>
+          <option value="trial">Trial</option>
+          <option value="essencial">Essencial</option>
+          <option value="studio">Studio</option>
+          <option value="master">Master</option>
         </select>
       </div>
       <div class="field">
@@ -331,9 +333,9 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04120649"></script>
-<script src="js/supabase.js?v=04120649"></script>
-<script src="js/utils.js?v=04120649"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04120654"></script>
+<script src="js/supabase.js?v=04120654"></script>
+<script src="js/utils.js?v=04120654"></script>
 <script>
 // ── Config admin — só seu e-mail tem acesso ───────────────────
 // ADMIN_EMAILS centralizado em utils.js
@@ -351,7 +353,7 @@ let editPayments = [];
 let editFeatures = {};
 let _admFilter = 'todas';
 const PAY_OPTIONS = ['dinheiro', 'pix', 'credito', 'debito'];
-const PLAN_PRICE = { basico: 29.90, profissional: 49.90, premium: 79.90 };
+const PLAN_PRICE = { essencial: 49.90, studio: 89.90, master: 129.90 };
 const FEATURES_DEF = [
   { key: 'comandas',           label: 'Comandas' },
   { key: 'estoque',            label: 'Estoque' },
@@ -543,7 +545,7 @@ function renderShops() {
       return sum + valor;
     }, 0);
 
-    const planCls = s.plan === 'premium' ? 'plan-premium' : s.plan === 'profissional' ? 'plan-profissional' : 'plan-basico';
+    const planCls = 'plan-' + (s.plan || 'trial');
     const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
 
     // Mensalidade
@@ -571,7 +573,7 @@ function renderShops() {
           <div class="shop-slug">${s.slug}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-          <span class="shop-plan ${planCls}">${s.plan || 'basico'}</span>
+          <span class="shop-plan ${planCls}">${s.plan || 'trial'}</span>
           ${mensBadge}
         </div>
       </div>
@@ -675,7 +677,7 @@ function editarShop(id) {
   document.getElementById('adm-instagram').value = s.instagram || '';
   editPayments = [...(s.payment_methods || ['dinheiro', 'pix'])];
   renderAdmPayments();
-  document.getElementById('adm-plan').value = s.plan || 'basico';
+  document.getElementById('adm-plan').value = s.plan || 'trial';
   document.getElementById('adm-paid-until').value = s.paid_until || '';
   document.getElementById('adm-open').value = s.opening_time || '08:00';
   document.getElementById('adm-close').value = s.closing_time || '19:00';
@@ -711,7 +713,7 @@ function abrirNovaShop() {
   document.getElementById('adm-instagram').value = '';
   editPayments = ['dinheiro', 'pix'];
   renderAdmPayments();
-  document.getElementById('adm-plan').value = 'basico';
+  document.getElementById('adm-plan').value = 'trial';
   // Pago até: 30 dias a partir de hoje (trial)
   const trial = new Date(); trial.setDate(trial.getDate() + 30);
   document.getElementById('adm-paid-until').value = trial.toISOString().split('T')[0];
@@ -824,6 +826,8 @@ async function salvarAdmin() {
   const businessType = document.getElementById('adm-type').value;
   const plan = document.getElementById('adm-plan').value;
   const paidUntil = document.getElementById('adm-paid-until').value || null;
+  // plan_expires_at = mesmo valor que paid_until mas no formato ISO (lido pelo plan-guard.js)
+  const planExpiresAt = paidUntil ? paidUntil + 'T23:59:59Z' : null;
   const opening = document.getElementById('adm-open').value;
   const closing = document.getElementById('adm-close').value;
   let slug = gerarSlug(name);
@@ -862,8 +866,8 @@ async function salvarAdmin() {
       // Atualizar barbearia
       const { error } = await sb.from('barbershops').update({
         name, slug, city, phone, address, instagram, payment_methods: editPayments,
-        business_type: businessType, plan, paid_until: paidUntil, opening_time: opening, closing_time: closing, days_open: editDays,
-        features: editFeatures
+        business_type: businessType, plan, paid_until: paidUntil, plan_expires_at: planExpiresAt,
+        opening_time: opening, closing_time: closing, days_open: editDays, features: editFeatures
       }).eq('id', editId);
       if (error) throw error;
 
@@ -894,8 +898,8 @@ async function salvarAdmin() {
       const { data, error } = await sb.from('barbershops').insert({
         owner_id: ownerId, name, slug, city, phone, address, instagram,
         payment_methods: editPayments, business_type: businessType, plan, paid_until: paidUntil,
-        opening_time: opening, closing_time: closing, days_open: editDays,
-        owner_password_hint: ownerPassword, features: editFeatures
+        plan_expires_at: planExpiresAt, opening_time: opening, closing_time: closing,
+        days_open: editDays, owner_password_hint: ownerPassword, features: editFeatures
       }).select().single();
       if (error) throw error;
       shopId = data.id;
@@ -1083,8 +1087,8 @@ async function logout() {
   window.location.href = 'app.html';
 }
 </script>
-<script src="js/ajuda.js?v=04120649"></script>
-<script src="js/sw-update.js?v=04120649"></script>
-<script src="js/sidebar.js?v=04120649"></script>
+<script src="js/ajuda.js?v=04120654"></script>
+<script src="js/sw-update.js?v=04120654"></script>
+<script src="js/sidebar.js?v=04120654"></script>
 </body>
 </html>
