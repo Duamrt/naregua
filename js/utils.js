@@ -62,6 +62,26 @@ function normServico(nome) {
     });
 }
 
+// ── ESC fecha modal aberto ──────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Escape') return;
+  var overlays = document.querySelectorAll('.modal-overlay, .modal');
+  var topModal = null;
+  for (var i = overlays.length - 1; i >= 0; i--) {
+    var el = overlays[i];
+    var cs = window.getComputedStyle(el);
+    if (cs.display !== 'none' && cs.visibility !== 'hidden' && el.offsetParent !== null) {
+      topModal = el;
+      break;
+    }
+  }
+  if (!topModal) return;
+  var closeBtn = topModal.querySelector('.modal-close, [data-modal-close], .btn-close');
+  if (closeBtn) { closeBtn.click(); return; }
+  topModal.classList.remove('show', 'active');
+  topModal.style.display = 'none';
+});
+
 // ── Google Analytics 4 ──────────────────────────────────────
 (function() {
   var GA_ID = 'G-FH9DRF8LBR';
