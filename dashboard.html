@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>const _NR_VER="naregua-04201435";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
+  <script>const _NR_VER="naregua-04201437";console.log("%c NaRegua %c "+_NR_VER+" ","background:#2d1b69;color:#a78bfa;font-weight:700;padding:3px 7px;border-radius:3px 0 0 3px;border:1px solid #a78bfa","background:#a78bfa;color:#2d1b69;font-weight:700;padding:3px 7px;border-radius:0 3px 3px 0");</script>
   <title>NaRegua — Dashboard</title>
     <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000000">
@@ -14,9 +14,9 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=04201435">
-  <link rel="stylesheet" href="css/layout.css?v=04201435">
-  <script src="js/theme.js?v=04201435"></script>
+  <link rel="stylesheet" href="css/style.css?v=04201437">
+  <link rel="stylesheet" href="css/layout.css?v=04201437">
+  <script src="js/theme.js?v=04201437"></script>
   <style>
     .dash-container { max-width:480px; width:100%; margin:0 auto; padding:16px; min-height:100dvh; }
 
@@ -752,7 +752,8 @@
     </div>
     <div class="field">
       <label>SERVIÇO *</label>
-      <select id="enc-service" style="width:100%;padding:10px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;"></select>
+      <input type="text" id="enc-service-input" list="enc-service-list" placeholder="Buscar serviço..." autocomplete="off" style="width:100%;padding:10px;background:var(--cinza-medio);border:1px solid var(--borda);border-radius:8px;color:var(--texto-principal);font-size:14px;font-family:inherit;box-sizing:border-box;">
+      <datalist id="enc-service-list"></datalist>
     </div>
     <div class="field">
       <label>HORARIO</label>
@@ -817,10 +818,10 @@ function toggleMore(){var m=document.getElementById('more-menu');m.style.display
 document.addEventListener('click',function(e){if(!e.target.closest('#more-menu')&&!e.target.closest('#btn-more')){document.getElementById('more-menu').style.display='none';}});
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04201435"></script>
-<script src="js/supabase.js?v=04201435"></script>
-<script src="js/utils.js?v=04201435"></script>
-<script src="js/push.js?v=04201435"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js?v=04201437"></script>
+<script src="js/supabase.js?v=04201437"></script>
+<script src="js/utils.js?v=04201437"></script>
+<script src="js/push.js?v=04201437"></script>
 <script>
 console.log('Dashboard v3 carregado');
 // ── Estado ────────────────────────────────────────────────────
@@ -2541,10 +2542,11 @@ function abrirEncaixe() {
     '<option value="' + b.id + '">' + esc(b.name) + '</option>'
   ).join('');
 
-  const selService = document.getElementById('enc-service');
-  selService.innerHTML = services.filter(s => s.active !== false).map(s =>
-    '<option value="' + s.id + '">' + esc(s.name) + ' (' + formatMoney(s.price) + ')</option>'
-  ).join('');
+  const _encSorted = services.filter(s => s.active !== false).sort((a,b) => a.name.localeCompare(b.name, 'pt-BR'));
+  window._encServices = _encSorted;
+  const dl = document.getElementById('enc-service-list');
+  dl.innerHTML = _encSorted.map(s => '<option value="' + esc(s.name) + ' (' + formatMoney(s.price) + ')">').join('');
+  document.getElementById('enc-service-input').value = '';
 
   document.getElementById('enc-time').value = '';
   document.getElementById('enc-name').value = '';
@@ -2560,7 +2562,9 @@ function fecharEncaixe() {
 async function salvarEncaixe() {
   const btn = document.getElementById('btn-encaixe');
   const barberId = document.getElementById('enc-barber').value;
-  const serviceId = document.getElementById('enc-service').value;
+  const _inputVal = document.getElementById('enc-service-input').value.trim();
+  const _svcMatch = (window._encServices || []).find(s => (s.name + ' (' + formatMoney(s.price) + ')') === _inputVal || s.name.toLowerCase() === _inputVal.toLowerCase());
+  const serviceId = _svcMatch ? _svcMatch.id : '';
   const nome = document.getElementById('enc-name').value.trim() || 'Cliente avulso';
   const phone = document.getElementById('enc-phone').value.trim();
 
@@ -2922,9 +2926,9 @@ function selectCalDay(dateKey) {
   renderDay();
 }
 </script>
-<script src="js/ajuda.js?v=04201435"></script>
-<script src="js/tour.js?v=04201435"></script>
-<script src="js/sw-update.js?v=04201435"></script>
-<script src="js/sidebar.js?v=04201435"></script>
+<script src="js/ajuda.js?v=04201437"></script>
+<script src="js/tour.js?v=04201437"></script>
+<script src="js/sw-update.js?v=04201437"></script>
+<script src="js/sidebar.js?v=04201437"></script>
 </body>
 </html>
