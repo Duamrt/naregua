@@ -47,3 +47,8 @@ Básico R$29,90 | Pro R$49,90 | Premium R$79,90
 - Testar com `node -c js/*.js` antes de subir
 - Não criar arquivos desnecessários
 - Commitar com frequência em progresso significativo
+
+## Início de sessão
+Ao iniciar qualquer sessão neste repo, leia primeiro:
+`G:/DUAM - ECOSISTEMA/DUAM - ECOSISTEMA/05_NA REGUA/_CONTEXTO_MESTRE.md`
+Esse arquivo tem: estado atual, pendências priorizadas, bugs abertos, próxima task.
